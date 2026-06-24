@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>DeepChat · Белый</title>
+    <title>DeepChat</title>
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -11,11 +11,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
-        /* ===== ГЛОБАЛЬНО ===== */
+        /* ===== БАЗА ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #ffffff;
-            color: #222222;
+            color: #222;
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
             height: 100vh;
             overflow: hidden;
@@ -24,7 +24,7 @@
         /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
         .app { display: flex; height: 100vh; width: 100%; background: #ffffff; }
 
-        /* ===== САЙДБАР (МЕНЮ СЛЕВА) ===== */
+        /* ===== САЙДБАР ===== */
         .sidebar {
             position: fixed;
             top: 0;
@@ -32,12 +32,12 @@
             width: 280px;
             height: 100vh;
             background: #ffffff;
-            border-right: 1px solid #e0e0e0;
+            border-right: 2px solid #e8e8e8;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             overflow-y: auto;
             padding: 16px 12px;
-            box-shadow: 4px 0 30px rgba(0,0,0,0.08);
+            box-shadow: 4px 0 30px rgba(0,0,0,0.06);
         }
         .sidebar.open { left: 0; }
 
@@ -49,18 +49,8 @@
             border-bottom: 2px solid #f0f0f0;
             margin-bottom: 12px;
         }
-        .sidebar .head h2 {
-            font-size: 1rem;
-            color: #1877f2;
-            font-weight: 700;
-        }
-        .sidebar .head .close {
-            background: none;
-            border: none;
-            color: #999;
-            font-size: 1.4rem;
-            cursor: pointer;
-        }
+        .sidebar .head h2 { font-size: 1rem; color: #1877f2; font-weight: 700; }
+        .sidebar .head .close { background: none; border: none; color: #999; font-size: 1.4rem; cursor: pointer; }
         .sidebar .head .close:hover { color: #222; }
 
         .sidebar .user {
@@ -74,26 +64,44 @@
             border: 1px solid #e8e8e8;
         }
         .sidebar .user .avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
+            width: 34px; height: 34px; border-radius: 50%;
             background: #1877f2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #fff;
-            font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: #fff; font-size: 0.85rem;
         }
         .sidebar .user .name { font-weight: 600; font-size: 0.85rem; color: #222; }
         .sidebar .user .status { font-size: 0.6rem; color: #999; }
 
+        .sidebar .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #555;
+            border: 1px solid transparent;
+            transition: all 0.15s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .sidebar .nav-item:hover { background: #f0f0f0; border-color: #e0e0e0; color: #222; }
+        .sidebar .nav-item.active { background: #e8f0fe; border-color: #1877f2; color: #1877f2; }
+
+        .sidebar .rooms-title {
+            color: #999;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 4px 4px;
+        }
         .sidebar .rooms { display: flex; flex-direction: column; gap: 2px; }
         .sidebar .rooms .room {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 8px 12px;
+            padding: 7px 12px;
             border-radius: 8px;
             cursor: pointer;
             color: #555;
@@ -101,17 +109,8 @@
             transition: all 0.15s;
             font-size: 0.85rem;
         }
-        .sidebar .rooms .room:hover {
-            background: #f0f0f0;
-            border-color: #e0e0e0;
-            color: #222;
-        }
-        .sidebar .rooms .room.active {
-            background: #e8f0fe;
-            border-color: #1877f2;
-            color: #1877f2;
-            font-weight: 500;
-        }
+        .sidebar .rooms .room:hover { background: #f0f0f0; border-color: #e0e0e0; color: #222; }
+        .sidebar .rooms .room.active { background: #e8f0fe; border-color: #1877f2; color: #1877f2; font-weight: 500; }
         .sidebar .rooms .room .count {
             margin-left: auto;
             font-size: 0.6rem;
@@ -193,46 +192,14 @@
             padding: 0;
         }
 
-        /* ===== ГЛАВНАЯ СТРАНИЦА ===== */
-        .home {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 40px 20px;
-            text-align: center;
-            background: #ffffff;
-        }
-        .home .icon { font-size: 4rem; margin-bottom: 16px; }
-        .home .title { font-size: 2rem; font-weight: 800; color: #222; margin-bottom: 8px; }
-        .home .title span { color: #1877f2; }
-        .home .sub { font-size: 0.95rem; color: #888; max-width: 400px; line-height: 1.6; }
-        .home .rooms-list { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .home .rooms-list .room-btn {
-            background: #f5f5f5;
-            border: 1px solid #e8e8e8;
-            border-radius: 12px;
-            padding: 10px 20px;
-            color: #222;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.85rem;
-        }
-        .home .rooms-list .room-btn:hover {
-            border-color: #1877f2;
-            background: #e8f0fe;
-        }
-        .home .empty { color: #bbb; font-size: 0.9rem; margin-top: 12px; }
-
         /* ===== ЛЕНТА ===== */
         .feed {
-            display: none;
+            display: block;
             padding: 14px;
             max-width: 800px;
             margin: 0 auto;
         }
-        .feed.show { display: block; }
+        .feed.hidden { display: none; }
 
         .feed .post-form {
             background: #f8f8f8;
@@ -326,7 +293,7 @@
         }
         .feed .post .author { color: #e67e22; font-weight: 700; }
         .feed .post .time { color: #999; font-size: 0.6rem; margin-left: 6px; }
-        .feed .post .text { color: #222; margin: 6px 0; }
+        .feed .post .text { color: #222; margin: 6px 0; line-height: 1.5; }
         .feed .post .btn-link {
             display: inline-block;
             background: #e67e22;
@@ -367,11 +334,12 @@
             background: #f0f0f0;
             border: 1px solid #ddd;
             color: #1877f2;
-            padding: 2px 14px;
+            padding: 3px 16px;
             border-radius: 40px;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             cursor: pointer;
             margin-top: 6px;
+            font-weight: 500;
         }
         .feed .post .discuss:hover { background: #e5e5e5; }
 
@@ -695,7 +663,6 @@
         }
         .admin-dot:hover { transform: scale(1.3); }
         .admin-dot.active { background: #e67e22; border-color: #e67e22; }
-        .admin-dot.room-dot.active { background: #e74c3c; border-color: #e74c3c; }
 
         /* ===== СКРОЛЛ ===== */
         ::-webkit-scrollbar { width: 4px; }
@@ -711,7 +678,7 @@
 <!-- ===== САЙДБАР ===== -->
 <div class="sidebar" id="sidebar">
     <div class="head">
-        <h2>💬 Комнаты</h2>
+        <h2>📱 Меню</h2>
         <button class="close" onclick="closeSidebar()">✕</button>
     </div>
     <div class="user">
@@ -721,9 +688,16 @@
             <div class="status" id="userStatus">онлайн</div>
         </div>
     </div>
+
+    <!-- Навигация -->
+    <div class="nav-item active" id="navFeed" onclick="goFeed()">📰 Лента</div>
+    <div class="nav-item" id="navRooms" onclick="goRooms()">💬 Комнаты</div>
+
+    <div class="rooms-title">📋 Комнаты</div>
     <div class="rooms" id="roomList">
-        <div style="text-align:center;color:#bbb;padding:16px;font-size:0.8rem;">Загрузка...</div>
+        <div style="text-align:center;color:#bbb;padding:12px;font-size:0.8rem;">Загрузка...</div>
     </div>
+
     <div class="footer">
         <button class="create-btn" id="createBtn" onclick="openCreateRoom()">➕ Создать комнату</button>
     </div>
@@ -734,7 +708,7 @@
     <!-- Топбар -->
     <div class="topbar">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <div class="title" onclick="goHome()">Deep<span>Chat</span></div>
+        <div class="title" onclick="goFeed()">Deep<span>Chat</span></div>
         <div class="right">
             <span class="user" id="topUser" onclick="openChangeName()">👤 Гость</span>
         </div>
@@ -742,14 +716,6 @@
 
     <!-- Контент -->
     <div class="content" id="content">
-        <!-- ГЛАВНАЯ -->
-        <div class="home" id="homePage">
-            <div class="icon">💬</div>
-            <div class="title">Deep<span>Chat</span></div>
-            <div class="sub">Выберите комнату из меню слева или создайте новую</div>
-            <div class="rooms-list" id="homeRooms"></div>
-        </div>
-
         <!-- ЛЕНТА -->
         <div class="feed" id="feedSection">
             <div class="post-form" id="feedForm">
@@ -891,6 +857,7 @@
     let FEED_EDIT_ID = null;
     let CHAT_EDIT_ID = null;
     let chatUnsub = null;
+    let currentTab = 'feed';
 
     // ================================================================
     // AUTH
@@ -943,7 +910,6 @@
         const n = document.getElementById('changeNameInput').value.trim();
         if (!n) { alert('Введите имя или войдите через Google'); return; }
         
-        // Если пользователь не залогинен через Google, создаём анонимного
         if (!USER_UID) {
             auth.signInAnonymously().then(() => {
                 USER = n.slice(0,24);
@@ -1035,34 +1001,28 @@
     };
 
     // ================================================================
-    // ГЛАВНАЯ
+    // НАВИГАЦИЯ
     // ================================================================
-    window.goHome = function() {
-        CUR_ROOM = '';
-        document.getElementById('homePage').style.display = 'flex';
-        document.getElementById('feedSection').classList.remove('show');
+    window.goFeed = function() {
+        currentTab = 'feed';
+        document.getElementById('feedSection').classList.remove('hidden');
         document.getElementById('chatSection').classList.remove('show');
+        document.getElementById('navFeed').classList.add('active');
+        document.getElementById('navRooms').classList.remove('active');
+        CUR_ROOM = '';
         closeSidebar();
-        updateHomeRooms();
     };
 
-    function updateHomeRooms() {
-        const container = document.getElementById('homeRooms');
-        db.ref('sites/'+SITE+'/rooms').once('value', snap => {
-            const data = snap.val() || {};
-            const keys = Object.keys(data);
-            if (keys.length === 0) {
-                container.innerHTML = '<div class="empty">Нет комнат. Создайте первую!</div>';
-                return;
-            }
-            let html = '';
-            keys.forEach(key => {
-                const room = data[key];
-                html += `<div class="room-btn" onclick="openRoom('${key}','${room.name || 'Без названия'}')"># ${room.name || 'Без названия'}</div>`;
-            });
-            container.innerHTML = html;
-        });
-    }
+    window.goRooms = function() {
+        currentTab = 'rooms';
+        document.getElementById('feedSection').classList.add('hidden');
+        document.getElementById('chatSection').classList.remove('show');
+        document.getElementById('navRooms').classList.add('active');
+        document.getElementById('navFeed').classList.remove('active');
+        closeSidebar();
+        // Показываем список комнат в сайдбаре
+        loadRooms();
+    };
 
     // ================================================================
     // КОМНАТЫ
@@ -1073,7 +1033,7 @@
             const keys = Object.keys(data).sort((a,b) => (data[a].createdAt||0) - (data[b].createdAt||0));
             const list = document.getElementById('roomList');
             if (!keys.length) {
-                list.innerHTML = '<div style="text-align:center;color:#bbb;padding:16px;font-size:0.8rem;">Нет комнат</div>';
+                list.innerHTML = '<div style="text-align:center;color:#bbb;padding:12px;font-size:0.8rem;">Нет комнат</div>';
                 return;
             }
             list.innerHTML = keys.map(k => {
@@ -1084,17 +1044,16 @@
                     <span class="count">${r.count || 0}</span>
                 </div>`;
             }).join('');
-            updateHomeRooms();
         });
     }
 
     window.openRoom = function(roomId, roomName) {
         if (!USER) { alert('Сначала введите имя!'); return; }
         CUR_ROOM = roomId;
-        document.getElementById('homePage').style.display = 'none';
-        document.getElementById('feedSection').classList.remove('show');
+        document.getElementById('feedSection').classList.add('hidden');
         document.getElementById('chatSection').classList.add('show');
-        document.getElementById('chatRoomLabel') && (document.getElementById('chatRoomLabel').textContent = roomName || 'Комната');
+        document.getElementById('navRooms').classList.add('active');
+        document.getElementById('navFeed').classList.remove('active');
         closeSidebar();
         loadChat(roomId);
         // Обновляем активный элемент в меню
@@ -1392,7 +1351,7 @@
     // ================================================================
     applyAdminUI();
     loadRooms();
-    goHome();
+    goFeed();
     console.log('💬 DeepChat (белая версия) запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345 (серая точка в правом нижнем углу)');
 })();
