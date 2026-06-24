@@ -2,360 +2,199 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DeepChat · Сообщество</title>
     
-    <!-- Подключаем Firebase (Compat version для простоты) -->
+    <!-- Firebase Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
-    <!-- ============================================================ -->
-    <!-- НАСТРОЙКА FIREBASE (ТВОЙ ПРОЕКТ)                           -->
-    <!-- ============================================================ -->
-    <script>
-        // !!! ЭТО ТВОИ КЛЮЧИ ИЗ FIREBASE (MyEcosystem) !!!
-        const FB_CONFIG = {
-            apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
-            authDomain: "myecosystem-e6414.firebaseapp.com",
-            databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
-            projectId: "myecosystem-e6414",
-            storageBucket: "myecosystem-e6414.firebasestorage.app",
-            messagingSenderId: "426302111033",
-            appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
-        };
-        // Инициализация
-        firebase.initializeApp(FB_CONFIG);
-        const db = firebase.database();
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
-        /* ================================================================ */
-        /* СТИЛИ - ВСЁ КРАСИВО И АДАПТИВНО                                */
-        /* ================================================================ */
+        /* ===== СТИЛИ (кратко, но красиво) ===== */
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{background:#ffffff;color:#222;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden;}
+        body{background:#0d1117;color:#e6edf3;font-family:system-ui,sans-serif;min-height:100vh;padding:10px;}
+        .app{max-width:800px;margin:0 auto;}
+        .header{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #30363d;flex-wrap:wrap;}
+        .logo{font-size:1.4rem;font-weight:800;color:#f0f6fc;}
+        .logo span{color:#ff8c00;}
+        .spacer{flex:1;}
+        .user-btn{background:#21262d;border:1px solid #30363d;border-radius:40px;padding:4px 14px;color:#c9d1d9;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;}
+        .user-btn:hover{background:#30363d;}
+        .change-name-btn{background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:40px;padding:2px 10px;font-size:0.6rem;cursor:pointer;margin-left:4px;}
+        .change-name-btn:hover{background:#30363d;color:#fff;}
+        .tabs{display:flex;gap:0;margin:12px 0;border-bottom:1px solid #30363d;}
+        .tab{padding:10px 20px;cursor:pointer;color:#8b949e;border-bottom:2px solid transparent;font-size:0.9rem;}
+        .tab.active{color:#f0f6fc;border-bottom-color:#ff8c00;}
+        .tab:hover{color:#f0f6fc;}
+        .hidden{display:none!important;}
 
-        .app-header{background:#ffffff;border-bottom:1px solid #e0e0e0;padding:10px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
-        .hamburger{background:none;border:none;color:#222;font-size:1.5rem;cursor:pointer;padding:2px 6px;line-height:1;}
-        .logo{font-size:1.15rem;font-weight:800;color:#222;display:flex;align-items:center;gap:6px;}
-        .logo span{color:#1877f2;}
-        .logo .badge{font-size:0.45rem;background:#1877f2;color:#fff;padding:1px 7px;border-radius:40px;font-weight:600;}
-        .hdr-user{margin-left:auto;font-size:0.6rem;color:#888;background:#f0f0f0;padding:2px 10px;border-radius:40px;border:1px solid #ddd;white-space:nowrap;cursor:pointer;}
-        .hdr-user:hover{background:#e5e5e5;}
-        .hdr-badge{display:none;font-size:0.5rem;color:#ff8c00;background:rgba(255,140,0,.1);padding:2px 8px;border-radius:40px;border:1px solid rgba(255,140,0,.2);}
-        .hdr-badge.show{display:inline-block;}
+        .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin-top:10px;}
+        .card-title{font-weight:700;color:#f0f6fc;margin-bottom:8px;}
 
-        .sidebar{position:fixed;top:0;left:-290px;width:270px;height:100%;background:#ffffff;border-right:1px solid #e0e0e0;transition:left .3s;z-index:1000;overflow-y:auto;padding:14px 10px;}
-        .sidebar.open{left:0;}
-        .sb-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #eee;margin-bottom:10px;}
-        .sb-title{color:#1877f2;font-weight:700;}
-        .sb-close{background:none;border:none;color:#888;font-size:1.3rem;cursor:pointer;}
-        .sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f5f5f5;border-radius:10px;border:1px solid #eee;margin-bottom:10px;}
-        .sb-user .uname{font-weight:600;font-size:0.85rem;color:#222;}
-        .sb-user .ustatus{font-size:0.55rem;color:#888;}
-        .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:#555;border:1px solid transparent;transition:all .2s;font-size:0.85rem;margin-bottom:3px;}
-        .nav-item:hover{background:#f0f0f0;border-color:#ddd;color:#222;}
-        .nav-item.active{background:#e8f0fe;border-color:#1877f2;color:#1877f2;}
-        .rooms-title{color:#888;font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;padding:0 4px;margin:10px 0 4px;}
-        .room-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:#666;border:1px solid transparent;transition:all .2s;font-size:0.8rem;margin-bottom:2px;}
-        .room-item:hover{background:#f0f0f0;border-color:#ddd;color:#222;}
-        .room-item.active{background:#e8f0fe;border-color:#1877f2;color:#1877f2;}
-        .room-cnt{margin-left:auto;font-size:0.55rem;color:#aaa;background:#f0f0f0;padding:0 8px;border-radius:40px;}
-        .sb-footer{margin-top:12px;padding-top:10px;border-top:1px solid #eee;}
-        .create-room-btn{display:none;width:100%;background:#1877f2;border:none;color:#fff;padding:7px;border-radius:40px;font-size:0.7rem;font-weight:700;cursor:pointer;}
-        .create-room-btn:hover{background:#4a9eff;}
-        .create-room-btn.show{display:block;}
-        .overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:999;display:none;opacity:0;transition:opacity .3s;}
-        .overlay.show{display:block;opacity:1;}
-
-        .app-content{max-width:800px;margin:0 auto;padding:0 10px 80px;}
-
-        .card{background:#ffffff;border:1px solid #e0e0e0;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-top:10px;}
-        .card-header{padding:9px 13px;background:#fafafa;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
-        .card-title{font-weight:700;font-size:0.8rem;color:#222;}
-        .card-title .or{color:#ff8c00;}
-        .card-title .bl{color:#1877f2;}
-        .card-status{font-size:0.55rem;color:#1877f2;background:rgba(24,119,242,.08);padding:2px 10px;border-radius:40px;border:1px solid rgba(24,119,242,.15);}
-        .card-back{background:none;border:1px solid #ddd;color:#888;cursor:pointer;font-size:0.75rem;padding:3px 10px;border-radius:40px;transition:all .2s;}
-        .card-back:hover{color:#222;border-color:#bbb;}
-        .card-body{padding:10px;}
-
-        .df-posts{display:flex;flex-direction:column;gap:14px;}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-        .df-post{background:#ffffff;border:1px solid #e8e8e8;border-radius:14px;padding:14px;animation:fadeUp .3s ease;transition:border-color .2s;}
-        .df-post:hover{border-color:#ccc;}
-        .df-marquee{background:#f5f5f5;padding:4px 0;overflow:hidden;white-space:nowrap;border-radius:6px;margin-bottom:8px;border:1px solid #eee;}
-        .df-marquee span{display:inline-block;animation:scroll 12s linear infinite;color:#ff8c00;font-weight:600;font-size:0.85rem;padding-left:14px;}
-        @keyframes scroll{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
-        .df-phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:3px;}
-        .df-author{color:#ff8c00;font-weight:700;font-size:0.85rem;}
-        .df-time{color:#999;font-size:0.55rem;}
-        .df-text{margin:5px 0;word-break:break-word;font-size:0.9rem;line-height:1.5;color:#333;}
-        .df-img{max-width:100%;max-height:240px;border-radius:10px;margin:6px 0;border:1px solid #eee;cursor:pointer;}
-        .df-frame{margin:6px 0;border:1px solid #eee;border-radius:10px;overflow:hidden;background:#fafafa;}
-        .df-frame iframe{width:100%;height:260px;border:none;display:block;}
-        .df-buttons{display:flex;flex-direction:column;gap:8px;margin:8px 0;}
-        .df-btn{display:block;background:#ff8c00;border:none;border-radius:12px;padding:10px 16px;text-align:center;text-decoration:none;color:#fff;font-weight:700;font-size:0.9rem;cursor:pointer;transition:.2s;}
+        /* Лента */
+        .df-post{background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:12px;margin-bottom:12px;}
+        .df-author{color:#ff8c00;font-weight:700;}
+        .df-time{color:#8b949e;font-size:0.65rem;margin-left:6px;}
+        .df-text{margin:6px 0;color:#e6edf3;}
+        .df-marquee{background:#21262d;padding:4px 10px;border-radius:6px;color:#ff8c00;font-weight:600;margin-bottom:6px;overflow:hidden;white-space:nowrap;}
+        .df-marquee span{display:inline-block;animation:scroll 10s linear infinite;padding-left:100%;}
+        @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
+        .df-btn{display:inline-block;background:#ff8c00;color:#0d1117;padding:6px 16px;border-radius:40px;text-decoration:none;font-weight:700;font-size:0.8rem;margin:4px 4px 0 0;}
         .df-btn:hover{background:#ffa033;}
-        .df-hashtags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 3px;padding-top:6px;border-top:1px solid #eee;}
-        .df-tag{color:#1877f2;font-size:0.6rem;background:#f0f7ff;padding:0 8px;border-radius:20px;border:1px solid #d0e4ff;}
-        .df-post-footer{display:flex;gap:8px;margin-top:7px;padding-top:7px;border-top:1px solid #eee;flex-wrap:wrap;align-items:center;}
-        .df-actions{display:flex;gap:5px;flex-wrap:wrap;}
-        .df-actions button{background:#f0f0f0;border:1px solid #ddd;color:#555;padding:0 10px;border-radius:40px;font-size:0.55rem;cursor:pointer;}
-        .df-actions button:hover{background:#e5e5e5;}
-        .df-edit-btn{background:#fff3e0!important;border-color:#ff8c00!important;color:#ff8c00!important;}
-        .df-del-btn{background:#ffebee!important;border-color:#ef9a9a!important;color:#c62828!important;}
-        .df-discuss-btn{background:#f0f0f0;border:1px solid #ddd;color:#1877f2;padding:3px 14px;border-radius:40px;font-size:0.65rem;cursor:pointer;}
-        .df-discuss-btn:hover{background:#e5e5e5;}
+        .df-tag{color:#58a6ff;font-size:0.6rem;background:#1f2937;padding:0 8px;border-radius:20px;border:1px solid #30363d;}
+        .df-actions{display:flex;gap:4px;margin-top:6px;}
+        .df-actions button{background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:0 10px;border-radius:20px;font-size:0.55rem;cursor:pointer;}
+        .df-actions button:hover{background:#30363d;}
+        .df-discuss-btn{background:#21262d;border:1px solid #30363d;color:#58a6ff;padding:2px 12px;border-radius:40px;font-size:0.6rem;cursor:pointer;}
+        .df-discuss-btn:hover{background:#30363d;}
 
-        .df-form{display:none;background:#fafafa;border:1px solid #e0e0e0;border-radius:14px;padding:14px;margin-bottom:14px;}
-        .df-form.show{display:block;}
-        .df-form-title{color:#ff8c00;font-weight:700;margin-bottom:8px;font-size:0.9rem;}
-        .df-form input,.df-form textarea{width:100%;padding:8px 12px;background:#ffffff;border:1px solid #ddd;border-radius:8px;color:#222;font-size:0.85rem;outline:none;margin-bottom:6px;font-family:inherit;}
-        .df-form input:focus,.df-form textarea:focus{border-color:#ff8c00;}
-        .df-form textarea{min-height:56px;resize:vertical;}
-        .df-fbtn-row{display:flex;gap:5px;margin-bottom:5px;align-items:center;}
+        /* Форма поста */
+        .df-form{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px;margin-bottom:12px;}
+        .df-form input,.df-form textarea{width:100%;padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.85rem;margin-bottom:6px;font-family:inherit;}
+        .df-form textarea{min-height:50px;resize:vertical;}
+        .df-fbtn-row{display:flex;gap:4px;margin-bottom:4px;}
         .df-fbtn-row input{flex:1;margin-bottom:0;}
-        .df-fremove{background:#ffebee;color:#c62828;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:0.65rem;}
-        .df-fadd{background:#f0f0f0;border:1px solid #ddd;color:#ff8c00;padding:3px 14px;border-radius:40px;cursor:pointer;font-size:0.75rem;margin-bottom:5px;}
-        .df-factions{display:flex;gap:6px;margin-top:8px;}
-        .df-factions button{padding:7px 18px;border-radius:40px;border:none;font-weight:700;cursor:pointer;font-size:0.8rem;}
-        .df-fsubmit{background:#ff8c00;color:#fff;}
-        .df-fsubmit:hover{background:#ffa033;}
-        .df-fcancel{background:#f0f0f0;color:#888;}
-        .df-fcancel:hover{background:#e5e5e5;}
+        .df-fbtn-row button{background:#21262d;border:1px solid #30363d;color:#f85149;border-radius:4px;padding:0 8px;cursor:pointer;}
+        .df-fadd{background:transparent;border:1px solid #30363d;color:#ff8c00;padding:2px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;}
+        .df-factions{display:flex;gap:6px;margin-top:6px;}
+        .df-factions button{padding:6px 16px;border-radius:40px;border:none;font-weight:700;cursor:pointer;}
+        .df-fsubmit{background:#ff8c00;color:#0d1117;}
+        .df-fcancel{background:#21262d;color:#8b949e;}
 
-        .dc-panel{background:#ffffff;border-radius:12px;border:1px solid #e0e0e0;overflow:hidden;display:flex;flex-direction:column;height:62vh;min-height:280px;margin-top:5px;}
-        .dc-messages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;}
-        .dc-msg{background:#f8f8f8;border-radius:10px;padding:9px 11px;border:1px solid #eee;animation:fadeUp .2s ease;}
-        .dc-msg .dc-marquee{background:#f5f5f5;padding:3px 0;overflow:hidden;white-space:nowrap;border-radius:5px;margin-bottom:5px;border:1px solid #eee;}
-        .dc-msg .dc-marquee span{display:inline-block;animation:scroll 12s linear infinite;color:#ff8c00;font-weight:600;font-size:0.75rem;padding-left:12px;}
-        .dc-author{color:#ff8c00;font-weight:700;font-size:0.75rem;}
-        .dc-time{color:#aaa;font-size:0.45rem;margin-left:4px;}
-        .dc-msg-text{margin:3px 0;word-break:break-word;font-size:0.8rem;line-height:1.4;color:#333;}
-        .dc-msg-img{max-width:100%;max-height:140px;border-radius:7px;margin:3px 0;border:1px solid #eee;cursor:pointer;}
-        .dc-post-buttons{display:flex;flex-direction:column;gap:5px;margin:5px 0;}
-        .dc-post-buttons a{display:block;background:#ff8c00;border-radius:7px;padding:6px 12px;text-decoration:none;color:#fff;font-weight:700;font-size:0.75rem;text-align:center;}
-        .dc-post-buttons a:hover{background:#ffa033;}
-        .dc-post-frame{margin:5px 0;border:1px solid #eee;border-radius:7px;overflow:hidden;}
-        .dc-post-frame iframe{width:100%;height:180px;border:none;display:block;}
-        .dc-post-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;}
-        .dc-post-tags span{color:#1877f2;font-size:0.55rem;background:#f0f7ff;padding:0 7px;border-radius:20px;border:1px solid #d0e4ff;}
-        .dc-actions{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
-        .dc-actions button{background:#f0f0f0;border:1px solid #ddd;color:#555;padding:0 9px;border-radius:40px;font-size:0.5rem;cursor:pointer;}
-        .dc-edit-btn{background:#fff3e0!important;border-color:#ff8c00!important;color:#ff8c00!important;}
-        .dc-del-btn{background:#ffebee!important;border-color:#ef9a9a!important;color:#c62828!important;}
+        /* Чат */
+        .dc-panel{background:#0d1117;border:1px solid #30363d;border-radius:10px;height:55vh;display:flex;flex-direction:column;}
+        .dc-messages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;}
+        .dc-msg{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:8px 10px;}
+        .dc-author{color:#ff8c00;font-weight:700;font-size:0.8rem;}
+        .dc-time{color:#8b949e;font-size:0.5rem;margin-left:4px;}
+        .dc-msg-text{color:#e6edf3;font-size:0.85rem;}
+        .dc-actions{display:flex;gap:4px;margin-top:4px;}
+        .dc-actions button{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:0 8px;border-radius:20px;font-size:0.5rem;cursor:pointer;}
+        .dc-actions button:hover{background:#30363d;}
+        .dc-edit-btn{background:#1f2937!important;border-color:#ff8c00!important;color:#ff8c00!important;}
+        .dc-del-btn{background:#1f2937!important;border-color:#f85149!important;color:#f85149!important;}
 
-        .dc-input-wrap{padding:7px 9px;background:#fafafa;border-top:1px solid #eee;}
-        .dc-input-row{display:flex;gap:5px;}
-        .dc-input-row input{flex:1;padding:7px 13px;background:#ffffff;border:1px solid #ddd;border-radius:40px;color:#222;font-size:0.78rem;outline:none;}
+        .dc-input-wrap{padding:8px;background:#161b22;border-top:1px solid #30363d;border-radius:0 0 10px 10px;}
+        .dc-input-row{display:flex;gap:6px;}
+        .dc-input-row input{flex:1;padding:8px 14px;background:#0d1117;border:1px solid #30363d;border-radius:40px;color:#e6edf3;font-size:0.8rem;outline:none;}
         .dc-input-row input:focus{border-color:#ff8c00;}
-        .dc-input-row button{background:#ff8c00;border:none;border-radius:40px;padding:0 13px;font-weight:700;color:#fff;cursor:pointer;font-size:0.78rem;}
+        .dc-input-row button{background:#ff8c00;border:none;border-radius:40px;padding:0 16px;font-weight:700;color:#0d1117;cursor:pointer;}
         .dc-input-row button:hover{background:#ffa033;}
-        .dc-file-row{margin-top:3px;}
-        .dc-file-label{background:#f0f0f0;padding:2px 11px;border-radius:40px;font-size:0.55rem;border:1px solid #ddd;cursor:pointer;display:inline-block;color:#555;}
-        .dc-preview{display:none;align-items:center;gap:5px;background:#f8f8f8;padding:2px 9px 2px 2px;border-radius:40px;margin-top:3px;border:1px solid #e0e0e0;}
+        .dc-file-label{color:#8b949e;font-size:0.6rem;cursor:pointer;border:1px solid #30363d;padding:0 10px;border-radius:40px;display:inline-block;}
+        .dc-preview{display:none;align-items:center;gap:4px;margin-top:4px;background:#0d1117;padding:2px 8px;border-radius:40px;border:1px solid #30363d;}
         .dc-preview.show{display:flex;}
-        .dc-preview img{width:26px;height:26px;border-radius:30px;object-fit:cover;}
-        .dc-preview-name{font-size:0.55rem;max-width:46px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#555;}
-        .dc-preview-remove{background:#ffebee;color:#c62828;border:none;border-radius:30px;padding:0 7px;cursor:pointer;font-size:0.55rem;}
+        .dc-preview img{width:24px;height:24px;border-radius:40px;object-fit:cover;}
+        .dc-preview-remove{background:transparent;border:none;color:#f85149;cursor:pointer;}
 
-        .dc-admin-bar{display:none;padding:8px 9px;background:#fafafa;border-top:1px solid #eee;flex-direction:column;gap:5px;}
+        /* Админ-панель в чате */
+        .dc-admin-bar{display:none;padding:8px;background:#161b22;border-top:1px solid #30363d;flex-direction:column;gap:4px;}
         .dc-admin-bar.show{display:flex;}
-        .dc-admin-bar-title{color:#ff8c00;font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
-        .dc-admin-bar-title button{background:none;border:1px solid #ddd;color:#888;padding:1px 8px;border-radius:20px;cursor:pointer;font-size:0.55rem;}
-        .dc-admin-bar-title button:hover{border-color:#ff8c00;color:#ff8c00;}
-        .dc-admin-form{display:none;flex-direction:column;gap:5px;}
+        .dc-admin-bar-title{color:#ff8c00;font-weight:700;font-size:0.7rem;display:flex;justify-content:space-between;}
+        .dc-admin-bar-title button{background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:20px;padding:0 8px;cursor:pointer;font-size:0.55rem;}
+        .dc-admin-form{display:none;flex-direction:column;gap:4px;}
         .dc-admin-form.open{display:flex;}
-        .dc-admin-form input,.dc-admin-form textarea{width:100%;padding:5px 10px;background:#ffffff;border:1px solid #ddd;border-radius:7px;color:#222;font-size:0.72rem;outline:none;font-family:inherit;}
-        .dc-admin-form input:focus,.dc-admin-form textarea:focus{border-color:#ff8c00;}
-        .dc-admin-form textarea{min-height:36px;resize:vertical;}
-        .dc-abtns{display:flex;flex-direction:column;gap:3px;}
-        .dc-abtn-row{display:flex;gap:3px;}
+        .dc-admin-form input,.dc-admin-form textarea{width:100%;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.7rem;font-family:inherit;}
+        .dc-admin-form textarea{min-height:30px;resize:vertical;}
+        .dc-abtn-row{display:flex;gap:4px;}
         .dc-abtn-row input{flex:1;}
-        .dc-abtn-remove{background:#ffebee;color:#c62828;border:none;border-radius:5px;padding:0 7px;cursor:pointer;font-size:0.6rem;}
-        .dc-aadd{background:#f0f0f0;border:1px solid #ddd;color:#ff8c00;padding:2px 10px;border-radius:20px;cursor:pointer;font-size:0.65rem;}
-        .dc-apublish{background:#ff8c00;border:none;border-radius:20px;padding:5px;font-weight:700;color:#fff;cursor:pointer;font-size:0.7rem;}
-        .dc-apublish:hover{background:#ffa033;}
+        .dc-aadd{background:transparent;border:1px solid #30363d;color:#ff8c00;padding:0 10px;border-radius:20px;cursor:pointer;font-size:0.6rem;}
+        .dc-apublish{background:#ff8c00;border:none;border-radius:20px;padding:4px;font-weight:700;color:#0d1117;cursor:pointer;font-size:0.7rem;}
 
-        .admin-dots{position:fixed;bottom:10px;right:10px;display:flex;gap:7px;z-index:9999;}
-        .admin-dot{width:13px;height:13px;border-radius:50%;border:2px solid rgba(0,0,0,.05);cursor:pointer;transition:all .3s;position:relative;}
-        .admin-dot:hover{transform:scale(1.3);}
-        .admin-dot.feed-dot{background:rgba(255,140,0,.15);border-color:rgba(255,140,0,.2);}
-        .admin-dot.feed-dot:hover,.admin-dot.feed-dot.active{background:rgba(255,140,0,.3);border-color:rgba(255,140,0,.4);}
-        .admin-dot.room-dot{background:rgba(255,0,0,.1);border-color:rgba(255,0,0,.15);}
-        .admin-dot.room-dot:hover,.admin-dot.room-dot.active{background:rgba(255,0,0,.25);border-color:rgba(255,0,0,.35);}
-        .dot-label{position:absolute;bottom:18px;right:0;font-size:0.45rem;color:#888;white-space:nowrap;background:#fff;padding:1px 5px;border-radius:3px;border:1px solid #ddd;display:none;}
-        .admin-dot:hover .dot-label{display:block;}
+        /* Админ-точки */
+        .admin-dots{position:fixed;bottom:10px;right:10px;display:flex;gap:6px;z-index:999;}
+        .admin-dot{width:12px;height:12px;border-radius:50%;border:2px solid #30363d;cursor:pointer;background:#21262d;}
+        .admin-dot.active{background:#ff8c00;border-color:#ff8c00;}
+        .admin-dot.feed-dot.active{background:#ff8c00;}
+        .admin-dot.room-dot.active{background:#da3633;}
 
-        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;justify-content:center;align-items:center;padding:16px;}
+        /* Модалки */
+        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9999;justify-content:center;align-items:center;padding:16px;}
         .modal.open{display:flex;}
-        .modal-box{background:#ffffff;padding:20px;border-radius:18px;max-width:480px;width:100%;border:1px solid #e0e0e0;max-height:85vh;overflow-y:auto;}
-        .modal-box h3{color:#222;margin-bottom:3px;}
-        .modal-sub{color:#888;font-size:0.8rem;margin-bottom:12px;}
-        .modal-box input,.modal-box textarea{width:100%;padding:9px 13px;background:#ffffff;border:1px solid #ddd;border-radius:9px;color:#222;font-size:0.9rem;outline:none;margin-bottom:9px;font-family:inherit;}
-        .modal-box textarea{min-height:46px;resize:vertical;}
+        .modal-box{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:20px;max-width:400px;width:100%;}
+        .modal-box h3{color:#f0f6fc;margin-bottom:4px;}
+        .modal-box input{width:100%;padding:8px 12px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.9rem;margin:8px 0;}
         .modal-btns{display:flex;gap:8px;justify-content:flex-end;}
-        .modal-btns button{padding:7px 18px;border-radius:40px;border:none;font-weight:700;font-size:0.85rem;cursor:pointer;}
-        .btn-cancel{background:#f0f0f0;color:#888;}
-        .btn-cancel:hover{background:#e5e5e5;}
-        .btn-save{background:#1877f2;color:#fff;}
-        .btn-save:hover{background:#4a9eff;}
-        .btn-save.orange{background:#ff8c00;}
-        .btn-save.orange:hover{background:#ffa033;}
+        .modal-btns button{padding:6px 16px;border-radius:40px;border:none;font-weight:700;cursor:pointer;}
+        .btn-cancel{background:#21262d;color:#8b949e;}
+        .btn-save{background:#ff8c00;color:#0d1117;}
 
-        .edit-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;justify-content:center;align-items:center;padding:12px;}
+        /* Edit modal */
+        .edit-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9999;justify-content:center;align-items:center;padding:12px;}
         .edit-overlay.open{display:flex;}
-        .edit-box{background:#ffffff;border-radius:14px;padding:14px;max-width:420px;width:100%;border:1px solid #e0e0e0;max-height:90vh;overflow-y:auto;}
-        .edit-box h2{color:#ff8c00;font-size:0.95rem;margin-bottom:7px;}
-        .edit-box input,.edit-box textarea{width:100%;padding:7px 10px;background:#ffffff;border:1px solid #ddd;border-radius:6px;color:#222;margin-bottom:5px;font-size:0.78rem;font-family:inherit;resize:vertical;outline:none;}
-        .edit-box textarea{min-height:38px;}
-        .edit-btn-row{display:flex;gap:3px;margin-bottom:3px;}
-        .edit-btn-row input{flex:1;margin-bottom:0;}
-        .edit-btn-rem{background:#ffebee;color:#c62828;border:none;border-radius:5px;padding:0 7px;cursor:pointer;font-size:0.6rem;}
-        .edit-action-row{display:flex;gap:5px;margin-top:5px;}
-        .edit-save{background:#ff8c00;color:#fff;border:none;border-radius:40px;padding:7px;font-weight:700;flex:1;cursor:pointer;font-size:0.78rem;}
-        .edit-close{background:#ffebee;color:#c62828;border:none;border-radius:40px;padding:7px;font-weight:700;flex:1;cursor:pointer;font-size:0.78rem;}
-        .edit-delete{background:#ffebee;color:#c62828;border:none;border-radius:40px;padding:7px;font-weight:700;width:100%;cursor:pointer;font-size:0.78rem;margin-top:7px;}
+        .edit-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;max-width:400px;width:100%;}
+        .edit-box h2{color:#ff8c00;font-size:0.9rem;}
+        .edit-box input,.edit-box textarea{width:100%;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.75rem;margin-bottom:4px;font-family:inherit;}
+        .edit-box textarea{min-height:30px;resize:vertical;}
+        .edit-action-row{display:flex;gap:6px;margin-top:6px;}
+        .edit-save{background:#ff8c00;border:none;border-radius:40px;padding:6px;flex:1;font-weight:700;color:#0d1117;cursor:pointer;}
+        .edit-close{background:#21262d;border:none;border-radius:40px;padding:6px;flex:1;font-weight:700;color:#8b949e;cursor:pointer;}
+        .edit-delete{background:#21262d;border:1px solid #f85149;color:#f85149;border-radius:40px;padding:6px;width:100%;margin-top:6px;cursor:pointer;}
 
-        ::-webkit-scrollbar{width:3px;}
-        ::-webkit-scrollbar-track{background:transparent;}
-        ::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px;}
+        .auth-panel{text-align:center;padding:50px 20px;}
+        .auth-panel h2{font-size:1.2rem;color:#f0f6fc;}
+        .auth-panel p{color:#8b949e;margin:10px 0 20px;}
+        .google-btn{background:#fff;border:1px solid #dadce0;border-radius:40px;padding:12px 28px;font-size:1rem;font-weight:600;color:#3c4043;cursor:pointer;display:inline-flex;align-items:center;gap:12px;transition:.2s;}
+        .google-btn:hover{background:#f8f9fa;transform:scale(1.02);}
+        .google-btn img{width:20px;height:20px;}
 
-        /* ================================================================ */
-        /* КНОПКА ВХОДА ЧЕРЕЗ GOOGLE - КРАСИВАЯ И БОЛЬШАЯ                    */
-        /* ================================================================ */
-        .google-login-btn {
-            background: #ffffff;
-            border: 1px solid #dadce0;
-            border-radius: 40px;
-            padding: 10px 24px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #3c4043;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin: 0 auto;
-        }
-        .google-login-btn:hover {
-            background: #f8f9fa;
-            border-color: #d2e3fc;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transform: scale(1.02);
-        }
-        .google-login-btn img {
-            width: 20px;
-            height: 20px;
-        }
+        .room-item{display:flex;justify-content:space-between;padding:6px 10px;border-radius:6px;cursor:pointer;color:#8b949e;border:1px solid transparent;}
+        .room-item:hover{background:#21262d;border-color:#30363d;color:#f0f6fc;}
+        .room-item.active{background:#1f2937;border-color:#ff8c00;color:#f0f6fc;}
+        .room-cnt{color:#8b949e;font-size:0.65rem;}
+        .create-room-btn{display:none;width:100%;background:#21262d;border:1px solid #30363d;color:#f0f6fc;padding:6px;border-radius:40px;margin-top:8px;cursor:pointer;}
+        .create-room-btn.show{display:block;}
+        .create-room-btn:hover{background:#30363d;}
+        .sb-footer{margin-top:10px;padding-top:8px;border-top:1px solid #30363d;}
+        .rooms-title{color:#8b949e;font-size:0.6rem;text-transform:uppercase;margin:8px 0 4px;}
 
-        .auth-panel {
-            background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 18px;
-            padding: 30px 24px;
-            text-align: center;
-            max-width: 400px;
-            margin: 40px auto 20px;
-        }
-        .auth-panel h2 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-            color: #222;
-        }
-        .auth-panel p {
-            font-size: 0.85rem;
-            color: #888;
-            margin-bottom: 18px;
-        }
-
-        @media(max-width:640px){
-            .app-header{padding:8px 10px;}
-            .logo{font-size:0.95rem;}
-            .hamburger{font-size:1.3rem;}
-            .sidebar{width:250px;left:-270px;}
-            .dc-panel{height:56vh;}
-            .df-frame iframe{height:200px;}
-        }
-        @media(max-width:400px){
-            .dc-panel{height:50vh;}
-            .df-frame iframe{height:160px;}
-        }
+        @media(max-width:640px){.header{flex-wrap:wrap;gap:6px;}.logo{font-size:1.1rem;}}
     </style>
 </head>
 <body>
 
-<!-- ============================================================ -->
-<!-- HEADER -->
-<!-- ============================================================ -->
-<header class="app-header">
-    <button class="hamburger" onclick="toggleSidebar()">☰</button>
-    <div class="logo">Deep<span>Chat</span><span class="badge">BETA</span></div>
-    <span class="hdr-badge" id="hdrFeedBadge">📰 Админ</span>
-    <span class="hdr-badge" id="hdrRoomBadge">💬 Админ</span>
-    <span class="hdr-user" id="hdrUser" onclick="logout()">👤 Войти</span>
-</header>
+<div class="app">
 
-<!-- ============================================================ -->
-<!-- SIDEBAR -->
-<!-- ============================================================ -->
-<div class="sidebar" id="sidebar">
-    <div class="sb-head">
-        <span class="sb-title">💬 DeepChat</span>
-        <button class="sb-close" onclick="toggleSidebar()">✕</button>
-    </div>
-    <div class="sb-user">
-        <span>👤</span>
-        <div>
-            <div class="uname" id="sbUserName">Гость</div>
-            <div class="ustatus">онлайн</div>
-        </div>
-    </div>
-    <div class="nav-item active" id="navFeed" onclick="goFeed()"><span>📰</span> Лента</div>
-    <div class="nav-item" id="navRooms" onclick="goRooms()"><span>💬</span> Комнаты</div>
-    <div class="rooms-title">📋 Комнаты</div>
-    <div id="roomList"><div class="room-empty">Нет комнат</div></div>
-    <div class="sb-footer">
-        <button class="create-room-btn" id="createRoomBtn" onclick="openCreateRoom()">➕ Создать комнату</button>
-    </div>
-</div>
-<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="logo">Deep<span>Chat</span></div>
+        <div class="spacer"></div>
+        <span class="user-btn" id="userDisplay" onclick="openChangeName()">
+            👤 <span id="userNameDisplay">Гость</span>
+        </span>
+        <button class="change-name-btn" onclick="openChangeName()">✏️</button>
+    </header>
 
-<!-- ============================================================ -->
-<!-- CONTENT -->
-<!-- ============================================================ -->
-<div class="app-content">
+    <!-- ===== TABS ===== -->
+    <div class="tabs">
+        <div class="tab active" id="tabFeed" onclick="switchTab('feed')">📰 Лента</div>
+        <div class="tab" id="tabRooms" onclick="switchTab('rooms')">💬 Комнаты</div>
+    </div>
 
-    <!-- ===== AUTH PANEL (показывается только если не залогинен) ===== -->
+    <!-- ===== AUTH PANEL (показывается, если не залогинен) ===== -->
     <div id="authPanel" class="auth-panel">
-        <h2>🚀 Добро пожаловать!</h2>
-        <p>Войдите через Google, чтобы начать общаться</p>
-        <button class="google-login-btn" id="googleLoginBtn">
+        <h2>🚀 Добро пожаловать</h2>
+        <p>Войдите через Google, чтобы начать</p>
+        <button class="google-btn" id="googleLoginBtn">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
             Войти через Google
         </button>
     </div>
 
-    <!-- ===== FEED ===== -->
-    <div id="feedSection" style="display:none;">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">📰 <span class="or">DeepFeed</span> · Новости</div>
-                <div class="card-status">● онлайн</div>
-            </div>
-            <div class="card-body">
-                <div class="df-form" id="feedForm">
-                    <div class="df-form-title">✏️ Новый пост</div>
-                    <input type="text" id="fMarquee" placeholder="📢 Бегущая строка">
-                    <textarea id="fText" placeholder="📝 Текст поста..."></textarea>
-                    <input type="url" id="fLink" placeholder="🔗 Ссылка (iframe)">
+    <!-- ===== CONTENT (скрыто, пока не залогинен) ===== -->
+    <div id="appContent" class="hidden">
+
+        <!-- ===== FEED ===== -->
+        <div id="feedSection">
+            <div class="card">
+                <div class="card-title">📰 Лента новостей</div>
+                <div id="feedForm" class="df-form hidden">
+                    <div class="card-title" style="color:#ff8c00;">✏️ Новый пост</div>
+                    <input type="text" id="fMarquee" placeholder="Бегущая строка">
+                    <textarea id="fText" placeholder="Текст поста..."></textarea>
+                    <input type="url" id="fLink" placeholder="Ссылка (iframe)">
                     <input type="text" id="fHashtags" placeholder="#хештеги через пробел">
-                    <div style="color:#888;font-size:0.65rem;margin:3px 0;">🔘 Кнопки</div>
+                    <div style="color:#8b949e;font-size:0.6rem;">Кнопки</div>
                     <div id="fBtns"></div>
                     <button class="df-fadd" onclick="fAddBtn()">➕ Кнопку</button>
                     <div class="df-factions">
@@ -363,41 +202,46 @@
                         <button class="df-fcancel" onclick="fCancel()">✕ Отмена</button>
                     </div>
                 </div>
-                <div class="df-posts" id="feedPosts"></div>
+                <div id="feedPosts"></div>
             </div>
         </div>
-    </div>
 
-    <!-- ===== CHAT ===== -->
-    <div id="chatSection" style="display:none;">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">💬 <span class="bl" id="chatRoomLabel">Комната</span></div>
-                <button class="card-back" onclick="goFeed()">← Назад</button>
+        <!-- ===== ROOMS (sidebar) ===== -->
+        <div id="roomsSection" class="hidden">
+            <div class="card">
+                <div class="card-title">💬 Комнаты</div>
+                <div id="roomList"><div style="color:#8b949e;">Нет комнат</div></div>
+                <div class="sb-footer">
+                    <button class="create-room-btn" id="createRoomBtn" onclick="openCreateRoom()">➕ Создать комнату</button>
+                </div>
             </div>
-            <div class="card-body" style="padding:6px;">
-                <div class="dc-panel" id="dcPanel">
+        </div>
+
+        <!-- ===== CHAT ===== -->
+        <div id="chatSection" class="hidden">
+            <div class="card">
+                <div class="card-title">💬 <span id="chatRoomLabel">Комната</span></div>
+                <div class="dc-panel">
                     <div class="dc-messages" id="dcMessages"></div>
 
-                    <!-- ADMIN PUBLISH BAR -->
+                    <!-- Admin publish bar -->
                     <div class="dc-admin-bar" id="dcAdminBar">
                         <div class="dc-admin-bar-title">
                             ✏️ Опубликовать пост
                             <button onclick="toggleAdminForm()">▼ Открыть</button>
                         </div>
                         <div class="dc-admin-form" id="dcAdminForm">
-                            <input type="text" id="apMarquee" placeholder="📢 Бегущая строка">
-                            <textarea id="apText" placeholder="📝 Текст поста..."></textarea>
-                            <input type="url" id="apLink" placeholder="🔗 Ссылка (iframe)">
-                            <input type="text" id="apHashtags" placeholder="#хештег1 #хештег2">
-                            <div style="color:#888;font-size:0.6rem;">🔘 Кнопки</div>
+                            <input type="text" id="apMarquee" placeholder="Бегущая строка">
+                            <textarea id="apText" placeholder="Текст поста..."></textarea>
+                            <input type="url" id="apLink" placeholder="Ссылка (iframe)">
+                            <input type="text" id="apHashtags" placeholder="#хештеги">
+                            <div style="color:#8b949e;font-size:0.6rem;">Кнопки</div>
                             <div class="dc-abtns" id="apBtns"></div>
                             <button class="dc-aadd" onclick="apAddBtn()">➕ Кнопку</button>
                             <button class="dc-apublish" onclick="apPublish()">📤 Опубликовать</button>
                         </div>
                     </div>
 
-                    <!-- USER INPUT -->
                     <div class="dc-input-wrap">
                         <div class="dc-input-row">
                             <input type="text" id="dcInput" placeholder="Напиши сообщение...">
@@ -418,385 +262,415 @@
         </div>
     </div>
 
-</div>
+    <!-- ===== ADMIN DOTS ===== -->
+    <div class="admin-dots">
+        <div class="admin-dot feed-dot" id="feedDot" onclick="openFeedLogin()"></div>
+        <div class="admin-dot room-dot" id="roomDot" onclick="openRoomLogin()"></div>
+    </div>
 
-<!-- ============================================================ -->
-<!-- ADMIN DOTS -->
-<!-- ============================================================ -->
-<div class="admin-dots">
-    <div class="admin-dot feed-dot" id="feedDot" onclick="openFeedLogin()"><span class="dot-label">Лента</span></div>
-    <div class="admin-dot room-dot" id="roomDot" onclick="openRoomLogin()"><span class="dot-label">Комнаты</span></div>
-</div>
-
-<!-- ============================================================ -->
-<!-- MODALS -->
-<!-- ============================================================ -->
-<div class="modal" id="feedLoginModal">
-    <div class="modal-box">
-        <h3>📰 Вход (Лента)</h3>
-        <div class="modal-sub">Пароль для управления лентой</div>
-        <input type="password" id="feedPass" placeholder="Пароль...">
-        <div class="modal-btns">
-            <button class="btn-cancel" onclick="closeModal('feedLoginModal')">Отмена</button>
-            <button class="btn-save orange" onclick="checkFeedPass()">Войти</button>
+    <!-- ===== MODALS ===== -->
+    <div class="modal" id="feedLoginModal">
+        <div class="modal-box">
+            <h3>📰 Админ ленты</h3>
+            <input type="password" id="feedPass" placeholder="Пароль">
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('feedLoginModal')">Отмена</button>
+                <button class="btn-save" onclick="checkFeedPass()">Войти</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="modal" id="roomLoginModal">
-    <div class="modal-box">
-        <h3>💬 Вход (Комнаты)</h3>
-        <div class="modal-sub">Пароль для управления комнатами</div>
-        <input type="password" id="roomPass" placeholder="Пароль...">
-        <div class="modal-btns">
-            <button class="btn-cancel" onclick="closeModal('roomLoginModal')">Отмена</button>
-            <button class="btn-save" onclick="checkRoomPass()">Войти</button>
+    <div class="modal" id="roomLoginModal">
+        <div class="modal-box">
+            <h3>💬 Админ комнат</h3>
+            <input type="password" id="roomPass" placeholder="Пароль">
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('roomLoginModal')">Отмена</button>
+                <button class="btn-save" onclick="checkRoomPass()">Войти</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="modal" id="createRoomModal">
-    <div class="modal-box">
-        <h3>📝 Новая комната</h3>
-        <div class="modal-sub">Введите название</div>
-        <input type="text" id="roomNameInput" placeholder="Например: Общий..." maxlength="30">
-        <div class="modal-btns">
-            <button class="btn-cancel" onclick="closeModal('createRoomModal')">Отмена</button>
-            <button class="btn-save" onclick="doCreateRoom()">Создать</button>
+    <div class="modal" id="createRoomModal">
+        <div class="modal-box">
+            <h3>📝 Новая комната</h3>
+            <input type="text" id="roomNameInput" placeholder="Название комнаты" maxlength="30">
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('createRoomModal')">Отмена</button>
+                <button class="btn-save" onclick="doCreateRoom()">Создать</button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- EDIT MODAL -->
-<div class="edit-overlay" id="editOverlay">
-    <div class="edit-box">
-        <h2>✏️ Редактировать</h2>
-        <input type="text" id="editMarquee" placeholder="Бегущая строка">
-        <textarea id="editText" placeholder="Текст..."></textarea>
-        <input type="url" id="editLink" placeholder="Ссылка (iframe)">
-        <input type="text" id="editHashtags" placeholder="#хештег1 #хештег2">
-        <div style="color:#888;font-size:0.6rem;margin:3px 0;">Кнопки</div>
-        <div id="editBtns"></div>
-        <button onclick="editAddBtn()" style="background:#f0f0f0;border:1px solid #ddd;color:#ff8c00;padding:2px 10px;border-radius:20px;cursor:pointer;font-size:0.65rem;margin-bottom:5px;">➕ Кнопку</button>
-        <div class="edit-action-row">
-            <button class="edit-save" onclick="doSaveEdit()">💾 Сохранить</button>
-            <button class="edit-close" onclick="closeEdit()">✕ Отмена</button>
+    <div class="modal" id="changeNameModal">
+        <div class="modal-box">
+            <h3>✏️ Сменить имя</h3>
+            <input type="text" id="changeNameInput" placeholder="Новое имя" maxlength="24">
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('changeNameModal')">Отмена</button>
+                <button class="btn-save" onclick="doChangeName()">Сохранить</button>
+            </div>
         </div>
-        <button class="edit-delete" onclick="doDeleteEdit()">🗑 Удалить</button>
     </div>
+
+    <div class="edit-overlay" id="editOverlay">
+        <div class="edit-box">
+            <h2>✏️ Редактировать</h2>
+            <input type="text" id="editMarquee" placeholder="Бегущая строка">
+            <textarea id="editText" placeholder="Текст..."></textarea>
+            <input type="url" id="editLink" placeholder="Ссылка (iframe)">
+            <input type="text" id="editHashtags" placeholder="#хештеги">
+            <div style="color:#8b949e;font-size:0.6rem;">Кнопки</div>
+            <div id="editBtns"></div>
+            <button onclick="editAddBtn()" style="background:transparent;border:1px solid #30363d;color:#ff8c00;padding:2px 10px;border-radius:20px;cursor:pointer;font-size:0.6rem;margin-bottom:4px;">➕ Кнопку</button>
+            <div class="edit-action-row">
+                <button class="edit-save" onclick="doSaveEdit()">💾 Сохранить</button>
+                <button class="edit-close" onclick="closeEdit()">✕ Отмена</button>
+            </div>
+            <button class="edit-delete" onclick="doDeleteEdit()">🗑 Удалить</button>
+        </div>
+    </div>
+
 </div>
 
-<!-- ============================================================ -->
-<!-- JAVASCRIPT - ВСЯ ЛОГИКА РАБОТЫ -->
-<!-- ============================================================ -->
+<!-- ================================================================ -->
+<!-- ===== JAVASCRIPT =============================================== -->
+<!-- ================================================================ -->
 <script>
 (function(){
 
 // ================================================================
-// 1. ПЕРЕМЕННЫЕ СОСТОЯНИЯ
+// FIREBASE CONFIG (ТВОЙ ПРОЕКТ)
 // ================================================================
-const SITE = (window.location.hostname||'local').replace(/\./g,'_');
-let USER = null;
-let IS_FEED_ADMIN = localStorage.getItem('dc_fa_'+SITE)==='1';
-let IS_ROOM_ADMIN = localStorage.getItem('dc_ra_'+SITE)==='1';
+const FB_CONFIG = {
+    apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
+    authDomain: "myecosystem-e6414.firebaseapp.com",
+    databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
+    projectId: "myecosystem-e6414",
+    storageBucket: "myecosystem-e6414.firebasestorage.app",
+    messagingSenderId: "426302111033",
+    appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
+};
+
+firebase.initializeApp(FB_CONFIG);
+const db = firebase.database();
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// ================================================================
+// СОСТОЯНИЕ
+// ================================================================
+const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
+let USER = null;           // текущее отображаемое имя
+let USER_UID = null;       // Firebase UID
+let IS_FEED_ADMIN = localStorage.getItem('dc_fa_'+SITE) === '1';
+let IS_ROOM_ADMIN = localStorage.getItem('dc_ra_'+SITE) === '1';
 let CUR_ROOM = '';
 let FEED_EDIT_ID = null;
 let CHAT_EDIT_ID = null;
 let DC_IMG = null;
 let chatUnsub = null;
-let authUnsub = null;
 
 // ================================================================
-// 2. FIREBASE AUTH (Google вход)
+// AUTH (Google вход)
 // ================================================================
-// Подключаем Firebase Auth отдельно (Compat)
-const auth = firebase.auth();
-const provider = new firebase.auth.GoogleAuthProvider();
-
-// Функция входа через Google
-window.googleLogin = function() {
+document.getElementById('googleLoginBtn').addEventListener('click', () => {
     auth.signInWithPopup(provider)
-        .then((result) => {
-            // Пользователь успешно вошёл
-            console.log('✅ Вход через Google выполнен');
+        .then(result => {
+            console.log('✅ Вход выполнен');
         })
-        .catch((error) => {
-            console.error('❌ Ошибка входа:', error);
-            alert('Ошибка входа: ' + error.message);
+        .catch(err => {
+            alert('❌ Ошибка: ' + err.message);
         });
-};
+});
 
-// Функция выхода
+// Выход
 window.logout = function() {
-    auth.signOut().then(() => {
-        console.log('✅ Выход выполнен');
-    });
+    auth.signOut();
 };
 
-// Следим за состоянием авторизации
-auth.onAuthStateChanged((user) => {
+// Следим за пользователем
+auth.onAuthStateChanged(user => {
     const authPanel = document.getElementById('authPanel');
-    const feedSection = document.getElementById('feedSection');
-    const hdrUser = document.getElementById('hdrUser');
-    const sbUserName = document.getElementById('sbUserName');
+    const appContent = document.getElementById('appContent');
+    const userDisplay = document.getElementById('userNameDisplay');
 
     if (user) {
-        // ПОЛЬЗОВАТЕЛЬ ЗАЛОГИНЕН
-        USER = user.displayName || user.email || 'Пользователь';
-        localStorage.setItem('dc_u_'+SITE, USER);
-        
-        // Обновляем UI
-        hdrUser.textContent = '👤 ' + USER;
-        sbUserName.textContent = USER;
+        USER_UID = user.uid;
+        // Имя из Google, либо из localStorage, либо uid
+        let savedName = localStorage.getItem('dc_u_'+SITE);
+        if (savedName) {
+            USER = savedName;
+        } else {
+            USER = user.displayName || user.email || user.uid.slice(0,8);
+            localStorage.setItem('dc_u_'+SITE, USER);
+        }
+        // Сохраняем в базу, чтобы другие видели
+        db.ref('sites/'+SITE+'/users/'+USER_UID).set({ name: USER, email: user.email });
+
+        // Показываем интерфейс
         authPanel.style.display = 'none';
-        feedSection.style.display = 'block';
-        
+        appContent.classList.remove('hidden');
+        userDisplay.textContent = USER;
+
         // Загружаем ленту и комнаты
         loadFeed();
         loadRooms();
-        
-        // Показываем админ-бейджи
         applyAdminUI();
+
+        // Если есть комната — подгружаем чат
+        if (CUR_ROOM) loadChat(CUR_ROOM);
     } else {
-        // ПОЛЬЗОВАТЕЛЬ НЕ ЗАЛОГИНЕН
+        // Не залогинен
         USER = null;
-        localStorage.removeItem('dc_u_'+SITE);
-        
-        // Прячем всё, показываем панель входа
+        USER_UID = null;
         authPanel.style.display = 'block';
-        feedSection.style.display = 'none';
-        document.getElementById('chatSection').style.display = 'none';
-        hdrUser.textContent = '👤 Войти';
-        sbUserName.textContent = 'Гость';
-        
-        // Отписываемся от чатов
-        if (chatUnsub) {
-            db.ref(chatUnsub).off('value');
-            chatUnsub = null;
-        }
+        appContent.classList.add('hidden');
+        userDisplay.textContent = 'Гость';
+        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        document.getElementById('feedPosts').innerHTML = '';
+        document.getElementById('roomList').innerHTML = '<div style="color:#8b949e;">Нет комнат</div>';
+        document.getElementById('dcMessages').innerHTML = '';
     }
 });
 
 // ================================================================
-// 3. ПРИМЕНЕНИЕ АДМИН-ИНТЕРФЕЙСА
+// СМЕНА ИМЕНИ
 // ================================================================
-function applyAdminUI(){
-    if(IS_FEED_ADMIN){
-        document.getElementById('hdrFeedBadge').classList.add('show');
-        document.getElementById('feedDot').classList.add('active');
-        document.getElementById('feedForm').classList.add('show');
+window.openChangeName = function() {
+    if (!USER) { alert('Сначала войдите!'); return; }
+    document.getElementById('changeNameInput').value = USER;
+    document.getElementById('changeNameModal').classList.add('open');
+};
+window.doChangeName = function() {
+    const newName = document.getElementById('changeNameInput').value.trim();
+    if (!newName || newName.length < 1) { alert('Имя не может быть пустым'); return; }
+    USER = newName.slice(0, 24);
+    localStorage.setItem('dc_u_'+SITE, USER);
+    document.getElementById('userNameDisplay').textContent = USER;
+    // Обновляем в базе
+    if (USER_UID) {
+        db.ref('sites/'+SITE+'/users/'+USER_UID).update({ name: USER });
     }
-    if(IS_ROOM_ADMIN){
-        document.getElementById('hdrRoomBadge').classList.add('show');
-        document.getElementById('roomDot').classList.add('active');
-        document.getElementById('createRoomBtn').classList.add('show');
-        document.getElementById('dcAdminBar').classList.add('show');
+    closeModal('changeNameModal');
+};
+
+// ================================================================
+// АДМИН-ПАНЕЛИ (пароль 12345)
+// ================================================================
+function applyAdminUI() {
+    const feedForm = document.getElementById('feedForm');
+    const feedDot = document.getElementById('feedDot');
+    const roomDot = document.getElementById('roomDot');
+    const createBtn = document.getElementById('createRoomBtn');
+    const adminBar = document.getElementById('dcAdminBar');
+
+    if (IS_FEED_ADMIN) {
+        feedForm.classList.remove('hidden');
+        feedDot.classList.add('active');
+    } else {
+        feedForm.classList.add('hidden');
+        feedDot.classList.remove('active');
+    }
+    if (IS_ROOM_ADMIN) {
+        roomDot.classList.add('active');
+        createBtn.classList.add('show');
+        adminBar.classList.add('show');
+    } else {
+        roomDot.classList.remove('active');
+        createBtn.classList.remove('show');
+        adminBar.classList.remove('show');
     }
 }
 
-// ================================================================
-// 4. УТИЛИТЫ
-// ================================================================
-const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
-const now = () => new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-
-// ================================================================
-// 5. САЙДБАР
-// ================================================================
-window.toggleSidebar = function(){
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-};
-function closeSidebar(){
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
-}
-
-// ================================================================
-// 6. НАВИГАЦИЯ
-// ================================================================
-window.goFeed = function(){
-    document.getElementById('feedSection').style.display = 'block';
-    document.getElementById('chatSection').style.display = 'none';
-    document.getElementById('navFeed').classList.add('active');
-    document.getElementById('navRooms').classList.remove('active');
-    CUR_ROOM = '';
-    document.querySelectorAll('.room-item').forEach(el => el.classList.remove('active'));
-    closeSidebar();
-};
-window.goRooms = function(){
-    closeSidebar();
-    if(!CUR_ROOM) alert('💬 Выберите комнату из списка');
-};
-
-// ================================================================
-// 7. КОМНАТЫ (ROOMS)
-// ================================================================
-function loadRooms(){
-    db.ref('sites/'+SITE+'/rooms').orderByChild('createdAt').on('value', snap => {
-        const data = snap.val() || {};
-        const keys = Object.keys(data).sort((a,b) => (data[a].createdAt||0) - (data[b].createdAt||0));
-        const list = document.getElementById('roomList');
-        if(!keys.length){
-            list.innerHTML = '<div class="room-empty">Нет комнат</div>';
-            return;
-        }
-        list.innerHTML = keys.map(k => {
-            const r = data[k];
-            const ac = k === CUR_ROOM ? 'active' : '';
-            return `<div class="room-item ${ac}" data-room="${k}" onclick="openRoom('${k}','${esc(r.name||'Комната')}')"># ${esc(r.name||'?')}<span class="room-cnt">${r.count||0}</span></div>`;
-        }).join('');
-    });
-}
-
-window.openRoom = function(roomId, roomName){
-    if(!USER){ alert('Сначала войдите!'); return; }
-    CUR_ROOM = roomId;
-    document.getElementById('feedSection').style.display = 'none';
-    document.getElementById('chatSection').style.display = 'block';
-    document.getElementById('chatRoomLabel').textContent = roomName || 'Комната';
-    document.getElementById('navRooms').classList.add('active');
-    document.getElementById('navFeed').classList.remove('active');
-    document.querySelectorAll('.room-item').forEach(el => el.classList.toggle('active', el.dataset.room === roomId));
-    closeSidebar();
-    loadChat(roomId);
-};
-
-window.openPostRoom = function(postId, title){
-    openRoom('post_'+postId, '💬 ' + (title || 'Обсуждение'));
-};
-
-window.openCreateRoom = function(){
-    if(!IS_ROOM_ADMIN){ alert('⛔ Только для админа!'); return; }
-    document.getElementById('createRoomModal').classList.add('open');
-    document.getElementById('roomNameInput').value = '';
-    document.getElementById('roomNameInput').focus();
-};
-window.doCreateRoom = function(){
-    const name = document.getElementById('roomNameInput').value.trim();
-    if(!name || name.length < 2){ alert('⚠️ Минимум 2 символа'); return; }
-    db.ref('sites/'+SITE+'/rooms').push({name, createdAt: Date.now(), count: 0})
-        .then(() => closeModal('createRoomModal'))
-        .catch(e => alert('❌ '+e.message));
-};
-
-// ================================================================
-// 8. АДМИН-ЛОГИН (по паролю)
-// ================================================================
-window.openFeedLogin = function(){ 
-    if(!USER){ alert('Сначала войдите через Google!'); return; }
+window.openFeedLogin = function() {
+    if (!USER) { alert('Сначала войдите!'); return; }
     document.getElementById('feedLoginModal').classList.add('open');
-    document.getElementById('feedPass').value = '';
-    document.getElementById('feedPass').focus();
 };
-window.openRoomLogin = function(){
-    if(!USER){ alert('Сначала войдите через Google!'); return; }
+window.openRoomLogin = function() {
+    if (!USER) { alert('Сначала войдите!'); return; }
     document.getElementById('roomLoginModal').classList.add('open');
-    document.getElementById('roomPass').value = '';
-    document.getElementById('roomPass').focus();
 };
-window.checkFeedPass = function(){
-    if(document.getElementById('feedPass').value.trim() === '12345'){
+window.checkFeedPass = function() {
+    if (document.getElementById('feedPass').value.trim() === '12345') {
         IS_FEED_ADMIN = true;
         localStorage.setItem('dc_fa_'+SITE, '1');
         applyAdminUI();
         closeModal('feedLoginModal');
         loadFeed();
-    } else alert('❌ Неверный пароль!');
+    } else alert('❌ Неверный пароль');
 };
-window.checkRoomPass = function(){
-    if(document.getElementById('roomPass').value.trim() === '12345'){
+window.checkRoomPass = function() {
+    if (document.getElementById('roomPass').value.trim() === '12345') {
         IS_ROOM_ADMIN = true;
         localStorage.setItem('dc_ra_'+SITE, '1');
         applyAdminUI();
         closeModal('roomLoginModal');
-    } else alert('❌ Неверный пароль!');
+    } else alert('❌ Неверный пароль');
 };
-window.closeModal = function(id){ document.getElementById(id).classList.remove('open'); };
+window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
 
 // ================================================================
-// 9. ЛЕНТА (FEED)
+// ТАБЫ
 // ================================================================
-function loadFeed(){
+window.switchTab = function(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if (tab === 'feed') {
+        document.getElementById('tabFeed').classList.add('active');
+        document.getElementById('feedSection').style.display = 'block';
+        document.getElementById('roomsSection').style.display = 'none';
+        document.getElementById('chatSection').style.display = 'none';
+    } else {
+        document.getElementById('tabRooms').classList.add('active');
+        document.getElementById('feedSection').style.display = 'none';
+        document.getElementById('roomsSection').style.display = 'block';
+        document.getElementById('chatSection').style.display = 'none';
+    }
+};
+
+// ================================================================
+// УТИЛИТЫ
+// ================================================================
+const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
+const now = () => new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+// ================================================================
+// КОМНАТЫ
+// ================================================================
+function loadRooms() {
+    db.ref('sites/'+SITE+'/rooms').orderByChild('createdAt').on('value', snap => {
+        const data = snap.val() || {};
+        const keys = Object.keys(data).sort((a,b) => (data[a].createdAt||0) - (data[b].createdAt||0));
+        const list = document.getElementById('roomList');
+        if (!keys.length) {
+            list.innerHTML = '<div style="color:#8b949e;">Нет комнат</div>';
+            return;
+        }
+        list.innerHTML = keys.map(k => {
+            const r = data[k];
+            const ac = k === CUR_ROOM ? 'active' : '';
+            return `<div class="room-item ${ac}" onclick="openRoom('${k}','${esc(r.name||'Комната')}')">
+                <span># ${esc(r.name||'?')}</span>
+                <span class="room-cnt">${r.count||0}</span>
+            </div>`;
+        }).join('');
+    });
+}
+
+window.openRoom = function(roomId, roomName) {
+    if (!USER) { alert('Сначала войдите!'); return; }
+    CUR_ROOM = roomId;
+    document.getElementById('chatSection').classList.remove('hidden');
+    document.getElementById('roomsSection').style.display = 'none';
+    document.getElementById('feedSection').style.display = 'none';
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tabRooms').classList.add('active');
+    document.getElementById('chatRoomLabel').textContent = roomName || 'Комната';
+    loadChat(roomId);
+};
+
+window.openCreateRoom = function() {
+    if (!IS_ROOM_ADMIN) { alert('⛔ Только для админа!'); return; }
+    document.getElementById('createRoomModal').classList.add('open');
+};
+window.doCreateRoom = function() {
+    const name = document.getElementById('roomNameInput').value.trim();
+    if (!name || name.length < 2) { alert('⚠️ Минимум 2 символа'); return; }
+    db.ref('sites/'+SITE+'/rooms').push({ name, createdAt: Date.now(), count: 0 })
+        .then(() => closeModal('createRoomModal'))
+        .catch(e => alert('❌ '+e.message));
+};
+
+// ================================================================
+// ЛЕНТА (FEED)
+// ================================================================
+function loadFeed() {
     db.ref('sites/'+SITE+'/feed_posts').orderByChild('timestamp').on('value', snap => {
         const c = document.getElementById('feedPosts');
         c.innerHTML = '';
         const data = snap.val() || {};
         const keys = Object.keys(data).sort((a,b) => (data[b].timestamp||0) - (data[a].timestamp||0));
-        if(!keys.length){
-            c.innerHTML = '<div class="df-empty"><div class="df-empty-icon">📭</div><div class="df-empty-title">Пока пусто</div></div>';
+        if (!keys.length) {
+            c.innerHTML = '<div style="text-align:center;padding:30px;color:#8b949e;">Пока пусто</div>';
             return;
         }
         keys.forEach(k => { const p = data[k]; p.id = k; c.appendChild(renderFeedPost(p)); });
     });
 }
 
-function renderFeedPost(p){
+function renderFeedPost(p) {
     const d = document.createElement('div');
     d.className = 'df-post';
     const mq = p.marquee ? `<div class="df-marquee"><span>${esc(p.marquee)}</span></div>` : '';
-    const img = p.img ? `<img class="df-img" src="${esc(p.img)}" onclick="window.open(this.src)">` : '';
-    const fr = p.link ? `<div class="df-frame"><iframe src="${esc(p.link)}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>` : '';
+    const fr = p.link ? `<iframe src="${esc(p.link)}" style="width:100%;height:200px;border:1px solid #30363d;border-radius:8px;margin:4px 0;"></iframe>` : '';
     let btns = '';
-    if(p.buttons && p.buttons.length){
-        btns = '<div class="df-buttons">'+p.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="df-btn">${esc(b.label||'🔗 Перейти')}</a>`).join('')+'</div>';
+    if (p.buttons && p.buttons.length) {
+        btns = p.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="df-btn">${esc(b.label||'🔗 Перейти')}</a>`).join('');
     }
     let tags = '';
-    if(p.hashtags && p.hashtags.length){
-        tags = '<div class="df-hashtags">'+p.hashtags.map(t => `<span class="df-tag">${esc(t)}</span>`).join('')+'</div>';
+    if (p.hashtags && p.hashtags.length) {
+        tags = p.hashtags.map(t => `<span class="df-tag">${esc(t)}</span>`).join(' ');
     }
     let acts = '';
-    if(IS_FEED_ADMIN){
-        acts = `<div class="df-actions"><button class="df-edit-btn" onclick="feedOpenEdit('${p.id}')">✏️ Ред.</button><button class="df-del-btn" onclick="feedDel('${p.id}')">🗑</button></div>`;
-    }
-    d.innerHTML = `${mq}
-        <div class="df-phead"><span class="df-author">${esc(p.author||'Аноним')}</span><span class="df-time">${p.time||''}${p.edited?' <span style="color:#999;font-size:0.45rem;">(ред.)</span>':''}</span></div>
-        <div class="df-text">${esc(p.text||'')}</div>
-        ${img}${btns}${fr}${tags}${acts}
-        <div class="df-post-footer">
-            <button class="df-discuss-btn" onclick="openPostRoom('${p.id}','${esc((p.text||'Пост').slice(0,28))}')">💬 Обсудить</button>
+    if (IS_FEED_ADMIN) {
+        acts = `<div class="df-actions">
+            <button class="df-edit-btn" onclick="feedOpenEdit('${p.id}')">✏️ Ред.</button>
+            <button class="df-del-btn" onclick="feedDel('${p.id}')">🗑</button>
         </div>`;
+    }
+    d.innerHTML = `
+        ${mq}
+        <div><span class="df-author">${esc(p.author||'Аноним')}</span><span class="df-time">${p.time||''}${p.edited?' (ред.)':''}</span></div>
+        <div class="df-text">${esc(p.text||'')}</div>
+        ${btns}
+        ${fr}
+        <div>${tags}</div>
+        ${acts}
+        <div style="margin-top:6px;">
+            <button class="df-discuss-btn" onclick="openRoom('post_${p.id}','${esc((p.text||'Пост').slice(0,28))}')">💬 Обсудить</button>
+        </div>
+    `;
     return d;
 }
 
-// feed form
-window.fAddBtn = function(l='', u=''){
+// Форма поста
+window.fAddBtn = function(l='', u='') {
     const c = document.getElementById('fBtns');
     const d = document.createElement('div'); d.className = 'df-fbtn-row';
-    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button class="df-fremove" onclick="this.parentElement.remove()">✕</button>`;
+    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()">✕</button>`;
     c.appendChild(d);
 };
-window.fSubmit = function(){
-    if(!USER){ alert('Сначала войдите!'); return; }
+window.fSubmit = function() {
+    if (!USER) { alert('Сначала войдите!'); return; }
     const marquee = document.getElementById('fMarquee').value.trim();
     const text = document.getElementById('fText').value.trim();
     const link = document.getElementById('fLink').value.trim();
     const hr = document.getElementById('fHashtags').value.trim();
     const hashtags = hr ? hr.split(/\s+/).filter(t=>t.startsWith('#')).slice(0,5) : [];
-    if(!text && !link){ alert('⚠️ Введите текст или ссылку'); return; }
+    if (!text && !link) { alert('⚠️ Введите текст или ссылку'); return; }
     const buttons = [];
     document.querySelectorAll('#fBtns .df-fbtn-row').forEach(g => {
         const [li, ui] = g.querySelectorAll('input');
-        if(ui.value.trim()) buttons.push({label: li.value.trim()||'🔗 Перейти', url: ui.value.trim()});
+        if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗 Перейти', url: ui.value.trim()});
     });
-    const post = {author: USER, text: text||'📝', time: now(), timestamp: Date.now(), marquee: marquee||null, link: link||null, buttons, hashtags, img: null, edited: false};
+    const post = { author: USER, text: text||'📝', time: now(), timestamp: Date.now(), marquee: marquee||null, link: link||null, buttons, hashtags, img: null, edited: false };
     const ref = db.ref('sites/'+SITE+'/feed_posts');
-    if(FEED_EDIT_ID){
+    if (FEED_EDIT_ID) {
         ref.child(FEED_EDIT_ID).update({...post, edited: true, editedAt: Date.now()}).then(fCancel);
-    }else{
+    } else {
         ref.push(post).then(fCancel);
     }
 };
-window.fCancel = function(){
+window.fCancel = function() {
     ['fMarquee','fText','fLink','fHashtags'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fBtns').innerHTML = '';
     document.getElementById('fSubmitBtn').textContent = '📤 Опубликовать';
     FEED_EDIT_ID = null;
 };
-window.feedOpenEdit = function(id){
+window.feedOpenEdit = function(id) {
     FEED_EDIT_ID = id;
     db.ref('sites/'+SITE+'/feed_posts/'+id).once('value', snap => {
-        const p = snap.val(); if(!p) return;
+        const p = snap.val(); if (!p) return;
         document.getElementById('fMarquee').value = p.marquee||'';
         document.getElementById('fText').value = p.text||'';
         document.getElementById('fLink').value = p.link||'';
@@ -804,33 +678,33 @@ window.feedOpenEdit = function(id){
         document.getElementById('fBtns').innerHTML = '';
         (p.buttons||[]).forEach(b => fAddBtn(b.label, b.url));
         document.getElementById('fSubmitBtn').textContent = '💾 Обновить';
-        document.getElementById('feedForm').classList.add('show');
+        document.getElementById('feedForm').classList.remove('hidden');
         document.getElementById('feedForm').scrollIntoView({behavior:'smooth'});
     });
 };
-window.feedDel = function(id){
-    if(!confirm('🗑 Удалить пост?')) return;
+window.feedDel = function(id) {
+    if (!confirm('🗑 Удалить пост?')) return;
     db.ref('sites/'+SITE+'/feed_posts/'+id).remove();
 };
 
 // ================================================================
-// 10. ЧАТ (CHAT)
+// ЧАТ
 // ================================================================
-function chatPath(roomId){ return 'rooms/'+SITE+'_'+roomId+'/messages'; }
+function chatPath(roomId) { return 'rooms/'+SITE+'_'+roomId+'/messages'; }
 
-function loadChat(roomId){
-    if(chatUnsub){ db.ref(chatUnsub).off('value'); chatUnsub = null; }
+function loadChat(roomId) {
+    if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
     DC_IMG = null;
     document.getElementById('dcPreview').classList.remove('show');
     document.getElementById('dcInput').value = '';
     const box = document.getElementById('dcMessages');
-    box.innerHTML = '<div style="color:#aaa;text-align:center;padding:20px;font-size:0.75rem;">⏳ Загрузка...</div>';
+    box.innerHTML = '<div style="color:#8b949e;text-align:center;padding:20px;">⏳ Загрузка...</div>';
     const path = chatPath(roomId);
     chatUnsub = path;
     db.ref(path).orderByChild('timestamp').on('value', snap => {
         box.innerHTML = '';
-        if(!snap.exists()){
-            box.innerHTML = '<div style="color:#aaa;text-align:center;padding:28px;font-size:0.75rem;">Сообщений пока нет. Напишите первым! 👋</div>';
+        if (!snap.exists()) {
+            box.innerHTML = '<div style="color:#8b949e;text-align:center;padding:30px;">Сообщений пока нет 👋</div>';
             return;
         }
         snap.forEach(s => { const m = s.val(); m.id = s.key; box.appendChild(renderChatMsg(m, roomId)); });
@@ -838,45 +712,44 @@ function loadChat(roomId){
     });
 }
 
-function renderChatMsg(m, roomId){
+function renderChatMsg(m, roomId) {
     const d = document.createElement('div');
     d.className = 'dc-msg';
     const isPost = m.isPost || m.marquee || (m.buttons && m.buttons.length);
-    const mq = (isPost && m.marquee) ? `<div class="dc-marquee"><span>${esc(m.marquee)}</span></div>` : '';
-    const img = m.img ? `<img class="dc-msg-img" src="${esc(m.img)}" onclick="window.open(this.src)">` : '';
-    const fr = (isPost && m.link) ? `<div class="dc-post-frame"><iframe src="${esc(m.link)}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>` : '';
+    const mq = (isPost && m.marquee) ? `<div class="df-marquee"><span>${esc(m.marquee)}</span></div>` : '';
+    const fr = (isPost && m.link) ? `<iframe src="${esc(m.link)}" style="width:100%;height:150px;border:1px solid #30363d;border-radius:6px;margin:4px 0;"></iframe>` : '';
     let btns = '';
-    if(isPost && m.buttons && m.buttons.length){
-        btns = '<div class="dc-post-buttons">'+m.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank">${esc(b.label||'🔗')}</a>`).join('')+'</div>';
+    if (isPost && m.buttons && m.buttons.length) {
+        btns = m.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="df-btn" style="font-size:0.7rem;padding:4px 12px;">${esc(b.label||'🔗')}</a>`).join('');
     }
     let tags = '';
-    if(isPost && m.hashtags && m.hashtags.length){
-        tags = '<div class="dc-post-tags">'+m.hashtags.map(t => `<span>${esc(t)}</span>`).join('')+'</div>';
+    if (isPost && m.hashtags && m.hashtags.length) {
+        tags = m.hashtags.map(t => `<span class="df-tag">${esc(t)}</span>`).join(' ');
     }
     let txt = esc(m.text||'');
-    if(!isPost){
-        const lm = (m.text||'').match(/(https?:\/\/[^\s]+)/);
-        if(lm) txt = txt.replace(esc(lm[1]), `<span style="color:#1877f2;text-decoration:underline;">${esc(lm[1])}</span>`);
-    }
-    let acts = `<button onclick="dcLike('${m.id}','${roomId}')">👍 ${m.likes||0}</button><button onclick="dcReply('${esc(m.nick)}')">💬</button>`;
-    if((m.nick === USER) || IS_ROOM_ADMIN){
+    let acts = `<button onclick="dcLike('${m.id}','${roomId}')">👍 ${m.likes||0}</button>
+                <button onclick="dcReply('${esc(m.nick)}')">💬</button>`;
+    if ((m.nick === USER) || IS_ROOM_ADMIN) {
         acts += `<button class="dc-edit-btn" onclick="openChatEdit('${m.id}','${roomId}')">✏️</button>`;
         acts += `<button class="dc-del-btn" onclick="dcDel('${m.id}','${roomId}')">🗑</button>`;
     }
-    d.innerHTML = `${mq}
-        <div><span class="dc-author">${esc(m.nick||'?')}</span><span class="dc-time">${m.time||''}${m.edited?' <span style="color:#999;font-size:0.4rem;">(ред.)</span>':''}</span></div>
+    d.innerHTML = `
+        ${mq}
+        <div><span class="dc-author">${esc(m.nick||'?')}</span><span class="dc-time">${m.time||''}${m.edited?' (ред.)':''}</span></div>
         <div class="dc-msg-text">${txt}</div>
-        ${img}${btns}${fr}${tags}
-        <div class="dc-actions">${acts}</div>`;
+        ${btns}
+        ${fr}
+        <div>${tags}</div>
+        <div class="dc-actions">${acts}</div>
+    `;
     return d;
 }
 
-// send user msg
-window.dcSend = function(){
-    if(!CUR_ROOM || !USER){ alert('Сначала войдите и выберите комнату!'); return; }
+window.dcSend = function() {
+    if (!CUR_ROOM || !USER) { alert('Сначала войдите и выберите комнату'); return; }
     const input = document.getElementById('dcInput');
     const text = input.value.trim();
-    if(!text && !DC_IMG) return;
+    if (!text && !DC_IMG) return;
     db.ref(chatPath(CUR_ROOM)).push({
         nick: USER,
         text: text || '📷',
@@ -890,13 +763,13 @@ window.dcSend = function(){
     input.value = '';
     dcRemoveImg();
 };
-document.getElementById('dcInput').addEventListener('keypress', e => { if(e.key === 'Enter') dcSend(); });
+document.getElementById('dcInput').addEventListener('keypress', e => { if (e.key === 'Enter') dcSend(); });
 
-// image
-document.getElementById('dcFile').addEventListener('change', function(e){
+// Фото
+document.getElementById('dcFile').addEventListener('change', function(e) {
     const f = e.target.files[0];
-    if(!f || !f.type.startsWith('image/')) return;
-    if(f.size > 2*1024*1024){ alert('Максимум 2MB'); return; }
+    if (!f || !f.type.startsWith('image/')) return;
+    if (f.size > 2*1024*1024) { alert('Максимум 2MB'); return; }
     const r = new FileReader();
     r.onload = ev => {
         DC_IMG = ev.target.result;
@@ -906,54 +779,53 @@ document.getElementById('dcFile').addEventListener('change', function(e){
     };
     r.readAsDataURL(f);
 });
-window.dcRemoveImg = function(){
+window.dcRemoveImg = function() {
     DC_IMG = null;
     document.getElementById('dcPreview').classList.remove('show');
     document.getElementById('dcFile').value = '';
 };
 
-// like / reply / delete
-window.dcLike = function(id, roomId){
-    const key = 'lk_'+id+'_'+USER;
-    if(localStorage.getItem(key)) return;
+window.dcLike = function(id, roomId) {
+    if (!USER) return;
+    const key = 'lk_'+id+'_'+USER_UID;
+    if (localStorage.getItem(key)) return;
     db.ref(chatPath(roomId)+'/'+id+'/likes').transaction(v => (v||0)+1);
     localStorage.setItem(key, '1');
 };
-window.dcReply = function(nick){
-    const i = document.getElementById('dcInput');
-    i.value = '@'+nick+' ';
-    i.focus();
+window.dcReply = function(nick) {
+    document.getElementById('dcInput').value = '@'+nick+' ';
+    document.getElementById('dcInput').focus();
 };
-window.dcDel = function(id, roomId){
-    if(!confirm('Удалить?')) return;
+window.dcDel = function(id, roomId) {
+    if (!confirm('Удалить?')) return;
     db.ref(chatPath(roomId)+'/'+id).remove();
 };
 
-// ADMIN PUBLISH in chat
-window.toggleAdminForm = function(){
+// Admin publish in chat
+window.toggleAdminForm = function() {
     const f = document.getElementById('dcAdminForm');
     const btn = document.querySelector('.dc-admin-bar-title button');
     const open = f.classList.toggle('open');
     btn.textContent = open ? '▲ Закрыть' : '▼ Открыть';
 };
-window.apAddBtn = function(l='', u=''){
+window.apAddBtn = function(l='', u='') {
     const c = document.getElementById('apBtns');
     const d = document.createElement('div'); d.className = 'dc-abtn-row';
-    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button class="dc-abtn-remove" onclick="this.parentElement.remove()">✕</button>`;
+    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#f85149;cursor:pointer;">✕</button>`;
     c.appendChild(d);
 };
-window.apPublish = function(){
-    if(!CUR_ROOM || !USER){ alert('Сначала войдите и выберите комнату'); return; }
+window.apPublish = function() {
+    if (!CUR_ROOM || !USER) { alert('Сначала войдите'); return; }
     const marquee = document.getElementById('apMarquee').value.trim();
     const text = document.getElementById('apText').value.trim();
     const link = document.getElementById('apLink').value.trim();
     const hr = document.getElementById('apHashtags').value.trim();
     const hashtags = hr ? hr.split(/\s+/).filter(t=>t.startsWith('#')).slice(0,5) : [];
-    if(!marquee && !text && !link){ alert('⚠️ Заполните хотя бы одно поле'); return; }
+    if (!marquee && !text && !link) { alert('⚠️ Заполните поле'); return; }
     const buttons = [];
     document.querySelectorAll('#apBtns .dc-abtn-row').forEach(g => {
         const [li, ui] = g.querySelectorAll('input');
-        if(ui.value.trim()) buttons.push({label: li.value.trim()||'🔗 Перейти', url: ui.value.trim()});
+        if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗 Перейти', url: ui.value.trim()});
     });
     db.ref(chatPath(CUR_ROOM)).push({
         nick: USER,
@@ -976,11 +848,11 @@ window.apPublish = function(){
     });
 };
 
-// EDIT MODAL (chat)
-window.openChatEdit = function(msgId, roomId){
+// Edit modal
+window.openChatEdit = function(msgId, roomId) {
     CHAT_EDIT_ID = { msgId, roomId };
     db.ref(chatPath(roomId)+'/'+msgId).once('value', snap => {
-        const m = snap.val(); if(!m) return;
+        const m = snap.val(); if (!m) return;
         document.getElementById('editMarquee').value = m.marquee||'';
         document.getElementById('editText').value = m.text||'';
         document.getElementById('editLink').value = m.link||'';
@@ -990,18 +862,15 @@ window.openChatEdit = function(msgId, roomId){
         document.getElementById('editOverlay').classList.add('open');
     });
 };
-window.closeEdit = function(){
-    document.getElementById('editOverlay').classList.remove('open');
-    CHAT_EDIT_ID = null;
-};
-window.editAddBtn = function(l='', u=''){
+window.closeEdit = function() { document.getElementById('editOverlay').classList.remove('open'); CHAT_EDIT_ID = null; };
+window.editAddBtn = function(l='', u='') {
     const c = document.getElementById('editBtns');
     const d = document.createElement('div'); d.className = 'edit-btn-row';
-    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button class="edit-btn-rem" onclick="this.parentElement.remove()">✕</button>`;
+    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#f85149;cursor:pointer;">✕</button>`;
     c.appendChild(d);
 };
-window.doSaveEdit = function(){
-    if(!CHAT_EDIT_ID) return;
+window.doSaveEdit = function() {
+    if (!CHAT_EDIT_ID) return;
     const { msgId, roomId } = CHAT_EDIT_ID;
     const marquee = document.getElementById('editMarquee').value.trim();
     const text = document.getElementById('editText').value.trim();
@@ -1011,7 +880,7 @@ window.doSaveEdit = function(){
     const buttons = [];
     document.querySelectorAll('#editBtns .edit-btn-row').forEach(g => {
         const [li, ui] = g.querySelectorAll('input');
-        if(ui.value.trim()) buttons.push({label: li.value.trim()||'🔗 Перейти', url: ui.value.trim()});
+        if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗 Перейти', url: ui.value.trim()});
     });
     db.ref(chatPath(roomId)+'/'+msgId).update({
         marquee: marquee || null,
@@ -1024,29 +893,24 @@ window.doSaveEdit = function(){
         isPost: !!(marquee || link || buttons.length)
     }).then(closeEdit);
 };
-window.doDeleteEdit = function(){
-    if(!CHAT_EDIT_ID || !confirm('Удалить?')) return;
+window.doDeleteEdit = function() {
+    if (!CHAT_EDIT_ID || !confirm('Удалить?')) return;
     const { msgId, roomId } = CHAT_EDIT_ID;
     db.ref(chatPath(roomId)+'/'+msgId).remove();
     closeEdit();
 };
 
 // ================================================================
-// 11. ЗАПУСК
+// СИД-ДАННЫЕ (если пусто)
 // ================================================================
-// Кнопка входа через Google
-document.getElementById('googleLoginBtn').addEventListener('click', window.googleLogin);
-
-// Если пользователь уже был залогинен — авторизация сработает через onAuthStateChanged
-
-// Seed examples if empty
 db.ref('sites/'+SITE+'/feed_posts').once('value', snap => {
-    if(snap.exists()) return;
-    const ex = [
-        {author:'📢 Администрация', text:'Добро пожаловать в DeepChat! Здесь можно общаться, делиться новостями и находить друзей. 🏳️‍🌈', time:'12:00', timestamp:Date.now()-3600000, marquee:'🌟 Добро пожаловать в DeepChat! Будьте собой! 🌟', link:null, buttons:[{label:'📋 Правила', url:'#'}], hashtags:['#ДоброПожаловать','#Сообщество'], img:null, edited:false},
-        {author:'🏳️‍🌈 Организатор', text:'Завтра в 19:00 онлайн-встреча! Обсудим планы на месяц. Все желающие приглашаются!', time:'11:30', timestamp:Date.now()-7200000, marquee:'📅 Онлайн-встреча завтра в 19:00!', link:null, buttons:[{label:'🔗 Подключиться', url:'https://meet.google.com/'}], hashtags:['#Встреча','#Планы'], img:null, edited:false}
-    ];
-    ex.forEach(p => db.ref('sites/'+SITE+'/feed_posts').push(p));
+    if (!snap.exists()) {
+        const ex = [
+            {author:'📢 Админ', text:'Добро пожаловать в DeepChat! Общайся, делись новостями.', time:'12:00', timestamp:Date.now()-3600000, marquee:'🌟 Добро пожаловать!', link:null, buttons:[{label:'📋 Правила', url:'#'}], hashtags:['#Добро'], img:null, edited:false},
+            {author:'🏳️‍🌈 Орг', text:'Встреча завтра в 19:00', time:'11:30', timestamp:Date.now()-7200000, marquee:'📅 Встреча!', link:null, buttons:[{label:'🔗 Ссылка', url:'https://meet.google.com/'}], hashtags:['#Встреча'], img:null, edited:false}
+        ];
+        ex.forEach(p => db.ref('sites/'+SITE+'/feed_posts').push(p));
+    }
 });
 
 })();
