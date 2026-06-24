@@ -530,30 +530,32 @@
             background: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 14px;
-            padding: 20px;
+            padding: 24px;
             max-width: 400px;
             width: 100%;
         }
-        .modal .box h3 { color: #222; margin-bottom: 4px; }
-        .modal .box .sub { color: #888; font-size: 0.85rem; margin-bottom: 12px; }
+        .modal .box h3 { color: #222; margin-bottom: 4px; font-size: 1.1rem; }
+        .modal .box .sub { color: #888; font-size: 0.85rem; margin-bottom: 16px; }
         .modal .box input {
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 14px;
             background: #fff;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 10px;
             color: #222;
             font-size: 0.9rem;
             margin: 6px 0;
+            outline: none;
         }
-        .modal .box input:focus { border-color: #1877f2; outline: none; }
+        .modal .box input:focus { border-color: #1877f2; }
         .modal .box .btns {
             display: flex;
             gap: 8px;
             justify-content: flex-end;
+            margin-top: 8px;
         }
         .modal .box .btns button {
-            padding: 6px 18px;
+            padding: 8px 20px;
             border-radius: 40px;
             border: none;
             font-weight: 700;
@@ -564,6 +566,48 @@
         .modal .box .btns .cancel:hover { background: #e0e0e0; }
         .modal .box .btns .save { background: #1877f2; color: #fff; }
         .modal .box .btns .save:hover { background: #4a9eff; }
+
+        /* ===== КНОПКА GOOGLE ===== */
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 16px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 8px 0 4px;
+        }
+        .google-btn:hover {
+            background: #f5f5f5;
+            border-color: #bbb;
+        }
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+        }
+        .modal .box .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            color: #bbb;
+            font-size: 0.75rem;
+        }
+        .modal .box .divider::before,
+        .modal .box .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
 
         /* ===== РЕДАКТИРОВАНИЕ ===== */
         .edit-overlay {
@@ -689,7 +733,6 @@
         </div>
     </div>
 
-    <!-- Навигация -->
     <div class="nav-item active" id="navFeed" onclick="goFeed()">📰 Лента</div>
     <div class="nav-item" id="navRooms" onclick="goRooms()">💬 Комнаты</div>
 
@@ -705,7 +748,6 @@
 
 <!-- ===== ОСНОВНАЯ ЧАСТЬ ===== -->
 <div class="main" id="main">
-    <!-- Топбар -->
     <div class="topbar">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
         <div class="title" onclick="goFeed()">Deep<span>Chat</span></div>
@@ -714,7 +756,6 @@
         </div>
     </div>
 
-    <!-- Контент -->
     <div class="content" id="content">
         <!-- ЛЕНТА -->
         <div class="feed" id="feedSection">
@@ -770,6 +811,28 @@
 <div class="admin-dot" id="adminDot" onclick="openAdminLogin()" title="Админ-вход"></div>
 
 <!-- ===== МОДАЛКИ ===== -->
+<!-- МОДАЛКА ВХОДА / СМЕНЫ ИМЕНИ -->
+<div class="modal" id="changeNameModal">
+    <div class="box">
+        <h3>👤 Вход в DeepChat</h3>
+        <div class="sub">Введите имя или войдите через Google</div>
+        
+        <!-- КНОПКА GOOGLE -->
+        <button class="google-btn" id="googleLoginBtn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+            Войти через Google
+        </button>
+        
+        <div class="divider">или</div>
+        
+        <input type="text" id="changeNameInput" placeholder="Введите имя..." maxlength="24">
+        <div class="btns">
+            <button class="cancel" onclick="closeChangeName()">Отмена</button>
+            <button class="save" onclick="doChangeName()">Войти</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal" id="adminModal">
     <div class="box">
         <h3>🏴‍☠️ Админ-вход</h3>
@@ -790,18 +853,6 @@
         <div class="btns">
             <button class="cancel" onclick="closeCreateRoom()">Отмена</button>
             <button class="save" onclick="doCreateRoom()">Создать</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal" id="changeNameModal">
-    <div class="box">
-        <h3>✏️ Сменить имя</h3>
-        <div class="sub">Введите новое имя</div>
-        <input type="text" id="changeNameInput" placeholder="Новое имя" maxlength="24">
-        <div class="btns">
-            <button class="cancel" onclick="closeChangeName()">Отмена</button>
-            <button class="save" onclick="doChangeName()">Сохранить</button>
         </div>
     </div>
 </div>
@@ -846,6 +897,21 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     // ================================================================
+    // КНОПКА GOOGLE
+    // ================================================================
+    document.getElementById('googleLoginBtn').addEventListener('click', function() {
+        auth.signInWithPopup(provider)
+            .then((result) => {
+                console.log('✅ Вход через Google выполнен');
+                closeChangeName();
+            })
+            .catch((error) => {
+                console.error('❌ Ошибка входа:', error);
+                alert('Ошибка входа: ' + error.message);
+            });
+    });
+
+    // ================================================================
     // СОСТОЯНИЕ
     // ================================================================
     const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
@@ -882,6 +948,7 @@
             loadFeed();
             loadRooms();
             if (CUR_ROOM) loadChat(CUR_ROOM);
+            closeChangeName();
         } else {
             USER = null;
             USER_UID = null;
@@ -892,7 +959,8 @@
             
             // Показываем модалку входа
             document.getElementById('changeNameModal').classList.add('open');
-            document.getElementById('changeNameInput').placeholder = 'Введите имя или войдите через Google...';
+            document.getElementById('changeNameInput').value = '';
+            document.getElementById('changeNameInput').placeholder = 'Введите имя...';
         }
     });
 
@@ -1020,7 +1088,6 @@
         document.getElementById('navRooms').classList.add('active');
         document.getElementById('navFeed').classList.remove('active');
         closeSidebar();
-        // Показываем список комнат в сайдбаре
         loadRooms();
     };
 
@@ -1056,7 +1123,6 @@
         document.getElementById('navFeed').classList.remove('active');
         closeSidebar();
         loadChat(roomId);
-        // Обновляем активный элемент в меню
         document.querySelectorAll('.room').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.room').forEach(el => {
             if (el.textContent.includes(roomName)) el.classList.add('active');
@@ -1354,6 +1420,7 @@
     goFeed();
     console.log('💬 DeepChat (белая версия) запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345 (серая точка в правом нижнем углу)');
+    console.log('🔑 Кнопка "Войти через Google" — в модалке входа');
 })();
 </script>
 </body>
