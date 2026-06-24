@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моя Экосистема</title>
+    <title>Вход через Google</title>
     
-    <!-- Подключаем Firebase SDK -->
     <script type="module">
-        // Импортируем функции Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        // ТВОИ КЛЮЧИ (вставь свои!)
         const firebaseConfig = {
             apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
             authDomain: "myecosystem-e6414.firebaseapp.com",
@@ -22,52 +19,38 @@
             appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
         };
 
-        // Инициализация
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
 
-        // ============ ЭТО НАША РЕГИСТРАЦИЯ ============
-        document.getElementById('registerBtn').addEventListener('click', async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const username = document.getElementById('username').value;
-
+        // Кнопка входа через Google
+        document.getElementById('googleBtn').addEventListener('click', async () => {
             try {
-                // 1. Регистрируем пользователя
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                // 2. Сохраняем данные в Firestore
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
                 await setDoc(doc(db, "users", user.uid), {
-                    username: username,
-                    email: email,
+                    username: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
                     createdAt: new Date().toISOString()
-                });
+                }, { merge: true });
 
-                alert('Регистрация успешна! 🎉');
+                alert('✅ Вход через Google выполнен!');
             } catch (error) {
-                alert('Ошибка: ' + error.message);
+                alert('❌ Ошибка: ' + error.message);
             }
         });
 
-        // ============ ЭТО ВХОД ============
-        document.getElementById('loginBtn').addEventListener('click', async () => {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                alert('Вход выполнен! 🚀');
-            } catch (error) {
-                alert('Ошибка: ' + error.message);
-            }
-        });
-
-        // ============ СЛЕДИМ ЗА ПОЛЬЗОВАТЕЛЕМ ============
+        // Следим за пользователем
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('status').innerHTML = `✅ Вы вошли как: ${user.email}`;
+                document.getElementById('status').innerHTML = `
+                    ✅ Вы вошли как: ${user.displayName || user.email}
+                    <br>
+                    <img src="${user.photoURL || ''}" width="50" style="border-radius: 50%;">
+                `;
                 document.getElementById('authPanel').style.display = 'none';
                 document.getElementById('userPanel').style.display = 'block';
             } else {
@@ -76,60 +59,68 @@
                 document.getElementById('userPanel').style.display = 'none';
             }
         });
+
+        // Выход
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut();
+            alert('Вы вышли');
+        });
     </script>
 </head>
 <body>
     <h1>🚀 Моя Экосистема</h1>
     <div id="status">Загрузка...</div>
 
-    <!-- Панель регистрации/входа -->
+    <!-- Панель входа -->
     <div id="authPanel">
-        <h2>📝 Регистрация</h2>
-        <input type="text" id="username" placeholder="Имя пользователя" />
-        <input type="email" id="email" placeholder="Email" />
-        <input type="password" id="password" placeholder="Пароль" />
-        <button id="registerBtn">Зарегистрироваться</button>
-
-        <hr />
-
-        <h2>🔑 Вход</h2>
-        <input type="email" id="loginEmail" placeholder="Email" />
-        <input type="password" id="loginPassword" placeholder="Пароль" />
-        <button id="loginBtn">Войти</button>
+        <h2>🔑 Вход через Google</h2>
+        <button id="googleBtn" style="background: #4285F4; padding: 15px 40px; font-size: 18px; border: none; border-radius: 8px; color: white; cursor: pointer;">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" style="vertical-align: middle; margin-right: 10px;">
+            Войти через Google
+        </button>
     </div>
 
     <!-- Панель пользователя -->
     <div id="userPanel" style="display: none;">
         <h2>🎮 Добро пожаловать!</h2>
         <p>Ты в своей экосистеме. Здесь будут твои сайты.</p>
-        <button onclick="window.location.reload()">Выйти</button>
+        <button id="logoutBtn" style="background: #da3633; padding: 10px 20px; border: none; border-radius: 8px; color: white; cursor: pointer;">Выйти</button>
     </div>
 
     <style>
-        body { font-family: Arial; padding: 20px; background: #0d1117; color: white; }
-        input { 
-            display: block; 
-            margin: 10px 0; 
-            padding: 10px; 
-            width: 250px; 
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #161b22;
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #0d1117;
             color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            margin: 0;
+        }
+        #authPanel, #userPanel {
+            background: #161b22;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 350px;
+            margin-top: 20px;
+        }
+        #status {
+            padding: 15px;
+            background: #161b22;
+            border-radius: 8px;
+            margin: 20px 0;
+            min-width: 350px;
+            text-align: center;
         }
         button {
-            padding: 10px 20px;
-            background: #238636;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 5px 0;
+            transition: 0.2s;
+            font-size: 16px;
         }
-        button:hover { background: #2ea043; }
-        #status { padding: 15px; background: #161b22; border-radius: 8px; margin: 20px 0; }
-        #authPanel, #userPanel { background: #161b22; padding: 20px; border-radius: 12px; }
-        hr { border-color: #333; margin: 20px 0; }
+        button:hover { opacity: 0.9; transform: scale(1.02); }
     </style>
 </body>
 </html>
