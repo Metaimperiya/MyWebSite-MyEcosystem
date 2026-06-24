@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя Экосистема</title>
+    
+    <!-- Подключаем Firebase SDK -->
+    <script type="module">
+        // Импортируем функции Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        // ТВОИ КЛЮЧИ (вставь свои!)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
+            authDomain: "myecosystem-e6414.firebaseapp.com",
+            projectId: "myecosystem-e6414",
+            storageBucket: "myecosystem-e6414.firebasestorage.app",
+            messagingSenderId: "426302111033",
+            appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
+        };
+
+        // Инициализация
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ============ ЭТО НАША РЕГИСТРАЦИЯ ============
+        document.getElementById('registerBtn').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+
+            try {
+                // 1. Регистрируем пользователя
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Сохраняем данные в Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    username: username,
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+
+                alert('Регистрация успешна! 🎉');
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        });
+
+        // ============ ЭТО ВХОД ============
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert('Вход выполнен! 🚀');
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        });
+
+        // ============ СЛЕДИМ ЗА ПОЛЬЗОВАТЕЛЕМ ============
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('status').innerHTML = `✅ Вы вошли как: ${user.email}`;
+                document.getElementById('authPanel').style.display = 'none';
+                document.getElementById('userPanel').style.display = 'block';
+            } else {
+                document.getElementById('status').innerHTML = '❌ Вы не авторизованы';
+                document.getElementById('authPanel').style.display = 'block';
+                document.getElementById('userPanel').style.display = 'none';
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>🚀 Моя Экосистема</h1>
+    <div id="status">Загрузка...</div>
+
+    <!-- Панель регистрации/входа -->
+    <div id="authPanel">
+        <h2>📝 Регистрация</h2>
+        <input type="text" id="username" placeholder="Имя пользователя" />
+        <input type="email" id="email" placeholder="Email" />
+        <input type="password" id="password" placeholder="Пароль" />
+        <button id="registerBtn">Зарегистрироваться</button>
+
+        <hr />
+
+        <h2>🔑 Вход</h2>
+        <input type="email" id="loginEmail" placeholder="Email" />
+        <input type="password" id="loginPassword" placeholder="Пароль" />
+        <button id="loginBtn">Войти</button>
+    </div>
+
+    <!-- Панель пользователя -->
+    <div id="userPanel" style="display: none;">
+        <h2>🎮 Добро пожаловать!</h2>
+        <p>Ты в своей экосистеме. Здесь будут твои сайты.</p>
+        <button onclick="window.location.reload()">Выйти</button>
+    </div>
+
+    <style>
+        body { font-family: Arial; padding: 20px; background: #0d1117; color: white; }
+        input { 
+            display: block; 
+            margin: 10px 0; 
+            padding: 10px; 
+            width: 250px; 
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #161b22;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        button:hover { background: #2ea043; }
+        #status { padding: 15px; background: #161b22; border-radius: 8px; margin: 20px 0; }
+        #authPanel, #userPanel { background: #161b22; padding: 20px; border-radius: 12px; }
+        hr { border-color: #333; margin: 20px 0; }
+    </style>
+</body>
+</html>
