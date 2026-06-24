@@ -3,294 +3,316 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DeepChat</title>
+    <title>DeepChat · Простой</title>
     
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
+        /* ===== МИНИМАЛИЗМ ===== */
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{background:#0d1117;color:#e6edf3;font-family:system-ui,sans-serif;padding:10px;}
-        .app{max-width:800px;margin:0 auto;}
-        .header{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #30363d;flex-wrap:wrap;}
-        .logo{font-size:1.4rem;font-weight:800;color:#f0f6fc;}
-        .logo span{color:#ff8c00;}
+        body{background:#fff;color:#222;font-family:system-ui,sans-serif;padding:10px;max-width:800px;margin:0 auto;}
+        
+        /* Шапка простая */
+        .header{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:2px solid #ccc;flex-wrap:wrap;}
+        .logo{font-size:1.3rem;font-weight:700;color:#222;}
+        .logo span{color:#e67e22;}
         .spacer{flex:1;}
-        .user-btn{background:#21262d;border:1px solid #30363d;border-radius:40px;padding:4px 14px;color:#c9d1d9;font-size:0.75rem;cursor:pointer;display:flex;align-items:center;gap:6px;}
-        .user-btn:hover{background:#30363d;}
-        .change-btn{background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:40px;padding:2px 10px;font-size:0.6rem;cursor:pointer;}
-        .change-btn:hover{background:#30363d;color:#fff;}
-        .tabs{display:flex;gap:0;margin:12px 0;border-bottom:1px solid #30363d;}
-        .tab{padding:10px 20px;cursor:pointer;color:#8b949e;border-bottom:2px solid transparent;font-size:0.9rem;}
-        .tab.active{color:#f0f6fc;border-bottom-color:#ff8c00;}
+        .user-btn{background:#f0f0f0;border:1px solid #ccc;border-radius:30px;padding:4px 12px;font-size:0.75rem;cursor:pointer;}
+        .user-btn:hover{background:#e0e0e0;}
+
+        /* Навигация */
+        .nav{display:flex;gap:0;margin:10px 0;border-bottom:2px solid #ccc;}
+        .nav-item{padding:8px 18px;cursor:pointer;color:#666;border-bottom:3px solid transparent;font-size:0.9rem;}
+        .nav-item.active{color:#222;border-bottom-color:#e67e22;font-weight:600;}
         .hidden{display:none!important;}
-        .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin-top:10px;}
-        .card-title{font-weight:700;color:#f0f6fc;margin-bottom:8px;}
 
-        .auth-panel{text-align:center;padding:50px 20px;}
-        .auth-panel h2{color:#f0f6fc;}
-        .auth-panel p{color:#8b949e;margin:10px 0 20px;}
-        .google-btn{background:#fff;border:1px solid #dadce0;border-radius:40px;padding:12px 28px;font-size:1rem;font-weight:600;color:#3c4043;cursor:pointer;display:inline-flex;align-items:center;gap:12px;}
-        .google-btn:hover{background:#f8f9fa;}
+        /* Карточки простые */
+        .card{background:#fff;border:1px solid #ccc;border-radius:8px;padding:12px;margin-top:10px;}
+        .card-title{font-weight:700;font-size:0.9rem;margin-bottom:6px;color:#222;}
 
-        .df-post{background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:12px;margin-bottom:12px;}
-        .df-author{color:#ff8c00;font-weight:700;}
-        .df-time{color:#8b949e;font-size:0.65rem;margin-left:6px;}
-        .df-text{color:#e6edf3;margin:6px 0;}
-        .df-marquee{background:#21262d;padding:4px 10px;border-radius:6px;color:#ff8c00;font-weight:600;margin-bottom:6px;overflow:hidden;white-space:nowrap;}
-        .df-marquee span{display:inline-block;animation:scroll 10s linear infinite;padding-left:100%;}
+        /* Авторизация */
+        .auth-panel{text-align:center;padding:40px 20px;border:1px solid #ccc;border-radius:8px;margin-top:20px;}
+        .auth-panel h2{color:#222;}
+        .auth-panel p{color:#666;margin:8px 0 16px;}
+        .google-btn{background:#fff;border:1px solid #ccc;border-radius:30px;padding:10px 24px;font-size:0.95rem;font-weight:600;color:#333;cursor:pointer;display:inline-flex;align-items:center;gap:10px;}
+        .google-btn:hover{background:#f5f5f5;}
+
+        /* Посты */
+        .post{background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px;margin-bottom:10px;}
+        .post-author{color:#e67e22;font-weight:700;}
+        .post-time{color:#999;font-size:0.6rem;margin-left:6px;}
+        .post-text{color:#222;margin:4px 0;}
+        .post-marquee{background:#f5f5f5;padding:3px 10px;border-radius:4px;color:#e67e22;font-weight:600;margin-bottom:4px;overflow:hidden;white-space:nowrap;}
+        .post-marquee span{display:inline-block;animation:scroll 10s linear infinite;padding-left:100%;}
         @keyframes scroll{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
-        .df-btn{display:inline-block;background:#ff8c00;color:#0d1117;padding:4px 14px;border-radius:40px;text-decoration:none;font-weight:700;font-size:0.75rem;margin:4px 4px 0 0;}
-        .df-tag{color:#58a6ff;font-size:0.6rem;background:#1f2937;padding:0 8px;border-radius:20px;border:1px solid #30363d;display:inline-block;margin:2px;}
-        .df-actions{display:flex;gap:4px;margin-top:6px;}
-        .df-actions button{background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:0 10px;border-radius:20px;font-size:0.55rem;cursor:pointer;}
-        .df-actions button:hover{background:#30363d;}
-        .df-discuss{background:#21262d;border:1px solid #30363d;color:#58a6ff;padding:2px 12px;border-radius:40px;font-size:0.6rem;cursor:pointer;}
+        .post-btn{display:inline-block;background:#e67e22;color:#fff;padding:3px 12px;border-radius:30px;text-decoration:none;font-size:0.7rem;font-weight:600;margin:2px 2px 0 0;}
+        .post-tag{color:#2980b9;font-size:0.6rem;background:#f0f0f0;padding:0 8px;border-radius:12px;border:1px solid #ddd;display:inline-block;margin:2px;}
+        .post-actions{display:flex;gap:4px;margin-top:4px;}
+        .post-actions button{background:#f0f0f0;border:1px solid #ddd;color:#555;padding:0 10px;border-radius:30px;font-size:0.55rem;cursor:pointer;}
+        .post-actions button:hover{background:#e0e0e0;}
+        .post-discuss{background:#f0f0f0;border:1px solid #ddd;color:#2980b9;padding:2px 12px;border-radius:30px;font-size:0.6rem;cursor:pointer;}
+        .post-discuss:hover{background:#e0e0e0;}
 
-        .df-form{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px;margin-bottom:12px;}
-        .df-form input,.df-form textarea{width:100%;padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.85rem;margin-bottom:6px;font-family:inherit;}
-        .df-form textarea{min-height:50px;resize:vertical;}
-        .df-fbtn-row{display:flex;gap:4px;margin-bottom:4px;}
-        .df-fbtn-row input{flex:1;margin-bottom:0;}
-        .df-fbtn-row button{background:#21262d;border:1px solid #30363d;color:#f85149;border-radius:4px;padding:0 8px;cursor:pointer;}
-        .df-fadd{background:transparent;border:1px solid #30363d;color:#ff8c00;padding:2px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;}
-        .df-factions{display:flex;gap:6px;margin-top:6px;}
-        .df-factions button{padding:6px 16px;border-radius:40px;border:none;font-weight:700;cursor:pointer;}
-        .df-fsubmit{background:#ff8c00;color:#0d1117;}
-        .df-fcancel{background:#21262d;color:#8b949e;}
+        /* Форма поста */
+        .post-form{background:#fafafa;border:1px solid #ddd;border-radius:6px;padding:10px;margin-bottom:10px;}
+        .post-form input,.post-form textarea{width:100%;padding:6px 10px;background:#fff;border:1px solid #ddd;border-radius:4px;color:#222;font-size:0.85rem;margin-bottom:4px;font-family:inherit;}
+        .post-form textarea{min-height:40px;resize:vertical;}
+        .btn-row{display:flex;gap:4px;margin-bottom:4px;}
+        .btn-row input{flex:1;margin-bottom:0;}
+        .btn-row button{background:#f0f0f0;border:1px solid #ddd;color:#e74c3c;border-radius:4px;padding:0 8px;cursor:pointer;}
+        .btn-add{background:transparent;border:1px solid #ddd;color:#e67e22;padding:2px 12px;border-radius:20px;cursor:pointer;font-size:0.7rem;}
+        .form-actions{display:flex;gap:6px;margin-top:6px;}
+        .form-actions button{padding:5px 16px;border-radius:30px;border:none;font-weight:600;cursor:pointer;}
+        .form-submit{background:#e67e22;color:#fff;}
+        .form-submit:hover{background:#d35400;}
+        .form-cancel{background:#f0f0f0;color:#888;}
+        .form-cancel:hover{background:#e0e0e0;}
 
-        .room-item{display:flex;justify-content:space-between;padding:6px 10px;border-radius:6px;cursor:pointer;color:#8b949e;border:1px solid transparent;}
-        .room-item:hover{background:#21262d;border-color:#30363d;color:#f0f6fc;}
-        .room-item.active{background:#1f2937;border-color:#ff8c00;color:#f0f6fc;}
-        .room-cnt{color:#8b949e;font-size:0.65rem;}
-        .create-room-btn{display:none;width:100%;background:#21262d;border:1px solid #30363d;color:#f0f6fc;padding:6px;border-radius:40px;margin-top:8px;cursor:pointer;}
+        /* Комнаты */
+        .room-item{display:flex;justify-content:space-between;padding:5px 10px;border-radius:4px;cursor:pointer;color:#555;border:1px solid transparent;}
+        .room-item:hover{background:#f0f0f0;border-color:#ddd;color:#222;}
+        .room-item.active{background:#f0f0f0;border-color:#e67e22;color:#222;font-weight:600;}
+        .room-cnt{color:#999;font-size:0.6rem;}
+        .create-room-btn{display:none;width:100%;background:#2980b9;border:none;color:#fff;padding:5px;border-radius:30px;margin-top:6px;cursor:pointer;font-weight:600;}
         .create-room-btn.show{display:block;}
-        .create-room-btn:hover{background:#30363d;}
+        .create-room-btn:hover{background:#1a6d95;}
 
-        .dc-panel{background:#0d1117;border:1px solid #30363d;border-radius:10px;height:55vh;display:flex;flex-direction:column;}
-        .dc-messages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;}
-        .dc-msg{background:#161b22;border:1px solid #21262d;border-radius:8px;padding:8px 10px;}
-        .dc-author{color:#ff8c00;font-weight:700;font-size:0.8rem;}
-        .dc-time{color:#8b949e;font-size:0.5rem;margin-left:4px;}
-        .dc-msg-text{color:#e6edf3;font-size:0.85rem;}
-        .dc-actions{display:flex;gap:4px;margin-top:4px;}
-        .dc-actions button{background:#21262d;border:1px solid #30363d;color:#8b949e;padding:0 8px;border-radius:20px;font-size:0.5rem;cursor:pointer;}
-        .dc-actions button:hover{background:#30363d;}
-        .dc-edit-btn{background:#1f2937!important;border-color:#ff8c00!important;color:#ff8c00!important;}
-        .dc-del-btn{background:#1f2937!important;border-color:#f85149!important;color:#f85149!important;}
+        /* Чат */
+        .chat-panel{background:#fff;border:1px solid #ccc;border-radius:6px;height:50vh;display:flex;flex-direction:column;}
+        .chat-messages{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:4px;}
+        .chat-msg{background:#f8f8f8;border:1px solid #eee;border-radius:6px;padding:6px 8px;}
+        .chat-author{color:#e67e22;font-weight:700;font-size:0.75rem;}
+        .chat-time{color:#999;font-size:0.45rem;margin-left:4px;}
+        .chat-text{color:#222;font-size:0.8rem;}
+        .chat-actions{display:flex;gap:4px;margin-top:3px;}
+        .chat-actions button{background:#f0f0f0;border:1px solid #ddd;color:#555;padding:0 8px;border-radius:30px;font-size:0.45rem;cursor:pointer;}
+        .chat-actions button:hover{background:#e0e0e0;}
+        .chat-edit-btn{background:#fef9e7!important;border-color:#f39c12!important;color:#d35400!important;}
+        .chat-del-btn{background:#fdedec!important;border-color:#e74c3c!important;color:#c0392b!important;}
 
-        .dc-input-wrap{padding:8px;background:#161b22;border-top:1px solid #30363d;border-radius:0 0 10px 10px;}
-        .dc-input-row{display:flex;gap:6px;}
-        .dc-input-row input{flex:1;padding:8px 14px;background:#0d1117;border:1px solid #30363d;border-radius:40px;color:#e6edf3;font-size:0.8rem;outline:none;}
-        .dc-input-row input:focus{border-color:#ff8c00;}
-        .dc-input-row button{background:#ff8c00;border:none;border-radius:40px;padding:0 16px;font-weight:700;color:#0d1117;cursor:pointer;}
-        .dc-input-row button:hover{background:#ffa033;}
+        .chat-input-wrap{padding:6px 8px;background:#fafafa;border-top:1px solid #ddd;border-radius:0 0 6px 6px;}
+        .chat-input-row{display:flex;gap:4px;}
+        .chat-input-row input{flex:1;padding:6px 12px;background:#fff;border:1px solid #ddd;border-radius:30px;color:#222;font-size:0.78rem;outline:none;}
+        .chat-input-row input:focus{border-color:#e67e22;}
+        .chat-input-row button{background:#e67e22;border:none;border-radius:30px;padding:0 14px;font-weight:700;color:#fff;cursor:pointer;}
+        .chat-input-row button:hover{background:#d35400;}
 
-        .dc-admin-bar{display:none;padding:8px;background:#161b22;border-top:1px solid #30363d;flex-direction:column;gap:4px;}
-        .dc-admin-bar.show{display:flex;}
-        .dc-admin-bar-title{color:#ff8c00;font-weight:700;font-size:0.7rem;display:flex;justify-content:space-between;}
-        .dc-admin-bar-title button{background:transparent;border:1px solid #30363d;color:#8b949e;border-radius:20px;padding:0 8px;cursor:pointer;font-size:0.55rem;}
-        .dc-admin-form{display:none;flex-direction:column;gap:4px;}
-        .dc-admin-form.open{display:flex;}
-        .dc-admin-form input,.dc-admin-form textarea{width:100%;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.7rem;font-family:inherit;}
-        .dc-admin-form textarea{min-height:30px;resize:vertical;}
-        .dc-abtn-row{display:flex;gap:4px;}
-        .dc-abtn-row input{flex:1;}
-        .dc-aadd{background:transparent;border:1px solid #30363d;color:#ff8c00;padding:0 10px;border-radius:20px;cursor:pointer;font-size:0.6rem;}
-        .dc-apublish{background:#ff8c00;border:none;border-radius:20px;padding:4px;font-weight:700;color:#0d1117;cursor:pointer;font-size:0.7rem;}
+        /* Админ-панель в чате */
+        .chat-admin-bar{display:none;padding:6px 8px;background:#fafafa;border-top:1px solid #ddd;flex-direction:column;gap:4px;}
+        .chat-admin-bar.show{display:flex;}
+        .chat-admin-title{color:#e67e22;font-weight:700;font-size:0.65rem;display:flex;justify-content:space-between;}
+        .chat-admin-title button{background:transparent;border:1px solid #ddd;color:#888;border-radius:20px;padding:0 8px;cursor:pointer;font-size:0.5rem;}
+        .chat-admin-form{display:none;flex-direction:column;gap:4px;}
+        .chat-admin-form.open{display:flex;}
+        .chat-admin-form input,.chat-admin-form textarea{width:100%;padding:4px 8px;background:#fff;border:1px solid #ddd;border-radius:4px;color:#222;font-size:0.7rem;font-family:inherit;}
+        .chat-admin-form textarea{min-height:28px;resize:vertical;}
+        .chat-abtn-row{display:flex;gap:4px;}
+        .chat-abtn-row input{flex:1;}
+        .chat-aadd{background:transparent;border:1px solid #ddd;color:#e67e22;padding:0 10px;border-radius:20px;cursor:pointer;font-size:0.6rem;}
+        .chat-apublish{background:#e67e22;border:none;border-radius:20px;padding:3px;font-weight:700;color:#fff;cursor:pointer;font-size:0.65rem;}
 
-        .admin-dots{position:fixed;bottom:10px;right:10px;display:flex;gap:6px;z-index:999;}
-        .admin-dot{width:12px;height:12px;border-radius:50%;border:2px solid #30363d;cursor:pointer;background:#21262d;}
-        .admin-dot.active{background:#ff8c00;border-color:#ff8c00;}
-        .admin-dot.feed-dot.active{background:#ff8c00;}
-        .admin-dot.room-dot.active{background:#da3633;}
+        /* Точки админа */
+        .admin-dots{position:fixed;bottom:10px;right:10px;display:flex;gap:5px;z-index:999;}
+        .admin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #ccc;cursor:pointer;background:#f0f0f0;}
+        .admin-dot.active{background:#e67e22;border-color:#e67e22;}
+        .admin-dot.room-dot.active{background:#e74c3c;border-color:#e74c3c;}
 
-        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9999;justify-content:center;align-items:center;padding:16px;}
+        /* Модалки */
+        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;justify-content:center;align-items:center;padding:16px;}
         .modal.open{display:flex;}
-        .modal-box{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:20px;max-width:400px;width:100%;}
-        .modal-box h3{color:#f0f6fc;}
-        .modal-box input{width:100%;padding:8px 12px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.9rem;margin:8px 0;}
-        .modal-btns{display:flex;gap:8px;justify-content:flex-end;}
-        .modal-btns button{padding:6px 16px;border-radius:40px;border:none;font-weight:700;cursor:pointer;}
-        .btn-cancel{background:#21262d;color:#8b949e;}
-        .btn-save{background:#ff8c00;color:#0d1117;}
+        .modal-box{background:#fff;border:1px solid #ccc;border-radius:10px;padding:16px;max-width:400px;width:100%;}
+        .modal-box h3{color:#222;}
+        .modal-box input{width:100%;padding:6px 10px;background:#fff;border:1px solid #ddd;border-radius:4px;color:#222;font-size:0.9rem;margin:6px 0;}
+        .modal-btns{display:flex;gap:6px;justify-content:flex-end;}
+        .modal-btns button{padding:5px 14px;border-radius:30px;border:none;font-weight:600;cursor:pointer;}
+        .btn-cancel{background:#f0f0f0;color:#888;}
+        .btn-cancel:hover{background:#e0e0e0;}
+        .btn-save{background:#e67e22;color:#fff;}
+        .btn-save:hover{background:#d35400;}
 
-        .edit-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:9999;justify-content:center;align-items:center;padding:12px;}
+        /* Редактирование */
+        .edit-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;justify-content:center;align-items:center;padding:12px;}
         .edit-overlay.open{display:flex;}
-        .edit-box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;max-width:400px;width:100%;}
-        .edit-box h2{color:#ff8c00;font-size:0.9rem;}
-        .edit-box input,.edit-box textarea{width:100%;padding:6px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:0.75rem;margin-bottom:4px;font-family:inherit;}
+        .edit-box{background:#fff;border:1px solid #ccc;border-radius:10px;padding:12px;max-width:400px;width:100%;}
+        .edit-box h2{color:#e67e22;font-size:0.85rem;}
+        .edit-box input,.edit-box textarea{width:100%;padding:5px 8px;background:#fff;border:1px solid #ddd;border-radius:4px;color:#222;font-size:0.75rem;margin-bottom:3px;font-family:inherit;}
         .edit-box textarea{min-height:30px;resize:vertical;}
-        .edit-action-row{display:flex;gap:6px;margin-top:6px;}
-        .edit-save{background:#ff8c00;border:none;border-radius:40px;padding:6px;flex:1;font-weight:700;color:#0d1117;cursor:pointer;}
-        .edit-close{background:#21262d;border:none;border-radius:40px;padding:6px;flex:1;font-weight:700;color:#8b949e;cursor:pointer;}
-        .edit-delete{background:#21262d;border:1px solid #f85149;color:#f85149;border-radius:40px;padding:6px;width:100%;margin-top:6px;cursor:pointer;}
+        .edit-btn-row{display:flex;gap:3px;margin-bottom:3px;}
+        .edit-btn-row input{flex:1;margin-bottom:0;}
+        .edit-action-row{display:flex;gap:4px;margin-top:4px;}
+        .edit-save{background:#e67e22;color:#fff;border:none;border-radius:30px;padding:5px;font-weight:600;flex:1;cursor:pointer;}
+        .edit-close{background:#f0f0f0;color:#888;border:none;border-radius:30px;padding:5px;font-weight:600;flex:1;cursor:pointer;}
+        .edit-delete{background:#fdedec;color:#c0392b;border:1px solid #e74c3c;border-radius:30px;padding:5px;font-weight:600;width:100%;margin-top:4px;cursor:pointer;}
     </style>
 </head>
 <body>
 
-<div class="app">
+<!-- HEADER -->
+<div class="header">
+    <div class="logo">Deep<span>Chat</span></div>
+    <div class="spacer"></div>
+    <span class="user-btn" id="headerUser" onclick="openChangeName()">👤 Гость</span>
+</div>
 
-    <header class="header">
-        <div class="logo">Deep<span>Chat</span></div>
-        <div class="spacer"></div>
-        <span class="user-btn" onclick="openChangeName()">👤 <span id="userNameDisplay">Гость</span></span>
-        <button class="change-btn" onclick="openChangeName()">✏️</button>
-    </header>
+<!-- NAVIGATION -->
+<div class="nav">
+    <div class="nav-item active" id="navFeed" onclick="switchTab('feed')">📰 Лента</div>
+    <div class="nav-item" id="navRooms" onclick="switchTab('rooms')">💬 Комнаты</div>
+</div>
 
-    <div class="tabs">
-        <div class="tab active" id="tabFeed" onclick="switchTab('feed')">📰 Лента</div>
-        <div class="tab" id="tabRooms" onclick="switchTab('rooms')">💬 Комнаты</div>
-    </div>
+<!-- AUTH -->
+<div id="authPanel" class="auth-panel">
+    <h2>🚀 Добро пожаловать</h2>
+    <p>Войдите через Google</p>
+    <button class="google-btn" id="googleLoginBtn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18" />
+        Войти через Google
+    </button>
+</div>
 
-    <div id="authPanel" class="auth-panel">
-        <h2>🚀 Добро пожаловать</h2>
-        <p>Войдите через Google</p>
-        <button class="google-btn" id="googleLoginBtn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" />
-            Войти через Google
-        </button>
-    </div>
+<!-- CONTENT -->
+<div id="appContent" class="hidden">
 
-    <div id="appContent" class="hidden">
-
-        <div id="feedSection">
-            <div class="card">
-                <div class="card-title">📰 Лента</div>
-                <div id="feedForm" class="df-form hidden">
-                    <div class="card-title" style="color:#ff8c00;">✏️ Новый пост</div>
-                    <input type="text" id="fMarquee" placeholder="Бегущая строка">
-                    <textarea id="fText" placeholder="Текст поста..."></textarea>
-                    <input type="url" id="fLink" placeholder="Ссылка (iframe)">
-                    <input type="text" id="fHashtags" placeholder="#хештеги через пробел">
-                    <div style="color:#8b949e;font-size:0.6rem;">Кнопки</div>
-                    <div id="fBtns"></div>
-                    <button class="df-fadd" onclick="fAddBtn()">➕ Кнопку</button>
-                    <div class="df-factions">
-                        <button class="df-fsubmit" id="fSubmitBtn" onclick="fSubmit()">📤 Опубликовать</button>
-                        <button class="df-fcancel" onclick="fCancel()">✕ Отмена</button>
-                    </div>
-                </div>
-                <div id="feedPosts"></div>
-            </div>
-        </div>
-
-        <div id="roomsSection" class="hidden">
-            <div class="card">
-                <div class="card-title">💬 Комнаты</div>
-                <div id="roomList"><div style="color:#8b949e;">Нет комнат</div></div>
-                <button class="create-room-btn" id="createRoomBtn" onclick="openCreateRoom()">➕ Создать комнату</button>
-            </div>
-        </div>
-
-        <div id="chatSection" class="hidden">
-            <div class="card">
-                <div class="card-title">💬 <span id="chatRoomLabel">Комната</span></div>
-                <div class="dc-panel">
-                    <div class="dc-messages" id="dcMessages"></div>
-                    <div class="dc-admin-bar" id="dcAdminBar">
-                        <div class="dc-admin-bar-title">
-                            ✏️ Опубликовать пост
-                            <button onclick="toggleAdminForm()">▼ Открыть</button>
-                        </div>
-                        <div class="dc-admin-form" id="dcAdminForm">
-                            <input type="text" id="apMarquee" placeholder="Бегущая строка">
-                            <textarea id="apText" placeholder="Текст поста..."></textarea>
-                            <input type="url" id="apLink" placeholder="Ссылка (iframe)">
-                            <input type="text" id="apHashtags" placeholder="#хештеги">
-                            <div style="color:#8b949e;font-size:0.6rem;">Кнопки</div>
-                            <div class="dc-abtns" id="apBtns"></div>
-                            <button class="dc-aadd" onclick="apAddBtn()">➕ Кнопку</button>
-                            <button class="dc-apublish" onclick="apPublish()">📤 Опубликовать</button>
-                        </div>
-                    </div>
-                    <div class="dc-input-wrap">
-                        <div class="dc-input-row">
-                            <input type="text" id="dcInput" placeholder="Сообщение...">
-                            <button onclick="dcSend()">→</button>
-                        </div>
-                    </div>
+    <!-- FEED -->
+    <div id="feedSection">
+        <div class="card">
+            <div class="card-title">📰 Лента</div>
+            <div id="feedForm" class="post-form hidden">
+                <div class="card-title" style="color:#e67e22;">✏️ Новый пост</div>
+                <input type="text" id="fMarquee" placeholder="Бегущая строка">
+                <textarea id="fText" placeholder="Текст поста..."></textarea>
+                <input type="url" id="fLink" placeholder="Ссылка (iframe)">
+                <input type="text" id="fHashtags" placeholder="#хештеги через пробел">
+                <div style="color:#888;font-size:0.6rem;">Кнопки</div>
+                <div id="fBtns"></div>
+                <button class="btn-add" onclick="fAddBtn()">➕ Кнопку</button>
+                <div class="form-actions">
+                    <button class="form-submit" id="fSubmitBtn" onclick="fSubmit()">📤 Опубликовать</button>
+                    <button class="form-cancel" onclick="fCancel()">✕ Отмена</button>
                 </div>
             </div>
+            <div id="feedPosts"></div>
         </div>
     </div>
 
-    <div class="admin-dots">
-        <div class="admin-dot feed-dot" id="feedDot" onclick="openFeedLogin()"></div>
-        <div class="admin-dot room-dot" id="roomDot" onclick="openRoomLogin()"></div>
+    <!-- ROOMS LIST -->
+    <div id="roomsSection" class="hidden">
+        <div class="card">
+            <div class="card-title">💬 Комнаты</div>
+            <div id="roomList"><div style="color:#999;">Нет комнат</div></div>
+            <button class="create-room-btn" id="createRoomBtn" onclick="openCreateRoom()">➕ Создать комнату</button>
+        </div>
     </div>
 
-    <div class="modal" id="feedLoginModal">
-        <div class="modal-box">
-            <h3>📰 Админ ленты</h3>
-            <input type="password" id="feedPass" placeholder="Пароль">
-            <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeModal('feedLoginModal')">Отмена</button>
-                <button class="btn-save" onclick="checkFeedPass()">Войти</button>
+    <!-- CHAT -->
+    <div id="chatSection" class="hidden">
+        <div class="card">
+            <div class="card-title">💬 <span id="chatRoomLabel">Комната</span></div>
+            <div class="chat-panel">
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-admin-bar" id="chatAdminBar">
+                    <div class="chat-admin-title">
+                        ✏️ Опубликовать пост
+                        <button onclick="toggleAdminForm()">▼ Открыть</button>
+                    </div>
+                    <div class="chat-admin-form" id="chatAdminForm">
+                        <input type="text" id="apMarquee" placeholder="Бегущая строка">
+                        <textarea id="apText" placeholder="Текст поста..."></textarea>
+                        <input type="url" id="apLink" placeholder="Ссылка (iframe)">
+                        <input type="text" id="apHashtags" placeholder="#хештеги">
+                        <div style="color:#888;font-size:0.6rem;">Кнопки</div>
+                        <div class="chat-abtns" id="apBtns"></div>
+                        <button class="chat-aadd" onclick="apAddBtn()">➕ Кнопку</button>
+                        <button class="chat-apublish" onclick="apPublish()">📤 Опубликовать</button>
+                    </div>
+                </div>
+                <div class="chat-input-wrap">
+                    <div class="chat-input-row">
+                        <input type="text" id="chatInput" placeholder="Сообщение...">
+                        <button onclick="chatSend()">→</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal" id="roomLoginModal">
-        <div class="modal-box">
-            <h3>💬 Админ комнат</h3>
-            <input type="password" id="roomPass" placeholder="Пароль">
-            <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeModal('roomLoginModal')">Отмена</button>
-                <button class="btn-save" onclick="checkRoomPass()">Войти</button>
-            </div>
+<!-- ADMIN DOTS -->
+<div class="admin-dots">
+    <div class="admin-dot" id="feedDot" onclick="openFeedLogin()" title="Админ ленты"></div>
+    <div class="admin-dot room-dot" id="roomDot" onclick="openRoomLogin()" title="Админ комнат"></div>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="feedLoginModal">
+    <div class="modal-box">
+        <h3>📰 Админ ленты</h3>
+        <input type="password" id="feedPass" placeholder="Пароль">
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal('feedLoginModal')">Отмена</button>
+            <button class="btn-save" onclick="checkFeedPass()">Войти</button>
         </div>
     </div>
+</div>
 
-    <div class="modal" id="createRoomModal">
-        <div class="modal-box">
-            <h3>📝 Новая комната</h3>
-            <input type="text" id="roomNameInput" placeholder="Название">
-            <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeModal('createRoomModal')">Отмена</button>
-                <button class="btn-save" onclick="doCreateRoom()">Создать</button>
-            </div>
+<div class="modal" id="roomLoginModal">
+    <div class="modal-box">
+        <h3>💬 Админ комнат</h3>
+        <input type="password" id="roomPass" placeholder="Пароль">
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal('roomLoginModal')">Отмена</button>
+            <button class="btn-save" onclick="checkRoomPass()">Войти</button>
         </div>
     </div>
+</div>
 
-    <div class="modal" id="changeNameModal">
-        <div class="modal-box">
-            <h3>✏️ Сменить имя</h3>
-            <input type="text" id="changeNameInput" placeholder="Новое имя" maxlength="24">
-            <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeModal('changeNameModal')">Отмена</button>
-                <button class="btn-save" onclick="doChangeName()">Сохранить</button>
-            </div>
+<div class="modal" id="createRoomModal">
+    <div class="modal-box">
+        <h3>📝 Новая комната</h3>
+        <input type="text" id="roomNameInput" placeholder="Название">
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal('createRoomModal')">Отмена</button>
+            <button class="btn-save" onclick="doCreateRoom()">Создать</button>
         </div>
     </div>
+</div>
 
-    <div class="edit-overlay" id="editOverlay">
-        <div class="edit-box">
-            <h2>✏️ Редактировать</h2>
-            <input type="text" id="editMarquee" placeholder="Бегущая строка">
-            <textarea id="editText" placeholder="Текст..."></textarea>
-            <input type="url" id="editLink" placeholder="Ссылка (iframe)">
-            <input type="text" id="editHashtags" placeholder="#хештеги">
-            <div style="color:#8b949e;font-size:0.6rem;">Кнопки</div>
-            <div id="editBtns"></div>
-            <button onclick="editAddBtn()" style="background:transparent;border:1px solid #30363d;color:#ff8c00;padding:2px 10px;border-radius:20px;cursor:pointer;font-size:0.6rem;margin-bottom:4px;">➕ Кнопку</button>
-            <div class="edit-action-row">
-                <button class="edit-save" onclick="doSaveEdit()">💾 Сохранить</button>
-                <button class="edit-close" onclick="closeEdit()">✕ Отмена</button>
-            </div>
-            <button class="edit-delete" onclick="doDeleteEdit()">🗑 Удалить</button>
+<div class="modal" id="changeNameModal">
+    <div class="modal-box">
+        <h3>✏️ Сменить имя</h3>
+        <input type="text" id="changeNameInput" placeholder="Новое имя" maxlength="24">
+        <div class="modal-btns">
+            <button class="btn-cancel" onclick="closeModal('changeNameModal')">Отмена</button>
+            <button class="btn-save" onclick="doChangeName()">Сохранить</button>
         </div>
     </div>
+</div>
 
+<!-- EDIT -->
+<div class="edit-overlay" id="editOverlay">
+    <div class="edit-box">
+        <h2>✏️ Редактировать</h2>
+        <input type="text" id="editMarquee" placeholder="Бегущая строка">
+        <textarea id="editText" placeholder="Текст..."></textarea>
+        <input type="url" id="editLink" placeholder="Ссылка (iframe)">
+        <input type="text" id="editHashtags" placeholder="#хештеги">
+        <div style="color:#888;font-size:0.6rem;">Кнопки</div>
+        <div id="editBtns"></div>
+        <button onclick="editAddBtn()" style="background:transparent;border:1px solid #ddd;color:#e67e22;padding:2px 10px;border-radius:20px;cursor:pointer;font-size:0.6rem;margin-bottom:4px;">➕ Кнопку</button>
+        <div class="edit-action-row">
+            <button class="edit-save" onclick="doSaveEdit()">💾 Сохранить</button>
+            <button class="edit-close" onclick="closeEdit()">✕ Отмена</button>
+        </div>
+        <button class="edit-delete" onclick="doDeleteEdit()">🗑 Удалить</button>
+    </div>
 </div>
 
 <script>
 (function(){
-
-// ================================================================
-// FIREBASE
-// ================================================================
+// ===== FIREBASE =====
 const FB_CONFIG = {
     apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
     authDomain: "myecosystem-e6414.firebaseapp.com",
@@ -306,18 +328,12 @@ const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
-let USER = null;
-let USER_UID = null;
+let USER = null, USER_UID = null;
 let IS_FEED_ADMIN = localStorage.getItem('dc_fa_'+SITE) === '1';
 let IS_ROOM_ADMIN = localStorage.getItem('dc_ra_'+SITE) === '1';
-let CUR_ROOM = '';
-let FEED_EDIT_ID = null;
-let CHAT_EDIT_ID = null;
-let chatUnsub = null;
+let CUR_ROOM = '', FEED_EDIT_ID = null, CHAT_EDIT_ID = null, chatUnsub = null;
 
-// ================================================================
-// AUTH
-// ================================================================
+// ===== AUTH =====
 document.getElementById('googleLoginBtn').addEventListener('click', () => {
     auth.signInWithPopup(provider).catch(e => alert('Ошибка: '+e.message));
 });
@@ -325,7 +341,7 @@ document.getElementById('googleLoginBtn').addEventListener('click', () => {
 auth.onAuthStateChanged(user => {
     const authPanel = document.getElementById('authPanel');
     const appContent = document.getElementById('appContent');
-    const userDisplay = document.getElementById('userNameDisplay');
+    const headerUser = document.getElementById('headerUser');
 
     if (user) {
         USER_UID = user.uid;
@@ -336,7 +352,7 @@ auth.onAuthStateChanged(user => {
 
         authPanel.style.display = 'none';
         appContent.classList.remove('hidden');
-        userDisplay.textContent = USER;
+        headerUser.textContent = '👤 ' + USER;
         applyAdminUI();
         loadFeed();
         loadRooms();
@@ -345,14 +361,12 @@ auth.onAuthStateChanged(user => {
         USER = null; USER_UID = null;
         authPanel.style.display = 'block';
         appContent.classList.add('hidden');
-        userDisplay.textContent = 'Гость';
+        headerUser.textContent = '👤 Гость';
         if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
     }
 });
 
-// ================================================================
-// ИМЯ
-// ================================================================
+// ===== ИМЯ =====
 window.openChangeName = function() {
     if (!USER) { alert('Сначала войдите!'); return; }
     document.getElementById('changeNameInput').value = USER;
@@ -363,20 +377,18 @@ window.doChangeName = function() {
     if (!n) return;
     USER = n.slice(0,24);
     localStorage.setItem('dc_u_'+SITE, USER);
-    document.getElementById('userNameDisplay').textContent = USER;
+    document.getElementById('headerUser').textContent = '👤 ' + USER;
     if (USER_UID) db.ref('sites/'+SITE+'/users/'+USER_UID).update({ name: USER });
     closeModal('changeNameModal');
 };
 
-// ================================================================
-// АДМИН
-// ================================================================
+// ===== АДМИН =====
 function applyAdminUI() {
     const f = document.getElementById('feedForm');
     const fd = document.getElementById('feedDot');
     const rd = document.getElementById('roomDot');
     const cb = document.getElementById('createRoomBtn');
-    const ab = document.getElementById('dcAdminBar');
+    const ab = document.getElementById('chatAdminBar');
     if (IS_FEED_ADMIN) { f.classList.remove('hidden'); fd.classList.add('active'); } else { f.classList.add('hidden'); fd.classList.remove('active'); }
     if (IS_ROOM_ADMIN) { rd.classList.add('active'); cb.classList.add('show'); ab.classList.add('show'); } else { rd.classList.remove('active'); cb.classList.remove('show'); ab.classList.remove('show'); }
 }
@@ -403,39 +415,33 @@ window.checkRoomPass = function() {
 };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
 
-// ================================================================
-// ТАБЫ
-// ================================================================
+// ===== ТАБЫ =====
 window.switchTab = function(tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
     if (tab === 'feed') {
-        document.getElementById('tabFeed').classList.add('active');
+        document.getElementById('navFeed').classList.add('active');
         document.getElementById('feedSection').style.display = 'block';
         document.getElementById('roomsSection').style.display = 'none';
         document.getElementById('chatSection').style.display = 'none';
     } else {
-        document.getElementById('tabRooms').classList.add('active');
+        document.getElementById('navRooms').classList.add('active');
         document.getElementById('feedSection').style.display = 'none';
         document.getElementById('roomsSection').style.display = 'block';
         document.getElementById('chatSection').style.display = 'none';
     }
 };
 
-// ================================================================
-// УТИЛИТЫ
-// ================================================================
+// ===== УТИЛИТЫ =====
 const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
 const now = () => new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 
-// ================================================================
-// КОМНАТЫ
-// ================================================================
+// ===== КОМНАТЫ =====
 function loadRooms() {
     db.ref('sites/'+SITE+'/rooms').orderByChild('createdAt').on('value', snap => {
         const data = snap.val() || {};
         const keys = Object.keys(data).sort((a,b) => (data[a].createdAt||0) - (data[b].createdAt||0));
         const list = document.getElementById('roomList');
-        if (!keys.length) { list.innerHTML = '<div style="color:#8b949e;">Нет комнат</div>'; return; }
+        if (!keys.length) { list.innerHTML = '<div style="color:#999;">Нет комнат</div>'; return; }
         list.innerHTML = keys.map(k => {
             const r = data[k];
             const ac = k === CUR_ROOM ? 'active' : '';
@@ -453,8 +459,8 @@ window.openRoom = function(roomId, roomName) {
     document.getElementById('chatSection').classList.remove('hidden');
     document.getElementById('roomsSection').style.display = 'none';
     document.getElementById('feedSection').style.display = 'none';
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tabRooms').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+    document.getElementById('navRooms').classList.add('active');
     document.getElementById('chatRoomLabel').textContent = roomName || 'Комната';
     loadChat(roomId);
 };
@@ -471,39 +477,37 @@ window.doCreateRoom = function() {
         .catch(e => alert('❌ '+e.message));
 };
 
-// ================================================================
-// ЛЕНТА
-// ================================================================
+// ===== ЛЕНТА =====
 function loadFeed() {
     db.ref('sites/'+SITE+'/feed_posts').orderByChild('timestamp').on('value', snap => {
         const c = document.getElementById('feedPosts');
         c.innerHTML = '';
         const data = snap.val() || {};
         const keys = Object.keys(data).sort((a,b) => (data[b].timestamp||0) - (data[a].timestamp||0));
-        if (!keys.length) { c.innerHTML = '<div style="text-align:center;padding:30px;color:#8b949e;">Пока пусто</div>'; return; }
+        if (!keys.length) { c.innerHTML = '<div style="text-align:center;padding:30px;color:#999;">Пока пусто</div>'; return; }
         keys.forEach(k => { const p = data[k]; p.id = k; c.appendChild(renderPost(p)); });
     });
 }
 
 function renderPost(p) {
-    const d = document.createElement('div'); d.className = 'df-post';
-    const mq = p.marquee ? `<div class="df-marquee"><span>${esc(p.marquee)}</span></div>` : '';
-    const fr = p.link ? `<iframe src="${esc(p.link)}" style="width:100%;height:200px;border:1px solid #30363d;border-radius:8px;margin:4px 0;"></iframe>` : '';
+    const d = document.createElement('div'); d.className = 'post';
+    const mq = p.marquee ? `<div class="post-marquee"><span>${esc(p.marquee)}</span></div>` : '';
+    const fr = p.link ? `<iframe src="${esc(p.link)}" style="width:100%;height:180px;border:1px solid #ddd;border-radius:4px;margin:4px 0;"></iframe>` : '';
     let btns = '';
-    if (p.buttons && p.buttons.length) btns = p.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="df-btn">${esc(b.label||'🔗')}</a>`).join('');
+    if (p.buttons && p.buttons.length) btns = p.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="post-btn">${esc(b.label||'🔗')}</a>`).join('');
     let tags = '';
-    if (p.hashtags && p.hashtags.length) tags = p.hashtags.map(t => `<span class="df-tag">${esc(t)}</span>`).join(' ');
+    if (p.hashtags && p.hashtags.length) tags = p.hashtags.map(t => `<span class="post-tag">${esc(t)}</span>`).join(' ');
     let acts = '';
-    if (IS_FEED_ADMIN) acts = `<div class="df-actions"><button onclick="feedOpenEdit('${p.id}')">✏️ Ред.</button><button onclick="feedDel('${p.id}')">🗑</button></div>`;
-    d.innerHTML = `${mq}<div><span class="df-author">${esc(p.author||'Аноним')}</span><span class="df-time">${p.time||''}${p.edited?' (ред.)':''}</span></div>
-        <div class="df-text">${esc(p.text||'')}</div>${btns}${fr}<div>${tags}</div>${acts}
-        <button class="df-discuss" onclick="openRoom('post_${p.id}','${esc((p.text||'Пост').slice(0,28))}')">💬 Обсудить</button>`;
+    if (IS_FEED_ADMIN) acts = `<div class="post-actions"><button onclick="feedOpenEdit('${p.id}')">✏️ Ред.</button><button onclick="feedDel('${p.id}')">🗑</button></div>`;
+    d.innerHTML = `${mq}<div><span class="post-author">${esc(p.author||'Аноним')}</span><span class="post-time">${p.time||''}${p.edited?' (ред.)':''}</span></div>
+        <div class="post-text">${esc(p.text||'')}</div>${btns}${fr}<div>${tags}</div>${acts}
+        <button class="post-discuss" onclick="openRoom('post_${p.id}','${esc((p.text||'Пост').slice(0,28))}')">💬 Обсудить</button>`;
     return d;
 }
 
 window.fAddBtn = function(l='', u='') {
     const c = document.getElementById('fBtns');
-    const d = document.createElement('div'); d.className = 'df-fbtn-row';
+    const d = document.createElement('div'); d.className = 'btn-row';
     d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()">✕</button>`;
     c.appendChild(d);
 };
@@ -516,7 +520,7 @@ window.fSubmit = function() {
     const hashtags = hr ? hr.split(/\s+/).filter(t=>t.startsWith('#')).slice(0,5) : [];
     if (!text && !link) { alert('Введите текст или ссылку'); return; }
     const buttons = [];
-    document.querySelectorAll('#fBtns .df-fbtn-row').forEach(g => {
+    document.querySelectorAll('#fBtns .btn-row').forEach(g => {
         const [li, ui] = g.querySelectorAll('input');
         if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗', url: ui.value.trim()});
     });
@@ -551,79 +555,77 @@ window.feedDel = function(id) {
     db.ref('sites/'+SITE+'/feed_posts/'+id).remove();
 };
 
-// ================================================================
-// ЧАТ
-// ================================================================
+// ===== ЧАТ =====
 function chatPath(roomId) { return 'rooms/'+SITE+'_'+roomId+'/messages'; }
 
 function loadChat(roomId) {
     if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
-    const box = document.getElementById('dcMessages');
-    box.innerHTML = '<div style="color:#8b949e;text-align:center;padding:20px;">⏳ Загрузка...</div>';
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = '<div style="color:#999;text-align:center;padding:20px;">⏳ Загрузка...</div>';
     const path = chatPath(roomId);
     chatUnsub = path;
     db.ref(path).orderByChild('timestamp').on('value', snap => {
         box.innerHTML = '';
-        if (!snap.exists()) { box.innerHTML = '<div style="color:#8b949e;text-align:center;padding:30px;">Сообщений нет 👋</div>'; return; }
+        if (!snap.exists()) { box.innerHTML = '<div style="color:#999;text-align:center;padding:30px;">Сообщений нет 👋</div>'; return; }
         snap.forEach(s => { const m = s.val(); m.id = s.key; box.appendChild(renderChatMsg(m, roomId)); });
         box.scrollTop = box.scrollHeight;
     });
 }
 
 function renderChatMsg(m, roomId) {
-    const d = document.createElement('div'); d.className = 'dc-msg';
+    const d = document.createElement('div'); d.className = 'chat-msg';
     const isPost = m.isPost || m.marquee || (m.buttons && m.buttons.length);
-    const mq = isPost && m.marquee ? `<div class="df-marquee"><span>${esc(m.marquee)}</span></div>` : '';
-    const fr = isPost && m.link ? `<iframe src="${esc(m.link)}" style="width:100%;height:150px;border:1px solid #30363d;border-radius:6px;margin:4px 0;"></iframe>` : '';
+    const mq = isPost && m.marquee ? `<div class="post-marquee"><span>${esc(m.marquee)}</span></div>` : '';
+    const fr = isPost && m.link ? `<iframe src="${esc(m.link)}" style="width:100%;height:140px;border:1px solid #ddd;border-radius:4px;margin:3px 0;"></iframe>` : '';
     let btns = '';
-    if (isPost && m.buttons && m.buttons.length) btns = m.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="df-btn" style="font-size:0.7rem;padding:4px 12px;">${esc(b.label||'🔗')}</a>`).join('');
+    if (isPost && m.buttons && m.buttons.length) btns = m.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="post-btn" style="font-size:0.65rem;padding:2px 10px;">${esc(b.label||'🔗')}</a>`).join('');
     let tags = '';
-    if (isPost && m.hashtags && m.hashtags.length) tags = m.hashtags.map(t => `<span class="df-tag">${esc(t)}</span>`).join(' ');
-    let acts = `<button onclick="dcLike('${m.id}','${roomId}')">👍 ${m.likes||0}</button>
-                <button onclick="dcReply('${esc(m.nick)}')">💬</button>`;
-    if ((m.nick === USER) || IS_ROOM_ADMIN) acts += `<button class="dc-edit-btn" onclick="openChatEdit('${m.id}','${roomId}')">✏️</button><button class="dc-del-btn" onclick="dcDel('${m.id}','${roomId}')">🗑</button>`;
-    d.innerHTML = `${mq}<div><span class="dc-author">${esc(m.nick||'?')}</span><span class="dc-time">${m.time||''}${m.edited?' (ред.)':''}</span></div>
-        <div class="dc-msg-text">${esc(m.text||'')}</div>${btns}${fr}<div>${tags}</div><div class="dc-actions">${acts}</div>`;
+    if (isPost && m.hashtags && m.hashtags.length) tags = m.hashtags.map(t => `<span class="post-tag">${esc(t)}</span>`).join(' ');
+    let acts = `<button onclick="chatLike('${m.id}','${roomId}')">👍 ${m.likes||0}</button>
+                <button onclick="chatReply('${esc(m.nick)}')">💬</button>`;
+    if ((m.nick === USER) || IS_ROOM_ADMIN) acts += `<button class="chat-edit-btn" onclick="openChatEdit('${m.id}','${roomId}')">✏️</button><button class="chat-del-btn" onclick="chatDel('${m.id}','${roomId}')">🗑</button>`;
+    d.innerHTML = `${mq}<div><span class="chat-author">${esc(m.nick||'?')}</span><span class="chat-time">${m.time||''}${m.edited?' (ред.)':''}</span></div>
+        <div class="chat-text">${esc(m.text||'')}</div>${btns}${fr}<div>${tags}</div><div class="chat-actions">${acts}</div>`;
     return d;
 }
 
-window.dcSend = function() {
+window.chatSend = function() {
     if (!CUR_ROOM || !USER) { alert('Выберите комнату'); return; }
-    const input = document.getElementById('dcInput');
+    const input = document.getElementById('chatInput');
     const text = input.value.trim();
     if (!text) return;
     db.ref(chatPath(CUR_ROOM)).push({ nick: USER, text, time: now(), timestamp: Date.now(), likes: 0, img: null, edited: false, isPost: false });
     input.value = '';
 };
-document.getElementById('dcInput').addEventListener('keypress', e => { if (e.key === 'Enter') dcSend(); });
+document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') chatSend(); });
 
-window.dcLike = function(id, roomId) {
+window.chatLike = function(id, roomId) {
     if (!USER) return;
     const key = 'lk_'+id+'_'+USER_UID;
     if (localStorage.getItem(key)) return;
     db.ref(chatPath(roomId)+'/'+id+'/likes').transaction(v => (v||0)+1);
     localStorage.setItem(key, '1');
 };
-window.dcReply = function(nick) {
-    document.getElementById('dcInput').value = '@'+nick+' ';
-    document.getElementById('dcInput').focus();
+window.chatReply = function(nick) {
+    document.getElementById('chatInput').value = '@'+nick+' ';
+    document.getElementById('chatInput').focus();
 };
-window.dcDel = function(id, roomId) {
+window.chatDel = function(id, roomId) {
     if (!confirm('Удалить?')) return;
     db.ref(chatPath(roomId)+'/'+id).remove();
 };
 
 // Admin publish
 window.toggleAdminForm = function() {
-    const f = document.getElementById('dcAdminForm');
-    const btn = document.querySelector('.dc-admin-bar-title button');
+    const f = document.getElementById('chatAdminForm');
+    const btn = document.querySelector('.chat-admin-title button');
     const open = f.classList.toggle('open');
     btn.textContent = open ? '▲ Закрыть' : '▼ Открыть';
 };
 window.apAddBtn = function(l='', u='') {
     const c = document.getElementById('apBtns');
-    const d = document.createElement('div'); d.className = 'dc-abtn-row';
-    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#f85149;cursor:pointer;">✕</button>`;
+    const d = document.createElement('div'); d.className = 'chat-abtn-row';
+    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#e74c3c;cursor:pointer;">✕</button>`;
     c.appendChild(d);
 };
 window.apPublish = function() {
@@ -635,7 +637,7 @@ window.apPublish = function() {
     const hashtags = hr ? hr.split(/\s+/).filter(t=>t.startsWith('#')).slice(0,5) : [];
     if (!marquee && !text && !link) { alert('Заполните поле'); return; }
     const buttons = [];
-    document.querySelectorAll('#apBtns .dc-abtn-row').forEach(g => {
+    document.querySelectorAll('#apBtns .chat-abtn-row').forEach(g => {
         const [li, ui] = g.querySelectorAll('input');
         if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗', url: ui.value.trim()});
     });
@@ -645,8 +647,8 @@ window.apPublish = function() {
     }).then(() => {
         ['apMarquee','apText','apLink','apHashtags'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('apBtns').innerHTML = '';
-        document.getElementById('dcAdminForm').classList.remove('open');
-        document.querySelector('.dc-admin-bar-title button').textContent = '▼ Открыть';
+        document.getElementById('chatAdminForm').classList.remove('open');
+        document.querySelector('.chat-admin-title button').textContent = '▼ Открыть';
     });
 };
 
@@ -668,7 +670,7 @@ window.closeEdit = function() { document.getElementById('editOverlay').classList
 window.editAddBtn = function(l='', u='') {
     const c = document.getElementById('editBtns');
     const d = document.createElement('div'); d.className = 'edit-btn-row';
-    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#f85149;cursor:pointer;">✕</button>`;
+    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#e74c3c;cursor:pointer;">✕</button>`;
     c.appendChild(d);
 };
 window.doSaveEdit = function() {
@@ -696,9 +698,7 @@ window.doDeleteEdit = function() {
     closeEdit();
 };
 
-// ================================================================
-// СИД
-// ================================================================
+// ===== СИД =====
 db.ref('sites/'+SITE+'/feed_posts').once('value', snap => {
     if (!snap.exists()) {
         const ex = [
