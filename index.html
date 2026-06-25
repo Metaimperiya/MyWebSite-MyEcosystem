@@ -23,10 +23,10 @@
             position: sticky; top: 0; z-index: 100;
         }
         .topbar .logo { font-size: 1.2rem; font-weight: 700; color: #1877f2; cursor: pointer; }
-        .topbar .menu { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .topbar .menu { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .topbar .menu button {
             background: none; border: none; color: #555; font-weight: 600;
-            font-size: 0.75rem; cursor: pointer; padding: 4px 8px; border-radius: 8px;
+            font-size: 0.7rem; cursor: pointer; padding: 4px 8px; border-radius: 8px;
         }
         .topbar .menu button:hover { background: #f0f0f0; }
         .topbar .menu button.active { color: #1877f2; background: #e8f0fe; }
@@ -45,12 +45,13 @@
         }
         .container { max-width: 700px; margin: 0 auto; padding: 12px; }
 
+        /* ===== ПРОФИЛЬ ===== */
         .profile-page { display: none; }
         .profile-page.active { display: block; }
         .profile-page .header {
             background: #fff; border-radius: 12px; padding: 20px;
             text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         .profile-page .header .big-avatar {
             width: 80px; height: 80px; border-radius: 50%;
@@ -73,33 +74,46 @@
         .profile-page .header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
         .profile-page .header .actions .edit-btn { background: #e4e6eb; color: #555; }
 
-        .profile-page .friends-section {
-            background: #fff; border-radius: 12px; padding: 16px;
-            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        /* ===== ДРУЗЬЯ И ПОДПИСКИ ===== */
+        .profile-stats {
+            display: flex; gap: 16px; justify-content: center; margin: 8px 0;
+            font-size: 0.8rem; color: #888;
         }
-        .profile-page .friends-section h4 { margin-bottom: 8px; color: #555; }
-        .profile-page .friends-section .friend-list {
+        .profile-stats span { cursor: pointer; }
+        .profile-stats span:hover { color: #1877f2; }
+
+        .friends-section, .subscribers-section, .subscriptions-section {
+            background: #fff; border-radius: 12px; padding: 16px;
+            margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .friends-section h4, .subscribers-section h4, .subscriptions-section h4 {
+            margin-bottom: 8px; color: #555; font-size: 0.9rem;
+        }
+        .friend-list, .subscriber-list, .subscription-list {
             display: flex; flex-wrap: wrap; gap: 6px;
         }
-        .profile-page .friends-section .friend-item {
+        .friend-item {
             background: #f0f2f5; padding: 4px 12px; border-radius: 20px;
             font-size: 0.8rem; display: flex; align-items: center; gap: 4px;
+            cursor: pointer;
         }
-        .profile-page .friends-section .friend-item .avatar {
+        .friend-item:hover { background: #e8f0fe; }
+        .friend-item .avatar {
             width: 20px; height: 20px; border-radius: 50%;
             background: #1877f2; color: #fff;
             display: flex; align-items: center; justify-content: center;
             font-size: 0.5rem; font-weight: 700;
         }
 
+        /* ===== СТРАНИЦЫ ===== */
         .pages-section {
             background: #fff; border-radius: 12px; padding: 16px;
-            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .pages-section h4 { margin-bottom: 8px; color: #555; }
+        .pages-section h4 { margin-bottom: 8px; color: #555; font-size: 0.9rem; }
         .pages-section .page-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 4px;
+            padding: 6px 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 4px;
         }
         .pages-section .page-item .name { font-weight: 600; }
         .pages-section .page-item .sub { color: #888; font-size: 0.7rem; }
@@ -109,9 +123,10 @@
             font-weight: 600; margin-top: 8px; width: 100%;
         }
 
+        /* ===== ПОСТ-ФОРМА ===== */
         .post-form {
             background: #fff; border-radius: 12px; padding: 16px;
-            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .post-form textarea {
             width: 100%; padding: 10px; border: 1px solid #ddd;
@@ -127,6 +142,7 @@
         .post-form .actions .submit:hover { background: #4a9eff; }
         .post-form .actions .cancel { background: #e4e6eb; color: #555; }
 
+        /* ===== ЛЕНТА ===== */
         .feed-page { display: none; }
         .feed-page.active { display: block; }
 
@@ -198,6 +214,7 @@
             font-weight: 600;
         }
 
+        /* ===== ГРУППЫ ===== */
         .groups-page { display: none; }
         .groups-page.active { display: block; }
         .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -211,26 +228,7 @@
         .groups-page .group-card .name { font-weight: 600; margin-top: 6px; }
         .groups-page .group-card .count { color: #888; font-size: 0.75rem; }
 
-        .dm-page { display: none; }
-        .dm-page.active { display: block; }
-        .dm-page .dm-list { display: flex; flex-direction: column; gap: 8px; }
-        .dm-page .dm-item {
-            background: #fff; border-radius: 12px; padding: 12px 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; gap: 12px;
-        }
-        .dm-page .dm-item:hover { transform: translateX(4px); }
-        .dm-page .dm-item .avatar {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: #1877f2; color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700;
-        }
-        .dm-page .dm-item .info { flex: 1; }
-        .dm-page .dm-item .info .name { font-weight: 600; }
-        .dm-page .dm-item .info .last { color: #888; font-size: 0.75rem; }
-
+        /* ===== ЧАТ ===== */
         .chat-view {
             display: none; background: #fff; border-radius: 12px;
             padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -261,6 +259,7 @@
             cursor: pointer;
         }
 
+        /* ===== МОДАЛКИ ===== */
         .modal {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 9999;
@@ -338,7 +337,6 @@
     <div class="menu">
         <button class="active" id="menuFeed" onclick="goToFeed()">📰 Лента</button>
         <button id="menuGroups" onclick="goToGroups()">👥 Группы</button>
-        <button id="menuDM" onclick="goToDM()">💬 Личка</button>
         <button id="menuProfile" onclick="goToProfile()">👤 Профиль</button>
     </div>
     <div class="user-info">
@@ -350,12 +348,17 @@
 
 <div class="container">
 
-    <!-- ПРОФИЛЬ -->
+    <!-- ПРОФИЛЬ (здесь всё: и личка, и друзья, и подписки) -->
     <div class="profile-page" id="profilePage">
         <div class="header">
             <div class="big-avatar" id="profileAvatar">?</div>
             <div class="name" id="profileName">Гость</div>
             <div class="bio" id="profileBio">Настройте свой профиль</div>
+            <div class="profile-stats" id="profileStats">
+                <span onclick="toggleStat('friends')">🤝 Друзья: <span id="friendsCount">0</span></span>
+                <span onclick="toggleStat('subscribers')">👀 Подписчики: <span id="subscribersCount">0</span></span>
+                <span onclick="toggleStat('subscriptions')">📌 Подписки: <span id="subscriptionsCount">0</span></span>
+            </div>
             <div class="actions" id="profileActions">
                 <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
             </div>
@@ -365,6 +368,18 @@
         <div class="friends-section" id="friendsSection">
             <h4>🤝 Друзья</h4>
             <div class="friend-list" id="friendList"></div>
+        </div>
+        
+        <!-- Подписчики -->
+        <div class="subscribers-section" id="subscribersSection" style="display:none;">
+            <h4>👀 Подписчики</h4>
+            <div class="subscriber-list" id="subscriberList"></div>
+        </div>
+        
+        <!-- Подписки -->
+        <div class="subscriptions-section" id="subscriptionsSection" style="display:none;">
+            <h4>📌 Подписки</h4>
+            <div class="subscription-list" id="subscriptionList"></div>
         </div>
         
         <!-- Страницы -->
@@ -395,13 +410,7 @@
         <div class="group-list" id="groupList"></div>
     </div>
 
-    <!-- ЛИЧКА -->
-    <div class="dm-page" id="dmPage">
-        <h3 style="margin-bottom:12px;">💬 Личные сообщения</h3>
-        <div class="dm-list" id="dmList"></div>
-    </div>
-
-    <!-- ЧАТ -->
+    <!-- ЧАТ (всплывает поверх) -->
     <div class="chat-view" id="chatView">
         <button class="back" onclick="closeChat()">← Назад</button>
         <div class="messages" id="chatMessages"></div>
@@ -433,7 +442,7 @@
     </div>
 </div>
 
-<!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+<!-- МОДАЛКА РЕДАКТИРОВАНИЯ -->
 <div class="modal" id="editProfileModal">
     <div class="box">
         <h3>✏️ Редактировать профиль</h3>
@@ -451,7 +460,7 @@
     <div class="box">
         <h3>📄 Создать страницу</h3>
         <input type="text" id="pageName" placeholder="Название страницы">
-        <textarea id="pageDesc" placeholder="Описание страницы..."></textarea>
+        <textarea id="pageDesc" placeholder="Описание..."></textarea>
         <div class="btns">
             <button class="cancel" onclick="closeCreatePage()">Отмена</button>
             <button class="save" onclick="createPage()">Создать</button>
@@ -533,7 +542,8 @@
     let CURRENT_ROOM = null;
     let CURRENT_DM = null;
     let chatUnsub = null;
-    let VIEWING_USER = null; // чей профиль смотрим
+    let VIEWING_USER = null;
+    let showStat = 'friends';
 
     // ================================================================
     // AUTH
@@ -561,9 +571,8 @@
             
             updateUI();
             loadFeed();
-            loadProfilePosts();
+            loadProfile();
             loadGroups();
-            loadDMList();
             closeLogin();
         } else {
             USER = null;
@@ -617,9 +626,8 @@
             });
         }
         loadFeed();
-        loadProfilePosts();
+        loadProfile();
         loadGroups();
-        loadDMList();
     };
 
     // ================================================================
@@ -630,17 +638,11 @@
         const name = document.getElementById('topName');
         const logout = document.getElementById('logoutBtn');
         const dot = document.getElementById('adminDot');
-        const profileAvatar = document.getElementById('profileAvatar');
-        const profileName = document.getElementById('profileName');
-        const profileBio = document.getElementById('profileBio');
 
         if (USER && USER_ACCOUNT) {
             avatar.textContent = USER_ACCOUNT.avatar;
             name.textContent = USER_ACCOUNT.name;
             logout.style.display = 'inline-block';
-            profileAvatar.textContent = USER_ACCOUNT.avatar;
-            profileName.textContent = USER_ACCOUNT.name;
-            profileBio.textContent = USER_ACCOUNT.bio || 'Настройте свой профиль';
             if (IS_ADMIN) dot.classList.add('active');
             else dot.classList.remove('active');
         } else if (USER) {
@@ -648,17 +650,11 @@
             avatar.textContent = initial;
             name.textContent = USER;
             logout.style.display = 'inline-block';
-            profileAvatar.textContent = initial;
-            profileName.textContent = USER;
-            profileBio.textContent = 'Настройте свой профиль';
             dot.classList.remove('active');
         } else {
             avatar.textContent = '?';
             name.textContent = 'Гость';
             logout.style.display = 'none';
-            profileAvatar.textContent = '?';
-            profileName.textContent = 'Гость';
-            profileBio.textContent = 'Выберите аккаунт';
             dot.classList.remove('active');
         }
     }
@@ -689,9 +685,8 @@
             localStorage.setItem('dc_u_' + SITE, USER);
             updateUI();
             loadFeed();
-            loadProfilePosts();
+            loadProfile();
             loadGroups();
-            loadDMList();
             closeLogin();
         }).catch(e => alert('Ошибка: ' + e.message));
     };
@@ -710,7 +705,6 @@
         });
         if (pageId === 'feedPage') document.getElementById('menuFeed').classList.add('active');
         else if (pageId === 'groupsPage') document.getElementById('menuGroups').classList.add('active');
-        else if (pageId === 'dmPage') document.getElementById('menuDM').classList.add('active');
         else if (pageId === 'profilePage') document.getElementById('menuProfile').classList.add('active');
     }
 
@@ -740,19 +734,6 @@
         loadGroups();
     };
 
-    window.goToDM = function() {
-        if (!USER) { alert('Войдите!'); return; }
-        setActivePage('dmPage');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        loadDMList();
-    };
-
     window.goToProfile = function() {
         if (!USER) { alert('Войдите!'); return; }
         VIEWING_USER = null;
@@ -764,29 +745,53 @@
         }
         CURRENT_ROOM = null;
         CURRENT_DM = null;
-        loadProfilePosts();
-        loadFriends();
-        loadPages();
-        showProfileActions();
+        loadProfile();
     };
 
     // ================================================================
-    // ПРОФИЛЬ: ДЕЙСТВИЯ (ДРУЗЬЯ, СООБЩЕНИЕ)
+    // ПРОФИЛЬ (загрузка данных пользователя)
     // ================================================================
-    function showProfileActions() {
+    function loadProfile() {
+        const uid = VIEWING_USER || USER_UID;
+        if (!uid) return;
+        
+        db.ref('sites/' + SITE + '/users/' + uid).once('value', snap => {
+            const u = snap.val() || {};
+            const name = u.name || 'Аноним';
+            const bio = u.bio || '';
+            const avatar = u.avatar || name.charAt(0).toUpperCase();
+            document.getElementById('profileAvatar').textContent = avatar;
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileBio').textContent = bio;
+            
+            showProfileActions(uid);
+            loadProfilePosts(uid);
+            loadFriends(uid);
+            loadSubscribers(uid);
+            loadSubscriptions(uid);
+            loadPages(uid);
+        });
+    }
+
+    // ================================================================
+    // ПРОФИЛЬ: ДЕЙСТВИЯ
+    // ================================================================
+    function showProfileActions(uid) {
         const actions = document.getElementById('profileActions');
-        if (!VIEWING_USER || VIEWING_USER === USER_UID) {
-            // Свой профиль
+        if (!uid || uid === USER_UID) {
             actions.innerHTML = `<button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>`;
             return;
         }
         
-        // Чужой профиль
-        const isFriend = checkFriend(VIEWING_USER);
+        const isFriend = checkFriend(uid);
+        const isSubscribed = checkSubscription(uid);
         actions.innerHTML = `
-            <button class="msg-btn" onclick="openDM('${VIEWING_USER}')">✉️ Написать</button>
-            <button class="friend-btn ${isFriend ? 'added' : ''}" onclick="toggleFriend('${VIEWING_USER}')">
+            <button class="msg-btn" onclick="openDM('${uid}')">✉️ Написать</button>
+            <button class="friend-btn ${isFriend ? 'added' : ''}" onclick="toggleFriend('${uid}')">
                 ${isFriend ? '🤝 В друзьях' : '➕ Добавить в друзья'}
+            </button>
+            <button class="friend-btn ${isSubscribed ? 'added' : ''}" onclick="toggleSubscription('${uid}')">
+                ${isSubscribed ? '✅ Подписан' : '➕ Подписаться'}
             </button>
         `;
     }
@@ -801,7 +806,7 @@
     }
 
     window.toggleFriend = function(uid) {
-        if (!USER_UID || !uid) return;
+        if (!USER_UID || !uid || uid === USER_UID) return;
         const key = 'fr_' + USER_UID + '_' + uid;
         const isFriend = localStorage.getItem(key) === '1';
         
@@ -812,26 +817,25 @@
             localStorage.setItem(key, '1');
             db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
         }
-        loadFriends();
-        showProfileActions();
+        loadFriends(VIEWING_USER || USER_UID);
+        if (VIEWING_USER) showProfileActions(VIEWING_USER);
     };
 
-    function loadFriends() {
+    function loadFriends(uid) {
+        if (!uid) return;
         const container = document.getElementById('friendList');
-        if (!USER_UID) {
-            container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Войдите, чтобы видеть друзей</div>';
-            return;
-        }
+        container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Загрузка...</div>';
         
-        db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', snap => {
+        db.ref('sites/' + SITE + '/friends/' + uid).once('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
+            document.getElementById('friendsCount').textContent = keys.length;
+            
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">У вас пока нет друзей</div>';
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Нет друзей</div>';
                 return;
             }
             
-            // Получаем имена друзей
             let html = '';
             let loaded = 0;
             keys.forEach(k => {
@@ -839,37 +843,143 @@
                     const u = usnap.val() || {};
                     const name = u.name || 'Аноним';
                     const avatar = u.avatar || name.charAt(0).toUpperCase();
-                    html += `<span class="friend-item"><span class="avatar">${avatar}</span> ${esc(name)}</span>`;
+                    html += `<span class="friend-item" onclick="viewUserProfile('${k}')">
+                        <span class="avatar">${avatar}</span> ${esc(name)}
+                    </span>`;
                     loaded++;
                     if (loaded === keys.length) {
                         container.innerHTML = html;
                     }
                 });
             });
-            if (keys.length === 0) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">У вас пока нет друзей</div>';
-            }
         });
     }
 
     // ================================================================
+    // ПОДПИСКИ И ПОДПИСЧИКИ
+    // ================================================================
+    function checkSubscription(uid) {
+        if (!USER_UID) return false;
+        const key = 'sub_' + USER_UID + '_' + uid;
+        return localStorage.getItem(key) === '1';
+    }
+
+    window.toggleSubscription = function(uid) {
+        if (!USER_UID || !uid || uid === USER_UID) return;
+        const key = 'sub_' + USER_UID + '_' + uid;
+        const isSub = localStorage.getItem(key) === '1';
+        
+        if (isSub) {
+            localStorage.removeItem(key);
+            db.ref('sites/' + SITE + '/subscriptions/' + USER_UID + '/' + uid).remove();
+            db.ref('sites/' + SITE + '/subscribers/' + uid + '/' + USER_UID).remove();
+        } else {
+            localStorage.setItem(key, '1');
+            db.ref('sites/' + SITE + '/subscriptions/' + USER_UID + '/' + uid).set(true);
+            db.ref('sites/' + SITE + '/subscribers/' + uid + '/' + USER_UID).set(true);
+        }
+        loadSubscribers(VIEWING_USER || USER_UID);
+        loadSubscriptions(VIEWING_USER || USER_UID);
+        if (VIEWING_USER) showProfileActions(VIEWING_USER);
+    };
+
+    function loadSubscribers(uid) {
+        if (!uid) return;
+        const container = document.getElementById('subscriberList');
+        container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/subscribers/' + uid).once('value', snap => {
+            const data = snap.val() || {};
+            const keys = Object.keys(data);
+            document.getElementById('subscribersCount').textContent = keys.length;
+            
+            if (!keys.length) {
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Нет подписчиков</div>';
+                return;
+            }
+            
+            let html = '';
+            let loaded = 0;
+            keys.forEach(k => {
+                db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
+                    const u = usnap.val() || {};
+                    const name = u.name || 'Аноним';
+                    const avatar = u.avatar || name.charAt(0).toUpperCase();
+                    html += `<span class="friend-item" onclick="viewUserProfile('${k}')">
+                        <span class="avatar">${avatar}</span> ${esc(name)}
+                    </span>`;
+                    loaded++;
+                    if (loaded === keys.length) {
+                        container.innerHTML = html;
+                    }
+                });
+            });
+        });
+    }
+
+    function loadSubscriptions(uid) {
+        if (!uid) return;
+        const container = document.getElementById('subscriptionList');
+        container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/subscriptions/' + uid).once('value', snap => {
+            const data = snap.val() || {};
+            const keys = Object.keys(data);
+            document.getElementById('subscriptionsCount').textContent = keys.length;
+            
+            if (!keys.length) {
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Нет подписок</div>';
+                return;
+            }
+            
+            let html = '';
+            let loaded = 0;
+            keys.forEach(k => {
+                db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
+                    const u = usnap.val() || {};
+                    const name = u.name || 'Аноним';
+                    const avatar = u.avatar || name.charAt(0).toUpperCase();
+                    html += `<span class="friend-item" onclick="viewUserProfile('${k}')">
+                        <span class="avatar">${avatar}</span> ${esc(name)}
+                    </span>`;
+                    loaded++;
+                    if (loaded === keys.length) {
+                        container.innerHTML = html;
+                    }
+                });
+            });
+        });
+    }
+
+    // ================================================================
+    // ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ В ПРОФИЛЕ
+    // ================================================================
+    window.toggleStat = function(type) {
+        document.getElementById('friendsSection').style.display = type === 'friends' ? 'block' : 'none';
+        document.getElementById('subscribersSection').style.display = type === 'subscribers' ? 'block' : 'none';
+        document.getElementById('subscriptionsSection').style.display = type === 'subscriptions' ? 'block' : 'none';
+    };
+
+    // ================================================================
     // СТРАНИЦЫ
     // ================================================================
-    function loadPages() {
-        if (!USER_UID) return;
+    function loadPages(uid) {
+        if (!uid) return;
         const container = document.getElementById('pageList');
-        db.ref('sites/' + SITE + '/pages/' + USER_UID).on('value', snap => {
+        container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/pages/' + uid).on('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">У вас нет страниц</div>';
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Нет страниц</div>';
                 return;
             }
             container.innerHTML = keys.map(k => {
                 const p = data[k];
                 return `<div class="page-item">
                     <div><span class="name">${esc(p.name)}</span> <span class="sub">${esc(p.desc || '')}</span></div>
-                    <button onclick="deletePage('${k}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;">🗑</button>
+                    ${uid === USER_UID ? `<button onclick="deletePage('${k}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;">🗑</button>` : ''}
                 </div>`;
             }).join('');
         });
@@ -889,7 +999,7 @@
         if (!name) { alert('Введите название'); return; }
         db.ref('sites/' + SITE + '/pages/' + USER_UID).push({ name, desc, createdAt: Date.now() });
         closeCreatePage();
-        loadPages();
+        loadPages(USER_UID);
     };
     window.deletePage = function(id) {
         if (!confirm('Удалить страницу?')) return;
@@ -922,8 +1032,29 @@
         }
         updateUI();
         closeEditProfile();
-        loadProfilePosts();
+        loadProfile();
         loadFeed();
+    };
+
+    // ================================================================
+    // ПРОСМОТР ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ
+    // ================================================================
+    window.viewUserProfile = function(uid) {
+        if (!uid) return;
+        if (uid === USER_UID) {
+            goToProfile();
+            return;
+        }
+        VIEWING_USER = uid;
+        setActivePage('profilePage');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
+        CURRENT_ROOM = null;
+        CURRENT_DM = null;
+        loadProfile();
     };
 
     // ================================================================
@@ -1036,15 +1167,16 @@
             repostCount: 0
         }).then(() => {
             document.getElementById('postInput').value = '';
-            loadProfilePosts();
+            loadProfile();
         });
     };
 
-    function loadProfilePosts() {
-        const uid = VIEWING_USER || USER_UID;
+    function loadProfilePosts(uid) {
         if (!uid) return;
+        const container = document.getElementById('profilePosts');
+        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">Загрузка...</div>';
+        
         db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
-            const container = document.getElementById('profilePosts');
             container.innerHTML = '';
             const data = snap.val() || {};
             const keys = Object.keys(data).filter(k => data[k].authorUid === uid).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
@@ -1211,7 +1343,7 @@
                 if (el) el.textContent = c;
             });
             
-            return `<div class="group-card" data-id="${group.id}" onclick="openRoom('${group.id}')">
+            return `<div class="group-card" data-id="${group.id}" onclick="openGroup('${group.id}')">
                 <div class="icon">${group.name.split(' ')[0]}</div>
                 <div class="name">${group.name}</div>
                 <div class="count">💬 <span class="count">0</span> сообщений</div>
@@ -1219,7 +1351,7 @@
         }).join('');
     }
 
-    window.openRoom = function(roomId) {
+    window.openGroup = function(roomId) {
         CURRENT_ROOM = roomId;
         CURRENT_DM = null;
         document.getElementById('chatView').classList.add('active');
@@ -1230,35 +1362,6 @@
     // ================================================================
     // ЛИЧКА (DM)
     // ================================================================
-    function loadDMList() {
-        if (!USER_UID) return;
-        const list = document.getElementById('dmList');
-        list.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Загрузка...</div>';
-        
-        db.ref('sites/' + SITE + '/users').once('value', snap => {
-            const users = snap.val() || {};
-            const keys = Object.keys(users).filter(k => k !== USER_UID);
-            
-            if (!keys.length) {
-                list.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Нет других пользователей</div>';
-                return;
-            }
-            
-            list.innerHTML = keys.map(k => {
-                const u = users[k];
-                const name = u.name || 'Аноним';
-                const initial = name.charAt(0).toUpperCase();
-                return `<div class="dm-item" onclick="openDM('${k}')">
-                    <div class="avatar">${initial}</div>
-                    <div class="info">
-                        <div class="name">${esc(name)}</div>
-                        <div class="last">Написать сообщение</div>
-                    </div>
-                </div>`;
-            }).join('');
-        });
-    }
-
     function getDMId(uid1, uid2) {
         const ids = [uid1, uid2].sort();
         return ids.join('_');
@@ -1270,37 +1373,6 @@
         document.getElementById('chatView').classList.add('active');
         setActivePage(null);
         loadDMChat(userId);
-    };
-
-    window.viewUserProfile = function(uid) {
-        if (!uid || uid === USER_UID) {
-            goToProfile();
-            return;
-        }
-        VIEWING_USER = uid;
-        setActivePage('profilePage');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        
-        // Загружаем данные пользователя
-        db.ref('sites/' + SITE + '/users/' + uid).once('value', snap => {
-            const u = snap.val() || {};
-            const name = u.name || 'Аноним';
-            const bio = u.bio || '';
-            const avatar = u.avatar || name.charAt(0).toUpperCase();
-            document.getElementById('profileAvatar').textContent = avatar;
-            document.getElementById('profileName').textContent = name;
-            document.getElementById('profileBio').textContent = bio;
-            showProfileActions();
-            loadProfilePosts();
-            loadFriends();
-            loadPages();
-        });
     };
 
     // ================================================================
@@ -1371,7 +1443,7 @@
     }
 
     // ================================================================
-    // ОТПРАВКА СООБЩЕНИЙ (ЧАТ / ЛИЧКА)
+    // ОТПРАВКА СООБЩЕНИЙ
     // ================================================================
     window.sendChat = function() {
         const input = document.getElementById('chatInput');
@@ -1415,8 +1487,6 @@
         CURRENT_DM = null;
         if (document.getElementById('groupsPage').classList.contains('active')) {
             goToGroups();
-        } else if (document.getElementById('dmPage').classList.contains('active')) {
-            goToDM();
         } else {
             goToFeed();
         }
@@ -1433,7 +1503,7 @@
     db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
         if (!snap.exists()) {
             const posts = [
-                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в MicroSocial! Теперь с друзьями, страницами и личкой!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
+                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в MicroSocial! Теперь всё в профиле: друзья, подписки, личка!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
                 { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, repostCount: 0 }
             ];
             posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
@@ -1447,14 +1517,11 @@
     updateUI();
     loadFeed();
     loadGroups();
-    loadDMList();
     setActivePage('feedPage');
     console.log('📱 MicroSocial запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345');
     console.log('📋 10 аккаунтов готовы!');
-    console.log('🤝 Друзья работают!');
-    console.log('📄 Страницы работают!');
-    console.log('💬 Личка работает!');
+    console.log('👤 Всё в профиле: друзья, подписки, личка!');
 })();
 </script>
 </body>
