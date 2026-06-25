@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>DeepChat</title>
+    <title>MicroSocial</title>
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -11,543 +11,210 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <style>
-        /* ===== БАЗА ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #ffffff;
+            background: #f0f2f5;
             color: #222;
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
         }
 
-        /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
-        .app { display: flex; height: 100vh; width: 100%; background: #ffffff; }
-
-        /* ===== САЙДБАР ===== */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -300px;
-            width: 280px;
-            height: 100vh;
+        /* Топбар */
+        .topbar {
             background: #ffffff;
-            border-right: 2px solid #e8e8e8;
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 16px 12px;
-            box-shadow: 4px 0 30px rgba(0,0,0,0.06);
-        }
-        .sidebar.open { left: 0; }
-
-        .sidebar .head {
+            padding: 12px 16px;
+            border-bottom: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f0f0;
-            margin-bottom: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .sidebar .head h2 { font-size: 1rem; color: #1877f2; font-weight: 700; }
-        .sidebar .head .close { background: none; border: none; color: #999; font-size: 1.4rem; cursor: pointer; }
-        .sidebar .head .close:hover { color: #222; }
-
-        .sidebar .user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            background: #f5f5f5;
-            border-radius: 10px;
-            margin-bottom: 14px;
-            border: 1px solid #e8e8e8;
-        }
-        .sidebar .user .avatar {
-            width: 34px; height: 34px; border-radius: 50%;
-            background: #1877f2;
+        .topbar .logo { font-size: 1.3rem; font-weight: 700; color: #1877f2; }
+        .topbar .user-info { display: flex; align-items: center; gap: 10px; }
+        .topbar .user-info .avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #1877f2; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; color: #fff; font-size: 0.85rem;
-        }
-        .sidebar .user .name { font-weight: 600; font-size: 0.85rem; color: #222; }
-        .sidebar .user .status { font-size: 0.6rem; color: #999; }
-
-        .sidebar .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            color: #555;
-            border: 1px solid transparent;
-            transition: all 0.15s;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 2px;
-        }
-        .sidebar .nav-item:hover { background: #f0f0f0; border-color: #e0e0e0; color: #222; }
-        .sidebar .nav-item.active { background: #e8f0fe; border-color: #1877f2; color: #1877f2; }
-
-        .sidebar .rooms-title {
-            color: #999;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 12px 4px 4px;
-        }
-        .sidebar .rooms { display: flex; flex-direction: column; gap: 2px; }
-        .sidebar .rooms .room {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 7px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #555;
-            border: 1px solid transparent;
-            transition: all 0.15s;
-            font-size: 0.85rem;
-        }
-        .sidebar .rooms .room:hover { background: #f0f0f0; border-color: #e0e0e0; color: #222; }
-        .sidebar .rooms .room.active { background: #e8f0fe; border-color: #1877f2; color: #1877f2; font-weight: 500; }
-        .sidebar .rooms .room .count {
-            margin-left: auto;
-            font-size: 0.6rem;
-            color: #aaa;
-            background: #f0f0f0;
-            padding: 0 8px;
-            border-radius: 40px;
-        }
-
-        .sidebar .footer { margin-top: 16px; padding-top: 12px; border-top: 2px solid #f0f0f0; }
-        .sidebar .footer .create-btn {
-            display: none;
-            background: #1877f2;
-            border: none;
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 40px;
-            font-size: 0.75rem;
             font-weight: 700;
-            cursor: pointer;
+        }
+        .topbar .user-info .name { font-weight: 600; font-size: 0.9rem; }
+        .topbar .user-info .logout {
+            background: none; border: 1px solid #ddd; border-radius: 20px;
+            padding: 4px 12px; cursor: pointer; font-size: 0.7rem;
+        }
+
+        /* Контейнер */
+        .container { max-width: 700px; margin: 0 auto; padding: 16px; }
+
+        /* Форма поста */
+        .post-form {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .post-form textarea {
             width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+            font-size: 0.9rem;
         }
-        .sidebar .footer .create-btn.show { display: block; }
-        .sidebar .footer .create-btn:hover { background: #4a9eff; }
-
-        /* ===== ОСНОВНАЯ ЧАСТЬ ===== */
-        .main {
-            flex: 1;
-            height: 100vh;
-            overflow: hidden;
-            background: #ffffff;
-            transition: margin-left 0.3s;
+        .post-form .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
         }
-        .main.shifted { margin-left: 280px; }
+        .post-form .actions button {
+            padding: 6px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .post-form .actions .submit { background: #1877f2; color: #fff; }
+        .post-form .actions .submit:hover { background: #4a9eff; }
+        .post-form .actions .cancel { background: #e4e6eb; color: #555; }
 
-        /* ===== ТОПБАР ===== */
-        .topbar {
+        /* Пост */
+        .post {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .post .author {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            background: #ffffff;
-            border-bottom: 2px solid #f0f0f0;
-            height: 56px;
+            gap: 10px;
+            margin-bottom: 8px;
         }
-        .topbar .menu-btn {
+        .post .author .avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #1877f2; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+        }
+        .post .author .name { font-weight: 600; }
+        .post .author .time { color: #999; font-size: 0.7rem; margin-left: auto; }
+        .post .text { font-size: 0.95rem; line-height: 1.5; margin-bottom: 8px; }
+        .post .stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .post .stats button {
             background: none;
             border: none;
-            color: #222;
-            font-size: 1.4rem;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-        .topbar .menu-btn:hover { color: #1877f2; }
-        .topbar .title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #222;
-            cursor: pointer;
-        }
-        .topbar .title span { color: #1877f2; }
-        .topbar .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-        .topbar .right .user {
-            font-size: 0.7rem;
             color: #888;
-            background: #f5f5f5;
-            padding: 4px 14px;
-            border-radius: 40px;
-            border: 1px solid #e8e8e8;
             cursor: pointer;
-        }
-        .topbar .right .user:hover { background: #e8e8e8; }
-
-        /* ===== КОНТЕНТ ===== */
-        .content {
-            height: calc(100vh - 56px);
-            overflow-y: auto;
-            background: #ffffff;
-            padding: 0;
-        }
-
-        /* ===== ЛЕНТА ===== */
-        .feed {
-            display: block;
-            padding: 14px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .feed.hidden { display: none; }
-
-        .feed .post-form {
-            background: #f8f8f8;
-            border: 1px solid #e8e8e8;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 14px;
-            display: none;
-        }
-        .feed .post-form.show { display: block; }
-        .feed .post-form .title { color: #e67e22; font-weight: 700; margin-bottom: 8px; }
-        .feed .post-form input,
-        .feed .post-form textarea {
-            width: 100%;
-            padding: 8px 12px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            color: #222;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
-            font-family: inherit;
-        }
-        .feed .post-form textarea { min-height: 50px; resize: vertical; }
-        .feed .post-form .btn-row {
             display: flex;
+            align-items: center;
             gap: 4px;
-            margin-bottom: 4px;
-        }
-        .feed .post-form .btn-row input { flex: 1; margin-bottom: 0; }
-        .feed .post-form .btn-row button {
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            color: #e74c3c;
-            border-radius: 4px;
-            padding: 0 8px;
-            cursor: pointer;
-        }
-        .feed .post-form .btn-add {
-            background: transparent;
-            border: 1px solid #ddd;
-            color: #e67e22;
-            padding: 2px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-        .feed .post-form .actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 6px;
-        }
-        .feed .post-form .actions button {
-            padding: 6px 18px;
-            border-radius: 40px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
             font-size: 0.8rem;
         }
-        .feed .post-form .actions .submit { background: #e67e22; color: #fff; }
-        .feed .post-form .actions .submit:hover { background: #d35400; }
-        .feed .post-form .actions .cancel { background: #f0f0f0; color: #888; }
-        .feed .post-form .actions .cancel:hover { background: #e0e0e0; }
+        .post .stats button:hover { color: #1877f2; }
+        .post .stats button.liked { color: #1877f2; }
 
-        .feed .post {
-            background: #ffffff;
-            border: 1px solid #e8e8e8;
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
+        /* Комментарии */
+        .comments {
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
         }
-        .feed .post .marquee {
-            background: #f5f5f5;
-            padding: 4px 10px;
-            border-radius: 6px;
-            color: #e67e22;
-            font-weight: 600;
-            margin-bottom: 6px;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .feed .post .marquee span {
-            display: inline-block;
-            animation: scroll 12s linear infinite;
-            padding-left: 100%;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-        .feed .post .author { color: #e67e22; font-weight: 700; }
-        .feed .post .time { color: #999; font-size: 0.6rem; margin-left: 6px; }
-        .feed .post .text { color: #222; margin: 6px 0; line-height: 1.5; }
-        .feed .post .btn-link {
-            display: inline-block;
-            background: #e67e22;
-            color: #fff;
-            padding: 4px 14px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.75rem;
-            margin: 4px 4px 0 0;
-        }
-        .feed .post .tag {
-            color: #1877f2;
-            font-size: 0.6rem;
-            background: #f0f7ff;
-            padding: 0 8px;
-            border-radius: 20px;
-            border: 1px solid #d0e4ff;
-            display: inline-block;
-            margin: 2px;
-        }
-        .feed .post .actions {
-            display: flex;
-            gap: 4px;
-            margin-top: 6px;
-        }
-        .feed .post .actions button {
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            color: #555;
-            padding: 0 10px;
-            border-radius: 20px;
-            font-size: 0.55rem;
-            cursor: pointer;
-        }
-        .feed .post .actions button:hover { background: #e5e5e5; }
-        .feed .post .discuss {
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            color: #1877f2;
-            padding: 3px 16px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            margin-top: 6px;
-            font-weight: 500;
-        }
-        .feed .post .discuss:hover { background: #e5e5e5; }
-
-        /* ===== ЧАТ ===== */
-        .chat-wrap {
-            display: none;
-            padding: 10px;
-            max-width: 800px;
-            margin: 0 auto;
-            height: calc(100vh - 56px);
-        }
-        .chat-wrap.show { display: block; }
-
-        .chat-panel {
-            background: #ffffff;
-            border: 1px solid #e8e8e8;
-            border-radius: 12px;
-            height: calc(100vh - 100px);
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-panel .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .chat-panel .messages .msg {
-            background: #f8f8f8;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 8px 10px;
-        }
-        .chat-panel .messages .msg .author { color: #e67e22; font-weight: 700; font-size: 0.8rem; }
-        .chat-panel .messages .msg .time { color: #999; font-size: 0.5rem; margin-left: 4px; }
-        .chat-panel .messages .msg .text { color: #222; font-size: 0.85rem; margin: 3px 0; }
-        .chat-panel .messages .msg .actions {
-            display: flex;
-            gap: 4px;
-            margin-top: 4px;
-        }
-        .chat-panel .messages .msg .actions button {
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            color: #555;
-            padding: 0 8px;
-            border-radius: 20px;
-            font-size: 0.5rem;
-            cursor: pointer;
-        }
-        .chat-panel .messages .msg .actions button:hover { background: #e5e5e5; }
-        .chat-panel .messages .msg .edit-btn { background: #fef9e7!important; border-color: #f39c12!important; color: #d35400!important; }
-        .chat-panel .messages .msg .del-btn { background: #fdedec!important; border-color: #e74c3c!important; color: #c0392b!important; }
-
-        .chat-panel .admin-bar {
-            display: none;
-            padding: 8px 10px;
-            background: #f8f8f8;
-            border-top: 1px solid #e8e8e8;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .chat-panel .admin-bar.show { display: flex; }
-        .chat-panel .admin-bar .title {
-            color: #e67e22;
-            font-weight: 700;
-            font-size: 0.7rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        .chat-panel .admin-bar .title button {
-            background: transparent;
-            border: 1px solid #ddd;
-            color: #888;
-            border-radius: 20px;
-            padding: 0 8px;
-            cursor: pointer;
-            font-size: 0.55rem;
-        }
-        .chat-panel .admin-bar .form {
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .chat-panel .admin-bar .form.open { display: flex; }
-        .chat-panel .admin-bar .form input,
-        .chat-panel .admin-bar .form textarea {
-            width: 100%;
-            padding: 5px 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            color: #222;
-            font-size: 0.75rem;
-            font-family: inherit;
-        }
-        .chat-panel .admin-bar .form textarea { min-height: 30px; resize: vertical; }
-        .chat-panel .admin-bar .form .abtn-row {
-            display: flex;
-            gap: 4px;
-        }
-        .chat-panel .admin-bar .form .abtn-row input { flex: 1; }
-        .chat-panel .admin-bar .form .aadd {
-            background: transparent;
-            border: 1px solid #ddd;
-            color: #e67e22;
-            padding: 0 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.6rem;
-        }
-        .chat-panel .admin-bar .form .apublish {
-            background: #e67e22;
+        .comments .toggle {
+            background: none;
             border: none;
-            border-radius: 20px;
-            padding: 4px;
-            font-weight: 700;
-            color: #fff;
+            color: #1877f2;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
         }
-
-        .chat-panel .input-wrap {
-            padding: 8px 10px;
-            background: #f8f8f8;
-            border-top: 1px solid #e8e8e8;
-            border-radius: 0 0 12px 12px;
-        }
-        .chat-panel .input-wrap .row {
+        .comments .toggle:hover { text-decoration: underline; }
+        .comments .list { display: none; }
+        .comments .list.open { display: block; }
+        .comments .comment {
             display: flex;
-            gap: 6px;
+            gap: 10px;
+            margin-bottom: 6px;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
-        .chat-panel .input-wrap .row input {
+        .comments .comment .avatar {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: #1877f2; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.6rem;
+        }
+        .comments .comment .body { flex: 1; }
+        .comments .comment .body .name { font-weight: 600; font-size: 0.8rem; }
+        .comments .comment .body .text { font-size: 0.85rem; color: #333; }
+        .comments .comment .body .time { font-size: 0.6rem; color: #999; margin-left: 6px; }
+        .comments .comment .del {
+            background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.6rem;
+        }
+        .comments .input-wrap {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .comments .input-wrap input {
             flex: 1;
-            padding: 8px 14px;
-            background: #fff;
+            padding: 6px 12px;
             border: 1px solid #ddd;
-            border-radius: 40px;
-            color: #222;
+            border-radius: 20px;
             font-size: 0.8rem;
             outline: none;
         }
-        .chat-panel .input-wrap .row input:focus { border-color: #e67e22; }
-        .chat-panel .input-wrap .row button {
-            background: #e67e22;
-            border: none;
-            border-radius: 40px;
-            padding: 0 16px;
-            font-weight: 700;
+        .comments .input-wrap input:focus { border-color: #1877f2; }
+        .comments .input-wrap button {
+            background: #1877f2;
             color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 4px 16px;
             cursor: pointer;
+            font-weight: 600;
         }
-        .chat-panel .input-wrap .row button:hover { background: #d35400; }
+        .comments .input-wrap button:hover { background: #4a9eff; }
 
-        /* ===== ОВЕРЛЕЙ ===== */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.3);
-            z-index: 999;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .overlay.show { display: block; opacity: 1; }
-
-        /* ===== МОДАЛКИ ===== */
+        /* Модалка входа */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5);
             z-index: 9999;
             justify-content: center;
             align-items: center;
-            padding: 16px;
         }
         .modal.open { display: flex; }
         .modal .box {
             background: #fff;
-            border: 1px solid #e0e0e0;
             border-radius: 14px;
             padding: 24px;
             max-width: 400px;
-            width: 100%;
+            width: 90%;
         }
-        .modal .box h3 { color: #222; margin-bottom: 4px; font-size: 1.1rem; }
-        .modal .box .sub { color: #888; font-size: 0.85rem; margin-bottom: 16px; }
+        .modal .box h3 { margin-bottom: 8px; }
         .modal .box input {
             width: 100%;
-            padding: 10px 14px;
-            background: #fff;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 10px;
-            color: #222;
-            font-size: 0.9rem;
+            border-radius: 8px;
             margin: 6px 0;
-            outline: none;
         }
-        .modal .box input:focus { border-color: #1877f2; }
         .modal .box .btns {
             display: flex;
             gap: 8px;
@@ -555,143 +222,48 @@
             margin-top: 8px;
         }
         .modal .box .btns button {
-            padding: 8px 20px;
-            border-radius: 40px;
+            padding: 6px 20px;
             border: none;
-            font-weight: 700;
+            border-radius: 20px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 0.85rem;
         }
-        .modal .box .btns .cancel { background: #f0f0f0; color: #888; }
-        .modal .box .btns .cancel:hover { background: #e0e0e0; }
+        .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
         .modal .box .btns .save { background: #1877f2; color: #fff; }
-        .modal .box .btns .save:hover { background: #4a9eff; }
 
-        /* ===== КНОПКА GOOGLE ===== */
         .google-btn {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             width: 100%;
-            padding: 10px 16px;
-            background: #ffffff;
+            padding: 10px;
+            background: #fff;
             border: 1px solid #ddd;
             border-radius: 40px;
-            font-size: 0.9rem;
             font-weight: 600;
-            color: #333;
             cursor: pointer;
-            transition: all 0.2s;
-            margin: 8px 0 4px;
+            margin: 8px 0;
         }
-        .google-btn:hover {
-            background: #f5f5f5;
-            border-color: #bbb;
-        }
-        .google-btn img {
-            width: 20px;
-            height: 20px;
-        }
-        .modal .box .divider {
+        .google-btn:hover { background: #f5f5f5; }
+        .google-btn img { width: 20px; height: 20px; }
+        .divider {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin: 12px 0;
             color: #bbb;
             font-size: 0.75rem;
+            margin: 8px 0;
         }
-        .modal .box .divider::before,
-        .modal .box .divider::after {
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
             height: 1px;
-            background: #e0e0e0;
+            background: #ddd;
         }
 
-        /* ===== РЕДАКТИРОВАНИЕ ===== */
-        .edit-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            padding: 12px;
-        }
-        .edit-overlay.open { display: flex; }
-        .edit-overlay .box {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 16px;
-            max-width: 420px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .edit-overlay .box h2 { color: #e67e22; font-size: 0.9rem; margin-bottom: 8px; }
-        .edit-overlay .box input,
-        .edit-overlay .box textarea {
-            width: 100%;
-            padding: 6px 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            color: #222;
-            font-size: 0.75rem;
-            margin-bottom: 4px;
-            font-family: inherit;
-        }
-        .edit-overlay .box textarea { min-height: 30px; resize: vertical; }
-        .edit-overlay .box .btn-row {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 4px;
-        }
-        .edit-overlay .box .btn-row input { flex: 1; margin-bottom: 0; }
-        .edit-overlay .box .actions {
-            display: flex;
-            gap: 4px;
-            margin-top: 4px;
-        }
-        .edit-overlay .box .actions .save {
-            background: #e67e22;
-            color: #fff;
-            border: none;
-            border-radius: 40px;
-            padding: 6px;
-            flex: 1;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .edit-overlay .box .actions .close {
-            background: #f0f0f0;
-            color: #888;
-            border: none;
-            border-radius: 40px;
-            padding: 6px;
-            flex: 1;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .edit-overlay .box .delete {
-            background: #fdedec;
-            color: #c0392b;
-            border: 1px solid #e74c3c;
-            border-radius: 40px;
-            padding: 6px;
-            width: 100%;
-            margin-top: 6px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        /* ===== АДМИН ТОЧКА ===== */
+        /* Админ точка */
         .admin-dot {
             position: fixed;
             bottom: 10px;
@@ -699,184 +271,74 @@
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #ddd;
             cursor: pointer;
             background: #f0f0f0;
             z-index: 99;
-            transition: all 0.3s;
         }
-        .admin-dot:hover { transform: scale(1.3); }
         .admin-dot.active { background: #e67e22; border-color: #e67e22; }
-
-        /* ===== СКРОЛЛ ===== */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<!-- ===== ОВЕРЛЕЙ ===== -->
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-<!-- ===== САЙДБАР ===== -->
-<div class="sidebar" id="sidebar">
-    <div class="head">
-        <h2>📱 Меню</h2>
-        <button class="close" onclick="closeSidebar()">✕</button>
-    </div>
-    <div class="user">
-        <div class="avatar" id="avatar">?</div>
-        <div>
-            <div class="name" id="userName">Гость</div>
-            <div class="status" id="userStatus">онлайн</div>
-        </div>
-    </div>
-
-    <div class="nav-item active" id="navFeed" onclick="goFeed()">📰 Лента</div>
-    <div class="nav-item" id="navRooms" onclick="goRooms()">💬 Комнаты</div>
-
-    <div class="rooms-title">📋 Комнаты</div>
-    <div class="rooms" id="roomList">
-        <div style="text-align:center;color:#bbb;padding:12px;font-size:0.8rem;">Загрузка...</div>
-    </div>
-
-    <div class="footer">
-        <button class="create-btn" id="createBtn" onclick="openCreateRoom()">➕ Создать комнату</button>
+<!-- ТОПБАР -->
+<div class="topbar">
+    <div class="logo">📱 MicroSocial</div>
+    <div class="user-info">
+        <div class="avatar" id="topAvatar">?</div>
+        <span class="name" id="topName">Гость</span>
+        <button class="logout" id="logoutBtn" style="display:none;" onclick="logout()">Выйти</button>
     </div>
 </div>
 
-<!-- ===== ОСНОВНАЯ ЧАСТЬ ===== -->
-<div class="main" id="main">
-    <div class="topbar">
-        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <div class="title" onclick="goFeed()">Deep<span>Chat</span></div>
-        <div class="right">
-            <span class="user" id="topUser" onclick="openChangeName()">👤 Гость</span>
+<!-- КОНТЕЙНЕР -->
+<div class="container" id="container">
+    <!-- Форма поста -->
+    <div class="post-form" id="postForm" style="display:none;">
+        <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
+        <div class="actions">
+            <button class="submit" onclick="submitPost()">📤 Опубликовать</button>
+            <button class="cancel" onclick="document.getElementById('postInput').value='';">Очистить</button>
         </div>
     </div>
 
-    <div class="content" id="content">
-        <!-- ЛЕНТА -->
-        <div class="feed" id="feedSection">
-            <div class="post-form" id="feedForm">
-                <div class="title">✏️ Новый пост</div>
-                <input type="text" id="fMarquee" placeholder="Бегущая строка">
-                <textarea id="fText" placeholder="Текст поста..."></textarea>
-                <input type="url" id="fLink" placeholder="Ссылка (iframe)">
-                <input type="text" id="fHashtags" placeholder="#хештеги через пробел">
-                <div style="color:#888;font-size:0.6rem;">Кнопки</div>
-                <div id="fBtns"></div>
-                <button class="btn-add" onclick="fAddBtn()">➕ Кнопку</button>
-                <div class="actions">
-                    <button class="submit" id="fSubmitBtn" onclick="fSubmit()">📤 Опубликовать</button>
-                    <button class="cancel" onclick="fCancel()">✕ Отмена</button>
-                </div>
-            </div>
-            <div id="feedPosts"></div>
-        </div>
-
-        <!-- ЧАТ -->
-        <div class="chat-wrap" id="chatSection">
-            <div class="chat-panel">
-                <div class="messages" id="chatMessages"></div>
-                <div class="admin-bar" id="chatAdminBar">
-                    <div class="title">
-                        ✏️ Опубликовать пост
-                        <button onclick="toggleAdminForm()">▼ Открыть</button>
-                    </div>
-                    <div class="form" id="chatAdminForm">
-                        <input type="text" id="apMarquee" placeholder="Бегущая строка">
-                        <textarea id="apText" placeholder="Текст поста..."></textarea>
-                        <input type="url" id="apLink" placeholder="Ссылка (iframe)">
-                        <input type="text" id="apHashtags" placeholder="#хештеги">
-                        <div style="color:#888;font-size:0.6rem;">Кнопки</div>
-                        <div id="apBtns"></div>
-                        <button class="aadd" onclick="apAddBtn()">➕ Кнопку</button>
-                        <button class="apublish" onclick="apPublish()">📤 Опубликовать</button>
-                    </div>
-                </div>
-                <div class="input-wrap">
-                    <div class="row">
-                        <input type="text" id="chatInput" placeholder="Сообщение...">
-                        <button onclick="chatSend()">→</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Лента -->
+    <div id="feed"></div>
 </div>
 
-<!-- ===== АДМИН ТОЧКА ===== -->
-<div class="admin-dot" id="adminDot" onclick="openAdminLogin()" title="Админ-вход"></div>
+<!-- АДМИН ТОЧКА -->
+<div class="admin-dot" id="adminDot" onclick="openAdminLogin()"></div>
 
-<!-- ===== МОДАЛКИ ===== -->
-<!-- МОДАЛКА ВХОДА / СМЕНЫ ИМЕНИ -->
-<div class="modal" id="changeNameModal">
+<!-- МОДАЛКА ВХОДА -->
+<div class="modal" id="loginModal">
     <div class="box">
-        <h3>👤 Вход в DeepChat</h3>
-        <div class="sub">Введите имя или войдите через Google</div>
-        
-        <!-- КНОПКА GOOGLE -->
+        <h3>👤 Вход в MicroSocial</h3>
+        <div class="sub" style="color:#888;font-size:0.85rem;margin-bottom:12px;">Войдите через Google</div>
         <button class="google-btn" id="googleLoginBtn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" />
             Войти через Google
         </button>
-        
         <div class="divider">или</div>
-        
-        <input type="text" id="changeNameInput" placeholder="Введите имя..." maxlength="24">
+        <input type="text" id="nameInput" placeholder="Введите имя..." maxlength="24">
         <div class="btns">
-            <button class="cancel" onclick="closeChangeName()">Отмена</button>
-            <button class="save" onclick="doChangeName()">Войти</button>
+            <button class="cancel" onclick="closeLogin()">Отмена</button>
+            <button class="save" onclick="loginWithName()">Войти</button>
         </div>
     </div>
 </div>
 
+<!-- МОДАЛКА АДМИНА -->
 <div class="modal" id="adminModal">
     <div class="box">
         <h3>🏴‍☠️ Админ-вход</h3>
-        <div class="sub">Введите пароль</div>
         <input type="password" id="adminPass" placeholder="Пароль...">
         <div class="btns">
             <button class="cancel" onclick="closeAdminModal()">Отмена</button>
-            <button class="save" onclick="checkAdminPass()">Войти</button>
+            <button class="save" onclick="checkAdmin()">Войти</button>
         </div>
     </div>
 </div>
 
-<div class="modal" id="createRoomModal">
-    <div class="box">
-        <h3>📝 Новая комната</h3>
-        <div class="sub">Введите название</div>
-        <input type="text" id="roomName" placeholder="Например: Общий..." maxlength="30">
-        <div class="btns">
-            <button class="cancel" onclick="closeCreateRoom()">Отмена</button>
-            <button class="save" onclick="doCreateRoom()">Создать</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===== РЕДАКТИРОВАНИЕ ===== -->
-<div class="edit-overlay" id="editOverlay">
-    <div class="box">
-        <h2>✏️ Редактировать</h2>
-        <input type="text" id="editMarquee" placeholder="Бегущая строка">
-        <textarea id="editText" placeholder="Текст..."></textarea>
-        <input type="url" id="editLink" placeholder="Ссылка (iframe)">
-        <input type="text" id="editHashtags" placeholder="#хештеги">
-        <div style="color:#888;font-size:0.6rem;">Кнопки</div>
-        <div id="editBtns"></div>
-        <button onclick="editAddBtn()" style="background:transparent;border:1px solid #ddd;color:#e67e22;padding:2px 10px;border-radius:20px;cursor:pointer;font-size:0.6rem;margin-bottom:4px;">➕ Кнопку</button>
-        <div class="actions">
-            <button class="save" onclick="doSaveEdit()">💾 Сохранить</button>
-            <button class="close" onclick="closeEdit()">✕ Отмена</button>
-        </div>
-        <button class="delete" onclick="doDeleteEdit()">🗑 Удалить</button>
-    </div>
-</div>
-
-<!-- ===== СКРИПТ ===== -->
 <script>
 (function() {
     // ================================================================
@@ -897,600 +359,341 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     // ================================================================
-    // КНОПКА GOOGLE
-    // ================================================================
-    document.getElementById('googleLoginBtn').addEventListener('click', function() {
-        auth.signInWithPopup(provider)
-            .then((result) => {
-                console.log('✅ Вход через Google выполнен');
-                closeChangeName();
-            })
-            .catch((error) => {
-                console.error('❌ Ошибка входа:', error);
-                if (error.code === 'auth/popup-blocked') {
-                    auth.signInWithRedirect(provider);
-                } else {
-                    alert('Ошибка входа: ' + error.message);
-                }
-            });
-    });
-
-    // ================================================================
     // СОСТОЯНИЕ
     // ================================================================
     const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
     let USER = null;
     let USER_UID = null;
-    let IS_FEED_ADMIN = localStorage.getItem('dc_fa_'+SITE) === '1';
-    let IS_ROOM_ADMIN = localStorage.getItem('dc_ra_'+SITE) === '1';
-    let CUR_ROOM = '';
-    let FEED_EDIT_ID = null;
-    let CHAT_EDIT_ID = null;
-    let chatUnsub = null;
-    let currentTab = 'feed';
-
-    // ================================================================
-    // СПИСОК КОМНАТ (ЖИВУТ В КОДЕ, НЕ В FIREBASE)
-    // ================================================================
-    const ROOMS_LIST = [
-        { id: 'general', name: '🌍 Общий' },
-        { id: 'sport', name: '⚽ Спорт' },
-        { id: 'games', name: '🎮 Игры' },
-        { id: 'movies', name: '🎬 Кино' },
-        { id: 'music', name: '🎵 Музыка' },
-        { id: 'tech', name: '💻 Технологии' },
-        { id: 'food', name: '🍕 Еда' },
-        { id: 'travel', name: '✈️ Путешествия' },
-        { id: 'fashion', name: '👗 Мода' },
-        { id: 'science', name: '🔬 Наука' }
-    ];
+    let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
 
     // ================================================================
     // AUTH
     // ================================================================
     auth.onAuthStateChanged(user => {
-        const topUser = document.getElementById('topUser');
-        const userName = document.getElementById('userName');
-        const avatar = document.getElementById('avatar');
-
         if (user) {
             USER_UID = user.uid;
-            let saved = localStorage.getItem('dc_u_'+SITE);
-            USER = saved || user.displayName || user.email || user.uid.slice(0,8);
-            if (!saved) localStorage.setItem('dc_u_'+SITE, USER);
-            db.ref('sites/'+SITE+'/users/'+USER_UID).set({ name: USER, email: user.email });
-
-            topUser.textContent = '👤 ' + USER;
-            userName.textContent = USER;
-            avatar.textContent = USER.charAt(0).toUpperCase();
+            let saved = localStorage.getItem('dc_u_' + SITE);
+            USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
+            if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
+            db.ref('sites/' + SITE + '/users/' + USER_UID).set({ name: USER, email: user.email });
             
-            applyAdminUI();
+            updateUI();
             loadFeed();
-            loadRooms();
-            
-            // Если нет сохраненной комнаты — даем "Общий"
-            const savedRoom = localStorage.getItem('dc_room_' + SITE);
-            if (!savedRoom) {
-                localStorage.setItem('dc_room_' + SITE, 'general');
-                openRoom('general', '🌍 Общий');
-            } else {
-                const room = ROOMS_LIST.find(r => r.id === savedRoom);
-                if (room) openRoom(room.id, room.name);
-            }
-            
-            closeChangeName();
+            closeLogin();
         } else {
             USER = null;
             USER_UID = null;
-            topUser.textContent = '👤 Войти';
-            userName.textContent = 'Гость';
-            avatar.textContent = '?';
-            if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
-            
-            document.getElementById('changeNameModal').classList.add('open');
-            document.getElementById('changeNameInput').value = '';
-            document.getElementById('changeNameInput').placeholder = 'Введите имя...';
+            document.getElementById('loginModal').classList.add('open');
+            updateUI();
         }
     });
 
+    // Google Login
+    document.getElementById('googleLoginBtn').addEventListener('click', function() {
+        auth.signInWithPopup(provider).catch(err => {
+            if (err.code === 'auth/popup-blocked') {
+                auth.signInWithRedirect(provider);
+            } else {
+                alert('Ошибка: ' + err.message);
+            }
+        });
+    });
+
     // ================================================================
-    // ИМЯ / ВХОД
+    // UI
     // ================================================================
-    window.openChangeName = function() {
-        document.getElementById('changeNameInput').value = USER || '';
-        document.getElementById('changeNameModal').classList.add('open');
-    };
-    window.closeChangeName = function() {
-        document.getElementById('changeNameModal').classList.remove('open');
-    };
-    window.doChangeName = function() {
-        const n = document.getElementById('changeNameInput').value.trim();
-        if (!n) { alert('Введите имя или войдите через Google'); return; }
-        
-        if (!USER_UID) {
-            auth.signInAnonymously().then(() => {
-                USER = n.slice(0,24);
-                localStorage.setItem('dc_u_'+SITE, USER);
-                document.getElementById('topUser').textContent = '👤 ' + USER;
-                document.getElementById('userName').textContent = USER;
-                document.getElementById('avatar').textContent = USER.charAt(0).toUpperCase();
-                closeChangeName();
-                applyAdminUI();
-                loadFeed();
-                loadRooms();
-            }).catch(e => alert('Ошибка: '+e.message));
-            return;
+    function updateUI() {
+        const avatar = document.getElementById('topAvatar');
+        const name = document.getElementById('topName');
+        const form = document.getElementById('postForm');
+        const logout = document.getElementById('logoutBtn');
+        const dot = document.getElementById('adminDot');
+
+        if (USER) {
+            avatar.textContent = USER.charAt(0).toUpperCase();
+            name.textContent = USER;
+            form.style.display = 'block';
+            logout.style.display = 'inline-block';
+            if (IS_ADMIN) dot.classList.add('active');
+            else dot.classList.remove('active');
+        } else {
+            avatar.textContent = '?';
+            name.textContent = 'Гость';
+            form.style.display = 'none';
+            logout.style.display = 'none';
+            dot.classList.remove('active');
         }
-        
-        USER = n.slice(0,24);
-        localStorage.setItem('dc_u_'+SITE, USER);
-        document.getElementById('topUser').textContent = '👤 ' + USER;
-        document.getElementById('userName').textContent = USER;
-        document.getElementById('avatar').textContent = USER.charAt(0).toUpperCase();
-        if (USER_UID) db.ref('sites/'+SITE+'/users/'+USER_UID).update({ name: USER });
-        closeChangeName();
+    }
+
+    window.logout = function() {
+        auth.signOut();
+        localStorage.removeItem('dc_u_' + SITE);
+    };
+
+    window.closeLogin = function() {
+        document.getElementById('loginModal').classList.remove('open');
+    };
+
+    window.loginWithName = function() {
+        const n = document.getElementById('nameInput').value.trim();
+        if (!n) { alert('Введите имя'); return; }
+        auth.signInAnonymously().then(() => {
+            USER = n.slice(0, 24);
+            localStorage.setItem('dc_u_' + SITE, USER);
+            updateUI();
+            loadFeed();
+            closeLogin();
+        }).catch(e => alert('Ошибка: ' + e.message));
     };
 
     // ================================================================
     // АДМИН
     // ================================================================
-    function applyAdminUI() {
-        const f = document.getElementById('feedForm');
-        const ad = document.getElementById('adminDot');
-        const cb = document.getElementById('createBtn');
-        const ab = document.getElementById('chatAdminBar');
-        if (IS_FEED_ADMIN) {
-            f.classList.add('show');
-            ad.classList.add('active');
-        } else {
-            f.classList.remove('show');
-            ad.classList.remove('active');
-        }
-        if (IS_ROOM_ADMIN) {
-            cb.classList.add('show');
-            ab.classList.add('show');
-            ad.classList.add('active');
-        } else {
-            cb.classList.remove('show');
-            ab.classList.remove('show');
-        }
-    }
-
     window.openAdminLogin = function() {
         document.getElementById('adminModal').classList.add('open');
         document.getElementById('adminPass').value = '';
-        document.getElementById('adminPass').focus();
     };
     window.closeAdminModal = function() {
         document.getElementById('adminModal').classList.remove('open');
     };
-    window.checkAdminPass = function() {
+    window.checkAdmin = function() {
         if (document.getElementById('adminPass').value.trim() === '12345') {
-            IS_FEED_ADMIN = true;
-            IS_ROOM_ADMIN = true;
-            localStorage.setItem('dc_fa_'+SITE, '1');
-            localStorage.setItem('dc_ra_'+SITE, '1');
-            applyAdminUI();
+            IS_ADMIN = true;
+            localStorage.setItem('dc_admin_' + SITE, '1');
+            document.getElementById('adminDot').classList.add('active');
             closeAdminModal();
-            loadFeed();
             alert('🏴‍☠️ Админ-режим включён!');
         } else {
             alert('❌ Неверный пароль');
-            document.getElementById('adminPass').value = '';
-            document.getElementById('adminPass').focus();
         }
     };
-
-    // ================================================================
-    // САЙДБАР
-    // ================================================================
-    window.toggleSidebar = function() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('overlay').classList.toggle('show');
-        if (window.innerWidth > 480) {
-            document.getElementById('main').classList.toggle('shifted');
-        }
-    };
-    window.closeSidebar = function() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-        document.getElementById('main').classList.remove('shifted');
-    };
-
-    // ================================================================
-    // НАВИГАЦИЯ
-    // ================================================================
-    window.goFeed = function() {
-        currentTab = 'feed';
-        document.getElementById('feedSection').classList.remove('hidden');
-        document.getElementById('chatSection').classList.remove('show');
-        document.getElementById('navFeed').classList.add('active');
-        document.getElementById('navRooms').classList.remove('active');
-        CUR_ROOM = '';
-        updateRoomTitle(null);
-        closeSidebar();
-    };
-
-    window.goRooms = function() {
-        currentTab = 'rooms';
-        document.getElementById('feedSection').classList.add('hidden');
-        document.getElementById('chatSection').classList.remove('show');
-        document.getElementById('navRooms').classList.add('active');
-        document.getElementById('navFeed').classList.remove('active');
-        closeSidebar();
-        loadRooms();
-    };
-
-    // ================================================================
-    // КОМНАТЫ
-    // ================================================================
-    function updateRoomTitle(roomName) {
-        const title = document.querySelector('.topbar .title');
-        if (roomName) {
-            title.innerHTML = '💬 ' + roomName;
-        } else {
-            title.innerHTML = 'Deep<span>Chat</span>';
-        }
-    }
-
-    window.openRoom = function(roomId, roomName) {
-        if (!USER) { 
-            alert('Сначала войдите!'); 
-            return; 
-        }
-        
-        CUR_ROOM = roomId;
-        localStorage.setItem('dc_room_' + SITE, roomId);
-        updateRoomTitle(roomName);
-        document.getElementById('feedSection').classList.add('hidden');
-        document.getElementById('chatSection').classList.add('show');
-        document.getElementById('navRooms').classList.add('active');
-        document.getElementById('navFeed').classList.remove('active');
-        closeSidebar();
-        loadChat(roomId);
-        loadRooms();
-    };
-
-    function loadRooms() {
-        const list = document.getElementById('roomList');
-        list.innerHTML = ROOMS_LIST.map(room => {
-            const ac = room.id === CUR_ROOM ? 'active' : '';
-            // Счетчик подгружаем из Firebase
-            let count = 0;
-            db.ref('sites/'+SITE+'/rooms/'+room.id+'/count').once('value', snap => {
-                const c = snap.val() || 0;
-                const countEl = document.querySelector(`#roomList .room[data-id="${room.id}"] .count`);
-                if (countEl) countEl.textContent = c;
-            });
-            return `<div class="room ${ac}" data-id="${room.id}" onclick="openRoom('${room.id}','${room.name.replace(/['"]/g, '')}')">
-                <span>${room.name}</span>
-                <span class="count">0</span>
-            </div>`;
-        }).join('');
-        
-        // Подписываемся на обновления счетчиков
-        ROOMS_LIST.forEach(room => {
-            db.ref('sites/'+SITE+'/rooms/'+room.id+'/count').on('value', snap => {
-                const count = snap.val() || 0;
-                const countEl = document.querySelector(`#roomList .room[data-id="${room.id}"] .count`);
-                if (countEl) countEl.textContent = count;
-            });
-        });
-    }
-
-    window.openCreateRoom = function() {
-        if (!IS_ROOM_ADMIN) { alert('⛔ Только для админа!'); return; }
-        document.getElementById('createRoomModal').classList.add('open');
-        document.getElementById('roomName').value = '';
-        document.getElementById('roomName').focus();
-    };
-    window.closeCreateRoom = function() {
-        document.getElementById('createRoomModal').classList.remove('open');
-    };
-    window.doCreateRoom = function() {
-        const name = document.getElementById('roomName').value.trim();
-        if (!name || name.length < 2) { alert('Минимум 2 символа'); return; }
-        // Добавляем в список комнат
-        const newRoom = { id: 'room_' + Date.now(), name: name };
-        ROOMS_LIST.push(newRoom);
-        loadRooms();
-        closeCreateRoom();
-        alert('✅ Комната "' + name + '" создана!');
-    };
-
-    // ================================================================
-    // УТИЛИТЫ
-    // ================================================================
-    const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
-    const now = () => new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 
     // ================================================================
     // ЛЕНТА
     // ================================================================
     function loadFeed() {
-        db.ref('sites/'+SITE+'/feed_posts').orderByChild('timestamp').on('value', snap => {
-            const c = document.getElementById('feedPosts');
-            c.innerHTML = '';
+        db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = '';
             const data = snap.val() || {};
-            const keys = Object.keys(data).sort((a,b) => (data[b].timestamp||0) - (data[a].timestamp||0));
+            const keys = Object.keys(data).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
             if (!keys.length) {
-                c.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;">Пока пусто</div>';
+                feed.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;">Пока пусто. Напишите первый пост!</div>';
                 return;
             }
-            keys.forEach(k => { const p = data[k]; p.id = k; c.appendChild(renderPost(p)); });
+            keys.forEach(k => {
+                const p = data[k];
+                p.id = k;
+                feed.appendChild(renderPost(p));
+            });
         });
     }
 
     function renderPost(p) {
-        const d = document.createElement('div'); d.className = 'post';
-        const mq = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
-        const fr = p.link ? `<iframe src="${esc(p.link)}" style="width:100%;height:200px;border:1px solid #e0e0e0;border-radius:8px;margin:4px 0;"></iframe>` : '';
-        let btns = '';
-        if (p.buttons && p.buttons.length) {
-            btns = p.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="btn-link">${esc(b.label||'🔗')}</a>`).join('');
-        }
-        let tags = '';
-        if (p.hashtags && p.hashtags.length) {
-            tags = p.hashtags.map(t => `<span class="tag">${esc(t)}</span>`).join(' ');
-        }
-        let acts = '';
-        if (IS_FEED_ADMIN) {
-            acts = `<div class="actions"><button onclick="feedOpenEdit('${p.id}')">✏️ Ред.</button><button onclick="feedDel('${p.id}')">🗑</button></div>`;
-        }
-        d.innerHTML = `${mq}<div><span class="author">${esc(p.author||'Аноним')}</span><span class="time">${p.time||''}${p.edited?' (ред.)':''}</span></div>
-            <div class="text">${esc(p.text||'')}</div>${btns}${fr}<div>${tags}</div>${acts}
-            <button class="discuss" onclick="openRoom('post_${p.id}','${esc((p.text||'Пост').slice(0,28))}')">💬 Обсудить</button>`;
-        return d;
+        const div = document.createElement('div');
+        div.className = 'post';
+        div.dataset.id = p.id;
+
+        const isLiked = localStorage.getItem('lk_' + p.id + '_' + USER_UID) === '1';
+
+        div.innerHTML = `
+            <div class="author">
+                <div class="avatar">${esc((p.author || '?').charAt(0).toUpperCase())}</div>
+                <span class="name">${esc(p.author || 'Аноним')}</span>
+                <span class="time">${p.time || ''}</span>
+                ${IS_ADMIN ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.7rem;margin-left:auto;">🗑</button>` : ''}
+            </div>
+            <div class="text">${esc(p.text || '')}</div>
+            <div class="stats">
+                <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">
+                    👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
+                </button>
+                <button onclick="toggleComments('${p.id}')">
+                    💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
+                </button>
+            </div>
+            <div class="comments" id="comments_${p.id}">
+                <button class="toggle" onclick="toggleComments('${p.id}')">💬 Показать комментарии</button>
+                <div class="list" id="commentsList_${p.id}">
+                    <div id="commentsContainer_${p.id}"></div>
+                    <div class="input-wrap">
+                        <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий..." />
+                        <button onclick="submitComment('${p.id}')">→</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Загружаем комментарии
+        loadComments(p.id);
+
+        return div;
     }
 
-    window.fAddBtn = function(l='', u='') {
-        const c = document.getElementById('fBtns');
-        const d = document.createElement('div'); d.className = 'btn-row';
-        d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()">✕</button>`;
-        c.appendChild(d);
-    };
-    window.fSubmit = function() {
-        if (!USER) { alert('Войдите!'); return; }
-        const marquee = document.getElementById('fMarquee').value.trim();
-        const text = document.getElementById('fText').value.trim();
-        const link = document.getElementById('fLink').value.trim();
-        const hr = document.getElementById('fHashtags').value.trim();
-        const hashtags = hr ? hr.split(/\s+/).filter(t=>t.startsWith('#')).slice(0,5) : [];
-        if (!text && !link) { alert('Введите текст или ссылку'); return; }
-        const buttons = [];
-        document.querySelectorAll('#fBtns .btn-row').forEach(g => {
-            const [li, ui] = g.querySelectorAll('input');
-            if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗', url: ui.value.trim()});
+    // ================================================================
+    // ПОСТЫ
+    // ================================================================
+    window.submitPost = function() {
+        if (!USER) { alert('Сначала войдите!'); return; }
+        const text = document.getElementById('postInput').value.trim();
+        if (!text) { alert('Введите текст'); return; }
+
+        db.ref('sites/' + SITE + '/feed_posts').push({
+            author: USER,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0
+        }).then(() => {
+            document.getElementById('postInput').value = '';
         });
-        const post = { author: USER, text: text||'📝', time: now(), timestamp: Date.now(), marquee: marquee||null, link: link||null, buttons, hashtags, img: null, edited: false };
-        const ref = db.ref('sites/'+SITE+'/feed_posts');
-        if (FEED_EDIT_ID) {
-            ref.child(FEED_EDIT_ID).update({...post, edited: true, editedAt: Date.now()}).then(fCancel);
+    };
+
+    window.deletePost = function(id) {
+        if (!IS_ADMIN || !confirm('Удалить пост?')) return;
+        db.ref('sites/' + SITE + '/feed_posts/' + id).remove();
+        // Удаляем комментарии
+        db.ref('sites/' + SITE + '/comments/' + id).remove();
+    };
+
+    // ================================================================
+    // ЛАЙКИ
+    // ================================================================
+    window.toggleLike = function(postId) {
+        if (!USER) { alert('Войдите!'); return; }
+        const key = 'lk_' + postId + '_' + USER_UID;
+        const liked = localStorage.getItem(key) === '1';
+        
+        const ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/likes');
+        if (liked) {
+            ref.transaction(v => Math.max(0, (v || 0) - 1));
+            localStorage.removeItem(key);
         } else {
-            ref.push(post).then(fCancel);
+            ref.transaction(v => (v || 0) + 1);
+            localStorage.setItem(key, '1');
         }
     };
-    window.fCancel = function() {
-        ['fMarquee','fText','fLink','fHashtags'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('fBtns').innerHTML = '';
-        document.getElementById('fSubmitBtn').textContent = '📤 Опубликовать';
-        FEED_EDIT_ID = null;
-    };
-    window.feedOpenEdit = function(id) {
-        FEED_EDIT_ID = id;
-        db.ref('sites/'+SITE+'/feed_posts/'+id).once('value', snap => {
-            const p = snap.val(); if (!p) return;
-            document.getElementById('fMarquee').value = p.marquee||'';
-            document.getElementById('fText').value = p.text||'';
-            document.getElementById('fLink').value = p.link||'';
-            document.getElementById('fHashtags').value = (p.hashtags||[]).join(' ');
-            document.getElementById('fBtns').innerHTML = '';
-            (p.buttons||[]).forEach(b => fAddBtn(b.label, b.url));
-            document.getElementById('fSubmitBtn').textContent = '💾 Обновить';
-            document.getElementById('feedForm').classList.add('show');
-            document.getElementById('feedForm').scrollIntoView({behavior:'smooth'});
-        });
-    };
-    window.feedDel = function(id) {
-        if (!confirm('Удалить?')) return;
-        db.ref('sites/'+SITE+'/feed_posts/'+id).remove();
-    };
 
     // ================================================================
-    // ЧАТ
+    // КОММЕНТАРИИ
     // ================================================================
-    function chatPath(roomId) { return 'rooms/'+SITE+'_'+roomId+'/messages'; }
+    function loadComments(postId) {
+        db.ref('sites/' + SITE + '/comments/' + postId).orderByChild('timestamp').on('value', snap => {
+            const container = document.getElementById('commentsContainer_' + postId);
+            if (!container) return;
+            container.innerHTML = '';
+            const data = snap.val() || {};
+            const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
+            
+            // Обновляем счетчик
+            const count = keys.length;
+            const countEl = document.getElementById('commentCount_' + postId);
+            if (countEl) countEl.textContent = count;
+            db.ref('sites/' + SITE + '/feed_posts/' + postId + '/commentCount').set(count);
 
-    function loadChat(roomId) {
-        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
-        const box = document.getElementById('chatMessages');
-        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">⏳ Загрузка...</div>';
-        const path = chatPath(roomId);
-        chatUnsub = path;
-        db.ref(path).orderByChild('timestamp').on('value', snap => {
-            box.innerHTML = '';
-            if (!snap.exists()) {
-                box.innerHTML = '<div style="color:#bbb;text-align:center;padding:30px;">Сообщений нет 👋</div>';
+            if (!keys.length) {
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;padding:4px 0;">Нет комментариев</div>';
                 return;
             }
-            snap.forEach(s => { const m = s.val(); m.id = s.key; box.appendChild(renderChatMsg(m, roomId)); });
-            box.scrollTop = box.scrollHeight;
+
+            keys.forEach(k => {
+                const c = data[k];
+                const div = document.createElement('div');
+                div.className = 'comment';
+                div.innerHTML = `
+                    <div class="avatar">${esc((c.author || '?').charAt(0).toUpperCase())}</div>
+                    <div class="body">
+                        <span class="name">${esc(c.author || 'Аноним')}</span>
+                        <span class="time">${c.time || ''}</span>
+                        <div class="text">${esc(c.text || '')}</div>
+                    </div>
+                    ${(c.author === USER || IS_ADMIN) ? `<button class="del" onclick="deleteComment('${postId}','${k}')">✕</button>` : ''}
+                `;
+                container.appendChild(div);
+            });
         });
     }
 
-    function renderChatMsg(m, roomId) {
-        const d = document.createElement('div'); d.className = 'msg';
-        const isPost = m.isPost || m.marquee || (m.buttons && m.buttons.length);
-        const mq = isPost && m.marquee ? `<div class="marquee"><span>${esc(m.marquee)}</span></div>` : '';
-        const fr = isPost && m.link ? `<iframe src="${esc(m.link)}" style="width:100%;height:150px;border:1px solid #e0e0e0;border-radius:6px;margin:4px 0;"></iframe>` : '';
-        let btns = '';
-        if (isPost && m.buttons && m.buttons.length) {
-            btns = m.buttons.filter(b=>b.url).map(b => `<a href="${esc(b.url)}" target="_blank" class="btn-link" style="font-size:0.7rem;padding:4px 12px;">${esc(b.label||'🔗')}</a>`).join('');
+    window.toggleComments = function(postId) {
+        const list = document.getElementById('commentsList_' + postId);
+        const toggle = document.querySelector(`#comments_${postId} .toggle`);
+        if (list) {
+            list.classList.toggle('open');
+            if (toggle) {
+                toggle.textContent = list.classList.contains('open') ? '▲ Скрыть комментарии' : '💬 Показать комментарии';
+            }
         }
-        let tags = '';
-        if (isPost && m.hashtags && m.hashtags.length) {
-            tags = m.hashtags.map(t => `<span class="tag">${esc(t)}</span>`).join(' ');
-        }
-        let acts = `<button onclick="chatLike('${m.id}','${roomId}')">👍 ${m.likes||0}</button>
-                    <button onclick="chatReply('${esc(m.nick)}')">💬</button>`;
-        if ((m.nick === USER) || IS_ROOM_ADMIN) {
-            acts += `<button class="edit-btn" onclick="openChatEdit('${m.id}','${roomId}')">✏️</button>`;
-            acts += `<button class="del-btn" onclick="chatDel('${m.id}','${roomId}')">🗑</button>`;
-        }
-        d.innerHTML = `${mq}<div><span class="author">${esc(m.nick||'?')}</span><span class="time">${m.time||''}${m.edited?' (ред.)':''}</span></div>
-            <div class="text">${esc(m.text||'')}</div>${btns}${fr}<div>${tags}</div><div class="actions">${acts}</div>`;
-        return d;
-    }
+    };
 
-    window.chatSend = function() {
-        if (!CUR_ROOM || !USER) { alert('Выберите комнату и войдите'); return; }
-        const input = document.getElementById('chatInput');
+    window.submitComment = function(postId) {
+        if (!USER) { alert('Войдите!'); return; }
+        const input = document.getElementById('commentInput_' + postId);
         const text = input.value.trim();
         if (!text) return;
-        
-        db.ref(chatPath(CUR_ROOM)).push({ 
-            nick: USER, 
-            text, 
-            time: now(), 
-            timestamp: Date.now(), 
-            likes: 0, 
-            img: null, 
-            edited: false, 
-            isPost: false 
-        });
-        
-        // Обновляем счетчик
-        db.ref('sites/'+SITE+'/rooms/'+CUR_ROOM+'/count').transaction(v => (v||0)+1);
-        
-        input.value = '';
-    };
-    
-    document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') chatSend(); });
 
-    window.chatLike = function(id, roomId) {
-        if (!USER) return;
-        const key = 'lk_'+id+'_'+USER_UID;
-        if (localStorage.getItem(key)) return;
-        db.ref(chatPath(roomId)+'/'+id+'/likes').transaction(v => (v||0)+1);
-        localStorage.setItem(key, '1');
-    };
-    window.chatReply = function(nick) {
-        document.getElementById('chatInput').value = '@'+nick+' ';
-        document.getElementById('chatInput').focus();
-    };
-    window.chatDel = function(id, roomId) {
-        if (!confirm('Удалить?')) return;
-        db.ref(chatPath(roomId)+'/'+id).remove();
-        db.ref('sites/'+SITE+'/rooms/'+roomId+'/count').transaction(v => Math.max(0, (v||0)-1));
-    };
-
-    // Admin publish
-    window.toggleAdminForm = function() {
-        const f = document.getElementById('chatAdminForm');
-        const btn = document.querySelector('.admin-bar .title button');
-        const open = f.classList.toggle('open');
-        btn.textContent = open ? '▲ Закрыть' : '▼ Открыть';
-    };
-    window.apAddBtn = function(l='', u='') {
-        const c = document.getElementById('apBtns');
-        const d = document.createElement('div'); d.className = 'abtn-row';
-        d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#e74c3c;cursor:pointer;">✕</button>`;
-        c.appendChild(d);
-    };
-    window.apPublish = function() {
-        if (!CUR_ROOM || !USER) { alert('Войдите'); return; }
-        const marquee = document.getElementById('apMarquee').value.trim();
-        const text = document.getElementById('apText').value.trim();
-        const link = document.getElementById('apLink').value.trim();
-        const hr = document.getElementById('apHashtags').value.trim();
-        const hashtags = hr ? hr.split(/\s+/).filter(t=>t.startsWith('#')).slice(0,5) : [];
-        if (!marquee && !text && !link) { alert('Заполните поле'); return; }
-        const buttons = [];
-        document.querySelectorAll('#apBtns .abtn-row').forEach(g => {
-            const [li, ui] = g.querySelectorAll('input');
-            if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗', url: ui.value.trim()});
-        });
-        db.ref(chatPath(CUR_ROOM)).push({
-            nick: USER, text: text || marquee || '📋', time: now(), timestamp: Date.now(),
-            likes: 0, marquee: marquee||null, link: link||null, buttons, hashtags, img: null, isPost: true, edited: false
+        db.ref('sites/' + SITE + '/comments/' + postId).push({
+            author: USER,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now()
         }).then(() => {
-            ['apMarquee','apText','apLink','apHashtags'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('apBtns').innerHTML = '';
-            document.getElementById('chatAdminForm').classList.remove('open');
-            document.querySelector('.admin-bar .title button').textContent = '▼ Открыть';
-            db.ref('sites/'+SITE+'/rooms/'+CUR_ROOM+'/count').transaction(v => (v||0)+1);
+            input.value = '';
+            // Открываем комментарии
+            const list = document.getElementById('commentsList_' + postId);
+            if (list) list.classList.add('open');
+            const toggle = document.querySelector(`#comments_${postId} .toggle`);
+            if (toggle) toggle.textContent = '▲ Скрыть комментарии';
         });
     };
 
-    // Edit modal
-    window.openChatEdit = function(msgId, roomId) {
-        CHAT_EDIT_ID = { msgId, roomId };
-        db.ref(chatPath(roomId)+'/'+msgId).once('value', snap => {
-            const m = snap.val(); if (!m) return;
-            document.getElementById('editMarquee').value = m.marquee||'';
-            document.getElementById('editText').value = m.text||'';
-            document.getElementById('editLink').value = m.link||'';
-            document.getElementById('editHashtags').value = (m.hashtags||[]).join(' ');
-            document.getElementById('editBtns').innerHTML = '';
-            (m.buttons||[]).forEach(b => editAddBtn(b.label, b.url));
-            document.getElementById('editOverlay').classList.add('open');
-        });
+    window.deleteComment = function(postId, commentId) {
+        if (!confirm('Удалить комментарий?')) return;
+        db.ref('sites/' + SITE + '/comments/' + postId + '/' + commentId).remove();
     };
-    window.closeEdit = function() { document.getElementById('editOverlay').classList.remove('open'); CHAT_EDIT_ID = null; };
-    window.editAddBtn = function(l='', u='') {
-        const c = document.getElementById('editBtns');
-        const d = document.createElement('div'); d.className = 'btn-row';
-        d.innerHTML = `<input placeholder="Текст" value="${esc(l)}"><input placeholder="Ссылка" value="${esc(u)}"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#e74c3c;cursor:pointer;">✕</button>`;
-        c.appendChild(d);
-    };
-    window.doSaveEdit = function() {
-        if (!CHAT_EDIT_ID) return;
-        const { msgId, roomId } = CHAT_EDIT_ID;
-        const marquee = document.getElementById('editMarquee').value.trim();
-        const text = document.getElementById('editText').value.trim();
-        const link = document.getElementById('editLink').value.trim();
-        const hr = document.getElementById('editHashtags').value.trim();
-        const hashtags = hr ? hr.split(/\s+/).filter(t=>t.startsWith('#')).slice(0,5) : [];
-        const buttons = [];
-        document.querySelectorAll('#editBtns .btn-row').forEach(g => {
-            const [li, ui] = g.querySelectorAll('input');
-            if (ui.value.trim()) buttons.push({label: li.value.trim()||'🔗', url: ui.value.trim()});
-        });
-        db.ref(chatPath(roomId)+'/'+msgId).update({
-            marquee: marquee||null, text: text||'📝', link: link||null, hashtags, buttons,
-            edited: true, editedAt: Date.now(), isPost: !!(marquee || link || buttons.length)
-        }).then(closeEdit);
-    };
-    window.doDeleteEdit = function() {
-        if (!CHAT_EDIT_ID || !confirm('Удалить?')) return;
-        const { msgId, roomId } = CHAT_EDIT_ID;
-        db.ref(chatPath(roomId)+'/'+msgId).remove();
-        db.ref('sites/'+SITE+'/rooms/'+roomId+'/count').transaction(v => Math.max(0, (v||0)-1));
-        closeEdit();
-    };
+
+    // ================================================================
+    // УТИЛИТЫ
+    // ================================================================
+    const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
 
     // ================================================================
     // СИД
     // ================================================================
-    db.ref('sites/'+SITE+'/feed_posts').once('value', snap => {
+    db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
         if (!snap.exists()) {
-            const ex = [
-                {author:'📢 Админ', text:'Добро пожаловать в DeepChat!', time:'12:00', timestamp:Date.now()-3600000, marquee:'🌟 Привет!', link:null, buttons:[{label:'📋 Правила', url:'#'}], hashtags:['#Добро'], img:null, edited:false},
-                {author:'🏳️‍🌈 Орг', text:'Встреча завтра в 19:00', time:'11:30', timestamp:Date.now()-7200000, marquee:'📅 Встреча!', link:null, buttons:[{label:'🔗 Ссылка', url:'https://meet.google.com/'}], hashtags:['#Встреча'], img:null, edited:false}
+            const posts = [
+                { author: '📢 Админ', text: 'Добро пожаловать в MicroSocial! Это ваш новый микроблог.', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2 },
+                { author: '🚀 Орг', text: 'Завтра в 19:00 встреча в общем чате!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1 }
             ];
-            ex.forEach(p => db.ref('sites/'+SITE+'/feed_posts').push(p));
+            posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
+            
+            // Добавляем пример комментариев
+            setTimeout(() => {
+                db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
+                    snap.forEach(s => {
+                        const p = s.val();
+                        if (p.text.includes('Добро пожаловать')) {
+                            db.ref('sites/' + SITE + '/comments/' + s.key).push({
+                                author: '👋 Гость',
+                                text: 'Круто! Спасибо!',
+                                time: '12:05',
+                                timestamp: Date.now() - 3000000
+                            });
+                        }
+                    });
+                });
+            }, 500);
         }
     });
 
     // ================================================================
     // ЗАПУСК
     // ================================================================
-    applyAdminUI();
-    loadRooms();
-    goFeed();
-    console.log('💬 DeepChat (белая версия) запущен!');
-    console.log('🏴‍☠️ Админ-пароль: 12345 (серая точка в правом нижнем углу)');
-    console.log('🔑 Кнопка "Войти через Google" — в модалке входа');
+    updateUI();
+    loadFeed();
+    console.log('📱 MicroSocial запущен!');
+    console.log('🏴‍☠️ Админ-пароль: 12345');
 })();
 </script>
 </body>
