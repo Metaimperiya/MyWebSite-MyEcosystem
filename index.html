@@ -907,7 +907,6 @@
             })
             .catch((error) => {
                 console.error('❌ Ошибка входа:', error);
-                // Если попап заблокирован - используем редирект
                 if (error.code === 'auth/popup-blocked') {
                     auth.signInWithRedirect(provider);
                 } else {
@@ -931,6 +930,22 @@
     let currentTab = 'feed';
 
     // ================================================================
+    // СПИСОК КОМНАТ (ЖИВУТ В КОДЕ, НЕ В FIREBASE)
+    // ================================================================
+    const ROOMS_LIST = [
+        { id: 'general', name: '🌍 Общий' },
+        { id: 'sport', name: '⚽ Спорт' },
+        { id: 'games', name: '🎮 Игры' },
+        { id: 'movies', name: '🎬 Кино' },
+        { id: 'music', name: '🎵 Музыка' },
+        { id: 'tech', name: '💻 Технологии' },
+        { id: 'food', name: '🍕 Еда' },
+        { id: 'travel', name: '✈️ Путешествия' },
+        { id: 'fashion', name: '👗 Мода' },
+        { id: 'science', name: '🔬 Наука' }
+    ];
+
+    // ================================================================
     // AUTH
     // ================================================================
     auth.onAuthStateChanged(user => {
@@ -952,7 +967,17 @@
             applyAdminUI();
             loadFeed();
             loadRooms();
-            if (CUR_ROOM) loadChat(CUR_ROOM);
+            
+            // Если нет сохраненной комнаты — даем "Общий"
+            const savedRoom = localStorage.getItem('dc_room_' + SITE);
+            if (!savedRoom) {
+                localStorage.setItem('dc_room_' + SITE, 'general');
+                openRoom('general', '🌍 Общий');
+            } else {
+                const room = ROOMS_LIST.find(r => r.id === savedRoom);
+                if (room) openRoom(room.id, room.name);
+            }
+            
             closeChangeName();
         } else {
             USER = null;
@@ -962,7 +987,6 @@
             avatar.textContent = '?';
             if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
             
-            // Показываем модалку входа
             document.getElementById('changeNameModal').classList.add('open');
             document.getElementById('changeNameInput').value = '';
             document.getElementById('changeNameInput').placeholder = 'Введите имя...';
@@ -1098,7 +1122,7 @@
     };
 
     // ================================================================
-    // КОМНАТЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ (ШАГ 1)
+    // КОМНАТЫ
     // ================================================================
     function updateRoomTitle(roomName) {
         const title = document.querySelector('.topbar .title');
@@ -1115,58 +1139,42 @@
             return; 
         }
         
-        // Проверяем, существует ли комната в базе
-        db.ref('sites/' + SITE + '/rooms/' + roomId).once('value')
-            .then(snap => {
-                if (!snap.exists()) {
-                    // Если комната не существует — создаём её
-                    return db.ref('sites/' + SITE + '/rooms/' + roomId).set({
-                        name: roomName || 'Обсуждение',
-                        createdAt: Date.now(),
-                        count: 0,
-                        createdBy: USER_UID || 'anon'
-                    }).then(() => {
-                        console.log('✅ Комната создана:', roomId);
-                    });
-                }
-                return Promise.resolve();
-            })
-            .then(() => {
-                // Открываем комнату
-                CUR_ROOM = roomId;
-                updateRoomTitle(roomName || 'Обсуждение');
-                document.getElementById('feedSection').classList.add('hidden');
-                document.getElementById('chatSection').classList.add('show');
-                document.getElementById('navRooms').classList.add('active');
-                document.getElementById('navFeed').classList.remove('active');
-                closeSidebar();
-                loadChat(roomId);
-                loadRooms(); // Обновляем список комнат
-            })
-            .catch(err => {
-                console.error('❌ Ошибка открытия комнаты:', err);
-                alert('Ошибка: ' + err.message);
-            });
+        CUR_ROOM = roomId;
+        localStorage.setItem('dc_room_' + SITE, roomId);
+        updateRoomTitle(roomName);
+        document.getElementById('feedSection').classList.add('hidden');
+        document.getElementById('chatSection').classList.add('show');
+        document.getElementById('navRooms').classList.add('active');
+        document.getElementById('navFeed').classList.remove('active');
+        closeSidebar();
+        loadChat(roomId);
+        loadRooms();
     };
 
     function loadRooms() {
-        db.ref('sites/'+SITE+'/rooms').orderByChild('createdAt').on('value', snap => {
-            const data = snap.val() || {};
-            const keys = Object.keys(data).sort((a,b) => (data[a].createdAt||0) - (data[b].createdAt||0));
-            const list = document.getElementById('roomList');
-            if (!keys.length) {
-                list.innerHTML = '<div style="text-align:center;color:#bbb;padding:12px;font-size:0.8rem;">Нет комнат</div>';
-                return;
-            }
-            list.innerHTML = keys.map(k => {
-                const r = data[k];
-                const ac = k === CUR_ROOM ? 'active' : '';
-                const count = r.count || 0;
-                return `<div class="room ${ac}" onclick="openRoom('${k}','${r.name || 'Комната'}')">
-                    <span># ${r.name || '?'}</span>
-                    <span class="count">${count}</span>
-                </div>`;
-            }).join('');
+        const list = document.getElementById('roomList');
+        list.innerHTML = ROOMS_LIST.map(room => {
+            const ac = room.id === CUR_ROOM ? 'active' : '';
+            // Счетчик подгружаем из Firebase
+            let count = 0;
+            db.ref('sites/'+SITE+'/rooms/'+room.id+'/count').once('value', snap => {
+                const c = snap.val() || 0;
+                const countEl = document.querySelector(`#roomList .room[data-id="${room.id}"] .count`);
+                if (countEl) countEl.textContent = c;
+            });
+            return `<div class="room ${ac}" data-id="${room.id}" onclick="openRoom('${room.id}','${room.name.replace(/['"]/g, '')}')">
+                <span>${room.name}</span>
+                <span class="count">0</span>
+            </div>`;
+        }).join('');
+        
+        // Подписываемся на обновления счетчиков
+        ROOMS_LIST.forEach(room => {
+            db.ref('sites/'+SITE+'/rooms/'+room.id+'/count').on('value', snap => {
+                const count = snap.val() || 0;
+                const countEl = document.querySelector(`#roomList .room[data-id="${room.id}"] .count`);
+                if (countEl) countEl.textContent = count;
+            });
         });
     }
 
@@ -1182,9 +1190,12 @@
     window.doCreateRoom = function() {
         const name = document.getElementById('roomName').value.trim();
         if (!name || name.length < 2) { alert('Минимум 2 символа'); return; }
-        db.ref('sites/'+SITE+'/rooms').push({ name, createdAt: Date.now(), count: 0 })
-            .then(() => closeCreateRoom())
-            .catch(e => alert('❌ '+e.message));
+        // Добавляем в список комнат
+        const newRoom = { id: 'room_' + Date.now(), name: name };
+        ROOMS_LIST.push(newRoom);
+        loadRooms();
+        closeCreateRoom();
+        alert('✅ Комната "' + name + '" создана!');
     };
 
     // ================================================================
@@ -1337,8 +1348,7 @@
         const text = input.value.trim();
         if (!text) return;
         
-        // Отправляем сообщение
-        const msgRef = db.ref(chatPath(CUR_ROOM)).push({ 
+        db.ref(chatPath(CUR_ROOM)).push({ 
             nick: USER, 
             text, 
             time: now(), 
@@ -1349,7 +1359,7 @@
             isPost: false 
         });
         
-        // Обновляем счётчик в комнате (ШАГ 2)
+        // Обновляем счетчик
         db.ref('sites/'+SITE+'/rooms/'+CUR_ROOM+'/count').transaction(v => (v||0)+1);
         
         input.value = '';
@@ -1371,7 +1381,6 @@
     window.chatDel = function(id, roomId) {
         if (!confirm('Удалить?')) return;
         db.ref(chatPath(roomId)+'/'+id).remove();
-        // Обновляем счётчик (ШАГ 2)
         db.ref('sites/'+SITE+'/rooms/'+roomId+'/count').transaction(v => Math.max(0, (v||0)-1));
     };
 
@@ -1409,7 +1418,6 @@
             document.getElementById('apBtns').innerHTML = '';
             document.getElementById('chatAdminForm').classList.remove('open');
             document.querySelector('.admin-bar .title button').textContent = '▼ Открыть';
-            // Обновляем счётчик (ШАГ 2)
             db.ref('sites/'+SITE+'/rooms/'+CUR_ROOM+'/count').transaction(v => (v||0)+1);
         });
     };
@@ -1457,7 +1465,6 @@
         if (!CHAT_EDIT_ID || !confirm('Удалить?')) return;
         const { msgId, roomId } = CHAT_EDIT_ID;
         db.ref(chatPath(roomId)+'/'+msgId).remove();
-        // Обновляем счётчик (ШАГ 2)
         db.ref('sites/'+SITE+'/rooms/'+roomId+'/count').transaction(v => Math.max(0, (v||0)-1));
         closeEdit();
     };
