@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>MicroSocial</title>
     
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -24,10 +23,10 @@
             position: sticky; top: 0; z-index: 100;
         }
         .topbar .logo { font-size: 1.2rem; font-weight: 700; color: #1877f2; cursor: pointer; }
-        .topbar .menu { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .topbar .menu { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .topbar .menu button {
             background: none; border: none; color: #555; font-weight: 600;
-            font-size: 0.8rem; cursor: pointer; padding: 4px 8px; border-radius: 8px;
+            font-size: 0.75rem; cursor: pointer; padding: 4px 8px; border-radius: 8px;
         }
         .topbar .menu button:hover { background: #f0f0f0; }
         .topbar .menu button.active { color: #1877f2; background: #e8f0fe; }
@@ -38,15 +37,14 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 0.8rem; cursor: pointer;
         }
-        .topbar .user-info .name { font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+        .topbar .user-info .name { font-weight: 600; font-size: 0.8rem; cursor: pointer; }
         .topbar .user-info .logout {
             background: none; border: 1px solid #ddd;
-            border-radius: 20px; padding: 4px 12px;
-            cursor: pointer; font-size: 0.7rem;
+            border-radius: 20px; padding: 4px 10px;
+            cursor: pointer; font-size: 0.65rem;
         }
         .container { max-width: 700px; margin: 0 auto; padding: 12px; }
 
-        /* Профиль */
         .profile-page { display: none; }
         .profile-page.active { display: block; }
         .profile-page .header {
@@ -62,10 +60,53 @@
         }
         .profile-page .header .name { font-size: 1.3rem; font-weight: 700; }
         .profile-page .header .bio { color: #888; font-size: 0.85rem; margin-top: 4px; }
-        .profile-page .header .edit-btn {
+        .profile-page .header .actions {
+            display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap;
+        }
+        .profile-page .header .actions button {
+            padding: 6px 16px; border: none; border-radius: 20px;
+            font-weight: 600; cursor: pointer; font-size: 0.75rem;
+        }
+        .profile-page .header .actions .msg-btn { background: #1877f2; color: #fff; }
+        .profile-page .header .actions .msg-btn:hover { background: #4a9eff; }
+        .profile-page .header .actions .friend-btn { background: #e4e6eb; color: #555; }
+        .profile-page .header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
+        .profile-page .header .actions .edit-btn { background: #e4e6eb; color: #555; }
+
+        .profile-page .friends-section {
+            background: #fff; border-radius: 12px; padding: 16px;
+            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .profile-page .friends-section h4 { margin-bottom: 8px; color: #555; }
+        .profile-page .friends-section .friend-list {
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .profile-page .friends-section .friend-item {
+            background: #f0f2f5; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.8rem; display: flex; align-items: center; gap: 4px;
+        }
+        .profile-page .friends-section .friend-item .avatar {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #1877f2; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.5rem; font-weight: 700;
+        }
+
+        .pages-section {
+            background: #fff; border-radius: 12px; padding: 16px;
+            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .pages-section h4 { margin-bottom: 8px; color: #555; }
+        .pages-section .page-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 4px;
+        }
+        .pages-section .page-item .name { font-weight: 600; }
+        .pages-section .page-item .sub { color: #888; font-size: 0.7rem; }
+        .pages-section .create-page-btn {
             background: #1877f2; color: #fff; border: none;
-            border-radius: 20px; padding: 6px 20px; margin-top: 10px;
-            cursor: pointer; font-weight: 600;
+            border-radius: 20px; padding: 6px 16px; cursor: pointer;
+            font-weight: 600; margin-top: 8px; width: 100%;
         }
 
         .post-form {
@@ -109,14 +150,13 @@
             background: #f5f5f5; padding: 4px 10px; border-radius: 6px;
         }
         .post .stats {
-            display: flex; gap: 16px; font-size: 0.8rem; color: #888;
+            display: flex; gap: 12px; font-size: 0.75rem; color: #888;
             border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px;
             flex-wrap: wrap;
         }
         .post .stats button {
             background: none; border: none; color: #888;
             cursor: pointer; display: flex; align-items: center; gap: 4px;
-            font-size: 0.75rem;
         }
         .post .stats button:hover { color: #1877f2; }
         .post .stats button.liked { color: #1877f2; }
@@ -158,18 +198,18 @@
             font-weight: 600;
         }
 
-        .rooms-page { display: none; }
-        .rooms-page.active { display: block; }
-        .rooms-page .room-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .rooms-page .room-card {
+        .groups-page { display: none; }
+        .groups-page.active { display: block; }
+        .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .groups-page .group-card {
             background: #fff; border-radius: 12px; padding: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             cursor: pointer; transition: all 0.2s; text-align: center;
         }
-        .rooms-page .room-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .rooms-page .room-card .icon { font-size: 2rem; }
-        .rooms-page .room-card .name { font-weight: 600; margin-top: 6px; }
-        .rooms-page .room-card .count { color: #888; font-size: 0.75rem; }
+        .groups-page .group-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .groups-page .group-card .icon { font-size: 2rem; }
+        .groups-page .group-card .name { font-weight: 600; margin-top: 6px; }
+        .groups-page .group-card .count { color: #888; font-size: 0.75rem; }
 
         .dm-page { display: none; }
         .dm-page.active { display: block; }
@@ -284,23 +324,22 @@
         .admin-dot.active { background: #e67e22; border-color: #e67e22; }
 
         @media (max-width: 600px) {
-            .rooms-page .room-list { grid-template-columns: 1fr; }
+            .groups-page .group-list { grid-template-columns: 1fr; }
             .account-list { grid-template-columns: 1fr 1fr; }
-            .topbar .menu button { font-size: 0.65rem; padding: 4px 6px; }
-            .topbar .logo { font-size: 1rem; }
+            .topbar .menu button { font-size: 0.6rem; padding: 4px 5px; }
+            .topbar .logo { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- ТОПБАР -->
 <div class="topbar">
     <div class="logo" onclick="goToFeed()">📱 MicroSocial</div>
     <div class="menu">
-        <button class="active" id="menuFeed" onclick="goToFeed()">Лента</button>
-        <button id="menuRooms" onclick="goToRooms()">Комнаты</button>
+        <button class="active" id="menuFeed" onclick="goToFeed()">📰 Лента</button>
+        <button id="menuGroups" onclick="goToGroups()">👥 Группы</button>
         <button id="menuDM" onclick="goToDM()">💬 Личка</button>
-        <button id="menuProfile" onclick="goToProfile()">Профиль</button>
+        <button id="menuProfile" onclick="goToProfile()">👤 Профиль</button>
     </div>
     <div class="user-info">
         <div class="avatar" id="topAvatar" onclick="goToProfile()">?</div>
@@ -309,17 +348,32 @@
     </div>
 </div>
 
-<!-- КОНТЕЙНЕР -->
 <div class="container">
 
-    <!-- СТРАНИЦА ПРОФИЛЯ -->
+    <!-- ПРОФИЛЬ -->
     <div class="profile-page" id="profilePage">
         <div class="header">
             <div class="big-avatar" id="profileAvatar">?</div>
             <div class="name" id="profileName">Гость</div>
             <div class="bio" id="profileBio">Настройте свой профиль</div>
-            <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
+            <div class="actions" id="profileActions">
+                <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
+            </div>
         </div>
+        
+        <!-- Друзья -->
+        <div class="friends-section" id="friendsSection">
+            <h4>🤝 Друзья</h4>
+            <div class="friend-list" id="friendList"></div>
+        </div>
+        
+        <!-- Страницы -->
+        <div class="pages-section" id="pagesSection">
+            <h4>📄 Мои страницы</h4>
+            <div id="pageList"></div>
+            <button class="create-page-btn" onclick="openCreatePage()">➕ Создать страницу</button>
+        </div>
+        
         <div class="post-form">
             <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
             <div class="actions">
@@ -330,24 +384,24 @@
         <div id="profilePosts"></div>
     </div>
 
-    <!-- СТРАНИЦА ЛЕНТЫ -->
+    <!-- ЛЕНТА -->
     <div class="feed-page" id="feedPage">
         <div id="feed"></div>
     </div>
 
-    <!-- СТРАНИЦА КОМНАТ -->
-    <div class="rooms-page" id="roomsPage">
-        <h3 style="margin-bottom:12px;">📋 Комнаты</h3>
-        <div class="room-list" id="roomList"></div>
+    <!-- ГРУППЫ -->
+    <div class="groups-page" id="groupsPage">
+        <h3 style="margin-bottom:12px;">👥 Группы</h3>
+        <div class="group-list" id="groupList"></div>
     </div>
 
-    <!-- СТРАНИЦА ЛИЧКИ -->
+    <!-- ЛИЧКА -->
     <div class="dm-page" id="dmPage">
         <h3 style="margin-bottom:12px;">💬 Личные сообщения</h3>
         <div class="dm-list" id="dmList"></div>
     </div>
 
-    <!-- ЧАТ В КОМНАТЕ / ЛИЧКЕ -->
+    <!-- ЧАТ -->
     <div class="chat-view" id="chatView">
         <button class="back" onclick="closeChat()">← Назад</button>
         <div class="messages" id="chatMessages"></div>
@@ -358,24 +412,18 @@
     </div>
 </div>
 
-<!-- АДМИН ТОЧКА -->
 <div class="admin-dot" id="adminDot" onclick="openAdminLogin()"></div>
 
 <!-- МОДАЛКА ВХОДА -->
 <div class="modal" id="loginModal">
     <div class="box">
         <h3>👤 Вход в MicroSocial</h3>
-        <div class="sub" style="color:#888;font-size:0.85rem;margin-bottom:12px;">Выберите аккаунт или войдите через Google</div>
-        
         <button class="google-btn" id="googleLoginBtn">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" />
             Войти через Google
         </button>
-        
         <div class="divider">или выберите аккаунт</div>
-        
         <div class="account-list" id="accountList"></div>
-        
         <div class="divider">или создайте новый</div>
         <input type="text" id="nameInput" placeholder="Введите имя..." maxlength="24">
         <div class="btns">
@@ -398,6 +446,19 @@
     </div>
 </div>
 
+<!-- МОДАЛКА СОЗДАНИЯ СТРАНИЦЫ -->
+<div class="modal" id="createPageModal">
+    <div class="box">
+        <h3>📄 Создать страницу</h3>
+        <input type="text" id="pageName" placeholder="Название страницы">
+        <textarea id="pageDesc" placeholder="Описание страницы..."></textarea>
+        <div class="btns">
+            <button class="cancel" onclick="closeCreatePage()">Отмена</button>
+            <button class="save" onclick="createPage()">Создать</button>
+        </div>
+    </div>
+</div>
+
 <!-- МОДАЛКА АДМИНА -->
 <div class="modal" id="adminModal">
     <div class="box">
@@ -413,7 +474,7 @@
 <script>
 (function() {
     // ================================================================
-    // FIREBASE (ОДИН ПРОЕКТ)
+    // FIREBASE
     // ================================================================
     const FB_CONFIG = {
         apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
@@ -430,7 +491,7 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     // ================================================================
-    // 10 АККАУНТОВ (В КОДЕ)
+    // АККАУНТЫ (В КОДЕ)
     // ================================================================
     const ACCOUNTS = [
         { id: 'user1', name: 'Алексей', avatar: 'А', bio: 'Люблю спорт и путешествия' },
@@ -446,9 +507,9 @@
     ];
 
     // ================================================================
-    // КОМНАТЫ (В КОДЕ)
+    // ГРУППЫ (В КОДЕ)
     // ================================================================
-    const ROOMS = [
+    const GROUPS = [
         { id: 'general', name: '🌍 Общий' },
         { id: 'sport', name: '⚽ Спорт' },
         { id: 'games', name: '🎮 Игры' },
@@ -472,6 +533,7 @@
     let CURRENT_ROOM = null;
     let CURRENT_DM = null;
     let chatUnsub = null;
+    let VIEWING_USER = null; // чей профиль смотрим
 
     // ================================================================
     // AUTH
@@ -489,9 +551,7 @@
                 if (acc) USER_ACCOUNT = acc;
             }
             
-            // Сохраняем профиль в Firebase (аккаунт)
-            const profileRef = db.ref('sites/' + SITE + '/users/' + USER_UID);
-            profileRef.update({ 
+            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
                 name: USER, 
                 email: user.email || 'anon',
                 account: USER_ACCOUNT ? USER_ACCOUNT.id : null,
@@ -502,13 +562,14 @@
             updateUI();
             loadFeed();
             loadProfilePosts();
-            loadRooms();
+            loadGroups();
             loadDMList();
             closeLogin();
         } else {
             USER = null;
             USER_UID = null;
             USER_ACCOUNT = null;
+            VIEWING_USER = null;
             document.getElementById('loginModal').classList.add('open');
             updateUI();
             renderAccounts();
@@ -557,7 +618,7 @@
         }
         loadFeed();
         loadProfilePosts();
-        loadRooms();
+        loadGroups();
         loadDMList();
     };
 
@@ -608,9 +669,7 @@
         localStorage.removeItem('dc_acc_' + SITE);
         USER_ACCOUNT = null;
         if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') {
-                db.ref(chatUnsub).off('value');
-            }
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
             chatUnsub = null; 
         }
         CURRENT_ROOM = null;
@@ -631,7 +690,7 @@
             updateUI();
             loadFeed();
             loadProfilePosts();
-            loadRooms();
+            loadGroups();
             loadDMList();
             closeLogin();
         }).catch(e => alert('Ошибка: ' + e.message));
@@ -650,7 +709,7 @@
             el.classList.remove('active');
         });
         if (pageId === 'feedPage') document.getElementById('menuFeed').classList.add('active');
-        else if (pageId === 'roomsPage') document.getElementById('menuRooms').classList.add('active');
+        else if (pageId === 'groupsPage') document.getElementById('menuGroups').classList.add('active');
         else if (pageId === 'dmPage') document.getElementById('menuDM').classList.add('active');
         else if (pageId === 'profilePage') document.getElementById('menuProfile').classList.add('active');
     }
@@ -668,9 +727,9 @@
         loadFeed();
     };
 
-    window.goToRooms = function() {
+    window.goToGroups = function() {
         if (!USER) { alert('Войдите!'); return; }
-        setActivePage('roomsPage');
+        setActivePage('groupsPage');
         document.getElementById('chatView').classList.remove('active');
         if (chatUnsub) { 
             if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
@@ -678,7 +737,7 @@
         }
         CURRENT_ROOM = null;
         CURRENT_DM = null;
-        loadRooms();
+        loadGroups();
     };
 
     window.goToDM = function() {
@@ -696,6 +755,7 @@
 
     window.goToProfile = function() {
         if (!USER) { alert('Войдите!'); return; }
+        VIEWING_USER = null;
         setActivePage('profilePage');
         document.getElementById('chatView').classList.remove('active');
         if (chatUnsub) { 
@@ -705,28 +765,135 @@
         CURRENT_ROOM = null;
         CURRENT_DM = null;
         loadProfilePosts();
+        loadFriends();
+        loadPages();
+        showProfileActions();
     };
 
     // ================================================================
-    // АДМИН
+    // ПРОФИЛЬ: ДЕЙСТВИЯ (ДРУЗЬЯ, СООБЩЕНИЕ)
     // ================================================================
-    window.openAdminLogin = function() {
-        document.getElementById('adminModal').classList.add('open');
-        document.getElementById('adminPass').value = '';
-    };
-    window.closeAdminModal = function() {
-        document.getElementById('adminModal').classList.remove('open');
-    };
-    window.checkAdmin = function() {
-        if (document.getElementById('adminPass').value.trim() === '12345') {
-            IS_ADMIN = true;
-            localStorage.setItem('dc_admin_' + SITE, '1');
-            document.getElementById('adminDot').classList.add('active');
-            closeAdminModal();
-            alert('🏴‍☠️ Админ-режим включён!');
-        } else {
-            alert('❌ Неверный пароль');
+    function showProfileActions() {
+        const actions = document.getElementById('profileActions');
+        if (!VIEWING_USER || VIEWING_USER === USER_UID) {
+            // Свой профиль
+            actions.innerHTML = `<button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>`;
+            return;
         }
+        
+        // Чужой профиль
+        const isFriend = checkFriend(VIEWING_USER);
+        actions.innerHTML = `
+            <button class="msg-btn" onclick="openDM('${VIEWING_USER}')">✉️ Написать</button>
+            <button class="friend-btn ${isFriend ? 'added' : ''}" onclick="toggleFriend('${VIEWING_USER}')">
+                ${isFriend ? '🤝 В друзьях' : '➕ Добавить в друзья'}
+            </button>
+        `;
+    }
+
+    // ================================================================
+    // ДРУЗЬЯ
+    // ================================================================
+    function checkFriend(uid) {
+        if (!USER_UID) return false;
+        const key = 'fr_' + USER_UID + '_' + uid;
+        return localStorage.getItem(key) === '1';
+    }
+
+    window.toggleFriend = function(uid) {
+        if (!USER_UID || !uid) return;
+        const key = 'fr_' + USER_UID + '_' + uid;
+        const isFriend = localStorage.getItem(key) === '1';
+        
+        if (isFriend) {
+            localStorage.removeItem(key);
+            db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).remove();
+        } else {
+            localStorage.setItem(key, '1');
+            db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
+        }
+        loadFriends();
+        showProfileActions();
+    };
+
+    function loadFriends() {
+        const container = document.getElementById('friendList');
+        if (!USER_UID) {
+            container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">Войдите, чтобы видеть друзей</div>';
+            return;
+        }
+        
+        db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', snap => {
+            const data = snap.val() || {};
+            const keys = Object.keys(data);
+            if (!keys.length) {
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">У вас пока нет друзей</div>';
+                return;
+            }
+            
+            // Получаем имена друзей
+            let html = '';
+            let loaded = 0;
+            keys.forEach(k => {
+                db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
+                    const u = usnap.val() || {};
+                    const name = u.name || 'Аноним';
+                    const avatar = u.avatar || name.charAt(0).toUpperCase();
+                    html += `<span class="friend-item"><span class="avatar">${avatar}</span> ${esc(name)}</span>`;
+                    loaded++;
+                    if (loaded === keys.length) {
+                        container.innerHTML = html;
+                    }
+                });
+            });
+            if (keys.length === 0) {
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">У вас пока нет друзей</div>';
+            }
+        });
+    }
+
+    // ================================================================
+    // СТРАНИЦЫ
+    // ================================================================
+    function loadPages() {
+        if (!USER_UID) return;
+        const container = document.getElementById('pageList');
+        db.ref('sites/' + SITE + '/pages/' + USER_UID).on('value', snap => {
+            const data = snap.val() || {};
+            const keys = Object.keys(data);
+            if (!keys.length) {
+                container.innerHTML = '<div style="color:#bbb;font-size:0.8rem;">У вас нет страниц</div>';
+                return;
+            }
+            container.innerHTML = keys.map(k => {
+                const p = data[k];
+                return `<div class="page-item">
+                    <div><span class="name">${esc(p.name)}</span> <span class="sub">${esc(p.desc || '')}</span></div>
+                    <button onclick="deletePage('${k}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;">🗑</button>
+                </div>`;
+            }).join('');
+        });
+    }
+
+    window.openCreatePage = function() {
+        document.getElementById('createPageModal').classList.add('open');
+        document.getElementById('pageName').value = '';
+        document.getElementById('pageDesc').value = '';
+    };
+    window.closeCreatePage = function() {
+        document.getElementById('createPageModal').classList.remove('open');
+    };
+    window.createPage = function() {
+        const name = document.getElementById('pageName').value.trim();
+        const desc = document.getElementById('pageDesc').value.trim();
+        if (!name) { alert('Введите название'); return; }
+        db.ref('sites/' + SITE + '/pages/' + USER_UID).push({ name, desc, createdAt: Date.now() });
+        closeCreatePage();
+        loadPages();
+    };
+    window.deletePage = function(id) {
+        if (!confirm('Удалить страницу?')) return;
+        db.ref('sites/' + SITE + '/pages/' + USER_UID + '/' + id).remove();
     };
 
     // ================================================================
@@ -760,7 +927,29 @@
     };
 
     // ================================================================
-    // ЛЕНТА (ПОСТЫ + РЕПОСТЫ)
+    // АДМИН
+    // ================================================================
+    window.openAdminLogin = function() {
+        document.getElementById('adminModal').classList.add('open');
+        document.getElementById('adminPass').value = '';
+    };
+    window.closeAdminModal = function() {
+        document.getElementById('adminModal').classList.remove('open');
+    };
+    window.checkAdmin = function() {
+        if (document.getElementById('adminPass').value.trim() === '12345') {
+            IS_ADMIN = true;
+            localStorage.setItem('dc_admin_' + SITE, '1');
+            document.getElementById('adminDot').classList.add('active');
+            closeAdminModal();
+            alert('🏴‍☠️ Админ-режим включён!');
+        } else {
+            alert('❌ Неверный пароль');
+        }
+    };
+
+    // ================================================================
+    // ЛЕНТА
     // ================================================================
     function loadFeed() {
         db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
@@ -786,7 +975,6 @@
         div.dataset.id = p.id;
 
         const isLiked = localStorage.getItem('lk_' + p.id + '_' + USER_UID) === '1';
-        const isReposted = localStorage.getItem('rp_' + p.id + '_' + USER_UID) === '1';
 
         let repostInfo = '';
         if (p.repostFrom) {
@@ -795,8 +983,8 @@
 
         div.innerHTML = `
             <div class="author">
-                <div class="avatar" onclick="goToProfile()">${esc((p.author || '?').charAt(0).toUpperCase())}</div>
-                <span class="name" onclick="goToProfile()">${esc(p.author || 'Аноним')}</span>
+                <div class="avatar" onclick="viewUserProfile('${p.authorUid || ''}')">${esc((p.author || '?').charAt(0).toUpperCase())}</div>
+                <span class="name" onclick="viewUserProfile('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
                 <span class="time">${p.time || ''}</span>
                 ${IS_ADMIN ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.7rem;margin-left:auto;">🗑</button>` : ''}
             </div>
@@ -812,7 +1000,6 @@
                 <button onclick="repostPost('${p.id}')">
                     🔁 <span id="repostCount_${p.id}">${p.repostCount || 0}</span>
                 </button>
-                <button onclick="repostToRoom('${p.id}')" title="Репостнуть в комнату">📤 В комнату</button>
             </div>
             <div class="comments" id="comments_${p.id}">
                 <button class="toggle" onclick="toggleComments('${p.id}')">💬 Показать комментарии</button>
@@ -840,6 +1027,7 @@
 
         db.ref('sites/' + SITE + '/feed_posts').push({
             author: USER,
+            authorUid: USER_UID,
             text: text,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             timestamp: Date.now(),
@@ -853,13 +1041,15 @@
     };
 
     function loadProfilePosts() {
+        const uid = VIEWING_USER || USER_UID;
+        if (!uid) return;
         db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
             const container = document.getElementById('profilePosts');
             container.innerHTML = '';
             const data = snap.val() || {};
-            const keys = Object.keys(data).filter(k => data[k].author === USER).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
+            const keys = Object.keys(data).filter(k => data[k].authorUid === uid).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
             if (!keys.length) {
-                container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">У вас пока нет постов</div>';
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">У пользователя пока нет постов</div>';
                 return;
             }
             keys.forEach(k => {
@@ -909,9 +1099,9 @@
             const p = snap.val();
             if (!p) return;
             
-            // Создаём репост в ленте
             db.ref('sites/' + SITE + '/feed_posts').push({
                 author: USER,
+                authorUid: USER_UID,
                 text: p.text || '',
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 timestamp: Date.now(),
@@ -922,40 +1112,9 @@
                 originalId: postId
             });
             
-            // Увеличиваем счётчик репостов
             db.ref('sites/' + SITE + '/feed_posts/' + postId + '/repostCount').transaction(v => (v || 0) + 1);
             localStorage.setItem(key, '1');
             alert('✅ Пост репостнут!');
-        });
-    };
-
-    window.repostToRoom = function(postId) {
-        if (!USER) { alert('Войдите!'); return; }
-        const roomId = prompt('Введите ID комнаты (general, sport, games, movies, music, tech, food, travel, fashion, science):');
-        if (!roomId) return;
-        
-        // Проверяем, существует ли комната
-        const room = ROOMS.find(r => r.id === roomId);
-        if (!room) {
-            alert('❌ Комната не найдена');
-            return;
-        }
-        
-        db.ref('sites/' + SITE + '/feed_posts/' + postId).once('value', snap => {
-            const p = snap.val();
-            if (!p) return;
-            
-            // Отправляем пост в комнату как сообщение
-            db.ref('rooms/' + SITE + '_' + roomId + '/messages').push({
-                nick: USER,
-                text: '📢 Репост из ленты: ' + (p.text || ''),
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now(),
-                isPost: true,
-                repostFrom: p.author || 'Аноним'
-            });
-            
-            alert('✅ Пост отправлен в комнату ' + room.name);
         });
     };
 
@@ -1035,26 +1194,26 @@
     };
 
     // ================================================================
-    // КОМНАТЫ
+    // ГРУППЫ
     // ================================================================
-    function loadRooms() {
-        const list = document.getElementById('roomList');
-        list.innerHTML = ROOMS.map(room => {
+    function loadGroups() {
+        const list = document.getElementById('groupList');
+        list.innerHTML = GROUPS.map(group => {
             let count = 0;
-            db.ref('rooms/' + SITE + '_' + room.id + '/messages').once('value', snap => {
+            db.ref('rooms/' + SITE + '_' + group.id + '/messages').once('value', snap => {
                 const c = snap.numChildren();
-                const el = document.querySelector(`#roomList .room-card[data-id="${room.id}"] .count`);
+                const el = document.querySelector(`#groupList .group-card[data-id="${group.id}"] .count`);
                 if (el) el.textContent = c;
             });
-            db.ref('rooms/' + SITE + '_' + room.id + '/messages').on('value', snap => {
+            db.ref('rooms/' + SITE + '_' + group.id + '/messages').on('value', snap => {
                 const c = snap.numChildren();
-                const el = document.querySelector(`#roomList .room-card[data-id="${room.id}"] .count`);
+                const el = document.querySelector(`#groupList .group-card[data-id="${group.id}"] .count`);
                 if (el) el.textContent = c;
             });
             
-            return `<div class="room-card" data-id="${room.id}" onclick="openRoom('${room.id}')">
-                <div class="icon">${room.name.split(' ')[0]}</div>
-                <div class="name">${room.name}</div>
+            return `<div class="group-card" data-id="${group.id}" onclick="openRoom('${group.id}')">
+                <div class="icon">${group.name.split(' ')[0]}</div>
+                <div class="name">${group.name}</div>
                 <div class="count">💬 <span class="count">0</span> сообщений</div>
             </div>`;
         }).join('');
@@ -1113,8 +1272,39 @@
         loadDMChat(userId);
     };
 
+    window.viewUserProfile = function(uid) {
+        if (!uid || uid === USER_UID) {
+            goToProfile();
+            return;
+        }
+        VIEWING_USER = uid;
+        setActivePage('profilePage');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
+        CURRENT_ROOM = null;
+        CURRENT_DM = null;
+        
+        // Загружаем данные пользователя
+        db.ref('sites/' + SITE + '/users/' + uid).once('value', snap => {
+            const u = snap.val() || {};
+            const name = u.name || 'Аноним';
+            const bio = u.bio || '';
+            const avatar = u.avatar || name.charAt(0).toUpperCase();
+            document.getElementById('profileAvatar').textContent = avatar;
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileBio').textContent = bio;
+            showProfileActions();
+            loadProfilePosts();
+            loadFriends();
+            loadPages();
+        });
+    };
+
     // ================================================================
-    // ЧАТ В КОМНАТЕ
+    // ЧАТ В ГРУППЕ
     // ================================================================
     function loadRoomChat(roomId) {
         if (chatUnsub) { 
@@ -1189,7 +1379,6 @@
         if (!text) return;
         
         if (CURRENT_ROOM) {
-            // Отправка в комнату
             db.ref('rooms/' + SITE + '_' + CURRENT_ROOM + '/messages').push({
                 nick: USER,
                 text: text,
@@ -1198,7 +1387,6 @@
             });
             input.value = '';
         } else if (CURRENT_DM) {
-            // Отправка в личку
             const dmId = getDMId(USER_UID, CURRENT_DM);
             db.ref('dms/' + SITE + '/' + dmId + '/messages').push({
                 from: USER_UID,
@@ -1225,8 +1413,8 @@
         }
         CURRENT_ROOM = null;
         CURRENT_DM = null;
-        if (document.getElementById('roomsPage').classList.contains('active')) {
-            goToRooms();
+        if (document.getElementById('groupsPage').classList.contains('active')) {
+            goToGroups();
         } else if (document.getElementById('dmPage').classList.contains('active')) {
             goToDM();
         } else {
@@ -1245,8 +1433,8 @@
     db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
         if (!snap.exists()) {
             const posts = [
-                { author: '📢 Админ', text: 'Добро пожаловать в MicroSocial! Теперь с репостами и личкой!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
-                { author: '🚀 Орг', text: 'Завтра в 19:00 встреча в общем чате!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, repostCount: 0 }
+                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в MicroSocial! Теперь с друзьями, страницами и личкой!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
+                { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, repostCount: 0 }
             ];
             posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
         }
@@ -1258,13 +1446,14 @@
     renderAccounts();
     updateUI();
     loadFeed();
-    loadRooms();
+    loadGroups();
     loadDMList();
     setActivePage('feedPage');
     console.log('📱 MicroSocial запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345');
     console.log('📋 10 аккаунтов готовы!');
-    console.log('🔁 Репосты работают!');
+    console.log('🤝 Друзья работают!');
+    console.log('📄 Страницы работают!');
     console.log('💬 Личка работает!');
 })();
 </script>
