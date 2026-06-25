@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* ТОПБАР */
         .topbar {
             background: #fff; padding: 8px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: space-between; align-items: center;
@@ -52,7 +51,6 @@
             max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* ГОРИЗОНТАЛЬНОЕ МЕНЮ */
         .hor-menu {
             background: #fff; padding: 6px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: center; gap: 8px;
@@ -67,7 +65,6 @@
         .hor-menu button:hover { background: #f0f0f0; }
         .hor-menu button.active { color: #1877f2; background: #e8f0fe; }
 
-        /* САЙДБАР */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
             background: #fff; border-right: 1px solid #ddd;
@@ -112,7 +109,7 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* ЛЕНТА - ПОСТЫ */
+        /* ПОСТЫ В ЛЕНТЕ */
         .post {
             background: #fff; border-radius: 12px; padding: 14px 16px;
             margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
@@ -341,7 +338,6 @@
             border-radius: 20px; padding: 0 18px; font-weight: 600;
             cursor: pointer; font-size: 0.75rem;
         }
-        .chat-view .input-wrap button:hover { background: #4a9eff; }
 
         /* МОДАЛКИ */
         .modal {
@@ -369,7 +365,6 @@
         }
         .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
         .modal .box .btns .save { background: #1877f2; color: #fff; }
-        .modal .box .btns .save:hover { background: #4a9eff; }
 
         .google-btn {
             display: flex; align-items: center; justify-content: center;
@@ -399,10 +394,6 @@
             .topbar .right .name { display: none; }
             .groups-page .group-list { grid-template-columns: 1fr 1fr; }
             .hor-menu button { font-size: 0.7rem; padding: 6px 12px; }
-        }
-        @media (min-width: 768px) {
-            .topbar .left .logo { font-size: 1.3rem; }
-            .hor-menu button { font-size: 0.9rem; padding: 8px 22px; }
         }
     </style>
 </head>
@@ -463,7 +454,7 @@
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
 <!-- КОНТЕЙНЕР -->
-<div class="container" id="container">
+<div class="container">
 
     <!-- ЛЕНТА -->
     <div class="page feed-page active" id="feedPage">
@@ -644,7 +635,7 @@
 <script>
 (function() {
     // ================================================================
-    // FIREBASE
+    // FIREBASE - ТОТ ЖЕ ПРОЕКТ
     // ================================================================
     const FB_CONFIG = {
         apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
@@ -680,10 +671,10 @@
     // ================================================================
     // СОСТОЯНИЕ
     // ================================================================
-    const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
+    const SITE = 'metaimperiya';
     let USER = null;
     let USER_UID = null;
-    let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
+    let IS_ADMIN = localStorage.getItem('admin_' + SITE) === '1';
     let CURRENT_ROOM = null;
     let CURRENT_DM = null;
     let chatUnsub = null;
@@ -697,30 +688,30 @@
     // AUTH
     // ================================================================
     auth.onAuthStateChanged(user => {
+        const loginModal = document.getElementById('loginModal');
         if (user) {
             USER_UID = user.uid;
-            let saved = localStorage.getItem('dc_u_' + SITE);
+            let saved = localStorage.getItem('user_' + SITE);
             USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
-            if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
+            if (!saved) localStorage.setItem('user_' + SITE, USER);
             
-            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
+            db.ref('users/' + USER_UID).update({ 
                 name: USER, 
                 email: user.email || 'anon'
             });
             
+            loginModal.classList.remove('open');
             updateUI();
             loadFeed();
-            loadProfile();
             loadGroups();
             loadPeople();
             loadNotifications();
-            closeLogin();
         } else {
             USER = null;
             USER_UID = null;
             VIEWING_USER = null;
-            document.getElementById('loginModal').classList.add('open');
             updateUI();
+            loginModal.classList.add('open');
         }
     });
 
@@ -734,6 +725,24 @@
         });
     });
 
+    window.closeLogin = function() {
+        document.getElementById('loginModal').classList.remove('open');
+    };
+
+    window.loginWithName = function() {
+        const n = document.getElementById('nameInput').value.trim();
+        if (!n) { alert('Введите имя'); return; }
+        auth.signInAnonymously().then(() => {
+            USER = n.slice(0, 24);
+            localStorage.setItem('user_' + SITE, USER);
+            updateUI();
+            loadFeed();
+            loadGroups();
+            loadPeople();
+            document.getElementById('loginModal').classList.remove('open');
+        }).catch(e => alert('Ошибка: ' + e.message));
+    };
+
     // ================================================================
     // АВАТАРКИ
     // ================================================================
@@ -746,6 +755,7 @@
             const file = e.target.files[0];
             if (!file) return;
             if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
+            
             const path = 'avatars/' + USER_UID + '/' + Date.now() + '_' + file.name;
             const ref = storage.ref(path);
             const uploadTask = ref.put(file);
@@ -757,7 +767,7 @@
                 },
                 function() {
                     ref.getDownloadURL().then(function(url) {
-                        db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
+                        db.ref('users/' + USER_UID + '/avatarUrl').set(url);
                         updateUI();
                         loadProfile();
                         loadFeed();
@@ -772,7 +782,7 @@
     window.removeAvatar = function() {
         if (!USER_UID) return;
         if (!confirm('Удалить аватарку?')) return;
-        db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').remove();
+        db.ref('users/' + USER_UID + '/avatarUrl').remove();
         updateUI();
         loadProfile();
         loadFeed();
@@ -781,7 +791,7 @@
 
     function getUserAvatar(uid, callback) {
         if (avatarUrlCache[uid]) { callback(avatarUrlCache[uid]); return; }
-        db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
+        db.ref('users/' + uid + '/avatarUrl').once('value', snap => {
             const url = snap.val() || null;
             avatarUrlCache[uid] = url;
             callback(url);
@@ -827,7 +837,7 @@
 
     window.logout = function() {
         auth.signOut();
-        localStorage.removeItem('dc_u_' + SITE);
+        localStorage.removeItem('user_' + SITE);
         USER = null;
         USER_UID = null;
         if (chatUnsub) { 
@@ -840,25 +850,6 @@
         updateUI();
         closeSettings();
         document.getElementById('loginModal').classList.add('open');
-    };
-
-    window.closeLogin = function() {
-        document.getElementById('loginModal').classList.remove('open');
-    };
-
-    window.loginWithName = function() {
-        const n = document.getElementById('nameInput').value.trim();
-        if (!n) { alert('Введите имя'); return; }
-        auth.signInAnonymously().then(() => {
-            USER = n.slice(0, 24);
-            localStorage.setItem('dc_u_' + SITE, USER);
-            updateUI();
-            loadFeed();
-            loadProfile();
-            loadGroups();
-            loadPeople();
-            closeLogin();
-        }).catch(e => alert('Ошибка: ' + e.message));
     };
 
     // ================================================================
@@ -955,7 +946,7 @@
     // ================================================================
     function getSubscriptions(callback) {
         if (!USER_UID) { callback([]); return; }
-        db.ref('sites/' + SITE + '/subscriptions/' + USER_UID).once('value', snap => {
+        db.ref('subscriptions/' + USER_UID).once('value', snap => {
             const data = snap.val() || {};
             callback(Object.keys(data));
         });
@@ -973,7 +964,7 @@
         getSubscriptions(subscriptions => {
             if (!subscriptions.includes(USER_UID)) subscriptions.push(USER_UID);
             
-            db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
+            db.ref('feed_posts').orderByChild('timestamp').on('value', snap => {
                 const feed = document.getElementById('feed');
                 feed.innerHTML = '';
                 const data = snap.val() || {};
@@ -1069,23 +1060,23 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 postData.img = e.target.result;
-                db.ref('sites/' + SITE + '/feed_posts').push(postData);
-                document.getElementById('postInput').value = '';
-                pendingImage = null;
-                pendingImageFile = null;
-                document.getElementById('previewBox').classList.remove('visible');
-                document.getElementById('fileInput').value = '';
+                db.ref('feed_posts').push(postData);
+                clearPostInputs();
             };
             reader.readAsDataURL(pendingImageFile);
         } else {
-            db.ref('sites/' + SITE + '/feed_posts').push(postData);
-            document.getElementById('postInput').value = '';
-            pendingImage = null;
-            pendingImageFile = null;
-            document.getElementById('previewBox').classList.remove('visible');
-            document.getElementById('fileInput').value = '';
+            db.ref('feed_posts').push(postData);
+            clearPostInputs();
         }
     };
+
+    function clearPostInputs() {
+        document.getElementById('postInput').value = '';
+        pendingImage = null;
+        pendingImageFile = null;
+        document.getElementById('previewBox').classList.remove('visible');
+        document.getElementById('fileInput').value = '';
+    }
 
     // Фото
     document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -1118,7 +1109,7 @@
         if (!container) return;
         container.innerHTML = '<div style="color:#bbb;text-align:center;padding:10px;font-size:0.75rem;">Загрузка...</div>';
         
-        db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
+        db.ref('feed_posts').orderByChild('timestamp').on('value', snap => {
             container.innerHTML = '';
             const data = snap.val() || {};
             const keys = Object.keys(data).filter(k => data[k].authorUid === uid).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
@@ -1136,8 +1127,8 @@
 
     window.deletePost = function(id) {
         if (!IS_ADMIN || !confirm('Удалить пост?')) return;
-        db.ref('sites/' + SITE + '/feed_posts/' + id).remove();
-        db.ref('sites/' + SITE + '/comments/' + id).remove();
+        db.ref('feed_posts/' + id).remove();
+        db.ref('comments/' + id).remove();
     };
 
     // ================================================================
@@ -1148,14 +1139,14 @@
         const key = 'lk_' + postId + '_' + USER_UID;
         const liked = localStorage.getItem(key) === '1';
         
-        const ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/likes');
+        const ref = db.ref('feed_posts/' + postId + '/likes');
         if (liked) {
             ref.transaction(v => Math.max(0, (v || 0) - 1));
             localStorage.removeItem(key);
         } else {
             ref.transaction(v => (v || 0) + 1);
             localStorage.setItem(key, '1');
-            db.ref('sites/' + SITE + '/feed_posts/' + postId).once('value', snap => {
+            db.ref('feed_posts/' + postId).once('value', snap => {
                 const p = snap.val();
                 if (p && p.authorUid && p.authorUid !== USER_UID) {
                     addNotification(p.authorUid, 'like', USER);
@@ -1175,11 +1166,11 @@
             return;
         }
         
-        db.ref('sites/' + SITE + '/feed_posts/' + postId).once('value', snap => {
+        db.ref('feed_posts/' + postId).once('value', snap => {
             const p = snap.val();
             if (!p) return;
             
-            db.ref('sites/' + SITE + '/feed_posts').push({
+            db.ref('feed_posts').push({
                 author: USER,
                 authorUid: USER_UID,
                 text: p.text || '',
@@ -1193,7 +1184,7 @@
                 img: p.img || null
             });
             
-            db.ref('sites/' + SITE + '/feed_posts/' + postId + '/repostCount').transaction(v => (v || 0) + 1);
+            db.ref('feed_posts/' + postId + '/repostCount').transaction(v => (v || 0) + 1);
             localStorage.setItem(key, '1');
             alert('✅ Пост репостнут!');
         });
@@ -1203,7 +1194,7 @@
     // КОММЕНТАРИИ
     // ================================================================
     function loadComments(postId) {
-        db.ref('sites/' + SITE + '/comments/' + postId).orderByChild('timestamp').on('value', snap => {
+        db.ref('comments/' + postId).orderByChild('timestamp').on('value', snap => {
             const container = document.getElementById('commentsContainer_' + postId);
             if (!container) return;
             container.innerHTML = '';
@@ -1213,7 +1204,7 @@
             const count = keys.length;
             const countEl = document.getElementById('commentCount_' + postId);
             if (countEl) countEl.textContent = count;
-            db.ref('sites/' + SITE + '/feed_posts/' + postId + '/commentCount').set(count);
+            db.ref('feed_posts/' + postId + '/commentCount').set(count);
 
             if (!keys.length) {
                 container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;padding:4px 0;">Нет комментариев</div>';
@@ -1260,7 +1251,7 @@
         const text = input.value.trim();
         if (!text) return;
 
-        db.ref('sites/' + SITE + '/comments/' + postId).push({
+        db.ref('comments/' + postId).push({
             author: USER,
             authorUid: USER_UID,
             text: text,
@@ -1272,7 +1263,7 @@
             if (list) list.classList.add('open');
             const toggle = document.querySelector(`#comments_${postId} .toggle`);
             if (toggle) toggle.textContent = '▲ Скрыть';
-            db.ref('sites/' + SITE + '/feed_posts/' + postId).once('value', snap => {
+            db.ref('feed_posts/' + postId).once('value', snap => {
                 const p = snap.val();
                 if (p && p.authorUid && p.authorUid !== USER_UID) {
                     addNotification(p.authorUid, 'comment', USER);
@@ -1283,7 +1274,7 @@
 
     window.deleteComment = function(postId, commentId) {
         if (!confirm('Удалить комментарий?')) return;
-        db.ref('sites/' + SITE + '/comments/' + postId + '/' + commentId).remove();
+        db.ref('comments/' + postId + '/' + commentId).remove();
     };
 
     // ================================================================
@@ -1293,7 +1284,7 @@
         const uid = VIEWING_USER || USER_UID;
         if (!uid) return;
         
-        db.ref('sites/' + SITE + '/users/' + uid).once('value', snap => {
+        db.ref('users/' + uid).once('value', snap => {
             const u = snap.val() || {};
             const name = u.name || 'Аноним';
             const bio = u.bio || '';
@@ -1379,8 +1370,8 @@
             if (!confirm('Удалить из друзей?')) return;
             localStorage.removeItem('fr_' + USER_UID + '_' + uid);
             localStorage.removeItem('fr_' + uid + '_' + USER_UID);
-            db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).remove();
-            db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).remove();
+            db.ref('friends/' + USER_UID + '/' + uid).remove();
+            db.ref('friends/' + uid + '/' + USER_UID).remove();
             loadFriends(VIEWING_USER || USER_UID);
             if (VIEWING_USER) showProfileActions(VIEWING_USER);
             return;
@@ -1391,21 +1382,21 @@
             if (action) {
                 localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
                 localStorage.setItem('fr_' + uid + '_' + USER_UID, '1');
-                db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
-                db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
+                db.ref('friends/' + USER_UID + '/' + uid).set(true);
+                db.ref('friends/' + uid + '/' + USER_UID).set(true);
                 localStorage.removeItem('fr_recv_' + USER_UID + '_' + uid);
                 localStorage.removeItem('fr_sent_' + uid + '_' + USER_UID);
-                db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).remove();
-                db.ref('sites/' + SITE + '/friend_requests/' + uid + '/' + USER_UID).remove();
+                db.ref('friend_requests/' + USER_UID + '/' + uid).remove();
+                db.ref('friend_requests/' + uid + '/' + USER_UID).remove();
                 addNotification(uid, 'friend_approved', USER);
             } else {
                 localStorage.removeItem('fr_recv_' + USER_UID + '_' + uid);
                 localStorage.removeItem('fr_sent_' + uid + '_' + USER_UID);
-                db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).remove();
-                db.ref('sites/' + SITE + '/friend_requests/' + uid + '/' + USER_UID).remove();
+                db.ref('friend_requests/' + USER_UID + '/' + uid).remove();
+                db.ref('friend_requests/' + uid + '/' + USER_UID).remove();
                 localStorage.setItem('sub_' + uid + '_' + USER_UID, '1');
-                db.ref('sites/' + SITE + '/subscriptions/' + uid + '/' + USER_UID).set(true);
-                db.ref('sites/' + SITE + '/subscribers/' + USER_UID + '/' + uid).set(true);
+                db.ref('subscriptions/' + uid + '/' + USER_UID).set(true);
+                db.ref('subscribers/' + USER_UID + '/' + uid).set(true);
                 alert('✅ Запрос отклонён. Пользователь подписан на вас.');
             }
             loadFriends(VIEWING_USER || USER_UID);
@@ -1419,10 +1410,10 @@
             if (!confirm('Отозвать запрос в друзья? Вы также отпишетесь от этого пользователя.')) return;
             localStorage.removeItem('fr_sent_' + USER_UID + '_' + uid);
             localStorage.removeItem('fr_recv_' + uid + '_' + USER_UID);
-            db.ref('sites/' + SITE + '/friend_requests/' + uid + '/' + USER_UID).remove();
+            db.ref('friend_requests/' + uid + '/' + USER_UID).remove();
             localStorage.removeItem('sub_' + USER_UID + '_' + uid);
-            db.ref('sites/' + SITE + '/subscriptions/' + USER_UID + '/' + uid).remove();
-            db.ref('sites/' + SITE + '/subscribers/' + uid + '/' + USER_UID).remove();
+            db.ref('subscriptions/' + USER_UID + '/' + uid).remove();
+            db.ref('subscribers/' + uid + '/' + USER_UID).remove();
             alert('✅ Запрос отозван, вы отписались от пользователя.');
             if (VIEWING_USER) showProfileActions(VIEWING_USER);
             loadSubscriptions(USER_UID);
@@ -1432,14 +1423,14 @@
         
         localStorage.setItem('fr_sent_' + USER_UID + '_' + uid, '1');
         localStorage.setItem('fr_recv_' + uid + '_' + USER_UID, '1');
-        db.ref('sites/' + SITE + '/friend_requests/' + uid + '/' + USER_UID).set({
+        db.ref('friend_requests/' + uid + '/' + USER_UID).set({
             from: USER,
             fromUid: USER_UID,
             timestamp: Date.now()
         });
         localStorage.setItem('sub_' + USER_UID + '_' + uid, '1');
-        db.ref('sites/' + SITE + '/subscriptions/' + USER_UID + '/' + uid).set(true);
-        db.ref('sites/' + SITE + '/subscribers/' + uid + '/' + USER_UID).set(true);
+        db.ref('subscriptions/' + USER_UID + '/' + uid).set(true);
+        db.ref('subscribers/' + uid + '/' + USER_UID).set(true);
         addNotification(uid, 'friend_request', USER);
         if (VIEWING_USER) showProfileActions(VIEWING_USER);
         loadFeed();
@@ -1450,7 +1441,7 @@
         const container = document.getElementById('friendList');
         container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
         
-        db.ref('sites/' + SITE + '/friends/' + uid).once('value', snap => {
+        db.ref('friends/' + uid).once('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
             document.getElementById('friendsCount').textContent = keys.length;
@@ -1463,7 +1454,7 @@
             let html = '';
             let loaded = 0;
             keys.forEach(k => {
-                db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
+                db.ref('users/' + k).once('value', usnap => {
                     const u = usnap.val() || {};
                     const name = u.name || 'Аноним';
                     const letter = name.charAt(0).toUpperCase();
@@ -1494,13 +1485,13 @@
         if (isSub) {
             if (!confirm('Отписаться от пользователя?')) return;
             localStorage.removeItem(key);
-            db.ref('sites/' + SITE + '/subscriptions/' + USER_UID + '/' + uid).remove();
-            db.ref('sites/' + SITE + '/subscribers/' + uid + '/' + USER_UID).remove();
+            db.ref('subscriptions/' + USER_UID + '/' + uid).remove();
+            db.ref('subscribers/' + uid + '/' + USER_UID).remove();
             loadFeed();
         } else {
             localStorage.setItem(key, '1');
-            db.ref('sites/' + SITE + '/subscriptions/' + USER_UID + '/' + uid).set(true);
-            db.ref('sites/' + SITE + '/subscribers/' + uid + '/' + USER_UID).set(true);
+            db.ref('subscriptions/' + USER_UID + '/' + uid).set(true);
+            db.ref('subscribers/' + uid + '/' + USER_UID).set(true);
             addNotification(uid, 'subscribe', USER);
             loadFeed();
         }
@@ -1514,7 +1505,7 @@
         const container = document.getElementById('subscriberList');
         container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
         
-        db.ref('sites/' + SITE + '/subscribers/' + uid).once('value', snap => {
+        db.ref('subscribers/' + uid).once('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
             document.getElementById('subscribersCount').textContent = keys.length;
@@ -1527,7 +1518,7 @@
             let html = '';
             let loaded = 0;
             keys.forEach(k => {
-                db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
+                db.ref('users/' + k).once('value', usnap => {
                     const u = usnap.val() || {};
                     const name = u.name || 'Аноним';
                     const letter = name.charAt(0).toUpperCase();
@@ -1552,7 +1543,7 @@
         const container = document.getElementById('subscriptionList');
         container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
         
-        db.ref('sites/' + SITE + '/subscriptions/' + uid).once('value', snap => {
+        db.ref('subscriptions/' + uid).once('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
             document.getElementById('subscriptionsCount').textContent = keys.length;
@@ -1565,7 +1556,7 @@
             let html = '';
             let loaded = 0;
             keys.forEach(k => {
-                db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
+                db.ref('users/' + k).once('value', usnap => {
                     const u = usnap.val() || {};
                     const name = u.name || 'Аноним';
                     const letter = name.charAt(0).toUpperCase();
@@ -1602,7 +1593,7 @@
         const container = document.getElementById('pageList');
         container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
         
-        db.ref('sites/' + SITE + '/pages/' + uid).on('value', snap => {
+        db.ref('pages/' + uid).on('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
             if (!keys.length) {
@@ -1631,13 +1622,13 @@
         const name = document.getElementById('pageName').value.trim();
         const desc = document.getElementById('pageDesc').value.trim();
         if (!name) { alert('Введите название'); return; }
-        db.ref('sites/' + SITE + '/pages/' + USER_UID).push({ name, desc, createdAt: Date.now() });
+        db.ref('pages/' + USER_UID).push({ name, desc, createdAt: Date.now() });
         closeCreatePage();
         loadPages(USER_UID);
     };
     window.deletePage = function(id) {
         if (!confirm('Удалить страницу?')) return;
-        db.ref('sites/' + SITE + '/pages/' + USER_UID + '/' + id).remove();
+        db.ref('pages/' + USER_UID + '/' + id).remove();
     };
 
     // ================================================================
@@ -1657,9 +1648,9 @@
         if (!name) { alert('Введите имя'); return; }
         
         USER = name;
-        localStorage.setItem('dc_u_' + SITE, USER);
+        localStorage.setItem('user_' + SITE, USER);
         if (USER_UID) {
-            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
+            db.ref('users/' + USER_UID).update({ name: USER, bio: bio });
         }
         updateUI();
         closeEditProfile();
@@ -1693,7 +1684,7 @@
     // ================================================================
     function addNotification(targetUid, type, from) {
         if (!targetUid || !USER_UID) return;
-        db.ref('sites/' + SITE + '/notifications/' + targetUid).push({
+        db.ref('notifications/' + targetUid).push({
             type: type,
             from: from,
             fromUid: USER_UID,
@@ -1704,7 +1695,7 @@
 
     function loadNotifications() {
         if (!USER_UID) return;
-        db.ref('sites/' + SITE + '/notifications/' + USER_UID).on('value', snap => {
+        db.ref('notifications/' + USER_UID).on('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
             let unread = 0;
@@ -1743,11 +1734,11 @@
     window.openNotifications = function() {
         document.getElementById('notifModal').classList.add('open');
         if (USER_UID) {
-            db.ref('sites/' + SITE + '/notifications/' + USER_UID).once('value', snap => {
+            db.ref('notifications/' + USER_UID).once('value', snap => {
                 const data = snap.val() || {};
                 Object.keys(data).forEach(k => {
                     if (!data[k].read) {
-                        db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + k + '/read').set(true);
+                        db.ref('notifications/' + USER_UID + '/' + k + '/read').set(true);
                     }
                 });
             });
@@ -1770,7 +1761,7 @@
     window.checkAdmin = function() {
         if (document.getElementById('adminPass').value.trim() === '12345') {
             IS_ADMIN = true;
-            localStorage.setItem('dc_admin_' + SITE, '1');
+            localStorage.setItem('admin_' + SITE, '1');
             document.getElementById('adminDot').classList.add('active');
             closeAdminModal();
             alert('🏴‍☠️ Админ-режим включён!');
@@ -1786,12 +1777,12 @@
         const list = document.getElementById('groupList');
         list.innerHTML = GROUPS.map(group => {
             let count = 0;
-            db.ref('rooms/' + SITE + '_' + group.id + '/messages').once('value', snap => {
+            db.ref('rooms/' + group.id + '/messages').once('value', snap => {
                 const c = snap.numChildren();
                 const el = document.querySelector(`#groupList .group-card[data-id="${group.id}"] .count`);
                 if (el) el.textContent = c;
             });
-            db.ref('rooms/' + SITE + '_' + group.id + '/messages').on('value', snap => {
+            db.ref('rooms/' + group.id + '/messages').on('value', snap => {
                 const c = snap.numChildren();
                 const el = document.querySelector(`#groupList .group-card[data-id="${group.id}"] .count`);
                 if (el) el.textContent = c;
@@ -1838,7 +1829,7 @@
         const list = document.getElementById('peopleList');
         list.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.75rem;">Загрузка...</div>';
         
-        db.ref('sites/' + SITE + '/users').once('value', snap => {
+        db.ref('users').once('value', snap => {
             const users = snap.val() || {};
             const keys = Object.keys(users).filter(k => k !== USER_UID);
             
@@ -1897,7 +1888,7 @@
         }
         const box = document.getElementById('chatMessages');
         box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">⏳ Загрузка...</div>';
-        const path = 'rooms/' + SITE + '_' + roomId + '/messages';
+        const path = 'rooms/' + roomId + '/messages';
         chatUnsub = path;
         db.ref(path).orderByChild('timestamp').on('value', snap => {
             box.innerHTML = '';
@@ -1931,7 +1922,7 @@
         const box = document.getElementById('chatMessages');
         box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">⏳ Загрузка...</div>';
         const dmId = getDMId(USER_UID, userId);
-        const path = 'dms/' + SITE + '/' + dmId + '/messages';
+        const path = 'dms/' + dmId + '/messages';
         chatUnsub = path;
         db.ref(path).orderByChild('timestamp').on('value', snap => {
             box.innerHTML = '';
@@ -1963,7 +1954,7 @@
         if (!text) return;
         
         if (CURRENT_ROOM) {
-            db.ref('rooms/' + SITE + '_' + CURRENT_ROOM + '/messages').push({
+            db.ref('rooms/' + CURRENT_ROOM + '/messages').push({
                 nick: USER,
                 text: text,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -1972,7 +1963,7 @@
             input.value = '';
         } else if (CURRENT_DM) {
             const dmId = getDMId(USER_UID, CURRENT_DM);
-            db.ref('dms/' + SITE + '/' + dmId + '/messages').push({
+            db.ref('dms/' + dmId + '/messages').push({
                 from: USER_UID,
                 nick: USER,
                 text: text,
@@ -2014,13 +2005,13 @@
     // ================================================================
     // СИД
     // ================================================================
-    db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
+    db.ref('feed_posts').once('value', snap => {
         if (!snap.exists()) {
             const posts = [
-                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в METAIMPERIYA!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
-                { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, repostCount: 0 }
+                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в METAIMPERIYA!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 0, repostCount: 0 },
+                { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 0, repostCount: 0 }
             ];
-            posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
+            posts.forEach(p => db.ref('feed_posts').push(p));
         }
     });
 
