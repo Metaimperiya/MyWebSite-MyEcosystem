@@ -5,16 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>METAIMPERIYA</title>
     
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js",
-                "firebase/database": "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js",
-                "firebase/storage": "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js"
-            }
-        }
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -542,7 +536,7 @@
 <!-- АДМИН ТОЧКА -->
 <div class="admin-dot" id="adminDot" onclick="openAdminLogin()"></div>
 
-<!-- МОДАЛКА ВХОДА С GOOGLE (как в твоём примере) -->
+<!-- МОДАЛКА ВХОДА С GOOGLE -->
 <div class="modal" id="loginModal">
     <div class="box">
         <h3>🚀 Вход в METAIMPERIYA</h3>
@@ -632,1487 +626,1415 @@
     </div>
 </div>
 
-<script type="importmap">
-    {
-        "imports": {
-            "firebase/app": "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js",
-            "firebase/auth": "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js",
-            "firebase/database": "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js",
-            "firebase/storage": "https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js"
-        }
-    }
-</script>
+<script>
+// ================================================================
+// FIREBASE (Compat - обычные скрипты, без import)
+// ================================================================
+const FB_CONFIG = {
+    apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
+    authDomain: "myecosystem-e6414.firebaseapp.com",
+    databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
+    projectId: "myecosystem-e6414",
+    storageBucket: "myecosystem-e6414.firebasestorage.app",
+    messagingSenderId: "426302111033",
+    appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
+};
+firebase.initializeApp(FB_CONFIG);
+const db = firebase.database();
+const auth = firebase.auth();
+const storage = firebase.storage();
+const provider = new firebase.auth.GoogleAuthProvider();
 
-<script type="module">
-    // ================================================================
-    // ИМПОРТЫ FIREBASE (как в твоём примере)
-    // ================================================================
-    import { initializeApp } from "firebase/app";
-    import { 
-        getAuth, 
-        GoogleAuthProvider, 
-        signInWithPopup, 
-        signInWithRedirect,
-        getRedirectResult,
-        onAuthStateChanged,
-        signOut
-    } from "firebase/auth";
-    import { getDatabase, ref, set, push, onValue, update, remove, get, child, query, orderByChild } from "firebase/database";
-    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+// ================================================================
+// ГРУППЫ
+// ================================================================
+const GROUPS = [
+    { id: 'general', name: '🌍 Общий' },
+    { id: 'sport', name: '⚽ Спорт' },
+    { id: 'games', name: '🎮 Игры' },
+    { id: 'movies', name: '🎬 Кино' },
+    { id: 'music', name: '🎵 Музыка' },
+    { id: 'tech', name: '💻 Технологии' },
+    { id: 'food', name: '🍕 Еда' },
+    { id: 'travel', name: '✈️ Путешествия' },
+    { id: 'fashion', name: '👗 Мода' },
+    { id: 'science', name: '🔬 Наука' }
+];
 
-    // ================================================================
-    // FIREBASE КОНФИГ (твой проект)
-    // ================================================================
-    const firebaseConfig = {
-        apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
-        authDomain: "myecosystem-e6414.firebaseapp.com",
-        databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
-        projectId: "myecosystem-e6414",
-        storageBucket: "myecosystem-e6414.firebasestorage.app",
-        messagingSenderId: "426302111033",
-        appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
-    };
+// ================================================================
+// СОСТОЯНИЕ
+// ================================================================
+let USER = null;
+let USER_UID = null;
+let IS_ADMIN = localStorage.getItem('metaimperiya_admin') === '1';
+let CURRENT_ROOM = null;
+let CURRENT_DM = null;
+let chatUnsub = null;
+let VIEWING_USER = null;
+let showStat = 'friends';
+let avatarUrlCache = {};
+let pendingImage = null;
+let pendingImageFile = null;
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const storage = getStorage(app);
-    const provider = new GoogleAuthProvider();
+// ================================================================
+// DOM ЭЛЕМЕНТЫ
+// ================================================================
+const loginModal = document.getElementById('loginModal');
+const googleBtn = document.getElementById('googleLoginBtn');
+const nameInput = document.getElementById('nameInput');
+const loginError = document.getElementById('loginError');
 
-    // ================================================================
-    // ГРУППЫ
-    // ================================================================
-    const GROUPS = [
-        { id: 'general', name: '🌍 Общий' },
-        { id: 'sport', name: '⚽ Спорт' },
-        { id: 'games', name: '🎮 Игры' },
-        { id: 'movies', name: '🎬 Кино' },
-        { id: 'music', name: '🎵 Музыка' },
-        { id: 'tech', name: '💻 Технологии' },
-        { id: 'food', name: '🍕 Еда' },
-        { id: 'travel', name: '✈️ Путешествия' },
-        { id: 'fashion', name: '👗 Мода' },
-        { id: 'science', name: '🔬 Наука' }
-    ];
+function showLoginError(msg) {
+    loginError.textContent = '❌ ' + msg;
+    loginError.style.display = 'block';
+    setTimeout(() => { loginError.style.display = 'none'; }, 5000);
+}
 
-    // ================================================================
-    // СОСТОЯНИЕ
-    // ================================================================
-    let USER = null;
-    let USER_UID = null;
-    let IS_ADMIN = false;
-    let CURRENT_ROOM = null;
-    let CURRENT_DM = null;
-    let chatUnsub = null;
-    let VIEWING_USER = null;
-    let showStat = 'friends';
-    let avatarUrlCache = {};
-    let pendingImage = null;
-    let pendingImageFile = null;
-
-    // ================================================================
-    // DOM ЭЛЕМЕНТЫ
-    // ================================================================
-    const loginModal = document.getElementById('loginModal');
-    const googleBtn = document.getElementById('googleLoginBtn');
-    const nameInput = document.getElementById('nameInput');
-    const loginError = document.getElementById('loginError');
-
-    // ================================================================
-    // ФУНКЦИЯ ПОКАЗА ОШИБКИ
-    // ================================================================
-    function showLoginError(msg) {
-        loginError.textContent = '❌ ' + msg;
-        loginError.style.display = 'block';
-        setTimeout(() => { loginError.style.display = 'none'; }, 5000);
-    }
-
-    // ================================================================
-    // ВХОД ЧЕРЕЗ GOOGLE (как в твоём примере)
-    // ================================================================
-    googleBtn.addEventListener('click', async () => {
-        try {
-            loginError.style.display = 'none';
-            
-            // Настройка для выбора аккаунта
-            provider.setCustomParameters({
-                prompt: 'select_account'
-            });
-            
-            // Пробуем popup
-            const result = await signInWithPopup(auth, provider);
+// ================================================================
+// GOOGLE ВХОД
+// ================================================================
+googleBtn.addEventListener('click', function() {
+    provider.setCustomParameters({ prompt: 'select_account' });
+    auth.signInWithPopup(provider)
+        .then(function(result) {
             const user = result.user;
-            
-            // Сохраняем в базу
-            await set(ref(db, 'users/' + user.uid), {
+            return firebase.database().ref('users/' + user.uid).set({
                 name: user.displayName || user.email,
                 email: user.email,
                 photoURL: user.photoURL || '',
                 createdAt: new Date().toISOString()
             }, { merge: true });
-            
-            console.log('✅ Вход выполнен как:', user.email);
-            
-        } catch (error) {
-            console.error('Ошибка входа:', error);
-            
-            // Если popup заблокирован - пробуем redirect
-            if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
-                showLoginError('Popup заблокирован! Используем redirect...');
-                try {
-                    await signInWithRedirect(auth, provider);
-                } catch (redirectError) {
-                    showLoginError('Redirect не сработал: ' + redirectError.message);
-                }
+        })
+        .then(function() {
+            console.log('✅ Вход выполнен');
+            loginModal.classList.remove('open');
+        })
+        .catch(function(error) {
+            console.error('Ошибка:', error);
+            if (error.code === 'auth/popup-blocked') {
+                showLoginError('Popup заблокирован! Разрешите всплывающие окна');
             } else {
                 showLoginError(error.message);
             }
-        }
-    });
+        });
+});
 
-    // ================================================================
-    // ОБРАБОТКА REDIRECT (если вернулись после редиректа)
-    // ================================================================
-    try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-            const user = result.user;
-            await set(ref(db, 'users/' + user.uid), {
-                name: user.displayName || user.email,
-                email: user.email,
-                photoURL: user.photoURL || '',
-                createdAt: new Date().toISOString()
-            }, { merge: true });
-            console.log('✅ Вход через redirect выполнен как:', user.email);
-        }
-    } catch (error) {
-        console.error('Ошибка redirect:', error);
-    }
-
-    // ================================================================
-    // СЛЕДИМ ЗА ПОЛЬЗОВАТЕЛЕМ
-    // ================================================================
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            USER_UID = user.uid;
-            USER = user.displayName || user.email || user.uid.slice(0, 8);
+// ================================================================
+// АНОНИМНЫЙ ВХОД
+// ================================================================
+window.loginWithName = function() {
+    const n = nameInput.value.trim();
+    if (!n) { showLoginError('Введите имя'); return; }
+    auth.signInAnonymously()
+        .then(function() {
+            USER = n.slice(0, 24);
             localStorage.setItem('metaimperiya_user', USER);
-            localStorage.setItem('metaimperiya_uid', USER_UID);
-            
-            loginModal.classList.remove('open');
             updateUI();
             loadFeed();
             loadGroups();
             loadPeople();
-            loadNotifications();
-            
-            console.log('👤 Пользователь:', USER);
-        } else {
-            USER = null;
-            USER_UID = null;
-            VIEWING_USER = null;
-            updateUI();
-            loginModal.classList.add('open');
-        }
-    });
+            loginModal.classList.remove('open');
+        })
+        .catch(function(e) { showLoginError(e.message); });
+};
 
-    // ================================================================
-    // АНОНИМНЫЙ ВХОД
-    // ================================================================
-    window.loginWithName = function() {
-        const n = nameInput.value.trim();
-        if (!n) { showLoginError('Введите имя'); return; }
+window.closeLogin = function() {
+    loginModal.classList.remove('open');
+};
+
+// ================================================================
+// ВЫХОД
+// ================================================================
+window.logout = function() {
+    auth.signOut();
+    localStorage.removeItem('metaimperiya_user');
+    localStorage.removeItem('metaimperiya_uid');
+    USER = null;
+    USER_UID = null;
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    CURRENT_DM = null;
+    document.getElementById('chatView').classList.remove('active');
+    updateUI();
+    closeSettings();
+    loginModal.classList.add('open');
+};
+
+// ================================================================
+// СЛЕДИМ ЗА ПОЛЬЗОВАТЕЛЕМ
+// ================================================================
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        USER_UID = user.uid;
+        let saved = localStorage.getItem('metaimperiya_user');
+        USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
+        if (!saved) localStorage.setItem('metaimperiya_user', USER);
         
-        // Анонимный вход через Firebase
-        import("firebase/auth").then(({ signInAnonymously }) => {
-            signInAnonymously(auth)
-                .then(() => {
-                    USER = n.slice(0, 24);
-                    localStorage.setItem('metaimperiya_user', USER);
-                    updateUI();
-                    loadFeed();
-                    loadGroups();
-                    loadPeople();
-                    loginModal.classList.remove('open');
-                })
-                .catch(e => showLoginError(e.message));
+        db.ref('users/' + USER_UID).update({ 
+            name: USER, 
+            email: user.email || 'anon'
         });
-    };
-
-    window.closeLogin = function() {
+        
         loginModal.classList.remove('open');
-    };
-
-    window.logout = function() {
-        signOut(auth);
-        localStorage.removeItem('metaimperiya_user');
-        localStorage.removeItem('metaimperiya_uid');
+        updateUI();
+        loadFeed();
+        loadGroups();
+        loadPeople();
+        loadNotifications();
+    } else {
         USER = null;
         USER_UID = null;
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        document.getElementById('chatView').classList.remove('active');
+        VIEWING_USER = null;
         updateUI();
-        closeSettings();
         loginModal.classList.add('open');
-    };
+    }
+});
 
-    // ================================================================
-    // АВАТАРКИ
-    // ================================================================
-    window.uploadAvatar = function() {
-        if (!USER_UID) { alert('Сначала войдите!'); return; }
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
-            
-            const path = 'avatars/' + USER_UID + '/' + Date.now() + '_' + file.name;
-            const sRef = storageRef(storage, path);
-            uploadBytes(sRef, file).then(() => {
-                getDownloadURL(sRef).then(function(url) {
-                    set(ref(db, 'users/' + USER_UID + '/avatarUrl'), url);
+// ================================================================
+// АВАТАРКИ
+// ================================================================
+window.uploadAvatar = function() {
+    if (!USER_UID) { alert('Сначала войдите!'); return; }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*, .gif';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
+        const path = 'avatars/' + USER_UID + '/' + Date.now() + '_' + file.name;
+        const ref = storage.ref(path);
+        const uploadTask = ref.put(file);
+        uploadTask.on('state_changed',
+            null,
+            function(error) {
+                console.error('Ошибка:', error);
+                alert('Ошибка: ' + error.message);
+            },
+            function() {
+                ref.getDownloadURL().then(function(url) {
+                    db.ref('users/' + USER_UID + '/avatarUrl').set(url);
                     updateUI();
                     loadProfile();
                     loadFeed();
                     alert('✅ Аватарка обновлена!');
                 });
-            }).catch(error => {
-                console.error('Ошибка загрузки:', error);
-                alert('Ошибка: ' + error.message);
-            });
-        };
-        input.click();
+            }
+        );
     };
+    input.click();
+};
 
-    window.removeAvatar = function() {
-        if (!USER_UID) return;
-        if (!confirm('Удалить аватарку?')) return;
-        set(ref(db, 'users/' + USER_UID + '/avatarUrl'), null);
-        updateUI();
-        loadProfile();
-        loadFeed();
-        alert('✅ Аватарка удалена');
-    };
+window.removeAvatar = function() {
+    if (!USER_UID) return;
+    if (!confirm('Удалить аватарку?')) return;
+    db.ref('users/' + USER_UID + '/avatarUrl').remove();
+    updateUI();
+    loadProfile();
+    loadFeed();
+    alert('✅ Аватарка удалена');
+};
 
-    function getUserAvatar(uid, callback) {
-        if (avatarUrlCache[uid]) { callback(avatarUrlCache[uid]); return; }
-        get(ref(db, 'users/' + uid + '/avatarUrl')).then(snap => {
-            const url = snap.val() || null;
-            avatarUrlCache[uid] = url;
-            callback(url);
+function getUserAvatar(uid, callback) {
+    if (avatarUrlCache[uid]) { callback(avatarUrlCache[uid]); return; }
+    db.ref('users/' + uid + '/avatarUrl').once('value', function(snap) {
+        const url = snap.val() || null;
+        avatarUrlCache[uid] = url;
+        callback(url);
+    });
+}
+
+function renderAvatar(uid, container, letter) {
+    if (!container) return;
+    getUserAvatar(uid, function(url) {
+        if (url) {
+            container.innerHTML = '<img src="' + url + '" />';
+        } else {
+            container.innerHTML = '<span class="letter">' + (letter || '?') + '</span>';
+        }
+    });
+}
+
+// ================================================================
+// UI
+// ================================================================
+function updateUI() {
+    const topAvatar = document.getElementById('topAvatar');
+    const sAvatar = document.getElementById('sAvatar');
+    const name = document.getElementById('topName');
+    const sName = document.getElementById('sName');
+    const dot = document.getElementById('adminDot');
+
+    if (USER) {
+        name.textContent = USER;
+        sName.textContent = USER;
+        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
+        if (IS_ADMIN) dot.classList.add('active');
+        else dot.classList.remove('active');
+    } else {
+        topAvatar.innerHTML = '<span class="letter">?</span>';
+        sAvatar.innerHTML = '<span class="letter">?</span>';
+        name.textContent = 'Гость';
+        sName.textContent = 'Гость';
+        dot.classList.remove('active');
+    }
+}
+
+// ================================================================
+// НАСТРОЙКИ
+// ================================================================
+window.openSettings = function() {
+    document.getElementById('settingsModal').classList.add('open');
+};
+window.closeSettings = function() {
+    document.getElementById('settingsModal').classList.remove('open');
+};
+
+// ================================================================
+// САЙДБАР
+// ================================================================
+window.toggleSidebar = function() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+};
+window.closeSidebar = function() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+};
+
+// ================================================================
+// НАВИГАЦИЯ
+// ================================================================
+function setActivePage(pageId) {
+    document.querySelectorAll('.page').forEach(function(el) { el.classList.remove('active'); });
+    if (pageId) document.getElementById(pageId).classList.add('active');
+    
+    document.querySelectorAll('.hor-menu button').forEach(function(el) { el.classList.remove('active'); });
+    if (pageId === 'feedPage') document.getElementById('hFeed').classList.add('active');
+    else if (pageId === 'groupsPage') document.getElementById('hGroups').classList.add('active');
+    else if (pageId === 'peoplePage') document.getElementById('hPeople').classList.add('active');
+    else if (pageId === 'profilePage') document.getElementById('hProfile').classList.add('active');
+}
+
+window.goToFeed = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    setActivePage('feedPage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    CURRENT_DM = null;
+    loadFeed();
+};
+
+window.goToGroups = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    setActivePage('groupsPage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    CURRENT_DM = null;
+    loadGroups();
+};
+
+window.goToPeople = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    setActivePage('peoplePage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    CURRENT_DM = null;
+    loadPeople();
+};
+
+window.goToProfile = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    VIEWING_USER = null;
+    setActivePage('profilePage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    CURRENT_DM = null;
+    loadProfile();
+};
+
+// ================================================================
+// ПОДПИСКИ
+// ================================================================
+function getSubscriptions(callback) {
+    if (!USER_UID) { callback([]); return; }
+    db.ref('subscriptions/' + USER_UID).once('value', function(snap) {
+        const data = snap.val() || {};
+        callback(Object.keys(data));
+    });
+}
+
+// ================================================================
+// ЛЕНТА
+// ================================================================
+function loadFeed() {
+    if (!USER_UID) {
+        document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;font-size:0.85rem;">Войдите, чтобы видеть ленту</div>';
+        return;
+    }
+    
+    getSubscriptions(function(subscriptions) {
+        if (!subscriptions.includes(USER_UID)) subscriptions.push(USER_UID);
+        
+        db.ref('feed_posts').orderByChild('timestamp').on('value', function(snap) {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = '';
+            const data = snap.val() || {};
+            const keys = Object.keys(data)
+                .filter(function(k) { return subscriptions.includes(data[k].authorUid); })
+                .sort(function(a, b) { return (data[b].timestamp || 0) - (data[a].timestamp || 0); });
+            
+            if (!keys.length) {
+                feed.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;font-size:0.85rem;">Нет постов от ваших подписок</div>';
+                return;
+            }
+            
+            keys.forEach(function(k) { const p = data[k]; p.id = k; feed.appendChild(renderPost(p)); });
         });
+    });
+}
+
+// ================================================================
+// ПОСТЫ
+// ================================================================
+function renderPost(p) {
+    const div = document.createElement('div');
+    div.className = 'post';
+    div.dataset.id = p.id;
+
+    const isLiked = localStorage.getItem('lk_' + p.id + '_' + USER_UID) === '1';
+    const letter = (p.author || '?').charAt(0).toUpperCase();
+    const avatarHtml = '<span class="avatar-wrap" id="post-avatar-' + p.id + '"><span class="letter">' + letter + '</span></span>';
+
+    let imgHtml = '';
+    if (p.img) {
+        imgHtml = '<img src="' + p.img + '" onclick="window.open(this.src)">';
     }
 
-    function renderAvatar(uid, container, letter) {
-        if (!container) return;
-        getUserAvatar(uid, function(url) {
-            if (url) {
-                container.innerHTML = `<img src="${url}" />`;
-            } else {
-                container.innerHTML = `<span class="letter">${letter || '?'}</span>`;
+    div.innerHTML = 
+        '<div class="author">' +
+            avatarHtml +
+            '<span class="name" onclick="viewUserProfile(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span>' +
+            '<span class="time">' + (p.time || '') + '</span>' +
+            (IS_ADMIN ? '<button onclick="deletePost(\'' + p.id + '\')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.55rem;">🗑</button>' : '') +
+        '</div>' +
+        '<div class="text">' + esc(p.text || '') + '</div>' +
+        imgHtml +
+        '<div class="stats">' +
+            '<button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\')">' +
+                '👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span>' +
+            '</button>' +
+            '<button onclick="toggleComments(\'' + p.id + '\')">' +
+                '💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span>' +
+            '</button>' +
+            '<button onclick="repostPost(\'' + p.id + '\')">' +
+                '🔁 <span id="repostCount_' + p.id + '">' + (p.repostCount || 0) + '</span>' +
+            '</button>' +
+        '</div>' +
+        '<div class="comments" id="comments_' + p.id + '">' +
+            '<button class="toggle" onclick="toggleComments(\'' + p.id + '\')">💬 Показать</button>' +
+            '<div class="list" id="commentsList_' + p.id + '">' +
+                '<div id="commentsContainer_' + p.id + '"></div>' +
+                '<div class="input-wrap">' +
+                    '<input type="text" id="commentInput_' + p.id + '" placeholder="Комментарий..." />' +
+                    '<button onclick="submitComment(\'' + p.id + '\')">→</button>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+    if (p.authorUid) {
+        const avatarEl = document.getElementById('post-avatar-' + p.id);
+        if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
+    }
+
+    loadComments(p.id);
+    return div;
+}
+
+window.submitPost = function() {
+    if (!USER) { alert('Сначала войдите!'); return; }
+    const text = document.getElementById('postInput').value.trim();
+    if (!text && !pendingImageFile) { alert('Введите текст или добавьте фото'); return; }
+
+    const postData = {
+        author: USER,
+        authorUid: USER_UID,
+        text: text || '📷 Фото',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now(),
+        likes: 0,
+        commentCount: 0,
+        repostCount: 0
+    };
+
+    if (pendingImageFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            postData.img = e.target.result;
+            db.ref('feed_posts').push(postData);
+            clearPostInputs();
+        };
+        reader.readAsDataURL(pendingImageFile);
+    } else {
+        db.ref('feed_posts').push(postData);
+        clearPostInputs();
+    }
+};
+
+function clearPostInputs() {
+    document.getElementById('postInput').value = '';
+    pendingImage = null;
+    pendingImageFile = null;
+    document.getElementById('previewBox').classList.remove('visible');
+    document.getElementById('fileInput').value = '';
+}
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('Только изображения!'); this.value = ''; return; }
+    if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); this.value = ''; return; }
+    
+    pendingImageFile = file;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        pendingImage = ev.target.result;
+        document.getElementById('previewImg').src = pendingImage;
+        document.getElementById('previewName').textContent = file.name.slice(0, 18);
+        document.getElementById('previewBox').classList.add('visible');
+    };
+    reader.readAsDataURL(file);
+});
+
+window.removeImage = function() {
+    pendingImage = null;
+    pendingImageFile = null;
+    document.getElementById('previewBox').classList.remove('visible');
+    document.getElementById('fileInput').value = '';
+};
+
+window.deletePost = function(id) {
+    if (!IS_ADMIN || !confirm('Удалить пост?')) return;
+    db.ref('feed_posts/' + id).remove();
+    db.ref('comments/' + id).remove();
+};
+
+// ================================================================
+// ЛАЙКИ
+// ================================================================
+window.toggleLike = function(postId) {
+    if (!USER) { alert('Войдите!'); return; }
+    const key = 'lk_' + postId + '_' + USER_UID;
+    const liked = localStorage.getItem(key) === '1';
+    
+    const ref = db.ref('feed_posts/' + postId + '/likes');
+    if (liked) {
+        ref.transaction(function(v) { return Math.max(0, (v || 0) - 1); });
+        localStorage.removeItem(key);
+    } else {
+        ref.transaction(function(v) { return (v || 0) + 1; });
+        localStorage.setItem(key, '1');
+        db.ref('feed_posts/' + postId).once('value', function(snap) {
+            const p = snap.val();
+            if (p && p.authorUid && p.authorUid !== USER_UID) {
+                addNotification(p.authorUid, 'like', USER);
             }
         });
     }
+};
 
-    // ================================================================
-    // UI
-    // ================================================================
-    function updateUI() {
-        const topAvatar = document.getElementById('topAvatar');
-        const sAvatar = document.getElementById('sAvatar');
-        const name = document.getElementById('topName');
-        const sName = document.getElementById('sName');
-        const dot = document.getElementById('adminDot');
-
-        if (USER) {
-            name.textContent = USER;
-            sName.textContent = USER;
-            renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-            renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-            if (IS_ADMIN) dot.classList.add('active');
-            else dot.classList.remove('active');
-        } else {
-            topAvatar.innerHTML = `<span class="letter">?</span>`;
-            sAvatar.innerHTML = `<span class="letter">?</span>`;
-            name.textContent = 'Гость';
-            sName.textContent = 'Гость';
-            dot.classList.remove('active');
-        }
+// ================================================================
+// РЕПОСТЫ
+// ================================================================
+window.repostPost = function(postId) {
+    if (!USER) { alert('Войдите!'); return; }
+    const key = 'rp_' + postId + '_' + USER_UID;
+    if (localStorage.getItem(key) === '1') {
+        alert('Вы уже репостнули этот пост');
+        return;
     }
-
-    // ================================================================
-    // НАСТРОЙКИ
-    // ================================================================
-    window.openSettings = function() {
-        document.getElementById('settingsModal').classList.add('open');
-    };
-    window.closeSettings = function() {
-        document.getElementById('settingsModal').classList.remove('open');
-    };
-
-    // ================================================================
-    // САЙДБАР
-    // ================================================================
-    window.toggleSidebar = function() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('overlay').classList.toggle('show');
-    };
-    window.closeSidebar = function() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-    };
-
-    // ================================================================
-    // НАВИГАЦИЯ
-    // ================================================================
-    function setActivePage(pageId) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        if (pageId) document.getElementById(pageId).classList.add('active');
+    
+    db.ref('feed_posts/' + postId).once('value', function(snap) {
+        const p = snap.val();
+        if (!p) return;
         
-        document.querySelectorAll('.hor-menu button').forEach(el => el.classList.remove('active'));
-        if (pageId === 'feedPage') document.getElementById('hFeed').classList.add('active');
-        else if (pageId === 'groupsPage') document.getElementById('hGroups').classList.add('active');
-        else if (pageId === 'peoplePage') document.getElementById('hPeople').classList.add('active');
-        else if (pageId === 'profilePage') document.getElementById('hProfile').classList.add('active');
-    }
-
-    window.goToFeed = function() {
-        if (!USER) { alert('Войдите!'); return; }
-        setActivePage('feedPage');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        loadFeed();
-    };
-
-    window.goToGroups = function() {
-        if (!USER) { alert('Войдите!'); return; }
-        setActivePage('groupsPage');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        loadGroups();
-    };
-
-    window.goToPeople = function() {
-        if (!USER) { alert('Войдите!'); return; }
-        setActivePage('peoplePage');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        loadPeople();
-    };
-
-    window.goToProfile = function() {
-        if (!USER) { alert('Войдите!'); return; }
-        VIEWING_USER = null;
-        setActivePage('profilePage');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        loadProfile();
-    };
-
-    // ================================================================
-    // ПОДПИСКИ
-    // ================================================================
-    function getSubscriptions(callback) {
-        if (!USER_UID) { callback([]); return; }
-        get(ref(db, 'subscriptions/' + USER_UID)).then(snap => {
-            const data = snap.val() || {};
-            callback(Object.keys(data));
-        });
-    }
-
-    // ================================================================
-    // ЛЕНТА
-    // ================================================================
-    function loadFeed() {
-        if (!USER_UID) {
-            document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;font-size:0.85rem;">Войдите, чтобы видеть ленту</div>';
-            return;
-        }
-        
-        getSubscriptions(subscriptions => {
-            if (!subscriptions.includes(USER_UID)) subscriptions.push(USER_UID);
-            
-            const postsRef = ref(db, 'feed_posts');
-            const postsQuery = query(postsRef, orderByChild('timestamp'));
-            onValue(postsQuery, snap => {
-                const feed = document.getElementById('feed');
-                feed.innerHTML = '';
-                const data = snap.val() || {};
-                const keys = Object.keys(data)
-                    .filter(k => subscriptions.includes(data[k].authorUid))
-                    .sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
-                
-                if (!keys.length) {
-                    feed.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;font-size:0.85rem;">Нет постов от ваших подписок</div>';
-                    return;
-                }
-                
-                keys.forEach(k => { const p = data[k]; p.id = k; feed.appendChild(renderPost(p)); });
-            });
-        });
-    }
-
-    // ================================================================
-    // ПОСТЫ
-    // ================================================================
-    function renderPost(p) {
-        const div = document.createElement('div');
-        div.className = 'post';
-        div.dataset.id = p.id;
-
-        const isLiked = localStorage.getItem('lk_' + p.id + '_' + USER_UID) === '1';
-        const letter = (p.author || '?').charAt(0).toUpperCase();
-        const avatarHtml = `<span class="avatar-wrap" id="post-avatar-${p.id}"><span class="letter">${letter}</span></span>`;
-
-        let imgHtml = '';
-        if (p.img) {
-            imgHtml = `<img src="${p.img}" onclick="window.open(this.src)">`;
-        }
-
-        div.innerHTML = `
-            <div class="author">
-                ${avatarHtml}
-                <span class="name" onclick="viewUserProfile('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
-                <span class="time">${p.time || ''}</span>
-                ${IS_ADMIN ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.55rem;">🗑</button>` : ''}
-            </div>
-            <div class="text">${esc(p.text || '')}</div>
-            ${imgHtml}
-            <div class="stats">
-                <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">
-                    👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
-                </button>
-                <button onclick="toggleComments('${p.id}')">
-                    💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
-                </button>
-                <button onclick="repostPost('${p.id}')">
-                    🔁 <span id="repostCount_${p.id}">${p.repostCount || 0}</span>
-                </button>
-            </div>
-            <div class="comments" id="comments_${p.id}">
-                <button class="toggle" onclick="toggleComments('${p.id}')">💬 Показать</button>
-                <div class="list" id="commentsList_${p.id}">
-                    <div id="commentsContainer_${p.id}"></div>
-                    <div class="input-wrap">
-                        <input type="text" id="commentInput_${p.id}" placeholder="Комментарий..." />
-                        <button onclick="submitComment('${p.id}')">→</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        if (p.authorUid) {
-            const avatarEl = document.getElementById('post-avatar-' + p.id);
-            if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
-        }
-
-        loadComments(p.id);
-        return div;
-    }
-
-    window.submitPost = function() {
-        if (!USER) { alert('Сначала войдите!'); return; }
-        const text = document.getElementById('postInput').value.trim();
-        if (!text && !pendingImageFile) { alert('Введите текст или добавьте фото'); return; }
-
-        const postData = {
+        db.ref('feed_posts').push({
             author: USER,
             authorUid: USER_UID,
-            text: text || '📷 Фото',
+            text: p.text || '',
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             timestamp: Date.now(),
             likes: 0,
             commentCount: 0,
-            repostCount: 0
-        };
-
-        if (pendingImageFile) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                postData.img = e.target.result;
-                push(ref(db, 'feed_posts'), postData);
-                clearPostInputs();
-            };
-            reader.readAsDataURL(pendingImageFile);
-        } else {
-            push(ref(db, 'feed_posts'), postData);
-            clearPostInputs();
-        }
-    };
-
-    function clearPostInputs() {
-        document.getElementById('postInput').value = '';
-        pendingImage = null;
-        pendingImageFile = null;
-        document.getElementById('previewBox').classList.remove('visible');
-        document.getElementById('fileInput').value = '';
-    }
-
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (!file.type.startsWith('image/')) { alert('Только изображения!'); this.value = ''; return; }
-        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); this.value = ''; return; }
+            repostCount: 0,
+            repostFrom: p.author || 'Аноним',
+            originalId: postId,
+            img: p.img || null
+        });
         
-        pendingImageFile = file;
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            pendingImage = ev.target.result;
-            document.getElementById('previewImg').src = pendingImage;
-            document.getElementById('previewName').textContent = file.name.slice(0, 18);
-            document.getElementById('previewBox').classList.add('visible');
-        };
-        reader.readAsDataURL(file);
+        db.ref('feed_posts/' + postId + '/repostCount').transaction(function(v) { return (v || 0) + 1; });
+        localStorage.setItem(key, '1');
+        alert('✅ Пост репостнут!');
     });
+};
 
-    window.removeImage = function() {
-        pendingImage = null;
-        pendingImageFile = null;
-        document.getElementById('previewBox').classList.remove('visible');
-        document.getElementById('fileInput').value = '';
-    };
-
-    window.deletePost = function(id) {
-        if (!IS_ADMIN || !confirm('Удалить пост?')) return;
-        remove(ref(db, 'feed_posts/' + id));
-        remove(ref(db, 'comments/' + id));
-    };
-
-    // ================================================================
-    // ЛАЙКИ
-    // ================================================================
-    window.toggleLike = function(postId) {
-        if (!USER) { alert('Войдите!'); return; }
-        const key = 'lk_' + postId + '_' + USER_UID;
-        const liked = localStorage.getItem(key) === '1';
+// ================================================================
+// КОММЕНТАРИИ
+// ================================================================
+function loadComments(postId) {
+    db.ref('comments/' + postId).orderByChild('timestamp').on('value', function(snap) {
+        const container = document.getElementById('commentsContainer_' + postId);
+        if (!container) return;
+        container.innerHTML = '';
+        const data = snap.val() || {};
+        const keys = Object.keys(data).sort(function(a, b) { return (data[a].timestamp || 0) - (data[b].timestamp || 0); });
         
-        const postRef = ref(db, 'feed_posts/' + postId + '/likes');
-        get(postRef).then(snap => {
-            const current = snap.val() || 0;
-            if (liked) {
-                set(postRef, Math.max(0, current - 1));
-                localStorage.removeItem(key);
-            } else {
-                set(postRef, current + 1);
-                localStorage.setItem(key, '1');
-                get(ref(db, 'feed_posts/' + postId)).then(s => {
-                    const p = s.val();
-                    if (p && p.authorUid && p.authorUid !== USER_UID) {
-                        addNotification(p.authorUid, 'like', USER);
-                    }
-                });
-            }
-        });
-    };
+        const count = keys.length;
+        const countEl = document.getElementById('commentCount_' + postId);
+        if (countEl) countEl.textContent = count;
+        db.ref('feed_posts/' + postId + '/commentCount').set(count);
 
-    // ================================================================
-    // РЕПОСТЫ
-    // ================================================================
-    window.repostPost = function(postId) {
-        if (!USER) { alert('Войдите!'); return; }
-        const key = 'rp_' + postId + '_' + USER_UID;
-        if (localStorage.getItem(key) === '1') {
-            alert('Вы уже репостнули этот пост');
+        if (!keys.length) {
+            container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;padding:4px 0;">Нет комментариев</div>';
             return;
         }
-        
-        get(ref(db, 'feed_posts/' + postId)).then(snap => {
-            const p = snap.val();
-            if (!p) return;
-            
-            push(ref(db, 'feed_posts'), {
-                author: USER,
-                authorUid: USER_UID,
-                text: p.text || '',
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now(),
-                likes: 0,
-                commentCount: 0,
-                repostCount: 0,
-                repostFrom: p.author || 'Аноним',
-                originalId: postId,
-                img: p.img || null
-            });
-            
-            const repostRef = ref(db, 'feed_posts/' + postId + '/repostCount');
-            get(repostRef).then(s => set(repostRef, (s.val() || 0) + 1));
-            localStorage.setItem(key, '1');
-            alert('✅ Пост репостнут!');
-        });
-    };
 
-    // ================================================================
-    // КОММЕНТАРИИ
-    // ================================================================
-    function loadComments(postId) {
-        const commentsRef = ref(db, 'comments/' + postId);
-        const commentsQuery = query(commentsRef, orderByChild('timestamp'));
-        onValue(commentsQuery, snap => {
-            const container = document.getElementById('commentsContainer_' + postId);
-            if (!container) return;
-            container.innerHTML = '';
-            const data = snap.val() || {};
-            const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
-            
-            const count = keys.length;
-            const countEl = document.getElementById('commentCount_' + postId);
-            if (countEl) countEl.textContent = count;
-            set(ref(db, 'feed_posts/' + postId + '/commentCount'), count);
-
-            if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;padding:4px 0;">Нет комментариев</div>';
-                return;
+        keys.forEach(function(k) {
+            const c = data[k];
+            const div = document.createElement('div');
+            div.className = 'comment';
+            const letter = (c.author || '?').charAt(0).toUpperCase();
+            div.innerHTML = 
+                '<span class="avatar-wrap" id="comment-avatar-' + k + '"><span class="letter">' + letter + '</span></span>' +
+                '<div class="body">' +
+                    '<span class="name">' + esc(c.author || 'Аноним') + '</span>' +
+                    '<span class="time">' + (c.time || '') + '</span>' +
+                    '<div>' + esc(c.text || '') + '</div>' +
+                '</div>' +
+                ((c.author === USER || IS_ADMIN) ? '<button onclick="deleteComment(\'' + postId + '\',\'' + k + '\')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.55rem;">✕</button>' : '');
+            container.appendChild(div);
+            if (c.authorUid) {
+                const avatarEl = document.getElementById('comment-avatar-' + k);
+                if (avatarEl) renderAvatar(c.authorUid, avatarEl, letter);
             }
-
-            keys.forEach(k => {
-                const c = data[k];
-                const div = document.createElement('div');
-                div.className = 'comment';
-                const letter = (c.author || '?').charAt(0).toUpperCase();
-                div.innerHTML = `
-                    <span class="avatar-wrap" id="comment-avatar-${k}"><span class="letter">${letter}</span></span>
-                    <div class="body">
-                        <span class="name">${esc(c.author || 'Аноним')}</span>
-                        <span class="time">${c.time || ''}</span>
-                        <div>${esc(c.text || '')}</div>
-                    </div>
-                    ${(c.author === USER || IS_ADMIN) ? `<button onclick="deleteComment('${postId}','${k}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.55rem;">✕</button>` : ''}
-                `;
-                container.appendChild(div);
-                if (c.authorUid) {
-                    const avatarEl = document.getElementById('comment-avatar-' + k);
-                    if (avatarEl) renderAvatar(c.authorUid, avatarEl, letter);
-                }
-            });
         });
-    }
+    });
+}
 
-    window.toggleComments = function(postId) {
+window.toggleComments = function(postId) {
+    const list = document.getElementById('commentsList_' + postId);
+    const toggle = document.querySelector('#comments_' + postId + ' .toggle');
+    if (list) {
+        list.classList.toggle('open');
+        if (toggle) {
+            toggle.textContent = list.classList.contains('open') ? '▲ Скрыть' : '💬 Показать';
+        }
+    }
+};
+
+window.submitComment = function(postId) {
+    if (!USER) { alert('Войдите!'); return; }
+    const input = document.getElementById('commentInput_' + postId);
+    const text = input.value.trim();
+    if (!text) return;
+
+    db.ref('comments/' + postId).push({
+        author: USER,
+        authorUid: USER_UID,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+    }).then(function() {
+        input.value = '';
         const list = document.getElementById('commentsList_' + postId);
-        const toggle = document.querySelector(`#comments_${postId} .toggle`);
-        if (list) {
-            list.classList.toggle('open');
-            if (toggle) {
-                toggle.textContent = list.classList.contains('open') ? '▲ Скрыть' : '💬 Показать';
+        if (list) list.classList.add('open');
+        const toggle = document.querySelector('#comments_' + postId + ' .toggle');
+        if (toggle) toggle.textContent = '▲ Скрыть';
+        db.ref('feed_posts/' + postId).once('value', function(snap) {
+            const p = snap.val();
+            if (p && p.authorUid && p.authorUid !== USER_UID) {
+                addNotification(p.authorUid, 'comment', USER);
             }
-        }
-    };
-
-    window.submitComment = function(postId) {
-        if (!USER) { alert('Войдите!'); return; }
-        const input = document.getElementById('commentInput_' + postId);
-        const text = input.value.trim();
-        if (!text) return;
-
-        push(ref(db, 'comments/' + postId), {
-            author: USER,
-            authorUid: USER_UID,
-            text: text,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: Date.now()
-        }).then(() => {
-            input.value = '';
-            const list = document.getElementById('commentsList_' + postId);
-            if (list) list.classList.add('open');
-            const toggle = document.querySelector(`#comments_${postId} .toggle`);
-            if (toggle) toggle.textContent = '▲ Скрыть';
-            get(ref(db, 'feed_posts/' + postId)).then(snap => {
-                const p = snap.val();
-                if (p && p.authorUid && p.authorUid !== USER_UID) {
-                    addNotification(p.authorUid, 'comment', USER);
-                }
-            });
         });
-    };
+    });
+};
 
-    window.deleteComment = function(postId, commentId) {
-        if (!confirm('Удалить комментарий?')) return;
-        remove(ref(db, 'comments/' + postId + '/' + commentId));
-    };
+window.deleteComment = function(postId, commentId) {
+    if (!confirm('Удалить комментарий?')) return;
+    db.ref('comments/' + postId + '/' + commentId).remove();
+};
 
-    // ================================================================
-    // ПРОФИЛЬ
-    // ================================================================
-    function loadProfile() {
-        const uid = VIEWING_USER || USER_UID;
-        if (!uid) return;
+// ================================================================
+// ПРОФИЛЬ
+// ================================================================
+function loadProfile() {
+    const uid = VIEWING_USER || USER_UID;
+    if (!uid) return;
+    
+    db.ref('users/' + uid).once('value', function(snap) {
+        const u = snap.val() || {};
+        const name = u.name || 'Аноним';
+        const bio = u.bio || '';
+        document.getElementById('profileName').textContent = name;
+        document.getElementById('profileBio').textContent = bio;
         
-        get(ref(db, 'users/' + uid)).then(snap => {
-            const u = snap.val() || {};
-            const name = u.name || 'Аноним';
-            const bio = u.bio || '';
-            document.getElementById('profileName').textContent = name;
-            document.getElementById('profileBio').textContent = bio;
-            
-            const avatar = document.getElementById('profileAvatar');
-            renderAvatar(uid, avatar, name.charAt(0).toUpperCase());
-            
-            showProfileActions(uid);
-            loadProfilePosts(uid);
-            loadFriends(uid);
-            loadSubscribers(uid);
-            loadSubscriptions(uid);
-            loadPages(uid);
-        });
+        const avatar = document.getElementById('profileAvatar');
+        renderAvatar(uid, avatar, name.charAt(0).toUpperCase());
+        
+        showProfileActions(uid);
+        loadProfilePosts(uid);
+        loadFriends(uid);
+        loadSubscribers(uid);
+        loadSubscriptions(uid);
+        loadPages(uid);
+    });
+}
+
+function showProfileActions(uid) {
+    const actions = document.getElementById('profileActions');
+    if (!uid || uid === USER_UID) {
+        actions.innerHTML = 
+            '<button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>' +
+            '<button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>' +
+            '<button class="avatar-btn" onclick="removeAvatar()" style="background:#e74c3c;color:#fff;">🗑 Удалить</button>';
+        return;
     }
-
-    function showProfileActions(uid) {
-        const actions = document.getElementById('profileActions');
-        if (!uid || uid === USER_UID) {
-            actions.innerHTML = `
-                <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
-                <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
-                <button class="avatar-btn" onclick="removeAvatar()" style="background:#e74c3c;color:#fff;">🗑 Удалить</button>
-            `;
-            return;
-        }
-        
-        const isFriend = checkFriend(uid);
-        const hasRequest = checkFriendRequest(uid);
-        const isSubscribed = checkSubscription(uid);
-        
-        let friendBtnText = '➕ Добавить в друзья';
-        let friendBtnClass = '';
-        if (hasRequest === 'sent') {
-            friendBtnText = '⏳ Отозвать запрос';
-            friendBtnClass = 'added';
-        } else if (hasRequest === 'received') {
-            friendBtnText = '✅ Принять / ❌ Отклонить';
-            friendBtnClass = 'added';
-        } else if (isFriend) {
-            friendBtnText = '🤝 В друзьях (удалить)';
-            friendBtnClass = 'added';
-        }
-        
-        actions.innerHTML = `
-            <button class="msg-btn" onclick="openDM('${uid}')">✉️</button>
-            <button class="friend-btn ${friendBtnClass}" onclick="toggleFriend('${uid}')">${friendBtnText}</button>
-            <button class="friend-btn ${isSubscribed ? 'added' : ''}" onclick="toggleSubscription('${uid}')">
-                ${isSubscribed ? '✅ Отписаться' : '➕ Подписаться'}
-            </button>
-        `;
+    
+    const isFriend = checkFriend(uid);
+    const hasRequest = checkFriendRequest(uid);
+    const isSubscribed = checkSubscription(uid);
+    
+    let friendBtnText = '➕ Добавить в друзья';
+    let friendBtnClass = '';
+    if (hasRequest === 'sent') {
+        friendBtnText = '⏳ Отозвать запрос';
+        friendBtnClass = 'added';
+    } else if (hasRequest === 'received') {
+        friendBtnText = '✅ Принять / ❌ Отклонить';
+        friendBtnClass = 'added';
+    } else if (isFriend) {
+        friendBtnText = '🤝 В друзьях (удалить)';
+        friendBtnClass = 'added';
     }
+    
+    actions.innerHTML = 
+        '<button class="msg-btn" onclick="openDM(\'' + uid + '\')">✉️</button>' +
+        '<button class="friend-btn ' + friendBtnClass + '" onclick="toggleFriend(\'' + uid + '\')">' + friendBtnText + '</button>' +
+        '<button class="friend-btn ' + (isSubscribed ? 'added' : '') + '" onclick="toggleSubscription(\'' + uid + '\')">' +
+            (isSubscribed ? '✅ Отписаться' : '➕ Подписаться') +
+        '</button>';
+}
 
-    // ================================================================
-    // ДРУЗЬЯ
-    // ================================================================
-    function checkFriend(uid) {
-        if (!USER_UID) return false;
-        return localStorage.getItem('fr_' + USER_UID + '_' + uid) === '1';
-    }
+// ================================================================
+// ДРУЗЬЯ
+// ================================================================
+function checkFriend(uid) {
+    if (!USER_UID) return false;
+    return localStorage.getItem('fr_' + USER_UID + '_' + uid) === '1';
+}
 
-    function checkFriendRequest(uid) {
-        if (!USER_UID) return false;
-        if (localStorage.getItem('fr_sent_' + USER_UID + '_' + uid) === '1') return 'sent';
-        if (localStorage.getItem('fr_recv_' + USER_UID + '_' + uid) === '1') return 'received';
-        return false;
-    }
+function checkFriendRequest(uid) {
+    if (!USER_UID) return false;
+    if (localStorage.getItem('fr_sent_' + USER_UID + '_' + uid) === '1') return 'sent';
+    if (localStorage.getItem('fr_recv_' + USER_UID + '_' + uid) === '1') return 'received';
+    return false;
+}
 
-    function checkSubscription(uid) {
-        if (!USER_UID) return false;
-        return localStorage.getItem('sub_' + USER_UID + '_' + uid) === '1';
-    }
+function checkSubscription(uid) {
+    if (!USER_UID) return false;
+    return localStorage.getItem('sub_' + USER_UID + '_' + uid) === '1';
+}
 
-    window.toggleFriend = function(uid) {
-        if (!USER_UID || !uid || uid === USER_UID) return;
-        
-        const isFriend = checkFriend(uid);
-        const hasRequest = checkFriendRequest(uid);
-        
-        if (isFriend) {
-            if (!confirm('Удалить из друзей?')) return;
-            localStorage.removeItem('fr_' + USER_UID + '_' + uid);
-            localStorage.removeItem('fr_' + uid + '_' + USER_UID);
-            remove(ref(db, 'friends/' + USER_UID + '/' + uid));
-            remove(ref(db, 'friends/' + uid + '/' + USER_UID));
-            loadFriends(VIEWING_USER || USER_UID);
-            if (VIEWING_USER) showProfileActions(VIEWING_USER);
-            return;
-        }
-        
-        if (hasRequest === 'received') {
-            const action = confirm('🤝 Пользователь хочет добавить вас в друзья.\nНажмите "ОК" чтобы принять, "Отмена" чтобы отклонить.');
-            if (action) {
-                localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
-                localStorage.setItem('fr_' + uid + '_' + USER_UID, '1');
-                set(ref(db, 'friends/' + USER_UID + '/' + uid), true);
-                set(ref(db, 'friends/' + uid + '/' + USER_UID), true);
-                localStorage.removeItem('fr_recv_' + USER_UID + '_' + uid);
-                localStorage.removeItem('fr_sent_' + uid + '_' + USER_UID);
-                remove(ref(db, 'friend_requests/' + USER_UID + '/' + uid));
-                remove(ref(db, 'friend_requests/' + uid + '/' + USER_UID));
-                addNotification(uid, 'friend_approved', USER);
-            } else {
-                localStorage.removeItem('fr_recv_' + USER_UID + '_' + uid);
-                localStorage.removeItem('fr_sent_' + uid + '_' + USER_UID);
-                remove(ref(db, 'friend_requests/' + USER_UID + '/' + uid));
-                remove(ref(db, 'friend_requests/' + uid + '/' + USER_UID));
-                localStorage.setItem('sub_' + uid + '_' + USER_UID, '1');
-                set(ref(db, 'subscriptions/' + uid + '/' + USER_UID), true);
-                set(ref(db, 'subscribers/' + USER_UID + '/' + uid), true);
-                alert('✅ Запрос отклонён. Пользователь подписан на вас.');
-            }
-            loadFriends(VIEWING_USER || USER_UID);
-            loadSubscribers(VIEWING_USER || USER_UID);
-            loadSubscriptions(VIEWING_USER || USER_UID);
-            if (VIEWING_USER) showProfileActions(VIEWING_USER);
-            return;
-        }
-        
-        if (hasRequest === 'sent') {
-            if (!confirm('Отозвать запрос в друзья? Вы также отпишетесь от этого пользователя.')) return;
-            localStorage.removeItem('fr_sent_' + USER_UID + '_' + uid);
-            localStorage.removeItem('fr_recv_' + uid + '_' + USER_UID);
-            remove(ref(db, 'friend_requests/' + uid + '/' + USER_UID));
-            localStorage.removeItem('sub_' + USER_UID + '_' + uid);
-            remove(ref(db, 'subscriptions/' + USER_UID + '/' + uid));
-            remove(ref(db, 'subscribers/' + uid + '/' + USER_UID));
-            alert('✅ Запрос отозван, вы отписались от пользователя.');
-            if (VIEWING_USER) showProfileActions(VIEWING_USER);
-            loadSubscriptions(USER_UID);
-            loadFeed();
-            return;
-        }
-        
-        localStorage.setItem('fr_sent_' + USER_UID + '_' + uid, '1');
-        localStorage.setItem('fr_recv_' + uid + '_' + USER_UID, '1');
-        set(ref(db, 'friend_requests/' + uid + '/' + USER_UID), {
-            from: USER,
-            fromUid: USER_UID,
-            timestamp: Date.now()
-        });
-        localStorage.setItem('sub_' + USER_UID + '_' + uid, '1');
-        set(ref(db, 'subscriptions/' + USER_UID + '/' + uid), true);
-        set(ref(db, 'subscribers/' + uid + '/' + USER_UID), true);
-        addNotification(uid, 'friend_request', USER);
+window.toggleFriend = function(uid) {
+    if (!USER_UID || !uid || uid === USER_UID) return;
+    
+    const isFriend = checkFriend(uid);
+    const hasRequest = checkFriendRequest(uid);
+    
+    if (isFriend) {
+        if (!confirm('Удалить из друзей?')) return;
+        localStorage.removeItem('fr_' + USER_UID + '_' + uid);
+        localStorage.removeItem('fr_' + uid + '_' + USER_UID);
+        db.ref('friends/' + USER_UID + '/' + uid).remove();
+        db.ref('friends/' + uid + '/' + USER_UID).remove();
+        loadFriends(VIEWING_USER || USER_UID);
         if (VIEWING_USER) showProfileActions(VIEWING_USER);
-        loadFeed();
-    };
-
-    function loadFriends(uid) {
-        if (!uid) return;
-        const container = document.getElementById('friendList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
-        
-        get(ref(db, 'friends/' + uid)).then(snap => {
-            const data = snap.val() || {};
-            const keys = Object.keys(data);
-            document.getElementById('friendsCount').textContent = keys.length;
-            
-            if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет друзей</div>';
-                return;
-            }
-            
-            let html = '';
-            let loaded = 0;
-            keys.forEach(k => {
-                get(ref(db, 'users/' + k)).then(usnap => {
-                    const u = usnap.val() || {};
-                    const name = u.name || 'Аноним';
-                    const letter = name.charAt(0).toUpperCase();
-                    html += `<span class="friend-item" onclick="viewUserProfile('${k}')">
-                        <span class="avatar-wrap"><span class="letter">${letter}</span></span> ${esc(name)}
-                    </span>`;
-                    loaded++;
-                    if (loaded === keys.length) {
-                        container.innerHTML = html;
-                        keys.forEach(k2 => {
-                            const el = container.querySelector(`[onclick="viewUserProfile('${k2}')"] .avatar-wrap`);
-                            if (el) renderAvatar(k2, el, '?');
-                        });
-                    }
-                });
-            });
-        });
+        return;
     }
-
-    // ================================================================
-    // ПОДПИСКИ
-    // ================================================================
-    window.toggleSubscription = function(uid) {
-        if (!USER_UID || !uid || uid === USER_UID) return;
-        const key = 'sub_' + USER_UID + '_' + uid;
-        const isSub = localStorage.getItem(key) === '1';
-        
-        if (isSub) {
-            if (!confirm('Отписаться от пользователя?')) return;
-            localStorage.removeItem(key);
-            remove(ref(db, 'subscriptions/' + USER_UID + '/' + uid));
-            remove(ref(db, 'subscribers/' + uid + '/' + USER_UID));
-            loadFeed();
+    
+    if (hasRequest === 'received') {
+        const action = confirm('🤝 Пользователь хочет добавить вас в друзья.\nНажмите "ОК" чтобы принять, "Отмена" чтобы отклонить.');
+        if (action) {
+            localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
+            localStorage.setItem('fr_' + uid + '_' + USER_UID, '1');
+            db.ref('friends/' + USER_UID + '/' + uid).set(true);
+            db.ref('friends/' + uid + '/' + USER_UID).set(true);
+            localStorage.removeItem('fr_recv_' + USER_UID + '_' + uid);
+            localStorage.removeItem('fr_sent_' + uid + '_' + USER_UID);
+            db.ref('friend_requests/' + USER_UID + '/' + uid).remove();
+            db.ref('friend_requests/' + uid + '/' + USER_UID).remove();
+            addNotification(uid, 'friend_approved', USER);
         } else {
-            localStorage.setItem(key, '1');
-            set(ref(db, 'subscriptions/' + USER_UID + '/' + uid), true);
-            set(ref(db, 'subscribers/' + uid + '/' + USER_UID), true);
-            addNotification(uid, 'subscribe', USER);
-            loadFeed();
+            localStorage.removeItem('fr_recv_' + USER_UID + '_' + uid);
+            localStorage.removeItem('fr_sent_' + uid + '_' + USER_UID);
+            db.ref('friend_requests/' + USER_UID + '/' + uid).remove();
+            db.ref('friend_requests/' + uid + '/' + USER_UID).remove();
+            localStorage.setItem('sub_' + uid + '_' + USER_UID, '1');
+            db.ref('subscriptions/' + uid + '/' + USER_UID).set(true);
+            db.ref('subscribers/' + USER_UID + '/' + uid).set(true);
+            alert('✅ Запрос отклонён. Пользователь подписан на вас.');
         }
+        loadFriends(VIEWING_USER || USER_UID);
         loadSubscribers(VIEWING_USER || USER_UID);
         loadSubscriptions(VIEWING_USER || USER_UID);
         if (VIEWING_USER) showProfileActions(VIEWING_USER);
-    };
-
-    function loadSubscribers(uid) {
-        if (!uid) return;
-        const container = document.getElementById('subscriberList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
-        
-        get(ref(db, 'subscribers/' + uid)).then(snap => {
-            const data = snap.val() || {};
-            const keys = Object.keys(data);
-            document.getElementById('subscribersCount').textContent = keys.length;
-            
-            if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет подписчиков</div>';
-                return;
-            }
-            
-            let html = '';
-            let loaded = 0;
-            keys.forEach(k => {
-                get(ref(db, 'users/' + k)).then(usnap => {
-                    const u = usnap.val() || {};
-                    const name = u.name || 'Аноним';
-                    const letter = name.charAt(0).toUpperCase();
-                    html += `<span class="friend-item" onclick="viewUserProfile('${k}')">
-                        <span class="avatar-wrap"><span class="letter">${letter}</span></span> ${esc(name)}
-                    </span>`;
-                    loaded++;
-                    if (loaded === keys.length) {
-                        container.innerHTML = html;
-                        keys.forEach(k2 => {
-                            const el = container.querySelector(`[onclick="viewUserProfile('${k2}')"] .avatar-wrap`);
-                            if (el) renderAvatar(k2, el, '?');
-                        });
-                    }
-                });
-            });
-        });
+        return;
     }
-
-    function loadSubscriptions(uid) {
-        if (!uid) return;
-        const container = document.getElementById('subscriptionList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
-        
-        get(ref(db, 'subscriptions/' + uid)).then(snap => {
-            const data = snap.val() || {};
-            const keys = Object.keys(data);
-            document.getElementById('subscriptionsCount').textContent = keys.length;
-            
-            if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет подписок</div>';
-                return;
-            }
-            
-            let html = '';
-            let loaded = 0;
-            keys.forEach(k => {
-                get(ref(db, 'users/' + k)).then(usnap => {
-                    const u = usnap.val() || {};
-                    const name = u.name || 'Аноним';
-                    const letter = name.charAt(0).toUpperCase();
-                    html += `<span class="friend-item" onclick="viewUserProfile('${k}')">
-                        <span class="avatar-wrap"><span class="letter">${letter}</span></span> ${esc(name)}
-                    </span>`;
-                    loaded++;
-                    if (loaded === keys.length) {
-                        container.innerHTML = html;
-                        keys.forEach(k2 => {
-                            const el = container.querySelector(`[onclick="viewUserProfile('${k2}')"] .avatar-wrap`);
-                            if (el) renderAvatar(k2, el, '?');
-                        });
-                    }
-                });
-            });
-        });
-    }
-
-    // ================================================================
-    // СТАТИСТИКА
-    // ================================================================
-    window.toggleStat = function(type) {
-        document.getElementById('friendsSection').style.display = type === 'friends' ? 'block' : 'none';
-        document.getElementById('subscribersSection').style.display = type === 'subscribers' ? 'block' : 'none';
-        document.getElementById('subscriptionsSection').style.display = type === 'subscriptions' ? 'block' : 'none';
-    };
-
-    // ================================================================
-    // СТРАНИЦЫ
-    // ================================================================
-    function loadPages(uid) {
-        if (!uid) return;
-        const container = document.getElementById('pageList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
-        
-        onValue(ref(db, 'pages/' + uid), snap => {
-            const data = snap.val() || {};
-            const keys = Object.keys(data);
-            if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет страниц</div>';
-                return;
-            }
-            container.innerHTML = keys.map(k => {
-                const p = data[k];
-                return `<div class="page-item">
-                    <span><span class="name">${esc(p.name)}</span> <span class="sub">${esc(p.desc || '')}</span></span>
-                    ${uid === USER_UID ? `<button onclick="deletePage('${k}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;">🗑</button>` : ''}
-                </div>`;
-            }).join('');
-        });
-    }
-
-    window.openCreatePage = function() {
-        document.getElementById('createPageModal').classList.add('open');
-        document.getElementById('pageName').value = '';
-        document.getElementById('pageDesc').value = '';
-    };
-    window.closeCreatePage = function() {
-        document.getElementById('createPageModal').classList.remove('open');
-    };
-    window.createPage = function() {
-        const name = document.getElementById('pageName').value.trim();
-        const desc = document.getElementById('pageDesc').value.trim();
-        if (!name) { alert('Введите название'); return; }
-        push(ref(db, 'pages/' + USER_UID), { name, desc, createdAt: Date.now() });
-        closeCreatePage();
-        loadPages(USER_UID);
-    };
-    window.deletePage = function(id) {
-        if (!confirm('Удалить страницу?')) return;
-        remove(ref(db, 'pages/' + USER_UID + '/' + id));
-    };
-
-    // ================================================================
-    // РЕДАКТИРОВАНИЕ
-    // ================================================================
-    window.openEditProfile = function() {
-        document.getElementById('editName').value = USER || '';
-        document.getElementById('editBio').value = '';
-        document.getElementById('editProfileModal').classList.add('open');
-    };
-    window.closeEditProfile = function() {
-        document.getElementById('editProfileModal').classList.remove('open');
-    };
-    window.saveProfile = function() {
-        const name = document.getElementById('editName').value.trim();
-        const bio = document.getElementById('editBio').value.trim();
-        if (!name) { alert('Введите имя'); return; }
-        
-        USER = name;
-        localStorage.setItem('metaimperiya_user', USER);
-        if (USER_UID) {
-            update(ref(db, 'users/' + USER_UID), { name: USER, bio: bio });
-        }
-        updateUI();
-        closeEditProfile();
-        loadProfile();
+    
+    if (hasRequest === 'sent') {
+        if (!confirm('Отозвать запрос в друзья? Вы также отпишетесь от этого пользователя.')) return;
+        localStorage.removeItem('fr_sent_' + USER_UID + '_' + uid);
+        localStorage.removeItem('fr_recv_' + uid + '_' + USER_UID);
+        db.ref('friend_requests/' + uid + '/' + USER_UID).remove();
+        localStorage.removeItem('sub_' + USER_UID + '_' + uid);
+        db.ref('subscriptions/' + USER_UID + '/' + uid).remove();
+        db.ref('subscribers/' + uid + '/' + USER_UID).remove();
+        alert('✅ Запрос отозван, вы отписались от пользователя.');
+        if (VIEWING_USER) showProfileActions(VIEWING_USER);
+        loadSubscriptions(USER_UID);
         loadFeed();
-    };
+        return;
+    }
+    
+    localStorage.setItem('fr_sent_' + USER_UID + '_' + uid, '1');
+    localStorage.setItem('fr_recv_' + uid + '_' + USER_UID, '1');
+    db.ref('friend_requests/' + uid + '/' + USER_UID).set({
+        from: USER,
+        fromUid: USER_UID,
+        timestamp: Date.now()
+    });
+    localStorage.setItem('sub_' + USER_UID + '_' + uid, '1');
+    db.ref('subscriptions/' + USER_UID + '/' + uid).set(true);
+    db.ref('subscribers/' + uid + '/' + USER_UID).set(true);
+    addNotification(uid, 'friend_request', USER);
+    if (VIEWING_USER) showProfileActions(VIEWING_USER);
+    loadFeed();
+};
 
-    // ================================================================
-    // ПРОСМОТР ПРОФИЛЯ
-    // ================================================================
-    window.viewUserProfile = function(uid) {
-        if (!uid) return;
-        if (uid === USER_UID) {
-            goToProfile();
+function loadFriends(uid) {
+    if (!uid) return;
+    const container = document.getElementById('friendList');
+    container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
+    
+    db.ref('friends/' + uid).once('value', function(snap) {
+        const data = snap.val() || {};
+        const keys = Object.keys(data);
+        document.getElementById('friendsCount').textContent = keys.length;
+        
+        if (!keys.length) {
+            container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет друзей</div>';
             return;
         }
-        VIEWING_USER = uid;
-        setActivePage('profilePage');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        loadProfile();
-    };
-
-    // ================================================================
-    // УВЕДОМЛЕНИЯ
-    // ================================================================
-    function addNotification(targetUid, type, from) {
-        if (!targetUid || !USER_UID) return;
-        push(ref(db, 'notifications/' + targetUid), {
-            type: type,
-            from: from,
-            fromUid: USER_UID,
-            timestamp: Date.now(),
-            read: false
-        });
-    }
-
-    function loadNotifications() {
-        if (!USER_UID) return;
-        onValue(ref(db, 'notifications/' + USER_UID), snap => {
-            const data = snap.val() || {};
-            const keys = Object.keys(data);
-            let unread = 0;
-            keys.forEach(k => { if (!data[k].read) unread++; });
-            const badge = document.getElementById('notifBadge');
-            if (unread > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = unread;
-            } else {
-                badge.style.display = 'none';
-            }
-            
-            const list = document.getElementById('notifList');
-            if (!list) return;
-            const sorted = keys.sort((a,b) => (data[b].timestamp||0) - (data[a].timestamp||0));
-            if (!sorted.length) {
-                list.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.75rem;">Нет уведомлений</div>';
-                return;
-            }
-            list.innerHTML = sorted.map(k => {
-                const n = data[k];
-                let text = '';
-                if (n.type === 'friend_request') text = `🤝 ${esc(n.from)} хочет добавить вас в друзья`;
-                else if (n.type === 'friend_approved') text = `✅ ${esc(n.from)} одобрил ваш запрос!`;
-                else if (n.type === 'subscribe') text = `👀 ${esc(n.from)} подписался на вас`;
-                else if (n.type === 'like') text = `👍 ${esc(n.from)} поставил лайк`;
-                else if (n.type === 'comment') text = `💬 ${esc(n.from)} прокомментировал`;
-                else text = `📢 ${esc(n.from)} сделал что-то`;
-                return `<div style="padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:0.75rem;${n.read ? 'color:#888;' : 'font-weight:600;'}">
-                    ${text} <span style="color:#999;font-size:0.5rem;">${new Date(n.timestamp).toLocaleTimeString()}</span>
-                </div>`;
-            }).join('');
-        });
-    }
-
-    window.openNotifications = function() {
-        document.getElementById('notifModal').classList.add('open');
-        if (USER_UID) {
-            get(ref(db, 'notifications/' + USER_UID)).then(snap => {
-                const data = snap.val() || {};
-                Object.keys(data).forEach(k => {
-                    if (!data[k].read) {
-                        set(ref(db, 'notifications/' + USER_UID + '/' + k + '/read'), true);
-                    }
-                });
-            });
-        }
-    };
-    window.closeNotifications = function() {
-        document.getElementById('notifModal').classList.remove('open');
-    };
-
-    // ================================================================
-    // АДМИН
-    // ================================================================
-    window.openAdminLogin = function() {
-        document.getElementById('adminModal').classList.add('open');
-        document.getElementById('adminPass').value = '';
-    };
-    window.closeAdminModal = function() {
-        document.getElementById('adminModal').classList.remove('open');
-    };
-    window.checkAdmin = function() {
-        if (document.getElementById('adminPass').value.trim() === '12345') {
-            IS_ADMIN = true;
-            localStorage.setItem('metaimperiya_admin', '1');
-            document.getElementById('adminDot').classList.add('active');
-            closeAdminModal();
-            alert('🏴‍☠️ Админ-режим включён!');
-        } else {
-            alert('❌ Неверный пароль');
-        }
-    };
-
-    // ================================================================
-    // ГРУППЫ
-    // ================================================================
-    function loadGroups() {
-        const list = document.getElementById('groupList');
-        list.innerHTML = GROUPS.map(group => {
-            let count = 0;
-            get(ref(db, 'rooms/' + group.id + '/messages')).then(snap => {
-                const c = snap.numChildren ? snap.numChildren() : 0;
-                const el = document.querySelector(`#groupList .group-card[data-id="${group.id}"] .count`);
-                if (el) el.textContent = c;
-            });
-            onValue(ref(db, 'rooms/' + group.id + '/messages'), snap => {
-                const c = snap.numChildren ? snap.numChildren() : 0;
-                const el = document.querySelector(`#groupList .group-card[data-id="${group.id}"] .count`);
-                if (el) el.textContent = c;
-            });
-            
-            return `<div class="group-card" data-id="${group.id}" onclick="openGroup('${group.id}')">
-                <div class="icon">${group.name.split(' ')[0]}</div>
-                <div class="name">${group.name}</div>
-                <div class="count">💬 <span class="count">0</span></div>
-            </div>`;
-        }).join('');
-    }
-
-    window.openGroup = function(roomId) {
-        CURRENT_ROOM = roomId;
-        CURRENT_DM = null;
-        document.getElementById('chatView').classList.add('active');
-        setActivePage(null);
-        loadRoomChat(roomId);
-    };
-
-    window.openCreateRoom = function() {
-        document.getElementById('createRoomModal').classList.add('open');
-        document.getElementById('roomName').value = '';
-    };
-    window.closeCreateRoom = function() {
-        document.getElementById('createRoomModal').classList.remove('open');
-    };
-    window.doCreateRoom = function() {
-        const name = document.getElementById('roomName').value.trim();
-        if (!name || name.length < 2) { alert('Минимум 2 символа'); return; }
-        const newRoom = { id: 'room_' + Date.now(), name: name };
-        GROUPS.push(newRoom);
-        loadGroups();
-        closeCreateRoom();
-        alert('✅ Группа "' + name + '" создана!');
-    };
-
-    // ================================================================
-    // ЛЮДИ
-    // ================================================================
-    function loadPeople() {
-        if (!USER_UID) return;
-        const list = document.getElementById('peopleList');
-        list.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.75rem;">Загрузка...</div>';
         
-        get(ref(db, 'users')).then(snap => {
-            const users = snap.val() || {};
-            const keys = Object.keys(users).filter(k => k !== USER_UID);
-            
-            if (!keys.length) {
-                list.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.75rem;">Нет других пользователей</div>';
-                return;
-            }
-            
-            let html = '';
-            let loaded = 0;
-            keys.forEach(k => {
-                const u = users[k];
+        let html = '';
+        let loaded = 0;
+        keys.forEach(function(k) {
+            db.ref('users/' + k).once('value', function(usnap) {
+                const u = usnap.val() || {};
                 const name = u.name || 'Аноним';
                 const letter = name.charAt(0).toUpperCase();
-                html += `<div class="people-item" onclick="viewUserProfile('${k}')">
-                    <span class="avatar-wrap" id="people-avatar-${k}"><span class="letter">${letter}</span></span>
-                    <div class="info">
-                        <div class="name">${esc(name)}</div>
-                        <div class="status">Нажмите для просмотра</div>
-                    </div>
-                </div>`;
+                html += '<span class="friend-item" onclick="viewUserProfile(\'' + k + '\')">' +
+                    '<span class="avatar-wrap"><span class="letter">' + letter + '</span></span> ' + esc(name) +
+                '</span>';
                 loaded++;
                 if (loaded === keys.length) {
-                    list.innerHTML = html;
-                    keys.forEach(k2 => {
-                        const el = document.getElementById('people-avatar-' + k2);
+                    container.innerHTML = html;
+                    keys.forEach(function(k2) {
+                        const el = container.querySelector('[onclick="viewUserProfile(\'' + k2 + '\')"] .avatar-wrap');
                         if (el) renderAvatar(k2, el, '?');
                     });
                 }
             });
         });
+    });
+}
+
+// ================================================================
+// ПОДПИСКИ
+// ================================================================
+window.toggleSubscription = function(uid) {
+    if (!USER_UID || !uid || uid === USER_UID) return;
+    const key = 'sub_' + USER_UID + '_' + uid;
+    const isSub = localStorage.getItem(key) === '1';
+    
+    if (isSub) {
+        if (!confirm('Отписаться от пользователя?')) return;
+        localStorage.removeItem(key);
+        db.ref('subscriptions/' + USER_UID + '/' + uid).remove();
+        db.ref('subscribers/' + uid + '/' + USER_UID).remove();
+        loadFeed();
+    } else {
+        localStorage.setItem(key, '1');
+        db.ref('subscriptions/' + USER_UID + '/' + uid).set(true);
+        db.ref('subscribers/' + uid + '/' + USER_UID).set(true);
+        addNotification(uid, 'subscribe', USER);
+        loadFeed();
     }
+    loadSubscribers(VIEWING_USER || USER_UID);
+    loadSubscriptions(VIEWING_USER || USER_UID);
+    if (VIEWING_USER) showProfileActions(VIEWING_USER);
+};
 
-    // ================================================================
-    // ЛИЧКА
-    // ================================================================
-    function getDMId(uid1, uid2) {
-        return [uid1, uid2].sort().join('_');
-    }
-
-    window.openDM = function(userId) {
-        CURRENT_DM = userId;
-        CURRENT_ROOM = null;
-        document.getElementById('chatView').classList.add('active');
-        setActivePage(null);
-        loadDMChat(userId);
-    };
-
-    // ================================================================
-    // ЧАТ В ГРУППЕ
-    // ================================================================
-    function loadRoomChat(roomId) {
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        const box = document.getElementById('chatMessages');
-        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">⏳ Загрузка...</div>';
-        const path = 'rooms/' + roomId + '/messages';
-        chatUnsub = path;
-        onValue(ref(db, path), snap => {
-            box.innerHTML = '';
-            if (!snap.exists()) {
-                box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">Сообщений нет 👋</div>';
-                return;
-            }
-            snap.forEach(s => {
-                const m = s.val();
-                const div = document.createElement('div');
-                div.className = 'msg';
-                div.innerHTML = `
-                    <span class="author">${esc(m.nick || '?')}</span>
-                    <span class="time">${m.time || ''}</span>
-                    <div>${esc(m.text || '')}</div>
-                `;
-                box.appendChild(div);
-            });
-            box.scrollTop = box.scrollHeight;
-        });
-    }
-
-    // ================================================================
-    // ЧАТ В ЛИЧКЕ
-    // ================================================================
-    function loadDMChat(userId) {
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        const box = document.getElementById('chatMessages');
-        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">⏳ Загрузка...</div>';
-        const dmId = getDMId(USER_UID, userId);
-        const path = 'dms/' + dmId + '/messages';
-        chatUnsub = path;
-        onValue(ref(db, path), snap => {
-            box.innerHTML = '';
-            if (!snap.exists()) {
-                box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">Нет сообщений 👋</div>';
-                return;
-            }
-            snap.forEach(s => {
-                const m = s.val();
-                const div = document.createElement('div');
-                div.className = 'msg';
-                div.innerHTML = `
-                    <span class="author">${esc(m.nick || '?')}</span>
-                    <span class="time">${m.time || ''}</span>
-                    <div>${esc(m.text || '')}</div>
-                `;
-                box.appendChild(div);
-            });
-            box.scrollTop = box.scrollHeight;
-        });
-    }
-
-    // ================================================================
-    // ОТПРАВКА СООБЩЕНИЙ
-    // ================================================================
-    window.sendChat = function() {
-        const input = document.getElementById('chatInput');
-        const text = input.value.trim();
-        if (!text) return;
+function loadSubscribers(uid) {
+    if (!uid) return;
+    const container = document.getElementById('subscriberList');
+    container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
+    
+    db.ref('subscribers/' + uid).once('value', function(snap) {
+        const data = snap.val() || {};
+        const keys = Object.keys(data);
+        document.getElementById('subscribersCount').textContent = keys.length;
         
-        if (CURRENT_ROOM) {
-            push(ref(db, 'rooms/' + CURRENT_ROOM + '/messages'), {
-                nick: USER,
-                text: text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now()
+        if (!keys.length) {
+            container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет подписчиков</div>';
+            return;
+        }
+        
+        let html = '';
+        let loaded = 0;
+        keys.forEach(function(k) {
+            db.ref('users/' + k).once('value', function(usnap) {
+                const u = usnap.val() || {};
+                const name = u.name || 'Аноним';
+                const letter = name.charAt(0).toUpperCase();
+                html += '<span class="friend-item" onclick="viewUserProfile(\'' + k + '\')">' +
+                    '<span class="avatar-wrap"><span class="letter">' + letter + '</span></span> ' + esc(name) +
+                '</span>';
+                loaded++;
+                if (loaded === keys.length) {
+                    container.innerHTML = html;
+                    keys.forEach(function(k2) {
+                        const el = container.querySelector('[onclick="viewUserProfile(\'' + k2 + '\')"] .avatar-wrap');
+                        if (el) renderAvatar(k2, el, '?');
+                    });
+                }
             });
-            input.value = '';
-        } else if (CURRENT_DM) {
-            const dmId = getDMId(USER_UID, CURRENT_DM);
-            push(ref(db, 'dms/' + dmId + '/messages'), {
-                from: USER_UID,
-                nick: USER,
-                text: text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now()
+        });
+    });
+}
+
+function loadSubscriptions(uid) {
+    if (!uid) return;
+    const container = document.getElementById('subscriptionList');
+    container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
+    
+    db.ref('subscriptions/' + uid).once('value', function(snap) {
+        const data = snap.val() || {};
+        const keys = Object.keys(data);
+        document.getElementById('subscriptionsCount').textContent = keys.length;
+        
+        if (!keys.length) {
+            container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет подписок</div>';
+            return;
+        }
+        
+        let html = '';
+        let loaded = 0;
+        keys.forEach(function(k) {
+            db.ref('users/' + k).once('value', function(usnap) {
+                const u = usnap.val() || {};
+                const name = u.name || 'Аноним';
+                const letter = name.charAt(0).toUpperCase();
+                html += '<span class="friend-item" onclick="viewUserProfile(\'' + k + '\')">' +
+                    '<span class="avatar-wrap"><span class="letter">' + letter + '</span></span> ' + esc(name) +
+                '</span>';
+                loaded++;
+                if (loaded === keys.length) {
+                    container.innerHTML = html;
+                    keys.forEach(function(k2) {
+                        const el = container.querySelector('[onclick="viewUserProfile(\'' + k2 + '\')"] .avatar-wrap');
+                        if (el) renderAvatar(k2, el, '?');
+                    });
+                }
             });
-            input.value = '';
-        } else {
-            alert('Выберите чат');
-        }
-    };
-
-    document.getElementById('chatInput').addEventListener('keypress', e => {
-        if (e.key === 'Enter') sendChat();
+        });
     });
+}
 
-    window.closeChat = function() {
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { 
-            if (typeof chatUnsub === 'string') ref(db, chatUnsub).off('value');
-            chatUnsub = null; 
-        }
-        CURRENT_ROOM = null;
-        CURRENT_DM = null;
-        if (document.getElementById('groupsPage').classList.contains('active')) {
-            goToGroups();
-        } else if (document.getElementById('peoplePage').classList.contains('active')) {
-            goToPeople();
-        } else {
-            goToFeed();
-        }
-    };
+// ================================================================
+// СТАТИСТИКА
+// ================================================================
+window.toggleStat = function(type) {
+    document.getElementById('friendsSection').style.display = type === 'friends' ? 'block' : 'none';
+    document.getElementById('subscribersSection').style.display = type === 'subscribers' ? 'block' : 'none';
+    document.getElementById('subscriptionsSection').style.display = type === 'subscriptions' ? 'block' : 'none';
+};
 
-    // ================================================================
-    // УТИЛИТЫ
-    // ================================================================
-    const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
-
-    // ================================================================
-    // СИД
-    // ================================================================
-    get(ref(db, 'feed_posts')).then(snap => {
-        if (!snap.exists()) {
-            const posts = [
-                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в METAIMPERIYA!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 0, repostCount: 0 },
-                { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 0, repostCount: 0 }
-            ];
-            posts.forEach(p => push(ref(db, 'feed_posts'), p));
+// ================================================================
+// СТРАНИЦЫ
+// ================================================================
+function loadPages(uid) {
+    if (!uid) return;
+    const container = document.getElementById('pageList');
+    container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Загрузка...</div>';
+    
+    db.ref('pages/' + uid).on('value', function(snap) {
+        const data = snap.val() || {};
+        const keys = Object.keys(data);
+        if (!keys.length) {
+            container.innerHTML = '<div style="color:#bbb;font-size:0.7rem;">Нет страниц</div>';
+            return;
         }
+        container.innerHTML = keys.map(function(k) {
+            const p = data[k];
+            return '<div class="page-item">' +
+                '<span><span class="name">' + esc(p.name) + '</span> <span class="sub">' + esc(p.desc || '') + '</span></span>' +
+                (uid === USER_UID ? '<button onclick="deletePage(\'' + k + '\')" style="background:none;border:none;color:#e74c3c;cursor:pointer;">🗑</button>' : '') +
+            '</div>';
+        }).join('');
     });
+}
 
-    // ================================================================
-    // ЗАПУСК
-    // ================================================================
-    console.log('🏛️ METAIMPERIYA запущена! (БЕЛАЯ ТЕМА)');
-    console.log('🔑 Google вход с выбором аккаунта!');
-    console.log('🏴‍☠️ Админ-пароль: 12345');
-    console.log('📷 Аватарки работают (JPG, PNG, GIF)!');
+window.openCreatePage = function() {
+    document.getElementById('createPageModal').classList.add('open');
+    document.getElementById('pageName').value = '';
+    document.getElementById('pageDesc').value = '';
+};
+window.closeCreatePage = function() {
+    document.getElementById('createPageModal').classList.remove('open');
+};
+window.createPage = function() {
+    const name = document.getElementById('pageName').value.trim();
+    const desc = document.getElementById('pageDesc').value.trim();
+    if (!name) { alert('Введите название'); return; }
+    db.ref('pages/' + USER_UID).push({ name: name, desc: desc, createdAt: Date.now() });
+    closeCreatePage();
+    loadPages(USER_UID);
+};
+window.deletePage = function(id) {
+    if (!confirm('Удалить страницу?')) return;
+    db.ref('pages/' + USER_UID + '/' + id).remove();
+};
 
-    // Показываем модалку входа если нет пользователя
-    if (!USER) {
-        loginModal.classList.add('open');
+// ================================================================
+// РЕДАКТИРОВАНИЕ
+// ================================================================
+window.openEditProfile = function() {
+    document.getElementById('editName').value = USER || '';
+    document.getElementById('editBio').value = '';
+    document.getElementById('editProfileModal').classList.add('open');
+};
+window.closeEditProfile = function() {
+    document.getElementById('editProfileModal').classList.remove('open');
+};
+window.saveProfile = function() {
+    const name = document.getElementById('editName').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    if (!name) { alert('Введите имя'); return; }
+    
+    USER = name;
+    localStorage.setItem('metaimperiya_user', USER);
+    if (USER_UID) {
+        db.ref('users/' + USER_UID).update({ name: USER, bio: bio });
     }
+    updateUI();
+    closeEditProfile();
+    loadProfile();
+    loadFeed();
+};
 
-}).catch(err => {
-    console.error('Ошибка загрузки модулей:', err);
-    alert('Ошибка загрузки Firebase. Проверь консоль (F12)');
+// ================================================================
+// ПРОСМОТР ПРОФИЛЯ
+// ================================================================
+window.viewUserProfile = function(uid) {
+    if (!uid) return;
+    if (uid === USER_UID) {
+        goToProfile();
+        return;
+    }
+    VIEWING_USER = uid;
+    setActivePage('profilePage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    CURRENT_DM = null;
+    loadProfile();
+};
+
+// ================================================================
+// УВЕДОМЛЕНИЯ
+// ================================================================
+function addNotification(targetUid, type, from) {
+    if (!targetUid || !USER_UID) return;
+    db.ref('notifications/' + targetUid).push({
+        type: type,
+        from: from,
+        fromUid: USER_UID,
+        timestamp: Date.now(),
+        read: false
+    });
+}
+
+function loadNotifications() {
+    if (!USER_UID) return;
+    db.ref('notifications/' + USER_UID).on('value', function(snap) {
+        const data = snap.val() || {};
+        const keys = Object.keys(data);
+        let unread = 0;
+        keys.forEach(function(k) { if (!data[k].read) unread++; });
+        const badge = document.getElementById('notifBadge');
+        if (unread > 0) {
+            badge.style.display = 'inline';
+            badge.textContent = unread;
+        } else {
+            badge.style.display = 'none';
+        }
+        
+        const list = document.getElementById('notifList');
+        if (!list) return;
+        const sorted = keys.sort(function(a,b) { return (data[b].timestamp||0) - (data[a].timestamp||0); });
+        if (!sorted.length) {
+            list.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.75rem;">Нет уведомлений</div>';
+            return;
+        }
+        list.innerHTML = sorted.map(function(k) {
+            const n = data[k];
+            let text = '';
+            if (n.type === 'friend_request') text = '🤝 ' + esc(n.from) + ' хочет добавить вас в друзья';
+            else if (n.type === 'friend_approved') text = '✅ ' + esc(n.from) + ' одобрил ваш запрос!';
+            else if (n.type === 'subscribe') text = '👀 ' + esc(n.from) + ' подписался на вас';
+            else if (n.type === 'like') text = '👍 ' + esc(n.from) + ' поставил лайк';
+            else if (n.type === 'comment') text = '💬 ' + esc(n.from) + ' прокомментировал';
+            else text = '📢 ' + esc(n.from) + ' сделал что-то';
+            return '<div style="padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:0.75rem;' + (n.read ? 'color:#888;' : 'font-weight:600;') + '">' +
+                text + ' <span style="color:#999;font-size:0.5rem;">' + new Date(n.timestamp).toLocaleTimeString() + '</span>' +
+            '</div>';
+        }).join('');
+    });
+}
+
+window.openNotifications = function() {
+    document.getElementById('notifModal').classList.add('open');
+    if (USER_UID) {
+        db.ref('notifications/' + USER_UID).once('value', function(snap) {
+            const data = snap.val() || {};
+            Object.keys(data).forEach(function(k) {
+                if (!data[k].read) {
+                    db.ref('notifications/' + USER_UID + '/' + k + '/read').set(true);
+                }
+            });
+        });
+    }
+};
+window.closeNotifications = function() {
+    document.getElementById('notifModal').classList.remove('open');
+};
+
+// ================================================================
+// АДМИН
+// ================================================================
+window.openAdminLogin = function() {
+    document.getElementById('adminModal').classList.add('open');
+    document.getElementById('adminPass').value = '';
+};
+window.closeAdminModal = function() {
+    document.getElementById('adminModal').classList.remove('open');
+};
+window.checkAdmin = function() {
+    if (document.getElementById('adminPass').value.trim() === '12345') {
+        IS_ADMIN = true;
+        localStorage.setItem('metaimperiya_admin', '1');
+        document.getElementById('adminDot').classList.add('active');
+        closeAdminModal();
+        alert('🏴‍☠️ Админ-режим включён!');
+    } else {
+        alert('❌ Неверный пароль');
+    }
+};
+
+// ================================================================
+// ГРУППЫ
+// ================================================================
+function loadGroups() {
+    const list = document.getElementById('groupList');
+    list.innerHTML = GROUPS.map(function(group) {
+        let count = 0;
+        db.ref('rooms/' + group.id + '/messages').once('value', function(snap) {
+            const c = snap.numChildren();
+            const el = document.querySelector('#groupList .group-card[data-id="' + group.id + '"] .count');
+            if (el) el.textContent = c;
+        });
+        db.ref('rooms/' + group.id + '/messages').on('value', function(snap) {
+            const c = snap.numChildren();
+            const el = document.querySelector('#groupList .group-card[data-id="' + group.id + '"] .count');
+            if (el) el.textContent = c;
+        });
+        
+        return '<div class="group-card" data-id="' + group.id + '" onclick="openGroup(\'' + group.id + '\')">' +
+            '<div class="icon">' + group.name.split(' ')[0] + '</div>' +
+            '<div class="name">' + group.name + '</div>' +
+            '<div class="count">💬 <span class="count">0</span></div>' +
+        '</div>';
+    }).join('');
+}
+
+window.openGroup = function(roomId) {
+    CURRENT_ROOM = roomId;
+    CURRENT_DM = null;
+    document.getElementById('chatView').classList.add('active');
+    setActivePage(null);
+    loadRoomChat(roomId);
+};
+
+window.openCreateRoom = function() {
+    document.getElementById('createRoomModal').classList.add('open');
+    document.getElementById('roomName').value = '';
+};
+window.closeCreateRoom = function() {
+    document.getElementById('createRoomModal').classList.remove('open');
+};
+window.doCreateRoom = function() {
+    const name = document.getElementById('roomName').value.trim();
+    if (!name || name.length < 2) { alert('Минимум 2 символа'); return; }
+    const newRoom = { id: 'room_' + Date.now(), name: name };
+    GROUPS.push(newRoom);
+    loadGroups();
+    closeCreateRoom();
+    alert('✅ Группа "' + name + '" создана!');
+};
+
+// ================================================================
+// ЛЮДИ
+// ================================================================
+function loadPeople() {
+    if (!USER_UID) return;
+    const list = document.getElementById('peopleList');
+    list.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.75rem;">Загрузка...</div>';
+    
+    db.ref('users').once('value', function(snap) {
+        const users = snap.val() || {};
+        const keys = Object.keys(users).filter(function(k) { return k !== USER_UID; });
+        
+        if (!keys.length) {
+            list.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.75rem;">Нет других пользователей</div>';
+            return;
+        }
+        
+        let html = '';
+        let loaded = 0;
+        keys.forEach(function(k) {
+            const u = users[k];
+            const name = u.name || 'Аноним';
+            const letter = name.charAt(0).toUpperCase();
+            html += '<div class="people-item" onclick="viewUserProfile(\'' + k + '\')">' +
+                '<span class="avatar-wrap" id="people-avatar-' + k + '"><span class="letter">' + letter + '</span></span>' +
+                '<div class="info">' +
+                    '<div class="name">' + esc(name) + '</div>' +
+                    '<div class="status">Нажмите для просмотра</div>' +
+                '</div>' +
+            '</div>';
+            loaded++;
+            if (loaded === keys.length) {
+                list.innerHTML = html;
+                keys.forEach(function(k2) {
+                    const el = document.getElementById('people-avatar-' + k2);
+                    if (el) renderAvatar(k2, el, '?');
+                });
+            }
+        });
+    });
+}
+
+// ================================================================
+// ЛИЧКА
+// ================================================================
+function getDMId(uid1, uid2) {
+    return [uid1, uid2].sort().join('_');
+}
+
+window.openDM = function(userId) {
+    CURRENT_DM = userId;
+    CURRENT_ROOM = null;
+    document.getElementById('chatView').classList.add('active');
+    setActivePage(null);
+    loadDMChat(userId);
+};
+
+// ================================================================
+// ЧАТ В ГРУППЕ
+// ================================================================
+function loadRoomChat(roomId) {
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">⏳ Загрузка...</div>';
+    const path = 'rooms/' + roomId + '/messages';
+    chatUnsub = path;
+    db.ref(path).orderByChild('timestamp').on('value', function(snap) {
+        box.innerHTML = '';
+        if (!snap.exists()) {
+            box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">Сообщений нет 👋</div>';
+            return;
+        }
+        snap.forEach(function(s) {
+            const m = s.val();
+            const div = document.createElement('div');
+            div.className = 'msg';
+            div.innerHTML = 
+                '<span class="author">' + esc(m.nick || '?') + '</span>' +
+                '<span class="time">' + (m.time || '') + '</span>' +
+                '<div>' + esc(m.text || '') + '</div>';
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+// ================================================================
+// ЧАТ В ЛИЧКЕ
+// ================================================================
+function loadDMChat(userId) {
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">⏳ Загрузка...</div>';
+    const dmId = getDMId(USER_UID, userId);
+    const path = 'dms/' + dmId + '/messages';
+    chatUnsub = path;
+    db.ref(path).orderByChild('timestamp').on('value', function(snap) {
+        box.innerHTML = '';
+        if (!snap.exists()) {
+            box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;font-size:0.75rem;">Нет сообщений 👋</div>';
+            return;
+        }
+        snap.forEach(function(s) {
+            const m = s.val();
+            const div = document.createElement('div');
+            div.className = 'msg';
+            div.innerHTML = 
+                '<span class="author">' + esc(m.nick || '?') + '</span>' +
+                '<span class="time">' + (m.time || '') + '</span>' +
+                '<div>' + esc(m.text || '') + '</div>';
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+// ================================================================
+// ОТПРАВКА СООБЩЕНИЙ
+// ================================================================
+window.sendChat = function() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    if (CURRENT_ROOM) {
+        db.ref('rooms/' + CURRENT_ROOM + '/messages').push({
+            nick: USER,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now()
+        });
+        input.value = '';
+    } else if (CURRENT_DM) {
+        const dmId = getDMId(USER_UID, CURRENT_DM);
+        db.ref('dms/' + dmId + '/messages').push({
+            from: USER_UID,
+            nick: USER,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now()
+        });
+        input.value = '';
+    } else {
+        alert('Выберите чат');
+    }
+};
+
+document.getElementById('chatInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendChat();
 });
+
+window.closeChat = function() {
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    CURRENT_DM = null;
+    if (document.getElementById('groupsPage').classList.contains('active')) {
+        goToGroups();
+    } else if (document.getElementById('peoplePage').classList.contains('active')) {
+        goToPeople();
+    } else {
+        goToFeed();
+    }
+};
+
+// ================================================================
+// УТИЛИТЫ
+// ================================================================
+function esc(s) {
+    if (!s) return '';
+    return s.replace(/[&<>"]/g, function(c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c];
+    });
+}
+
+// ================================================================
+// СИД
+// ================================================================
+db.ref('feed_posts').once('value', function(snap) {
+    if (!snap.exists()) {
+        const posts = [
+            { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в METAIMPERIYA!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 0, repostCount: 0 },
+            { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 0, repostCount: 0 }
+        ];
+        posts.forEach(function(p) { db.ref('feed_posts').push(p); });
+    }
+});
+
+// ================================================================
+// ЗАПУСК
+// ================================================================
+updateUI();
+loadFeed();
+loadGroups();
+loadPeople();
+setActivePage('feedPage');
+console.log('🏛️ METAIMPERIYA запущена!');
+console.log('🔑 Google вход с выбором аккаунта!');
+console.log('🏴‍☠️ Админ-пароль: 12345');
+console.log('📷 Аватарки работают!');
 </script>
 </body>
 </html>
