@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>MicroSocial</title>
     
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -19,10 +18,9 @@
             min-height: 100vh;
         }
 
-        /* Топбар */
         .topbar {
             background: #ffffff;
-            padding: 12px 16px;
+            padding: 10px 16px;
             border-bottom: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
@@ -31,24 +29,75 @@
             top: 0;
             z-index: 100;
         }
-        .topbar .logo { font-size: 1.3rem; font-weight: 700; color: #1877f2; }
-        .topbar .user-info { display: flex; align-items: center; gap: 10px; }
+        .topbar .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1877f2;
+            cursor: pointer;
+        }
+        .topbar .menu {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .topbar .menu button {
+            background: none;
+            border: none;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+        .topbar .menu button:hover { background: #f0f0f0; }
+        .topbar .menu button.active { color: #1877f2; background: #e8f0fe; }
+        .topbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         .topbar .user-info .avatar {
             width: 32px; height: 32px; border-radius: 50%;
             background: #1877f2; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700;
+            font-weight: 700; font-size: 0.8rem;
+            cursor: pointer;
         }
-        .topbar .user-info .name { font-weight: 600; font-size: 0.9rem; }
+        .topbar .user-info .name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
         .topbar .user-info .logout {
-            background: none; border: 1px solid #ddd; border-radius: 20px;
-            padding: 4px 12px; cursor: pointer; font-size: 0.7rem;
+            background: none; border: 1px solid #ddd;
+            border-radius: 20px; padding: 4px 12px;
+            cursor: pointer; font-size: 0.7rem;
         }
 
-        /* Контейнер */
         .container { max-width: 700px; margin: 0 auto; padding: 16px; }
 
-        /* Форма поста */
+        /* Профиль */
+        .profile-page { display: none; }
+        .profile-page.active { display: block; }
+        .profile-page .header {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+        .profile-page .header .big-avatar {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: #1877f2; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: 700;
+            margin: 0 auto 10px;
+        }
+        .profile-page .header .name { font-size: 1.3rem; font-weight: 700; }
+        .profile-page .header .bio { color: #888; font-size: 0.85rem; margin-top: 4px; }
+
         .post-form {
             background: #fff;
             border-radius: 12px;
@@ -82,7 +131,9 @@
         .post-form .actions .submit:hover { background: #4a9eff; }
         .post-form .actions .cancel { background: #e4e6eb; color: #555; }
 
-        /* Пост */
+        .feed-page { display: none; }
+        .feed-page.active { display: block; }
+
         .post {
             background: #fff;
             border-radius: 12px;
@@ -102,7 +153,8 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 700;
         }
-        .post .author .name { font-weight: 600; }
+        .post .author .name { font-weight: 600; cursor: pointer; }
+        .post .author .name:hover { text-decoration: underline; }
         .post .author .time { color: #999; font-size: 0.7rem; margin-left: auto; }
         .post .text { font-size: 0.95rem; line-height: 1.5; margin-bottom: 8px; }
         .post .stats {
@@ -127,7 +179,6 @@
         .post .stats button:hover { color: #1877f2; }
         .post .stats button.liked { color: #1877f2; }
 
-        /* Комментарии */
         .comments {
             margin-top: 10px;
             border-top: 1px solid #eee;
@@ -188,6 +239,82 @@
             font-weight: 600;
         }
         .comments .input-wrap button:hover { background: #4a9eff; }
+
+        .rooms-page { display: none; }
+        .rooms-page.active { display: block; }
+        .rooms-page .room-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .rooms-page .room-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .rooms-page .room-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .rooms-page .room-card .icon { font-size: 2rem; }
+        .rooms-page .room-card .name { font-weight: 600; margin-top: 6px; }
+        .rooms-page .room-card .count { color: #888; font-size: 0.75rem; }
+
+        .chat-view {
+            display: none;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 500px;
+            flex-direction: column;
+        }
+        .chat-view.active { display: flex; }
+        .chat-view .back {
+            background: none;
+            border: none;
+            color: #1877f2;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .chat-view .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 8px;
+        }
+        .chat-view .messages .msg {
+            padding: 6px 10px;
+            margin-bottom: 4px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .chat-view .messages .msg .author { font-weight: 600; font-size: 0.8rem; }
+        .chat-view .messages .msg .text { font-size: 0.9rem; }
+        .chat-view .messages .msg .time { color: #999; font-size: 0.6rem; margin-left: 6px; }
+        .chat-view .input-wrap {
+            display: flex;
+            gap: 8px;
+        }
+        .chat-view .input-wrap input {
+            flex: 1;
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+        .chat-view .input-wrap input:focus { border-color: #1877f2; }
+        .chat-view .input-wrap button {
+            background: #1877f2;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 0 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
 
         /* Модалка входа */
         .modal {
@@ -263,7 +390,32 @@
             background: #ddd;
         }
 
-        /* Админ точка */
+        /* Список аккаунтов для выбора */
+        .account-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .account-list .acc {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .account-list .acc:hover { border-color: #1877f2; background: #e8f0fe; }
+        .account-list .acc .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: #1877f2; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 4px;
+            font-weight: 700;
+        }
+        .account-list .acc .name { font-weight: 600; font-size: 0.8rem; }
+
         .admin-dot {
             position: fixed;
             bottom: 10px;
@@ -277,33 +429,71 @@
             z-index: 99;
         }
         .admin-dot.active { background: #e67e22; border-color: #e67e22; }
+
+        @media (max-width: 600px) {
+            .rooms-page .room-list { grid-template-columns: 1fr; }
+            .account-list { grid-template-columns: 1fr 1fr; }
+            .topbar .menu button { font-size: 0.7rem; padding: 4px 6px; }
+        }
     </style>
 </head>
 <body>
 
 <!-- ТОПБАР -->
 <div class="topbar">
-    <div class="logo">📱 MicroSocial</div>
+    <div class="logo" onclick="goToFeed()">📱 MicroSocial</div>
+    <div class="menu">
+        <button class="active" id="menuFeed" onclick="goToFeed()">Лента</button>
+        <button id="menuRooms" onclick="goToRooms()">Комнаты</button>
+        <button id="menuProfile" onclick="goToProfile()">Профиль</button>
+    </div>
     <div class="user-info">
-        <div class="avatar" id="topAvatar">?</div>
-        <span class="name" id="topName">Гость</span>
+        <div class="avatar" id="topAvatar" onclick="goToProfile()">?</div>
+        <span class="name" id="topName" onclick="goToProfile()">Гость</span>
         <button class="logout" id="logoutBtn" style="display:none;" onclick="logout()">Выйти</button>
     </div>
 </div>
 
 <!-- КОНТЕЙНЕР -->
-<div class="container" id="container">
-    <!-- Форма поста -->
-    <div class="post-form" id="postForm" style="display:none;">
-        <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
-        <div class="actions">
-            <button class="submit" onclick="submitPost()">📤 Опубликовать</button>
-            <button class="cancel" onclick="document.getElementById('postInput').value='';">Очистить</button>
+<div class="container">
+
+    <!-- СТРАНИЦА ПРОФИЛЯ -->
+    <div class="profile-page" id="profilePage">
+        <div class="header">
+            <div class="big-avatar" id="profileAvatar">?</div>
+            <div class="name" id="profileName">Гость</div>
+            <div class="bio" id="profileBio">Выберите аккаунт</div>
         </div>
+        <div class="post-form">
+            <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
+            <div class="actions">
+                <button class="submit" onclick="submitPost()">📤 Опубликовать</button>
+                <button class="cancel" onclick="document.getElementById('postInput').value='';">Очистить</button>
+            </div>
+        </div>
+        <div id="profilePosts"></div>
     </div>
 
-    <!-- Лента -->
-    <div id="feed"></div>
+    <!-- СТРАНИЦА ЛЕНТЫ -->
+    <div class="feed-page" id="feedPage">
+        <div id="feed"></div>
+    </div>
+
+    <!-- СТРАНИЦА КОМНАТ -->
+    <div class="rooms-page" id="roomsPage">
+        <h3 style="margin-bottom:12px;">📋 Комнаты</h3>
+        <div class="room-list" id="roomList"></div>
+    </div>
+
+    <!-- ЧАТ В КОМНАТЕ -->
+    <div class="chat-view" id="chatView">
+        <button class="back" onclick="closeChat()">← Назад к комнатам</button>
+        <div class="messages" id="chatMessages"></div>
+        <div class="input-wrap">
+            <input type="text" id="chatInput" placeholder="Сообщение..." />
+            <button onclick="sendChat()">→</button>
+        </div>
+    </div>
 </div>
 
 <!-- АДМИН ТОЧКА -->
@@ -313,12 +503,18 @@
 <div class="modal" id="loginModal">
     <div class="box">
         <h3>👤 Вход в MicroSocial</h3>
-        <div class="sub" style="color:#888;font-size:0.85rem;margin-bottom:12px;">Войдите через Google</div>
+        <div class="sub" style="color:#888;font-size:0.85rem;margin-bottom:12px;">Выберите аккаунт или войдите через Google</div>
+        
         <button class="google-btn" id="googleLoginBtn">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" />
             Войти через Google
         </button>
-        <div class="divider">или</div>
+        
+        <div class="divider">или выберите аккаунт</div>
+        
+        <div class="account-list" id="accountList"></div>
+        
+        <div class="divider">или создайте новый</div>
         <input type="text" id="nameInput" placeholder="Введите имя..." maxlength="24">
         <div class="btns">
             <button class="cancel" onclick="closeLogin()">Отмена</button>
@@ -359,12 +555,47 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     // ================================================================
+    // 10 АККАУНТОВ (В КОДЕ)
+    // ================================================================
+    const ACCOUNTS = [
+        { id: 'user1', name: 'Алексей', avatar: 'А', bio: 'Люблю спорт и путешествия' },
+        { id: 'user2', name: 'Марина', avatar: 'М', bio: 'Фотограф, кофеманка' },
+        { id: 'user3', name: 'Сергей', avatar: 'С', bio: 'IT-разработчик' },
+        { id: 'user4', name: 'Елена', avatar: 'Е', bio: 'Дизайнер интерьеров' },
+        { id: 'user5', name: 'Михаил', avatar: 'М', bio: 'Музыкант' },
+        { id: 'user6', name: 'Анна', avatar: 'А', bio: 'Психолог' },
+        { id: 'user7', name: 'Дмитрий', avatar: 'Д', bio: 'Блогер' },
+        { id: 'user8', name: 'Ольга', avatar: 'О', bio: 'Учитель английского' },
+        { id: 'user9', name: 'Иван', avatar: 'И', bio: 'Спортсмен' },
+        { id: 'user10', name: 'Наталья', avatar: 'Н', bio: 'Маркетолог' }
+    ];
+
+    // ================================================================
+    // КОМНАТЫ (В КОДЕ)
+    // ================================================================
+    const ROOMS = [
+        { id: 'general', name: '🌍 Общий', desc: 'Для всех' },
+        { id: 'sport', name: '⚽ Спорт', desc: 'Обсуждение спорта' },
+        { id: 'games', name: '🎮 Игры', desc: 'Игровые обсуждения' },
+        { id: 'movies', name: '🎬 Кино', desc: 'Фильмы и сериалы' },
+        { id: 'music', name: '🎵 Музыка', desc: 'Музыкальные предпочтения' },
+        { id: 'tech', name: '💻 Технологии', desc: 'IT, гаджеты, AI' },
+        { id: 'food', name: '🍕 Еда', desc: 'Рецепты и кулинария' },
+        { id: 'travel', name: '✈️ Путешествия', desc: 'Страны и приключения' },
+        { id: 'fashion', name: '👗 Мода', desc: 'Стиль и тренды' },
+        { id: 'science', name: '🔬 Наука', desc: 'Открытия и технологии' }
+    ];
+
+    // ================================================================
     // СОСТОЯНИЕ
     // ================================================================
     const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
     let USER = null;
     let USER_UID = null;
+    let USER_ACCOUNT = null; // выбранный аккаунт из ACCOUNTS
     let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
+    let CURRENT_ROOM = null;
+    let chatUnsub = null;
 
     // ================================================================
     // AUTH
@@ -375,20 +606,36 @@
             let saved = localStorage.getItem('dc_u_' + SITE);
             USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
             if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
-            db.ref('sites/' + SITE + '/users/' + USER_UID).set({ name: USER, email: user.email });
+            
+            // Проверяем, есть ли у пользователя аккаунт
+            const accId = localStorage.getItem('dc_acc_' + SITE);
+            if (accId) {
+                const acc = ACCOUNTS.find(a => a.id === accId);
+                if (acc) USER_ACCOUNT = acc;
+            }
+            
+            db.ref('sites/' + SITE + '/users/' + USER_UID).set({ 
+                name: USER, 
+                email: user.email,
+                account: USER_ACCOUNT ? USER_ACCOUNT.id : null 
+            });
             
             updateUI();
             loadFeed();
+            loadProfilePosts();
+            loadRooms();
             closeLogin();
         } else {
             USER = null;
             USER_UID = null;
+            USER_ACCOUNT = null;
             document.getElementById('loginModal').classList.add('open');
             updateUI();
+            // Показываем список аккаунтов
+            renderAccounts();
         }
     });
 
-    // Google Login
     document.getElementById('googleLoginBtn').addEventListener('click', function() {
         auth.signInWithPopup(provider).catch(err => {
             if (err.code === 'auth/popup-blocked') {
@@ -400,27 +647,73 @@
     });
 
     // ================================================================
+    // АККАУНТЫ
+    // ================================================================
+    function renderAccounts() {
+        const list = document.getElementById('accountList');
+        list.innerHTML = ACCOUNTS.map(acc => `
+            <div class="acc" onclick="selectAccount('${acc.id}')">
+                <div class="avatar">${acc.avatar}</div>
+                <div class="name">${acc.name}</div>
+            </div>
+        `).join('');
+    }
+
+    window.selectAccount = function(accId) {
+        const acc = ACCOUNTS.find(a => a.id === accId);
+        if (!acc) return;
+        localStorage.setItem('dc_acc_' + SITE, accId);
+        USER_ACCOUNT = acc;
+        USER = acc.name;
+        localStorage.setItem('dc_u_' + SITE, USER);
+        updateUI();
+        closeLogin();
+        // Если есть UID - обновляем в базе
+        if (USER_UID) {
+            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, account: accId });
+        }
+        loadFeed();
+        loadProfilePosts();
+        loadRooms();
+    };
+
+    // ================================================================
     // UI
     // ================================================================
     function updateUI() {
         const avatar = document.getElementById('topAvatar');
         const name = document.getElementById('topName');
-        const form = document.getElementById('postForm');
         const logout = document.getElementById('logoutBtn');
         const dot = document.getElementById('adminDot');
+        const profileAvatar = document.getElementById('profileAvatar');
+        const profileName = document.getElementById('profileName');
+        const profileBio = document.getElementById('profileBio');
 
-        if (USER) {
-            avatar.textContent = USER.charAt(0).toUpperCase();
-            name.textContent = USER;
-            form.style.display = 'block';
+        if (USER && USER_ACCOUNT) {
+            avatar.textContent = USER_ACCOUNT.avatar;
+            name.textContent = USER_ACCOUNT.name;
             logout.style.display = 'inline-block';
+            profileAvatar.textContent = USER_ACCOUNT.avatar;
+            profileName.textContent = USER_ACCOUNT.name;
+            profileBio.textContent = USER_ACCOUNT.bio;
             if (IS_ADMIN) dot.classList.add('active');
             else dot.classList.remove('active');
+        } else if (USER) {
+            const initial = USER.charAt(0).toUpperCase();
+            avatar.textContent = initial;
+            name.textContent = USER;
+            logout.style.display = 'inline-block';
+            profileAvatar.textContent = initial;
+            profileName.textContent = USER;
+            profileBio.textContent = 'Без аккаунта';
+            dot.classList.remove('active');
         } else {
             avatar.textContent = '?';
             name.textContent = 'Гость';
-            form.style.display = 'none';
             logout.style.display = 'none';
+            profileAvatar.textContent = '?';
+            profileName.textContent = 'Гость';
+            profileBio.textContent = 'Выберите аккаунт';
             dot.classList.remove('active');
         }
     }
@@ -428,6 +721,11 @@
     window.logout = function() {
         auth.signOut();
         localStorage.removeItem('dc_u_' + SITE);
+        localStorage.removeItem('dc_acc_' + SITE);
+        USER_ACCOUNT = null;
+        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        CURRENT_ROOM = null;
+        document.getElementById('chatView').classList.remove('active');
     };
 
     window.closeLogin = function() {
@@ -442,8 +740,54 @@
             localStorage.setItem('dc_u_' + SITE, USER);
             updateUI();
             loadFeed();
+            loadProfilePosts();
+            loadRooms();
             closeLogin();
         }).catch(e => alert('Ошибка: ' + e.message));
+    };
+
+    // ================================================================
+    // НАВИГАЦИЯ
+    // ================================================================
+    function setActivePage(pageId) {
+        document.querySelectorAll('.container > div').forEach(el => {
+            el.classList.remove('active');
+        });
+        if (pageId) document.getElementById(pageId).classList.add('active');
+        
+        document.querySelectorAll('.topbar .menu button').forEach(el => {
+            el.classList.remove('active');
+        });
+        if (pageId === 'feedPage') document.getElementById('menuFeed').classList.add('active');
+        else if (pageId === 'roomsPage') document.getElementById('menuRooms').classList.add('active');
+        else if (pageId === 'profilePage') document.getElementById('menuProfile').classList.add('active');
+    }
+
+    window.goToFeed = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        setActivePage('feedPage');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        CURRENT_ROOM = null;
+        loadFeed();
+    };
+
+    window.goToRooms = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        setActivePage('roomsPage');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        CURRENT_ROOM = null;
+        loadRooms();
+    };
+
+    window.goToProfile = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        setActivePage('profilePage');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        CURRENT_ROOM = null;
+        loadProfilePosts();
     };
 
     // ================================================================
@@ -478,7 +822,7 @@
             const data = snap.val() || {};
             const keys = Object.keys(data).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
             if (!keys.length) {
-                feed.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;">Пока пусто. Напишите первый пост!</div>';
+                feed.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;">Пока пусто</div>';
                 return;
             }
             keys.forEach(k => {
@@ -499,7 +843,7 @@
         div.innerHTML = `
             <div class="author">
                 <div class="avatar">${esc((p.author || '?').charAt(0).toUpperCase())}</div>
-                <span class="name">${esc(p.author || 'Аноним')}</span>
+                <span class="name" onclick="goToProfile()">${esc(p.author || 'Аноним')}</span>
                 <span class="time">${p.time || ''}</span>
                 ${IS_ADMIN ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.7rem;margin-left:auto;">🗑</button>` : ''}
             </div>
@@ -524,9 +868,7 @@
             </div>
         `;
 
-        // Загружаем комментарии
         loadComments(p.id);
-
         return div;
     }
 
@@ -547,13 +889,31 @@
             commentCount: 0
         }).then(() => {
             document.getElementById('postInput').value = '';
+            loadProfilePosts();
         });
     };
+
+    function loadProfilePosts() {
+        db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
+            const container = document.getElementById('profilePosts');
+            container.innerHTML = '';
+            const data = snap.val() || {};
+            const keys = Object.keys(data).filter(k => data[k].author === USER).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
+            if (!keys.length) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">У вас пока нет постов</div>';
+                return;
+            }
+            keys.forEach(k => {
+                const p = data[k];
+                p.id = k;
+                container.appendChild(renderPost(p));
+            });
+        });
+    }
 
     window.deletePost = function(id) {
         if (!IS_ADMIN || !confirm('Удалить пост?')) return;
         db.ref('sites/' + SITE + '/feed_posts/' + id).remove();
-        // Удаляем комментарии
         db.ref('sites/' + SITE + '/comments/' + id).remove();
     };
 
@@ -586,7 +946,6 @@
             const data = snap.val() || {};
             const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
             
-            // Обновляем счетчик
             const count = keys.length;
             const countEl = document.getElementById('commentCount_' + postId);
             if (countEl) countEl.textContent = count;
@@ -639,7 +998,6 @@
             timestamp: Date.now()
         }).then(() => {
             input.value = '';
-            // Открываем комментарии
             const list = document.getElementById('commentsList_' + postId);
             if (list) list.classList.add('open');
             const toggle = document.querySelector(`#comments_${postId} .toggle`);
@@ -653,6 +1011,95 @@
     };
 
     // ================================================================
+    // КОМНАТЫ (ГРУППЫ)
+    // ================================================================
+    function loadRooms() {
+        const list = document.getElementById('roomList');
+        list.innerHTML = ROOMS.map(room => {
+            let count = 0;
+            db.ref('rooms/' + SITE + '_' + room.id + '/messages').once('value', snap => {
+                const c = snap.numChildren();
+                const el = document.querySelector(`#roomList .room-card[data-id="${room.id}"] .count`);
+                if (el) el.textContent = c;
+            });
+            db.ref('rooms/' + SITE + '_' + room.id + '/messages').on('value', snap => {
+                const c = snap.numChildren();
+                const el = document.querySelector(`#roomList .room-card[data-id="${room.id}"] .count`);
+                if (el) el.textContent = c;
+            });
+            
+            return `<div class="room-card" data-id="${room.id}" onclick="openRoom('${room.id}')">
+                <div class="icon">${room.name.split(' ')[0]}</div>
+                <div class="name">${room.name}</div>
+                <div class="count">💬 <span class="count">0</span> сообщений</div>
+            </div>`;
+        }).join('');
+    }
+
+    window.openRoom = function(roomId) {
+        CURRENT_ROOM = roomId;
+        document.getElementById('chatView').classList.add('active');
+        setActivePage(null);
+        loadChat(roomId);
+    };
+
+    window.closeChat = function() {
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        CURRENT_ROOM = null;
+        goToRooms();
+    };
+
+    // ================================================================
+    // ЧАТ В КОМНАТЕ
+    // ================================================================
+    function loadChat(roomId) {
+        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        const box = document.getElementById('chatMessages');
+        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">⏳ Загрузка...</div>';
+        const path = 'rooms/' + SITE + '_' + roomId + '/messages';
+        chatUnsub = path;
+        db.ref(path).orderByChild('timestamp').on('value', snap => {
+            box.innerHTML = '';
+            if (!snap.exists()) {
+                box.innerHTML = '<div style="color:#bbb;text-align:center;padding:30px;">Сообщений нет 👋</div>';
+                return;
+            }
+            snap.forEach(s => {
+                const m = s.val();
+                const div = document.createElement('div');
+                div.className = 'msg';
+                div.innerHTML = `
+                    <span class="author">${esc(m.nick || '?')}</span>
+                    <span class="time">${m.time || ''}</span>
+                    <div class="text">${esc(m.text || '')}</div>
+                `;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    window.sendChat = function() {
+        if (!CURRENT_ROOM || !USER) { alert('Выберите комнату и войдите'); return; }
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+        
+        db.ref('rooms/' + SITE + '_' + CURRENT_ROOM + '/messages').push({
+            nick: USER,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now()
+        });
+        input.value = '';
+    };
+
+    document.getElementById('chatInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendChat();
+    });
+
+    // ================================================================
     // УТИЛИТЫ
     // ================================================================
     const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
@@ -663,37 +1110,24 @@
     db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
         if (!snap.exists()) {
             const posts = [
-                { author: '📢 Админ', text: 'Добро пожаловать в MicroSocial! Это ваш новый микроблог.', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2 },
+                { author: '📢 Админ', text: 'Добро пожаловать в MicroSocial!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2 },
                 { author: '🚀 Орг', text: 'Завтра в 19:00 встреча в общем чате!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1 }
             ];
             posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
-            
-            // Добавляем пример комментариев
-            setTimeout(() => {
-                db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
-                    snap.forEach(s => {
-                        const p = s.val();
-                        if (p.text.includes('Добро пожаловать')) {
-                            db.ref('sites/' + SITE + '/comments/' + s.key).push({
-                                author: '👋 Гость',
-                                text: 'Круто! Спасибо!',
-                                time: '12:05',
-                                timestamp: Date.now() - 3000000
-                            });
-                        }
-                    });
-                });
-            }, 500);
         }
     });
 
     // ================================================================
     // ЗАПУСК
     // ================================================================
+    renderAccounts();
     updateUI();
     loadFeed();
+    loadRooms();
+    setActivePage('feedPage');
     console.log('📱 MicroSocial запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345');
+    console.log('📋 10 аккаунтов готовы!');
 })();
 </script>
 </body>
