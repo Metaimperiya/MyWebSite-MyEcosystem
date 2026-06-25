@@ -21,7 +21,7 @@
 
         /* ===== ТОПБАР ===== */
         .topbar {
-            background: #fff; padding: 8px 14px; border-bottom: 1px solid #ddd;
+            background: #fff; padding: 6px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100;
             flex-wrap: wrap;
@@ -39,19 +39,46 @@
         .player {
             background: #0a0a12; color: #0f0; border: 2px solid #0f0;
             padding: 3px 12px; border-radius: 30px; font-family: monospace;
-            display: flex; align-items: center; gap: 6px;
+            display: flex; align-items: center; gap: 8px;
             flex: 0 1 auto;
             min-width: 120px;
+            position: relative;
+            overflow: visible;
         }
-        .player .track-name { font-size: 0.5rem; max-width: 50px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .player .track-name {
+            font-size: 0.55rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 60px;
+        }
         .player .play-btn {
-            background: #0f0; border: none; padding: 2px 8px; cursor: pointer;
-            font-weight: 700; font-size: 0.6rem; border-radius: 20px; color: #000;
+            background: #0f0; border: none; padding: 2px 10px;
+            cursor: pointer; font-weight: 700; font-size: 0.65rem;
+            border-radius: 20px; color: #000; transition: 0.2s;
         }
-        .player .play-btn:hover { background: #0d0; }
-        .player .nav-btn { background: none; border: none; color: #0f0; cursor: pointer; font-size: 0.8rem; padding: 0 2px; }
-        .eq-bars { display: flex; align-items: center; gap: 2px; height: 16px; }
-        .eq-bars .bar { width: 2px; background: #0f0; border-radius: 2px; height: 4px; transition: height 0.08s; }
+        .player .play-btn:hover { background: #0d0; transform: scale(1.05); }
+        .player .nav-btn {
+            background: none; border: none; color: #0f0;
+            cursor: pointer; font-size: 0.9rem; padding: 0 2px;
+            transition: 0.2s;
+        }
+        .player .nav-btn:hover { transform: scale(1.2); }
+        
+        /* ===== БИТЫ (ЭКВАЛАЙЗЕР) ===== */
+        .eq-bars {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 20px;
+        }
+        .eq-bars .bar {
+            width: 3px;
+            background: #0f0;
+            border-radius: 2px;
+            height: 4px;
+            transition: height 0.08s;
+        }
 
         .topbar .right { display: flex; align-items: center; gap: 6px; }
         .topbar .right .avatar-wrap {
@@ -60,14 +87,23 @@
         }
         .topbar .right .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .topbar .right .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.7rem; }
-        .topbar .right .name { font-weight: 600; font-size: 0.7rem; cursor: pointer; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .topbar .right .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.8rem; padding: 0 4px; }
+        .topbar .right .name {
+            font-weight: 600; font-size: 0.7rem; cursor: pointer;
+            max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .topbar .right .logout-btn {
+            background: none; border: none; color: #e74c3c;
+            cursor: pointer; font-size: 0.8rem; padding: 0 4px;
+            transition: 0.2s;
+        }
+        .topbar .right .logout-btn:hover { transform: scale(1.2); }
 
-        /* ===== МЕНЮ ===== */
+        /* ===== ГОРИЗОНТАЛЬНОЕ МЕНЮ ===== */
         .hor-menu {
             background: #fff; padding: 4px 10px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: center; gap: 4px;
             position: sticky; top: 50px; z-index: 99; overflow-x: auto;
+            max-width: 700px; margin: 0 auto;
         }
         .hor-menu button {
             background: none; border: none; color: #555; font-weight: 600;
@@ -85,28 +121,28 @@
         }
         .sidebar.open { left: 0; }
         .sidebar .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-        .sidebar .head h3 { font-size: 1rem; color: #1877f2; }
-        .sidebar .head .close { background: none; border: none; font-size: 1.3rem; cursor: pointer; }
+        .sidebar .head h3 { font-size: 1.1rem; color: #1877f2; }
+        .sidebar .head .close { background: none; border: none; font-size: 1.4rem; cursor: pointer; }
         .sidebar .user {
-            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-            background: #f5f5f5; border-radius: 10px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+            background: #f5f5f5; border-radius: 10px; margin-bottom: 14px;
         }
-        .sidebar .user .avatar-wrap { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .sidebar .user .avatar-wrap { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .sidebar .user .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .sidebar .user .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.8rem; }
-        .sidebar .user .name { font-weight: 600; font-size: 0.85rem; }
+        .sidebar .user .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.9rem; }
+        .sidebar .user .name { font-weight: 600; font-size: 0.9rem; }
 
         .sidebar .nav-item {
-            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-            border-radius: 8px; cursor: pointer; color: #555; font-size: 0.85rem;
-            border: 1px solid transparent; margin-bottom: 2px;
+            display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+            border-radius: 8px; cursor: pointer; color: #555; font-size: 0.9rem;
+            border: 1px solid transparent; margin-bottom: 3px;
         }
         .sidebar .nav-item:hover { background: #f0f0f0; }
         .sidebar .nav-item.active { background: #e8f0fe; color: #1877f2; border-color: #1877f2; }
-        .sidebar .footer { margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd; }
+        .sidebar .footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; }
         .sidebar .footer .create-btn {
             background: #1877f2; color: #fff; border: none; border-radius: 40px;
-            padding: 6px; width: 100%; font-weight: 700; cursor: pointer; font-size: 0.75rem;
+            padding: 8px; width: 100%; font-weight: 700; cursor: pointer; font-size: 0.8rem;
         }
 
         .overlay {
@@ -121,201 +157,237 @@
 
         /* ===== ПОСТЫ ===== */
         .post-form {
-            background: #fff; border-radius: 12px; padding: 10px 12px;
-            margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            background: #fff; border-radius: 12px; padding: 12px 14px;
+            margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
             border: 1px solid #e8e8e8;
         }
         .post-form textarea {
-            width: 100%; padding: 6px 10px; border: 1px solid #ddd;
-            border-radius: 6px; resize: vertical; min-height: 40px;
+            width: 100%; padding: 8px 12px; border: 1px solid #ddd;
+            border-radius: 8px; resize: vertical; min-height: 44px;
             font-family: inherit; font-size: 0.8rem; outline: none;
         }
         .post-form textarea:focus { border-color: #1877f2; }
-        .post-form .actions { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+        .post-form .actions { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
         .post-form .actions button {
-            padding: 4px 14px; border: none; border-radius: 20px;
-            font-weight: 600; cursor: pointer; font-size: 0.65rem;
+            padding: 5px 16px; border: none; border-radius: 20px;
+            font-weight: 600; cursor: pointer; font-size: 0.7rem;
         }
         .post-form .actions .submit { background: #1877f2; color: #fff; }
+        .post-form .actions .submit:hover { background: #4a9eff; }
         .post-form .actions .cancel { background: #e4e6eb; color: #555; }
         .post-form .file-label {
-            background: #e4e6eb; padding: 2px 12px; border-radius: 20px;
-            font-size: 0.6rem; cursor: pointer; display: inline-block; margin-top: 3px;
+            background: #e4e6eb; padding: 3px 14px; border-radius: 20px;
+            font-size: 0.65rem; cursor: pointer; display: inline-block; margin-top: 4px;
             color: #555;
         }
+        .post-form .file-label:hover { background: #d0d2d6; }
         .post-form .hidden { display: none; }
         .post-form .preview-box {
-            display: none; align-items: center; gap: 6px;
-            background: #f5f5f5; padding: 3px 10px 3px 3px;
-            border-radius: 30px; margin-top: 4px; border: 1px solid #ddd;
+            display: none; align-items: center; gap: 8px;
+            background: #f5f5f5; padding: 4px 12px 4px 4px;
+            border-radius: 30px; margin-top: 6px; border: 1px solid #ddd;
         }
         .post-form .preview-box.visible { display: flex; }
-        .post-form .preview-box img { width: 30px; height: 30px; border-radius: 30px; object-fit: cover; }
-        .post-form .remove-pic { background: #ffebee; color: #c62828; border: none; border-radius: 30px; padding: 2px 8px; cursor: pointer; font-size: 0.6rem; }
+        .post-form .preview-box img { width: 36px; height: 36px; border-radius: 30px; object-fit: cover; }
+        .post-form .remove-pic { background: #ffebee; color: #c62828; border: none; border-radius: 30px; padding: 2px 10px; cursor: pointer; font-size: 0.7rem; }
 
         .post {
-            background: #fff; border-radius: 12px; padding: 12px 14px;
-            margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            background: #fff; border-radius: 12px; padding: 14px 16px;
+            margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
             border: 1px solid #e8e8e8;
             position: relative;
         }
         .post .marquee {
-            background: #f5f5f5; padding: 4px 10px; border-radius: 6px;
+            background: #f5f5f5; padding: 6px 12px; border-radius: 8px;
             color: #e67e22; font-weight: 700; overflow: hidden; white-space: nowrap;
-            margin-bottom: 6px; border: 1px solid #eee;
+            margin-bottom: 8px; border: 1px solid #eee;
         }
         .post .marquee span { display: inline-block; animation: scroll 14s linear infinite; padding-left: 100%; }
         @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        .post .author { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-        .post .author .avatar-wrap { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .post .author { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .post .author .avatar-wrap { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .post .author .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .post .author .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.6rem; }
-        .post .name { font-weight: 600; font-size: 0.8rem; color: #1877f2; cursor: pointer; }
-        .post .time { color: #999; font-size: 0.5rem; margin-left: 6px; }
-
-        .post .post-menu { position: absolute; top: 10px; right: 12px; }
-        .post .post-menu .dots { background: none; border: none; color: #888; font-size: 1.1rem; cursor: pointer; padding: 0 4px; }
+        .post .author .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.7rem; }
+        .post .name { font-weight: 600; font-size: 0.85rem; color: #1877f2; cursor: pointer; }
+        .post .time { color: #999; font-size: 0.55rem; margin-left: 8px; }
+        
+        /* ===== ТРИ ТОЧКИ (МЕНЮ ПОСТА) ===== */
+        .post .post-menu {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+        }
+        .post .post-menu .dots {
+            background: none; border: none; color: #888;
+            font-size: 1.2rem; cursor: pointer; padding: 0 4px;
+            transition: 0.2s;
+        }
         .post .post-menu .dots:hover { color: #222; }
-        .post .post-menu .dropdown { display: none; position: absolute; right: 0; top: 22px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); z-index: 50; min-width: 120px; padding: 4px 0; }
+        .post .post-menu .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 24px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            z-index: 50;
+            min-width: 140px;
+            padding: 4px 0;
+        }
         .post .post-menu .dropdown.open { display: block; }
-        .post .post-menu .dropdown button { display: block; width: 100%; padding: 4px 12px; background: none; border: none; text-align: left; font-size: 0.7rem; cursor: pointer; color: #555; }
+        .post .post-menu .dropdown button {
+            display: block;
+            width: 100%;
+            padding: 6px 14px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #555;
+            transition: 0.15s;
+        }
         .post .post-menu .dropdown button:hover { background: #f0f2f5; }
         .post .post-menu .dropdown .edit-btn { color: #e67e22; }
         .post .post-menu .dropdown .del-btn { color: #e74c3c; }
 
-        .post .text { margin: 4px 0; word-break: break-word; font-size: 0.85rem; line-height: 1.4; color: #333; }
-        .post .post-img { max-width: 100%; max-height: 300px; border-radius: 8px; margin: 4px 0; border: 1px solid #eee; cursor: pointer; }
-        .post .link-preview { margin: 6px 0 4px 0; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #f5f5f5; }
-        .post .link-preview iframe { width: 100%; height: 250px; border: none; display: block; }
-        .post .buttons-wrap { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+        .post .text { margin: 6px 0; word-break: break-word; font-size: 0.9rem; line-height: 1.5; color: #333; }
+        .post .post-img { max-width: 100%; max-height: 350px; border-radius: 10px; margin: 6px 0; border: 1px solid #eee; cursor: pointer; }
+        .post .link-preview { margin: 8px 0 4px 0; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #f5f5f5; }
+        .post .link-preview iframe { width: 100%; height: 300px; border: none; display: block; }
+        .post .buttons-wrap { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
         .post .buttons-wrap .btn-item {
             display: block; background: #1877f2; color: #fff;
-            border: none; border-radius: 8px; padding: 8px 14px;
+            border: none; border-radius: 10px; padding: 10px 16px;
             text-align: center; text-decoration: none; font-weight: 700;
-            font-size: 0.8rem; transition: 0.2s; cursor: pointer;
+            font-size: 0.85rem; transition: 0.2s; cursor: pointer;
         }
-        .post .buttons-wrap .btn-item:hover { background: #4a9eff; }
-        .post .hashtags { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 4px 0; padding-top: 6px; border-top: 1px solid #eee; }
-        .post .hashtags .tag { color: #1877f2; font-size: 0.65rem; background: #e8f0fe; padding: 2px 10px; border-radius: 16px; border: 1px solid #d0e4ff; cursor: pointer; }
+        .post .buttons-wrap .btn-item:hover { background: #4a9eff; transform: scale(1.01); }
+        .post .hashtags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px 0; padding-top: 8px; border-top: 1px solid #eee; }
+        .post .hashtags .tag { color: #1877f2; font-size: 0.7rem; background: #e8f0fe; padding: 2px 12px; border-radius: 20px; border: 1px solid #d0e4ff; cursor: pointer; }
 
         .post .stats {
-            display: flex; gap: 8px; font-size: 0.6rem; color: #888;
-            border-top: 1px solid #eee; padding-top: 6px; margin-top: 4px; flex-wrap: wrap;
+            display: flex; gap: 12px; font-size: 0.65rem; color: #888;
+            border-top: 1px solid #eee; padding-top: 8px; margin-top: 6px; flex-wrap: wrap;
         }
         .post .stats button {
             background: none; border: none; color: #888; cursor: pointer;
-            display: flex; align-items: center; gap: 3px; font-size: 0.6rem; padding: 2px 6px;
-            border-radius: 16px; transition: 0.2s;
+            display: flex; align-items: center; gap: 4px; font-size: 0.65rem; padding: 2px 8px;
+            border-radius: 20px; transition: 0.2s;
         }
         .post .stats button:hover { background: #f0f2f5; color: #1877f2; }
         .post .stats button.liked { color: #1877f2; }
 
-        /* ===== КОММЕНТАРИИ (ИСПРАВЛЕНЫ) ===== */
-        .comments { margin-top: 6px; border-top: 1px solid #eee; padding-top: 6px; }
-        .comments .toggle { background: none; border: none; color: #1877f2; cursor: pointer; font-size: 0.65rem; }
+        .comments { margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; }
+        .comments .toggle { background: none; border: none; color: #1877f2; cursor: pointer; font-size: 0.7rem; }
         .comments .list { display: none; }
         .comments .list.open { display: block; }
-        .comments .comment {
-            display: flex; gap: 6px; margin-bottom: 3px; padding: 4px 0; border-bottom: 1px solid #f5f5f5;
-        }
-        .comments .comment .avatar-wrap { width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .comments .comment { display: flex; gap: 6px; margin-bottom: 4px; padding: 4px 0; border-bottom: 1px solid #f5f5f5; }
+        .comments .comment .avatar-wrap { width: 22px; height: 22px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .comments .comment .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .comments .comment .avatar-wrap .letter { color: #fff; font-size: 0.45rem; font-weight: 700; }
-        .comments .comment .body { flex: 1; font-size: 0.7rem; line-height: 1.3; }
+        .comments .comment .avatar-wrap .letter { color: #fff; font-size: 0.5rem; font-weight: 700; }
+        .comments .comment .body { flex: 1; font-size: 0.75rem; }
         .comments .comment .body .name { font-weight: 600; color: #1877f2; }
-        .comments .comment .body .time { color: #999; font-size: 0.45rem; margin-left: 4px; }
-        .comments .comment .body .text { color: #333; margin-top: 1px; }
-        .comments .input-wrap { display: flex; gap: 4px; margin-top: 4px; }
-        .comments .input-wrap input {
-            flex: 1; padding: 4px 10px; border: 1px solid #ddd;
-            border-radius: 16px; font-size: 0.65rem; outline: none;
-        }
+        .comments .comment .body .time { color: #999; font-size: 0.5rem; margin-left: 4px; }
+        .comments .input-wrap { display: flex; gap: 4px; margin-top: 6px; }
+        .comments .input-wrap input { flex: 1; padding: 5px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 0.7rem; outline: none; }
         .comments .input-wrap input:focus { border-color: #1877f2; }
-        .comments .input-wrap button {
-            background: #1877f2; color: #fff; border: none;
-            border-radius: 16px; padding: 3px 12px; cursor: pointer;
-            font-weight: 600; font-size: 0.6rem;
-        }
+        .comments .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 20px; padding: 4px 14px; cursor: pointer; font-weight: 600; font-size: 0.65rem; }
 
         /* ===== ПРОФИЛЬ ===== */
         .profile-header {
-            background: #fff; border-radius: 12px; padding: 14px; text-align: center;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8; margin-bottom: 8px;
+            background: #fff; border-radius: 12px; padding: 16px; text-align: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8; margin-bottom: 10px;
         }
         .profile-header .avatar-wrap {
-            width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
-            margin: 0 auto 6px; background: #1877f2; display: flex; align-items: center; justify-content: center; cursor: pointer;
+            width: 80px; height: 80px; border-radius: 50%; overflow: hidden;
+            margin: 0 auto 8px; background: #1877f2; display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
         .profile-header .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-header .avatar-wrap .letter { color: #fff; font-size: 2rem; font-weight: 700; }
-        .profile-header .name { font-size: 1rem; font-weight: 700; }
-        .profile-header .bio { color: #888; font-size: 0.7rem; margin-top: 2px; }
-        .profile-header .actions { display: flex; gap: 4px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
-        .profile-header .actions button { padding: 3px 12px; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 0.6rem; }
+        .profile-header .avatar-wrap .letter { color: #fff; font-size: 2.2rem; font-weight: 700; }
+        .profile-header .name { font-size: 1.1rem; font-weight: 700; }
+        .profile-header .bio { color: #888; font-size: 0.75rem; margin-top: 2px; }
+        .profile-header .actions { display: flex; gap: 6px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+        .profile-header .actions button { padding: 4px 14px; border: none; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.65rem; }
         .profile-header .actions .edit-btn { background: #e4e6eb; color: #555; }
         .profile-header .actions .avatar-btn { background: #333; color: #fff; }
+        .profile-header .actions .msg-btn { background: #1877f2; color: #fff; }
+        .profile-header .actions .friend-btn { background: #e4e6eb; color: #555; }
+        .profile-header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
 
-        .profile-stats { display: flex; gap: 12px; justify-content: center; margin: 4px 0; font-size: 0.65rem; color: #888; }
+        .profile-stats { display: flex; gap: 16px; justify-content: center; margin: 6px 0; font-size: 0.7rem; color: #888; }
         .profile-stats span { cursor: pointer; }
+        .profile-stats span:hover { color: #1877f2; }
 
         .friends-section {
-            background: #fff; border-radius: 12px; padding: 8px 12px;
-            margin-bottom: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            background: #fff; border-radius: 12px; padding: 10px 14px;
+            margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
             border: 1px solid #e8e8e8;
         }
-        .friends-section h4 { margin-bottom: 4px; color: #555; font-size: 0.75rem; }
-        .friend-list { display: flex; flex-wrap: wrap; gap: 4px; }
+        .friends-section h4 { margin-bottom: 6px; color: #555; font-size: 0.8rem; }
+        .friend-list { display: flex; flex-wrap: wrap; gap: 6px; }
         .friend-item {
-            background: #f0f2f5; padding: 2px 8px; border-radius: 12px;
-            font-size: 0.65rem; display: flex; align-items: center; gap: 4px; cursor: pointer;
+            background: #f0f2f5; padding: 3px 10px; border-radius: 14px;
+            font-size: 0.7rem; display: flex; align-items: center; gap: 4px; cursor: pointer;
         }
-        .friend-item .avatar-wrap { width: 16px; height: 16px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .friend-item .avatar-wrap { width: 18px; height: 18px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .friend-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.4rem; font-weight: 700; }
+        .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.45rem; font-weight: 700; }
 
         /* ===== ГРУППЫ ===== */
-        .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .groups-page .group-card {
-            background: #fff; border-radius: 12px; padding: 12px;
+            background: #fff; border-radius: 12px; padding: 14px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8;
             cursor: pointer; text-align: center; transition: all 0.2s;
         }
-        .groups-page .group-card:hover { transform: translateY(-2px); border-color: #1877f2; }
-        .groups-page .group-card .icon { font-size: 1.5rem; }
-        .groups-page .group-card .name { font-weight: 600; font-size: 0.75rem; margin-top: 2px; }
-        .groups-page .group-card .count { color: #888; font-size: 0.6rem; }
+        .groups-page .group-card:hover { transform: translateY(-3px); border-color: #1877f2; }
+        .groups-page .group-card .icon { font-size: 1.8rem; }
+        .groups-page .group-card .name { font-weight: 600; font-size: 0.8rem; margin-top: 4px; }
+        .groups-page .group-card .count { color: #888; font-size: 0.65rem; }
+        .groups-page .group-card .group-links {
+            display: flex; justify-content: center; gap: 10px; margin-top: 6px;
+        }
+        .groups-page .group-card .group-links span {
+            font-size: 0.6rem; color: #1877f2; cursor: pointer; padding: 2px 8px;
+            border-radius: 12px; background: #e8f0fe;
+        }
+        .groups-page .group-card .group-links span:hover { background: #d0e4ff; }
 
         /* ===== ЛЮДИ ===== */
-        .people-page .people-list { display: flex; flex-direction: column; gap: 4px; }
+        .people-page .people-list { display: flex; flex-direction: column; gap: 6px; }
         .people-page .people-item {
-            background: #fff; border-radius: 10px; padding: 8px 12px;
+            background: #fff; border-radius: 12px; padding: 10px 14px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8;
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            cursor: pointer; display: flex; align-items: center; gap: 10px;
         }
-        .people-page .people-item .avatar-wrap { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .people-page .people-item:hover { border-color: #1877f2; }
+        .people-page .people-item .avatar-wrap { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .people-page .people-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .people-page .people-item .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.7rem; }
+        .people-page .people-item .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.8rem; }
         .people-page .people-item .info { flex: 1; }
-        .people-page .people-item .info .name { font-weight: 600; font-size: 0.75rem; }
-        .people-page .people-item .info .status { color: #888; font-size: 0.6rem; }
+        .people-page .people-item .info .name { font-weight: 600; font-size: 0.8rem; }
+        .people-page .people-item .info .status { color: #888; font-size: 0.65rem; }
 
         /* ===== ЧАТ ===== */
         .chat-view {
-            display: none; background: #fff; border-radius: 12px; padding: 10px;
+            display: none; background: #fff; border-radius: 12px; padding: 12px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8;
-            height: 60vh; flex-direction: column;
+            height: 65vh; flex-direction: column;
         }
         .chat-view.active { display: flex; }
-        .chat-view .back { background: none; border: none; color: #1877f2; cursor: pointer; font-weight: 600; margin-bottom: 4px; font-size: 0.75rem; }
-        .chat-view .messages { flex: 1; overflow-y: auto; margin-bottom: 4px; }
-        .chat-view .messages .msg { padding: 4px 8px; margin-bottom: 2px; background: #f5f5f5; border-radius: 6px; font-size: 0.75rem; }
-        .chat-view .messages .msg .author { font-weight: 600; font-size: 0.65rem; color: #1877f2; }
-        .chat-view .messages .msg .time { color: #999; font-size: 0.45rem; margin-left: 4px; }
-        .chat-view .input-wrap { display: flex; gap: 4px; }
-        .chat-view .input-wrap input { flex: 1; padding: 4px 10px; border: 1px solid #ddd; border-radius: 16px; outline: none; font-size: 0.75rem; }
+        .chat-view .back { background: none; border: none; color: #1877f2; cursor: pointer; font-weight: 600; margin-bottom: 6px; font-size: 0.8rem; }
+        .chat-view .messages { flex: 1; overflow-y: auto; margin-bottom: 6px; }
+        .chat-view .messages .msg { padding: 6px 10px; margin-bottom: 4px; background: #f5f5f5; border-radius: 8px; font-size: 0.8rem; }
+        .chat-view .messages .msg .author { font-weight: 600; font-size: 0.7rem; color: #1877f2; }
+        .chat-view .messages .msg .time { color: #999; font-size: 0.5rem; margin-left: 4px; }
+        .chat-view .input-wrap { display: flex; gap: 6px; }
+        .chat-view .input-wrap input { flex: 1; padding: 6px 14px; border: 1px solid #ddd; border-radius: 20px; outline: none; font-size: 0.8rem; }
         .chat-view .input-wrap input:focus { border-color: #1877f2; }
-        .chat-view .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 16px; padding: 0 14px; font-weight: 600; cursor: pointer; font-size: 0.7rem; }
+        .chat-view .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 20px; padding: 0 18px; font-weight: 600; cursor: pointer; font-size: 0.75rem; }
 
         /* ===== МОДАЛКИ ===== */
         .modal {
@@ -324,45 +396,45 @@
         }
         .modal.open { display: flex; }
         .modal .box {
-            background: #fff; border-radius: 14px; padding: 16px;
-            max-width: 380px; width: 92%; max-height: 80vh; overflow-y: auto;
+            background: #fff; border-radius: 14px; padding: 20px;
+            max-width: 420px; width: 92%; max-height: 80vh; overflow-y: auto;
         }
-        .modal .box h3 { margin-bottom: 4px; font-size: 0.9rem; color: #e67e22; }
-        .modal .box .sub { color: #888; font-size: 0.75rem; margin-bottom: 6px; }
+        .modal .box h3 { margin-bottom: 8px; font-size: 0.95rem; color: #e67e22; }
+        .modal .box .sub { color: #888; font-size: 0.75rem; margin-bottom: 8px; }
         .modal .box input, .modal .box textarea {
-            width: 100%; padding: 6px 10px; border: 1px solid #ddd;
-            border-radius: 6px; margin: 3px 0; font-family: inherit; font-size: 0.8rem;
+            width: 100%; padding: 8px 12px; border: 1px solid #ddd;
+            border-radius: 8px; margin: 4px 0; font-family: inherit; font-size: 0.85rem;
             outline: none;
         }
         .modal .box input:focus, .modal .box textarea:focus { border-color: #e67e22; }
-        .modal .box textarea { min-height: 40px; resize: vertical; }
-        .modal .box .btns { display: flex; gap: 4px; justify-content: flex-end; margin-top: 6px; }
+        .modal .box textarea { min-height: 44px; resize: vertical; }
+        .modal .box .btns { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; }
         .modal .box .btns button {
-            padding: 4px 14px; border: none; border-radius: 16px;
-            font-weight: 600; cursor: pointer; font-size: 0.7rem;
+            padding: 6px 18px; border: none; border-radius: 20px;
+            font-weight: 600; cursor: pointer; font-size: 0.75rem;
         }
         .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
         .modal .box .btns .save { background: #e67e22; color: #fff; }
-        .modal .box .btn-group { display: flex; gap: 4px; margin-bottom: 4px; align-items: center; }
+        .modal .box .btn-group { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
         .modal .box .btn-group input { margin-bottom: 0; flex: 1; }
-        .modal .box .btn-group .btn-remove { background: #ffebee; color: #c62828; border: none; border-radius: 30px; padding: 4px 10px; cursor: pointer; font-size: 0.6rem; }
-        .modal .box .btn-add { background: #f0f0f0; border: 1px solid #ddd; color: #e67e22; padding: 3px 12px; border-radius: 20px; cursor: pointer; font-size: 0.65rem; margin-top: 3px; }
+        .modal .box .btn-group .btn-remove { background: #ffebee; color: #c62828; border: none; border-radius: 30px; padding: 6px 12px; cursor: pointer; font-size: 0.7rem; }
+        .modal .box .btn-add { background: #f0f0f0; border: 1px solid #ddd; color: #e67e22; padding: 4px 14px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; margin-top: 4px; }
 
         .google-btn {
             display: flex; align-items: center; justify-content: center;
-            gap: 6px; width: 100%; padding: 6px;
+            gap: 8px; width: 100%; padding: 8px;
             background: #fff; border: 1px solid #ddd; border-radius: 40px;
-            font-weight: 600; cursor: pointer; margin: 4px 0; font-size: 0.8rem;
+            font-weight: 600; cursor: pointer; margin: 4px 0; font-size: 0.85rem;
         }
         .google-btn:hover { background: #f5f5f5; }
-        .google-btn img { width: 16px; height: 16px; }
+        .google-btn img { width: 18px; height: 18px; }
 
-        .divider { display: flex; align-items: center; gap: 6px; color: #bbb; font-size: 0.65rem; margin: 4px 0; }
+        .divider { display: flex; align-items: center; gap: 8px; color: #bbb; font-size: 0.7rem; margin: 6px 0; }
         .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
 
         .admin-dot {
-            position: fixed; bottom: 8px; right: 8px;
-            width: 10px; height: 10px; border-radius: 50%;
+            position: fixed; bottom: 10px; right: 10px;
+            width: 12px; height: 12px; border-radius: 50%;
             border: 2px solid #ddd; cursor: pointer;
             background: #f0f0f0; z-index: 99;
         }
@@ -371,24 +443,25 @@
         @media (max-width: 480px) {
             .topbar .right .name { display: none; }
             .groups-page .group-list { grid-template-columns: 1fr 1fr; }
-            .hor-menu button { font-size: 0.6rem; padding: 4px 10px; }
-            .post .link-preview iframe { height: 180px; }
+            .hor-menu button { font-size: 0.65rem; padding: 4px 10px; }
+            .post .link-preview iframe { height: 200px; }
             .player { min-width: 100px; padding: 2px 8px; }
-            .player .track-name { max-width: 35px; font-size: 0.4rem; }
-            .player .play-btn { padding: 2px 6px; font-size: 0.5rem; }
-            .player .nav-btn { font-size: 0.6rem; }
+            .player .track-name { max-width: 40px; font-size: 0.45rem; }
+            .player .play-btn { padding: 2px 8px; font-size: 0.55rem; }
+            .player .nav-btn { font-size: 0.7rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- ===== ТОПБАР ===== -->
+<!-- ===== ТОПБАР С ПЛЕЕРОМ ===== -->
 <div class="topbar">
     <div class="left">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
         <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
     </div>
     
+    <!-- ===== ПЛЕЕР ===== -->
     <div class="player" id="player">
         <button class="nav-btn" onclick="prevTrack()">⏮</button>
         <button class="play-btn" id="playBtn" onclick="playMusic()">▶</button>
@@ -410,7 +483,7 @@
     </div>
 </div>
 
-<!-- ===== МЕНЮ ===== -->
+<!-- ===== ГОРИЗОНТАЛЬНОЕ МЕНЮ ===== -->
 <div class="hor-menu">
     <button class="active" id="hFeed" onclick="goToFeed()">📰 Лента</button>
     <button id="hGroups" onclick="goToGroups()">👥 Группы</button>
@@ -429,7 +502,9 @@
     <div class="nav-item" onclick="goToGroups();closeSidebar();">👥 Группы</div>
     <div class="nav-item" onclick="goToPeople();closeSidebar();">👤 Люди</div>
     <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
-    <div class="footer"><button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button></div>
+    <div class="footer">
+        <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
+    </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -437,7 +512,7 @@
 <!-- ===== КОНТЕЙНЕР ===== -->
 <div class="container">
 
-    <!-- ЛЕНТА -->
+    <!-- ===== ЛЕНТА (ГЛАВНАЯ) ===== -->
     <div class="page feed-page active" id="feedPage">
         <div class="post-form">
             <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
@@ -449,26 +524,42 @@
             <input type="file" id="fileInput" accept="image/*" class="hidden">
             <div id="previewBox" class="preview-box">
                 <img id="previewImg">
-                <span id="previewName" style="font-size:0.65rem;max-width:70px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"></span>
+                <span id="previewName" style="font-size:0.7rem;max-width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"></span>
                 <button class="remove-pic" onclick="removeImage()">✕</button>
             </div>
         </div>
         <div id="feed"></div>
     </div>
 
-    <!-- ГРУППЫ -->
+    <!-- ===== ГРУППЫ ===== -->
     <div class="page groups-page" id="groupsPage">
-        <h3 style="margin-bottom:6px;font-size:0.85rem;">👥 Группы</h3>
+        <h3 style="margin-bottom:8px;font-size:0.9rem;">👥 Группы</h3>
         <div class="group-list" id="groupList"></div>
     </div>
 
-    <!-- ЛЮДИ -->
+    <!-- ===== ГРУППОВАЯ ЛЕНТА ===== -->
+    <div class="page feed-page" id="groupFeedPage" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h3 style="font-size:0.9rem;" id="groupFeedTitle">📰 Группа</h3>
+            <button onclick="goToGroups()" style="background:#e4e6eb;border:none;border-radius:20px;padding:4px 14px;cursor:pointer;font-weight:600;font-size:0.7rem;">← Назад</button>
+        </div>
+        <div class="post-form">
+            <textarea id="groupPostInput" placeholder="Пост в группе..."></textarea>
+            <div class="actions">
+                <button class="submit" onclick="submitGroupPost()">📤 Опубликовать</button>
+                <button class="cancel" onclick="document.getElementById('groupPostInput').value='';">Очистить</button>
+            </div>
+        </div>
+        <div id="groupFeed"></div>
+    </div>
+
+    <!-- ===== ЛЮДИ ===== -->
     <div class="page people-page" id="peoplePage">
-        <h3 style="margin-bottom:6px;font-size:0.85rem;">👤 Люди</h3>
+        <h3 style="margin-bottom:8px;font-size:0.9rem;">👤 Люди</h3>
         <div class="people-list" id="peopleList"></div>
     </div>
 
-    <!-- ПРОФИЛЬ -->
+    <!-- ===== ПРОФИЛЬ ===== -->
     <div class="page profile-page" id="profilePage">
         <div class="profile-header">
             <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()">
@@ -490,11 +581,11 @@
             <h4>🤝 Друзья</h4>
             <div class="friend-list" id="friendList"></div>
         </div>
-        <h4 style="margin:6px 0 4px;font-size:0.75rem;color:#555;">📰 Посты пользователя</h4>
+        <h4 style="margin:6px 0 4px;font-size:0.8rem;color:#555;">📰 Посты пользователя</h4>
         <div id="profilePosts"></div>
     </div>
 
-    <!-- ЧАТ -->
+    <!-- ===== ЧАТ ===== -->
     <div class="chat-view" id="chatView">
         <button class="back" onclick="closeChat()">← Назад</button>
         <div class="messages" id="chatMessages"></div>
@@ -526,23 +617,26 @@
     </div>
 </div>
 
-<!-- МОДАЛКА РЕДАКТИРОВАНИЯ -->
+<!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА ===== -->
 <div class="modal" id="editModal">
     <div class="box">
         <h3>✏️ Редактировать пост</h3>
         <div class="sub">Измените содержимое поста</div>
-        <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
+        
+        <input type="text" id="editMarquee" placeholder="📢 Бегущая строка (заголовок)">
         <textarea id="editText" placeholder="📝 Текст поста"></textarea>
-        <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
+        <input type="url" id="editLink" placeholder="🔗 Ссылка для фрейма (iframe)">
         <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
-        <div style="color:#888;font-size:0.65rem;margin:4px 0 2px;">🔘 Кнопки</div>
+        
+        <div style="color:#888;font-size:0.7rem;margin:6px 0 2px;">🔘 Кнопки (до 5 штук)</div>
         <div id="editButtonsContainer"></div>
         <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
-        <div class="btns" style="margin-top:8px;">
+        
+        <div class="btns" style="margin-top:12px;">
             <button class="save" onclick="saveEdit()">💾 Сохранить</button>
             <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
         </div>
-        <button onclick="deleteEditPost()" style="width:100%;padding:4px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:16px;margin-top:6px;cursor:pointer;font-weight:600;font-size:0.7rem;">🗑 Удалить пост</button>
+        <button onclick="deleteEditPost()" style="width:100%;padding:6px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:20px;margin-top:8px;cursor:pointer;font-weight:600;font-size:0.75rem;">🗑 Удалить пост</button>
     </div>
 </div>
 
@@ -606,8 +700,13 @@
     // ================================================================
     // ПЛЕЕР
     // ================================================================
-    const PLAYLIST = [{ name: 'ONE IN BILLION', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/ONE-IN-BILLION.mp3' }];
-    let currentTrack = 0, isPlaying = false, eqInterval = null, audio = null;
+    const PLAYLIST = [
+        { name: 'ONE IN BILLION', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/ONE-IN-BILLION.mp3' }
+    ];
+    let currentTrack = 0;
+    let isPlaying = false;
+    let eqInterval = null;
+    let audio = null;
 
     function initAudio() {
         if (!audio) {
@@ -640,13 +739,25 @@
 
     window.prevTrack = function() {
         currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
-        if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(() => {}); }
+        if (audio) {
+            audio.src = PLAYLIST[currentTrack].url;
+            if (isPlaying) {
+                audio.play().catch(e => console.log('Ошибка:', e));
+                startEq();
+            }
+        }
         document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
     };
 
     window.nextTrack = function() {
         currentTrack = (currentTrack + 1) % PLAYLIST.length;
-        if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(() => {}); }
+        if (audio) {
+            audio.src = PLAYLIST[currentTrack].url;
+            if (isPlaying) {
+                audio.play().catch(e => console.log('Ошибка:', e));
+                startEq();
+            }
+        }
         document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
     };
 
@@ -695,15 +806,15 @@
     let pendingImageFile = null;
     let EDITING_ID = null;
     let showStat = 'friends';
+    let currentGroup = null;
 
     // ================================================================
-    // AUTH - GOOGLE (ИСПРАВЛЕНО)
+    // AUTH - GOOGLE
     // ================================================================
     auth.onAuthStateChanged(user => {
         if (user) {
             USER_UID = user.uid;
-            // ===== БЕРЁМ ИМЯ ТОЛЬКО ИЗ GOOGLE =====
-            USER = user.displayName || user.email || 'User';
+            USER = user.displayName || user.email || user.uid.slice(0, 8);
             localStorage.setItem('dc_u_' + SITE, USER);
             db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, email: user.email || 'anon' });
             updateUI();
@@ -730,25 +841,6 @@
             }
         });
     });
-
-    window.closeLogin = function() {
-        document.getElementById('loginModal').classList.remove('open');
-    };
-
-    window.loginName = function() {
-        const n = document.getElementById('nameInput').value.trim();
-        if (!n) { alert('Введите имя'); return; }
-        auth.signInAnonymously().then(() => {
-            USER = n.slice(0, 24);
-            localStorage.setItem('dc_u_' + SITE, USER);
-            updateUI();
-            loadFeed();
-            loadGroups();
-            loadPeople();
-            loadProfile();
-            closeLogin();
-        }).catch(e => alert('Ошибка: ' + e.message));
-    };
 
     // ================================================================
     // АВАТАРКИ
@@ -817,6 +909,25 @@
         }
     }
 
+    window.closeLogin = function() {
+        document.getElementById('loginModal').classList.remove('open');
+    };
+
+    window.loginName = function() {
+        const n = document.getElementById('nameInput').value.trim();
+        if (!n) { alert('Введите имя'); return; }
+        auth.signInAnonymously().then(() => {
+            USER = n.slice(0, 24);
+            localStorage.setItem('dc_u_' + SITE, USER);
+            updateUI();
+            loadFeed();
+            loadGroups();
+            loadPeople();
+            loadProfile();
+            closeLogin();
+        }).catch(e => alert('Ошибка: ' + e.message));
+    };
+
     // ================================================================
     // САЙДБАР
     // ================================================================
@@ -833,15 +944,26 @@
     // НАВИГАЦИЯ
     // ================================================================
     function setActivePage(pageId) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        if (pageId) document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.page').forEach(el => {
+            if (el.id !== 'groupFeedPage') el.classList.remove('active');
+        });
+        if (pageId) {
+            const el = document.getElementById(pageId);
+            if (el) el.classList.add('active');
+        }
         document.querySelectorAll('.hor-menu button').forEach(el => el.classList.remove('active'));
         const map = { feedPage: 'hFeed', groupsPage: 'hGroups', peoplePage: 'hPeople', profilePage: 'hProfile' };
         if (map[pageId]) document.getElementById(map[pageId]).classList.add('active');
+        
+        if (pageId !== 'groupFeedPage') {
+            document.getElementById('groupFeedPage').style.display = 'none';
+        }
     }
 
     window.goToFeed = function() {
         if (!USER) { alert('Войдите!'); return; }
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('feedPage');
         document.getElementById('chatView').classList.remove('active');
         if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
@@ -851,6 +973,8 @@
 
     window.goToGroups = function() {
         if (!USER) { alert('Войдите!'); return; }
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('groupsPage');
         document.getElementById('chatView').classList.remove('active');
         if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
@@ -860,6 +984,8 @@
 
     window.goToPeople = function() {
         if (!USER) { alert('Войдите!'); return; }
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('peoplePage');
         document.getElementById('chatView').classList.remove('active');
         if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
@@ -870,6 +996,8 @@
     window.goToProfile = function() {
         if (!USER) { alert('Войдите!'); return; }
         VIEWING_USER = null;
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('profilePage');
         document.getElementById('chatView').classList.remove('active');
         if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
@@ -889,7 +1017,7 @@
     }
 
     // ================================================================
-    // ЛЕНТА
+    // ЛЕНТА (ГЛАВНАЯ)
     // ================================================================
     function loadFeed() {
         if (!USER_UID) {
@@ -913,7 +1041,63 @@
     }
 
     // ================================================================
-    // ОТРИСОВКА ПОСТА
+    // ЛЕНТА ГРУППЫ
+    // ================================================================
+    window.openGroupFeed = function(groupId, groupName) {
+        currentGroup = groupId;
+        document.getElementById('groupFeedTitle').textContent = '📰 ' + groupName;
+        document.getElementById('groupFeedPage').style.display = 'block';
+        setActivePage(null);
+        loadGroupFeed(groupId);
+    };
+
+    function loadGroupFeed(groupId) {
+        const el = document.getElementById('groupFeed');
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/group_posts/' + groupId).orderByChild('timestamp').on('value', snap => {
+            el.innerHTML = '';
+            const data = snap.val() || {};
+            const keys = Object.keys(data).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
+            if (!keys.length) {
+                el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Нет постов в группе</div>';
+                return;
+            }
+            keys.forEach(k => { const p = data[k]; p.id = k; el.appendChild(renderPost(p, 'group')); });
+        });
+    }
+
+    window.submitGroupPost = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        if (!currentGroup) { alert('Выберите группу'); return; }
+        const text = document.getElementById('groupPostInput').value.trim();
+        if (!text) { alert('Введите текст'); return; }
+
+        const hashtags = extractHashtags(text);
+        const postData = {
+            author: USER,
+            authorUid: USER_UID,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            edited: false
+        };
+
+        const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+        if (linkMatch) postData.link = linkMatch[1];
+
+        db.ref('sites/' + SITE + '/group_posts/' + currentGroup).push(postData);
+        document.getElementById('groupPostInput').value = '';
+    };
+
+    // ================================================================
+    // ОТРИСОВКА ПОСТА С ТРЕМЯ ТОЧКАМИ
     // ================================================================
     function renderPost(p, type) {
         const div = document.createElement('div');
@@ -953,7 +1137,7 @@
             hashtagsHtml += '</div>';
         }
 
-        // ===== ТРИ ТОЧКИ =====
+        // ===== ТРИ ТОЧКИ (МЕНЮ ПОСТА) =====
         let menuHtml = '';
         if (p.author === USER || IS_ADMIN) {
             menuHtml = `
@@ -984,7 +1168,7 @@
             <div class="author">
                 ${avatarHtml}
                 <span class="name" onclick="viewUser('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
-                <span class="time">${p.time || ''}${p.edited ? ' <span style="color:#999;font-size:0.45rem;">(ред.)</span>' : ''}</span>
+                <span class="time">${p.time || ''}${p.edited ? ' <span style="color:#999;font-size:0.5rem;">(ред.)</span>' : ''}</span>
             </div>
             <div class="text">${textHtml}</div>
             ${imgHtml}
@@ -1013,12 +1197,11 @@
         return div;
     }
 
-    // ================================================================
-    // ТОГГЛ МЕНЮ
-    // ================================================================
+    // ===== ТОГГЛ МЕНЮ ПОСТА =====
     window.togglePostMenu = function(id) {
         const menu = document.getElementById('menu_' + id);
         if (menu) {
+            // Закрываем все открытые меню
             document.querySelectorAll('.post-menu .dropdown.open').forEach(el => {
                 if (el.id !== 'menu_' + id) el.classList.remove('open');
             });
@@ -1026,6 +1209,7 @@
         }
     };
 
+    // Закрываем меню при клике вне
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.post-menu')) {
             document.querySelectorAll('.post-menu .dropdown.open').forEach(el => el.classList.remove('open'));
@@ -1038,8 +1222,6 @@
     function getPostPath(type) {
         return type === 'group' ? 'group_posts/' + currentGroup : 'feed_posts';
     }
-
-    let currentGroup = null;
 
     function loadComments(postId, type) {
         const path = getPostPath(type);
@@ -1056,7 +1238,7 @@
             db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(count);
 
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.6rem;padding:3px 0;">Нет комментариев</div>';
+                container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;padding:4px 0;">Нет комментариев</div>';
                 return;
             }
 
@@ -1070,9 +1252,9 @@
                     <div class="body">
                         <span class="name">${esc(c.author || 'Аноним')}</span>
                         <span class="time">${c.time || ''}</span>
-                        <div class="text">${esc(c.text || '')}</div>
+                        <div>${esc(c.text || '')}</div>
                     </div>
-                    ${(c.author === USER || IS_ADMIN) ? `<button onclick="deleteComment('${postId}','${k}','${type}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.5rem;">✕</button>` : ''}
+                    ${(c.author === USER || IS_ADMIN) ? `<button onclick="deleteComment('${postId}','${k}','${type}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.55rem;">✕</button>` : ''}
                 `;
                 container.appendChild(div);
                 if (c.authorUid) {
@@ -1142,6 +1324,7 @@
         if (!confirm('🗑 Удалить пост?')) return;
         const path = getPostPath(type);
         db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
+        // Закрываем меню
         const menu = document.getElementById('menu_' + id);
         if (menu) menu.classList.remove('open');
     };
@@ -1154,6 +1337,7 @@
         document.getElementById('editModal').classList.add('open');
         const path = getPostPath(type);
 
+        // Закрываем меню
         const menu = document.getElementById('menu_' + id);
         if (menu) menu.classList.remove('open');
 
@@ -1266,14 +1450,14 @@
 
     function loadProfilePosts(uid) {
         const container = document.getElementById('profilePosts');
-        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">Загрузка...</div>';
+        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:10px;font-size:0.75rem;">Загрузка...</div>';
         
         db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
             container.innerHTML = '';
             const data = snap.val() || {};
             const keys = Object.keys(data).filter(k => data[k].authorUid === uid).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
             if (!keys.length) {
-                container.innerHTML = '<div style="text-align:center;padding:8px;color:#bbb;font-size:0.7rem;">Нет постов</div>';
+                container.innerHTML = '<div style="text-align:center;padding:10px;color:#bbb;font-size:0.75rem;">Нет постов</div>';
                 return;
             }
             keys.forEach(k => {
@@ -1295,6 +1479,7 @@
         }
         const isFriend = checkFriend(uid);
         actions.innerHTML = `
+            <button class="msg-btn" onclick="openDM('${uid}')">✉️ Сообщение</button>
             <button class="friend-btn ${isFriend ? 'added' : ''}" onclick="toggleFriend('${uid}')">
                 ${isFriend ? '✅ В друзьях' : '➕ Добавить в друзья'}
             </button>
@@ -1419,10 +1604,14 @@
                 const el2 = document.querySelector(`#groupList .group-card[data-id="${g.id}"] .count`);
                 if (el2) el2.textContent = snap.numChildren();
             });
-            return `<div class="group-card" data-id="${g.id}" onclick="openGroup('${g.id}')">
+            return `<div class="group-card" data-id="${g.id}">
                 <div class="icon">${g.name.split(' ')[0]}</div>
                 <div class="name">${g.name}</div>
                 <div class="count">💬 <span class="count">0</span></div>
+                <div class="group-links">
+                    <span onclick="openGroup('${g.id}')">💬 Чат</span>
+                    <span onclick="openGroupFeed('${g.id}','${g.name}')">📰 Лента</span>
+                </div>
             </div>`;
         }).join('');
     }
@@ -1461,7 +1650,7 @@
             const keys = Object.keys(users).filter(k => k !== USER_UID);
             const el = document.getElementById('peopleList');
             if (!keys.length) { el.innerHTML =
-                '<div style="text-align:center;padding:8px;color:#bbb;font-size:0.7rem;">Нет других пользователей</div>'; return; }
+                '<div style="text-align:center;padding:12px;color:#bbb;">Нет других пользователей</div>'; return; }
             el.innerHTML = keys.map(k => {
                 const u = users[k];
                 const name = u.name || 'Аноним';
@@ -1485,12 +1674,12 @@
         if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
             chatUnsub = null; }
         const box = document.getElementById('chatMessages');
-        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">⏳ Загрузка...</div>';
+        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">⏳ Загрузка...</div>';
         chatUnsub = path;
         db.ref(path).orderByChild('timestamp').on('value', snap => {
             box.innerHTML = '';
             if (!snap.exists()) { box.innerHTML =
-                '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">Сообщений нет</div>'; return; }
+                '<div style="color:#bbb;text-align:center;padding:20px;">Сообщений нет</div>'; return; }
             snap.forEach(s => {
                 const m = s.val();
                 const div = document.createElement('div');
@@ -1526,7 +1715,18 @@
         if (document.getElementById('groupsPage').classList.contains('active')) goToGroups();
         else if (document.getElementById('peoplePage').classList.contains('active')) goToPeople();
         else if (document.getElementById('profilePage').classList.contains('active')) goToProfile();
-        else goToFeed();
+        else if (document.getElementById('groupFeedPage').style.display !== 'none') {
+            document.getElementById('groupFeedPage').style.display = 'none';
+            goToGroups();
+        } else goToFeed();
+    };
+
+    window.openDM = function(userId) {
+        if (!userId) return;
+        CURRENT_ROOM = 'dm_' + userId;
+        document.getElementById('chatView').classList.add('active');
+        setActivePage(null);
+        loadChat('dms/' + SITE + '/' + [USER_UID, userId].sort().join('_') + '/messages');
     };
 
     // ================================================================
@@ -1672,10 +1872,10 @@
     loadPeople();
     setActivePage('feedPage');
 
-    console.log('🏛️ METAIMPERIYA - ИСПРАВЛЕННАЯ ВЕРСИЯ!');
-    console.log('🔑 Google-вход: имя берётся из аккаунта');
+    console.log('🏛️ METAIMPERIYA - ПОЛНАЯ ВЕРСИЯ!');
     console.log('📰 Три точки на постах (редактировать/удалить)');
-    console.log('💬 Комментарии: текст виден чётко');
+    console.log('🎵 Плеер: Play/Pause, Вперёд, Назад');
+    console.log('🚪 Выход из профиля — кнопка в шапке');
     console.log('🏴‍☠️ Админ-пароль: 12345');
 
 })();
