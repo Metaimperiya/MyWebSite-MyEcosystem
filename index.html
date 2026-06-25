@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAIMPERIYA · Лента</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>METAIMPERIYA</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#0a0a12; color:#eee; font-family:system-ui; padding:12px; }
         .container { max-width:720px; margin:0 auto; }
         .header { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #222; }
         .header h1 { color:#ff8c00; cursor:pointer; }
-        .chat-panel { background:#10101a; border-radius:20px; border:1px solid #262633; overflow:hidden; display:flex; flex-direction:column; height:80vh; margin-top:12px; }
+        .header .right { display:flex; align-items:center; gap:8px; }
+        .header .right .avatar { width:30px; height:30px; border-radius:50%; background:#ff8c00; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; }
+        .header .right .avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+        .header .right .name { font-size:0.8rem; cursor:pointer; }
+        .header .right .logout { background:#4a1a1a; border:1px solid #6a1a1a; color:#ff6666; border-radius:20px; padding:2px 12px; cursor:pointer; font-size:0.65rem; }
+
+        /* ===== ПЛЕЕР ===== */
+        #player { background:#000; color:#0f0; border:2px solid #0f0; padding:12px; border-radius:10px; font-family:monospace; text-align:center; margin:10px 0; display:flex; justify-content:space-between; align-items:center; }
+        #player h4 { margin:0; font-size:0.8rem; }
+        #player button { background:#0f0; border:none; padding:6px 16px; cursor:pointer; font-weight:bold; border-radius:6px; font-size:0.7rem; }
+
+        .chat-panel { background:#10101a; border-radius:20px; border:1px solid #262633; overflow:hidden; display:flex; flex-direction:column; height:65vh; margin-top:8px; }
         #messages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px; }
         
         .post { background:#14141f; border-radius:16px; padding:14px 16px; border:1px solid #2a2a3a; }
@@ -24,19 +38,14 @@
         .post .name { color:#ffaa44; font-weight:700; }
         .post .time { color:#666; font-size:0.65rem; margin-left:10px; }
         .post .text { margin:6px 0; word-break:break-word; font-size:0.95rem; line-height:1.5; }
-        .post .text .link-hidden { color:#555; font-size:0.8rem; }
-        .post img { max-width:100%; max-height:300px; border-radius:12px; margin:6px 0; border:1px solid #333; cursor:pointer; }
-        
+        .post img { max-width:100%; max-height:250px; border-radius:12px; margin:6px 0; border:1px solid #333; cursor:pointer; }
         .post .link-preview { margin:8px 0 4px 0; border:1px solid #333; border-radius:12px; overflow:hidden; background:#0f0f1a; width:100%; }
         .post .link-preview iframe { width:100%; height:350px; border:none; display:block; }
-        
         .post .buttons { display:flex; flex-direction:column; gap:6px; margin:8px 0; }
         .post .buttons .btn-item { display:block; background:#ff8c00; border:none; border-radius:12px; padding:12px 18px; text-align:center; text-decoration:none; color:#0b0b0f; font-weight:700; font-size:0.95rem; transition:0.2s; cursor:pointer; }
         .post .buttons .btn-item:hover { background:#ffa033; transform:scale(1.01); }
-        
         .post .hashtags { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px 0; padding-top:8px; border-top:1px solid #222; }
         .post .hashtags .tag { color:#66aaff; font-size:0.75rem; background:#0f0f1a; padding:2px 12px; border-radius:20px; border:1px solid #222; }
-        
         .post .actions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
         .post .actions button { background:#222233; border:1px solid #333349; color:#ccc; padding:2px 14px; border-radius:40px; font-size:0.7rem; cursor:pointer; }
         .post .actions button.edit-btn { background:#2a2a3a; border-color:#ff8c00; color:#ff8c00; }
@@ -77,7 +86,19 @@
 <div class="container">
     <div class="header">
         <h1 id="brandTitle">🌀 METAIMPERIYA</h1>
-        <span style="font-size:0.7rem;color:#666;">📸 лента с фото</span>
+        <div class="right">
+            <span style="font-size:0.6rem;color:#666;" id="userNameDisplay">Гость</span>
+            <div class="avatar" id="avatarDisplay" onclick="goToProfile()">?</div>
+            <button class="logout" onclick="logout()" id="logoutBtn" style="display:none;">Выйти</button>
+        </div>
+    </div>
+
+    <!-- ПЛЕЕР -->
+    <div id="player">
+        <h4>🎵 ONE IN BILLION</h4>
+        <div>
+            <button id="playBtn" onclick="playMusic()">▶ PLAY</button>
+        </div>
     </div>
 
     <div class="chat-panel">
@@ -104,15 +125,13 @@
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h2>✏️ Редактировать пост</h2>
-        <input type="text" id="editMarquee" placeholder="Бегущая строка (заголовок)">
+        <input type="text" id="editMarquee" placeholder="Бегущая строка">
         <textarea id="editText" placeholder="Текст поста"></textarea>
-        <input type="url" id="editLink" placeholder="Ссылка для превью (iframe)">
-        <input type="text" id="editHashtags" placeholder="Хэштеги: #chat #smm #dating">
-        
-        <div style="margin:8px 0 4px 0;color:#888;font-size:0.8rem;">🔘 Кнопки (до 5 штук)</div>
+        <input type="url" id="editLink" placeholder="Ссылка для превью">
+        <input type="text" id="editHashtags" placeholder="#хэштеги через пробел">
+        <div style="margin:8px 0 4px 0;color:#888;font-size:0.8rem;">🔘 Кнопки</div>
         <div id="editButtonsContainer"></div>
         <button onclick="addButtonField()" style="background:#222;color:#ff8c00;border:1px solid #333;border-radius:30px;padding:6px 16px;cursor:pointer;font-size:0.8rem;margin-top:4px;">➕ Добавить кнопку</button>
-        
         <div class="row" style="margin-top:12px;">
             <button class="btn-primary" onclick="saveEdit()">💾 Сохранить</button>
             <button class="btn-danger" onclick="closeEdit()">✕ Отмена</button>
@@ -123,34 +142,79 @@
 
 <script>
 // ================================================================
-// FIREBASE (2 ПРОЕКТА)
+// FIREBASE
 // ================================================================
-
-// 1. ОСНОВНОЙ ПРОЕКТ (база данных)
 const MAIN_CONFIG = {
-    apiKey: "AIzaSyC5L2GQ-2CYj-GNYsHENASdvKVF68rsEb0",
-    databaseURL: "https://mychatapp-2c141-default-rtdb.firebaseio.com",
-};
-firebase.initializeApp(MAIN_CONFIG);
-const db = firebase.database();
-
-// 2. СТОРАДЖ (фото)
-const STORAGE_CONFIG = {
     apiKey: "AIzaSyC5L2GQ-2CYj-GNYsHENASdvKVF68rsEb0",
     databaseURL: "https://mychatapp-2c141-default-rtdb.firebaseio.com",
     storageBucket: "mychatapp-2c141.appspot.com"
 };
-const storageApp = firebase.initializeApp(STORAGE_CONFIG, 'storage');
-const storage = firebase.storage(storageApp);
+firebase.initializeApp(MAIN_CONFIG);
+const db = firebase.database();
+const storage = firebase.storage();
+const auth = firebase.auth();
 
 // ================================================================
 // СОСТОЯНИЕ
 // ================================================================
-let currentUser = localStorage.getItem('deepchat_user') || 'anon';
+let currentUser = localStorage.getItem('metaimperiya_user') || 'anon';
+let currentUserUID = null;
 let pendingImage = null;
 let pendingImageFile = null;
 let roomId = 'room_001';
 let editingId = null;
+let isAdmin = localStorage.getItem('metaimperiya_admin') === 'true';
+
+// ================================================================
+// AUTH
+// ================================================================
+auth.onAuthStateChanged(user => {
+    if (user) {
+        currentUserUID = user.uid;
+        let saved = localStorage.getItem('metaimperiya_user');
+        if (!saved) {
+            currentUser = user.displayName || user.email || user.uid.slice(0,8);
+            localStorage.setItem('metaimperiya_user', currentUser);
+        } else {
+            currentUser = saved;
+        }
+        db.ref('users/' + currentUserUID).set({ name: currentUser, email: user.email });
+        updateUI();
+    } else {
+        currentUserUID = null;
+        updateUI();
+    }
+});
+
+function updateUI() {
+    const nameEl = document.getElementById('userNameDisplay');
+    const avatarEl = document.getElementById('avatarDisplay');
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (currentUser) {
+        nameEl.textContent = currentUser;
+        avatarEl.textContent = currentUser.charAt(0).toUpperCase();
+        logoutBtn.style.display = 'inline-block';
+    } else {
+        nameEl.textContent = 'Гость';
+        avatarEl.textContent = '?';
+        logoutBtn.style.display = 'none';
+    }
+}
+
+window.goToProfile = function() {
+    alert('👤 Профиль: ' + currentUser + '\nUID: ' + (currentUserUID || 'не авторизован'));
+};
+
+window.logout = function() {
+    if (auth.currentUser) {
+        auth.signOut();
+    }
+    localStorage.removeItem('metaimperiya_user');
+    currentUser = 'anon';
+    currentUserUID = null;
+    updateUI();
+    location.reload();
+};
 
 // ================================================================
 // АДМИНКА
@@ -158,14 +222,37 @@ let editingId = null;
 function adminLogin() {
     const pwd = prompt('🔐 Введите пароль админа:');
     if (pwd === '12345') {
-        localStorage.setItem('deepchat_admin', 'true');
+        localStorage.setItem('metaimperiya_admin', 'true');
+        isAdmin = true;
         alert('✅ Админ-режим ВКЛЮЧЕН!');
         location.reload();
     } else {
         alert('❌ Неверный пароль');
     }
 }
-const isAdmin = localStorage.getItem('deepchat_admin') === 'true';
+
+// ================================================================
+// МУЗЫКА
+// ================================================================
+const music = new Audio("https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/ONE-IN-BILLION.mp3");
+let isPlaying = false;
+
+function playMusic() {
+    const btn = document.getElementById('playBtn');
+    if (isPlaying) {
+        music.pause();
+        btn.textContent = '▶ PLAY';
+        isPlaying = false;
+    } else {
+        music.play().catch(e => console.log('Ошибка аудио:', e));
+        btn.textContent = '⏸ PAUSE';
+        isPlaying = true;
+    }
+}
+music.addEventListener('ended', function() {
+    document.getElementById('playBtn').textContent = '▶ PLAY';
+    isPlaying = false;
+});
 
 // ================================================================
 // DOM
@@ -195,40 +282,30 @@ function renderPost(m) {
     div.className = 'post';
     
     let marqueeHtml = m.marquee ? `<div class="marquee"><span>${escapeHtml(m.marquee)}</span></div>` : '';
-    
     let textHtml = escapeHtml(m.text || '');
     const linkMatch = (m.text || '').match(/(https?:\/\/[^\s]+)/);
-    if (linkMatch && m.link) {
-        textHtml = textHtml.replace(linkMatch[1], `<span class="link-hidden">${linkMatch[1]}</span>`);
-    }
-    
+    if (linkMatch && m.link) textHtml = textHtml.replace(linkMatch[1], `<span class="link-hidden">${linkMatch[1]}</span>`);
     let imgHtml = m.img ? `<img src="${m.img}" onclick="window.open(this.src)">` : '';
-    
     let buttonsHtml = '';
     if (m.buttons && m.buttons.length > 0) {
         buttonsHtml = '<div class="buttons">';
         m.buttons.forEach(btn => {
-            if (btn.url) {
-                buttonsHtml += `<a href="${escapeHtml(btn.url)}" target="_blank" class="btn-item">${escapeHtml(btn.label || '🔗 Перейти')}</a>`;
-            }
+            if (btn.url) buttonsHtml += `<a href="${escapeHtml(btn.url)}" target="_blank" class="btn-item">${escapeHtml(btn.label || '🔗 Перейти')}</a>`;
         });
         buttonsHtml += '</div>';
     }
-    
     let previewHtml = m.link ? `<div class="link-preview"><iframe src="${m.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>` : '';
-    
     let hashtagsHtml = '';
     if (m.hashtags && m.hashtags.length > 0) {
         hashtagsHtml = '<div class="hashtags">';
-        m.hashtags.forEach(tag => { hashtagsHtml += `<span class="tag">${escapeHtml(tag)}</span>`; });
+        m.hashtags.forEach(tag => hashtagsHtml += `<span class="tag">${escapeHtml(tag)}</span>`);
         hashtagsHtml += '</div>';
     }
-    
     let actionsHtml = `
         <button onclick="likeMsg('${m.id}')">👍 ${m.likes || 0}</button>
         <button onclick="replyMsg('${m.id}','${escapeHtml(m.nick)}')">💬 ответ</button>
     `;
-    if (m.nick === currentUser) actionsHtml += `<button class="edit-btn" onclick="openEdit('${m.id}')">✏️ ред.</button>`;
+    if (m.nick === currentUser || isAdmin) actionsHtml += `<button class="edit-btn" onclick="openEdit('${m.id}')">✏️ ред.</button>`;
     if (m.nick === currentUser || isAdmin) actionsHtml += `<button class="del-btn" onclick="deleteMsg('${m.id}')">🗑</button>`;
     
     div.innerHTML = `
@@ -249,14 +326,15 @@ function renderPost(m) {
 // ================================================================
 function sendMessage() {
     const text = msgInput.value.trim();
-    if (!text && !pendingImageFile) return;
+    if (!text && !pendingImageFile) {
+        alert('Напишите текст или добавьте фото');
+        return;
+    }
     
-    // Если есть фото — загружаем в Storage
     if (pendingImageFile) {
         const file = pendingImageFile;
         const path = 'images/' + Date.now() + '_' + file.name;
         const ref = storage.ref(path);
-        
         const uploadTask = ref.put(file);
         uploadTask.on('state_changed',
             function(snapshot) {
@@ -280,7 +358,7 @@ function sendMessage() {
 
 function sendPostData(text, imgUrl) {
     const data = {
-        nick: currentUser,
+        nick: currentUser || 'Аноним',
         text: text || '📷',
         time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
         timestamp: Date.now(),
@@ -292,10 +370,8 @@ function sendPostData(text, imgUrl) {
         hashtags: [],
         edited: false
     };
-    
     const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
     if (linkMatch) data.link = linkMatch[1];
-    
     msgRef.push(data);
     msgInput.value = '';
     pendingImage = null;
@@ -309,10 +385,7 @@ function sendPostData(text, imgUrl) {
 document.getElementById('fileInput').addEventListener('change', e => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Максимум 5 МБ');
-            return;
-        }
+        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
         pendingImageFile = file;
         const reader = new FileReader();
         reader.onload = ev => {
@@ -370,12 +443,8 @@ function addButtonField(label = '', url = '') {
 
 function removeButtonField(btn) {
     const group = btn.parentElement;
-    if (document.getElementById('editButtonsContainer').children.length > 1) {
-        group.remove();
-    } else {
-        group.querySelector('.btn-label-input').value = '';
-        group.querySelector('.btn-url-input').value = '';
-    }
+    if (document.getElementById('editButtonsContainer').children.length > 1) group.remove();
+    else { group.querySelector('.btn-label-input').value = ''; group.querySelector('.btn-url-input').value = ''; }
 }
 
 function saveEdit() {
@@ -397,11 +466,9 @@ function saveEdit() {
 }
 
 function deletePost() {
-    if (!editingId) return;
-    if (confirm('Удалить пост навсегда?')) {
-        db.ref(`rooms/${roomId}/messages/${editingId}`).remove();
-        closeEdit();
-    }
+    if (!editingId || !confirm('Удалить пост навсегда?')) return;
+    db.ref(`rooms/${roomId}/messages/${editingId}`).remove();
+    closeEdit();
 }
 
 function closeEdit() {
@@ -429,15 +496,12 @@ function escapeHtml(str) {
 msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
 // ================================================================
-// НИК
+// ЗАПУСК
 // ================================================================
-if (currentUser === 'anon') {
-    const nick = prompt('Введите ваш ник:');
-    if (nick) {
-        currentUser = nick;
-        localStorage.setItem('deepchat_user', nick);
-    }
-}
+updateUI();
+console.log('🏛️ METAIMPERIYA запущена!');
+console.log('🔑 Админ-пароль: 12345');
+console.log('🎵 Плеер с ONE IN BILLION');
 </script>
 </body>
 </html>
