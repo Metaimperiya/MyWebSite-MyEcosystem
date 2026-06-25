@@ -19,10 +19,13 @@
             min-height: 100vh;
         }
 
+        /* ===== ТОПБАР С ПЛЕЕРОМ ===== */
         .topbar {
             background: #fff; padding: 8px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100;
+            flex-wrap: wrap;
+            gap: 6px;
         }
         .topbar .left { display: flex; align-items: center; gap: 8px; }
         .topbar .left .menu-btn {
@@ -31,6 +34,44 @@
         .topbar .left .logo {
             font-size: 1.1rem; font-weight: 700; color: #1877f2; cursor: pointer;
         }
+
+        /* ===== ПЛЕЕР ===== */
+        .player {
+            background: #0a0a12; color: #0f0; border: 2px solid #0f0;
+            padding: 4px 14px; border-radius: 30px; font-family: monospace;
+            display: flex; align-items: center; gap: 10px;
+            flex: 0 1 auto;
+            min-width: 140px;
+        }
+        .player .track-name {
+            font-size: 0.6rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+        }
+        .player .play-btn {
+            background: #0f0; border: none; padding: 4px 14px;
+            cursor: pointer; font-weight: 700; font-size: 0.7rem;
+            border-radius: 20px; color: #000;
+            transition: 0.2s;
+        }
+        .player .play-btn:hover { background: #0d0; transform: scale(1.05); }
+        .player .play-btn:active { transform: scale(0.95); }
+        .player .eq-bars {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 18px;
+        }
+        .player .eq-bars .bar {
+            width: 3px;
+            background: #0f0;
+            border-radius: 2px;
+            height: 4px;
+            transition: height 0.08s;
+        }
+
         .topbar .right { display: flex; align-items: center; gap: 8px; }
         .topbar .right .avatar-wrap {
             width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
@@ -43,10 +84,11 @@
             max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
+        /* ===== ГОРИЗОНТАЛЬНОЕ МЕНЮ ===== */
         .hor-menu {
             background: #fff; padding: 6px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: center; gap: 8px;
-            position: sticky; top: 49px; z-index: 99; overflow-x: auto;
+            position: sticky; top: 56px; z-index: 99; overflow-x: auto;
             max-width: 700px; margin: 0 auto;
         }
         .hor-menu button {
@@ -57,6 +99,7 @@
         .hor-menu button:hover { background: #f0f0f0; }
         .hor-menu button.active { color: #1877f2; background: #e8f0fe; }
 
+        /* ===== САЙДБАР ===== */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
             background: #fff; border-right: 1px solid #ddd;
@@ -179,7 +222,6 @@
         
         .post .hashtags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px 0; padding-top: 8px; border-top: 1px solid #eee; }
         .post .hashtags .tag { color: #1877f2; font-size: 0.7rem; background: #e8f0fe; padding: 2px 12px; border-radius: 20px; border: 1px solid #d0e4ff; cursor: pointer; }
-        .post .hashtags .tag:hover { background: #d0e4ff; }
 
         .post .stats {
             display: flex; gap: 12px; font-size: 0.65rem; color: #888;
@@ -226,15 +268,25 @@
         .profile-header .actions button { padding: 4px 14px; border: none; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.65rem; }
         .profile-header .actions .edit-btn { background: #e4e6eb; color: #555; }
         .profile-header .actions .avatar-btn { background: #333; color: #fff; }
+        .profile-header .actions .msg-btn { background: #1877f2; color: #fff; }
+        .profile-header .actions .friend-btn { background: #e4e6eb; color: #555; }
+        .profile-header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
 
         .profile-stats { display: flex; gap: 16px; justify-content: center; margin: 6px 0; font-size: 0.7rem; color: #888; }
         .profile-stats span { cursor: pointer; }
         .profile-stats span:hover { color: #1877f2; }
 
-        .friends-section { background: #fff; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8; }
+        .friends-section {
+            background: #fff; border-radius: 12px; padding: 10px 14px;
+            margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            border: 1px solid #e8e8e8;
+        }
         .friends-section h4 { margin-bottom: 6px; color: #555; font-size: 0.8rem; }
         .friend-list { display: flex; flex-wrap: wrap; gap: 6px; }
-        .friend-item { background: #f0f2f5; padding: 3px 10px; border-radius: 14px; font-size: 0.7rem; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .friend-item {
+            background: #f0f2f5; padding: 3px 10px; border-radius: 14px;
+            font-size: 0.7rem; display: flex; align-items: center; gap: 4px; cursor: pointer;
+        }
         .friend-item .avatar-wrap { width: 18px; height: 18px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .friend-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.45rem; font-weight: 700; }
@@ -347,17 +399,32 @@
             .groups-page .group-list { grid-template-columns: 1fr 1fr; }
             .hor-menu button { font-size: 0.7rem; padding: 6px 12px; }
             .post .link-preview iframe { height: 200px; }
+            .player { min-width: 100px; padding: 3px 10px; }
+            .player .track-name { max-width: 50px; font-size: 0.5rem; }
+            .player .play-btn { padding: 2px 10px; font-size: 0.6rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- ===== ТОПБАР ===== -->
+<!-- ===== ТОПБАР С ПЛЕЕРОМ ===== -->
 <div class="topbar">
     <div class="left">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
         <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
     </div>
+    
+    <!-- ===== ПЛЕЕР ===== -->
+    <div class="player" id="player">
+        <span class="track-name" id="trackName">ONE IN BILLION</span>
+        <button class="play-btn" id="playBtn" onclick="playMusic()">▶</button>
+        <div class="eq-bars" id="eqBars">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+    </div>
+
     <div class="right">
         <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
             <span class="letter">?</span>
@@ -480,7 +547,7 @@
     </div>
 </div>
 
-<!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА (ПОЛНАЯ) ===== -->
+<!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА ===== -->
 <div class="modal" id="editModal">
     <div class="box">
         <h3>✏️ Редактировать пост</h3>
@@ -561,6 +628,50 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     // ================================================================
+    // ПЛЕЕР
+    // ================================================================
+    const audio = new Audio("https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/ONE-IN-BILLION.mp3");
+    let isPlaying = false;
+    let eqInterval = null;
+
+    window.playMusic = function() {
+        if (isPlaying) {
+            audio.pause();
+            isPlaying = false;
+            document.getElementById('playBtn').textContent = '▶';
+            stopEq();
+        } else {
+            audio.play().catch(e => console.log('Ошибка воспроизведения:', e));
+            isPlaying = true;
+            document.getElementById('playBtn').textContent = '⏸';
+            startEq();
+        }
+    };
+
+    function startEq() {
+        if (eqInterval) return;
+        eqInterval = setInterval(() => {
+            document.querySelectorAll('.eq-bars .bar').forEach(bar => {
+                bar.style.height = 2 + Math.random() * 14 + 'px';
+            });
+        }, 100);
+    }
+
+    function stopEq() {
+        if (eqInterval) {
+            clearInterval(eqInterval);
+            eqInterval = null;
+        }
+        document.querySelectorAll('.eq-bars .bar').forEach(bar => bar.style.height = '4px');
+    }
+
+    audio.addEventListener('ended', () => {
+        isPlaying = false;
+        document.getElementById('playBtn').textContent = '▶';
+        stopEq();
+    });
+
+    // ================================================================
     // СОСТОЯНИЕ
     // ================================================================
     const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
@@ -577,14 +688,14 @@
     let showStat = 'friends';
 
     // ================================================================
-    // AUTH
+    // AUTH - GOOGLE (ИСПРАВЛЕНО!)
     // ================================================================
     auth.onAuthStateChanged(user => {
         if (user) {
             USER_UID = user.uid;
-            let saved = localStorage.getItem('dc_u_' + SITE);
-            USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
-            if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
+            // ===== БЕРЁМ ИМЯ ИЗ GOOGLE, НЕ ИЗ LOCALSTORAGE! =====
+            USER = user.displayName || user.email || user.uid.slice(0, 8);
+            localStorage.setItem('dc_u_' + SITE, USER);
             db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, email: user.email || 'anon' });
             updateUI();
             loadFeed();
@@ -603,8 +714,11 @@
 
     document.getElementById('googleBtn').addEventListener('click', function() {
         auth.signInWithPopup(provider).catch(err => {
-            if (err.code === 'auth/popup-blocked') auth.signInWithRedirect(provider);
-            else alert('Ошибка: ' + err.message);
+            if (err.code === 'auth/popup-blocked') {
+                auth.signInWithRedirect(provider);
+            } else {
+                alert('Ошибка входа: ' + err.message);
+            }
         });
     });
 
@@ -798,7 +912,7 @@
     }
 
     // ================================================================
-    // ОТРИСОВКА ПОСТА (С ПОДДЕРЖКОЙ ВСЕХ ПОЛЕЙ)
+    // ОТРИСОВКА ПОСТА
     // ================================================================
     function renderPost(p) {
         const div = document.createElement('div');
@@ -809,22 +923,10 @@
         const letter = (p.author || '?').charAt(0).toUpperCase();
         const avatarHtml = `<span class="avatar-wrap" id="post-avatar-${p.id}"><span class="letter">${letter}</span></span>`;
 
-        // ===== БЕГУЩАЯ СТРОКА =====
-        let marqueeHtml = '';
-        if (p.marquee) {
-            marqueeHtml = `<div class="marquee"><span>${esc(p.marquee)}</span></div>`;
-        }
-
-        // ===== ТЕКСТ =====
+        let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
         let textHtml = esc(p.text || '');
-
-        // ===== ФОТО =====
-        let imgHtml = '';
-        if (p.img) {
-            imgHtml = `<img src="${p.img}" class="post-img" onclick="window.open(this.src)">`;
-        }
-
-        // ===== КНОПКИ =====
+        let imgHtml = p.img ? `<img src="${p.img}" class="post-img" onclick="window.open(this.src)">` : '';
+        
         let buttonsHtml = '';
         if (p.buttons && p.buttons.length > 0) {
             buttonsHtml = '<div class="buttons-wrap">';
@@ -836,13 +938,11 @@
             buttonsHtml += '</div>';
         }
 
-        // ===== ФРЕЙМ (iframe) =====
         let previewHtml = '';
         if (p.link) {
             previewHtml = `<div class="link-preview"><iframe src="${p.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
         }
 
-        // ===== ХЭШТЕГИ =====
         let hashtagsHtml = '';
         if (p.hashtags && p.hashtags.length > 0) {
             hashtagsHtml = '<div class="hashtags">';
@@ -852,7 +952,6 @@
             hashtagsHtml += '</div>';
         }
 
-        // ===== ДЕЙСТВИЯ =====
         let actionsHtml = `
             <div class="stats">
                 <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">
@@ -926,9 +1025,7 @@
         const text = document.getElementById('postInput').value.trim();
         if (!text && !pendingImageFile) { alert('Введите текст или добавьте фото'); return; }
 
-        // Авто-извлечение хэштегов
         const hashtags = extractHashtags(text);
-
         const postData = {
             author: USER,
             authorUid: USER_UID,
@@ -945,7 +1042,6 @@
             edited: false
         };
 
-        // Проверяем ссылку
         const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
         if (linkMatch) postData.link = linkMatch[1];
 
@@ -1144,7 +1240,7 @@
     };
 
     // ================================================================
-    // ===== ПОЛНОЕ РЕДАКТИРОВАНИЕ ПОСТА =====
+    // ===== ПОЛНОЕ РЕДАКТИРОВАНИЕ =====
     // ================================================================
     window.openEdit = function(id) {
         EDITING_ID = id;
@@ -1245,9 +1341,52 @@
             document.getElementById('profileBio').textContent = u.bio || 'Привет!';
             const avatar = document.getElementById('profileAvatar');
             renderAvatar(uid, avatar, (u.name || '?').charAt(0).toUpperCase());
+            showProfileActions(uid);
         });
         loadFriends(uid);
+        loadSubscribers(uid);
+        loadSubscriptions(uid);
     }
+
+    function showProfileActions(uid) {
+        const actions = document.getElementById('profileActions');
+        if (!uid || uid === USER_UID) {
+            actions.innerHTML = `
+                <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
+                <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
+            `;
+            return;
+        }
+        const isFriend = checkFriend(uid);
+        actions.innerHTML = `
+            <button class="msg-btn" onclick="openDM('${uid}')">✉️ Сообщение</button>
+            <button class="friend-btn ${isFriend ? 'added' : ''}" onclick="toggleFriend('${uid}')">
+                ${isFriend ? '✅ В друзьях' : '➕ Добавить в друзья'}
+            </button>
+        `;
+    }
+
+    function checkFriend(uid) {
+        if (!USER_UID) return false;
+        return localStorage.getItem('fr_' + USER_UID + '_' + uid) === '1';
+    }
+
+    window.toggleFriend = function(uid) {
+        if (!USER_UID) return;
+        const isFriend = checkFriend(uid);
+        if (isFriend) {
+            if (!confirm('Удалить из друзей?')) return;
+            localStorage.removeItem('fr_' + USER_UID + '_' + uid);
+            db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).remove();
+            db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).remove();
+        } else {
+            localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
+            db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
+            db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
+        }
+        loadProfile();
+        if (VIEWING_USER) showProfileActions(VIEWING_USER);
+    };
 
     function loadFriends(uid) {
         db.ref('sites/' + SITE + '/friends/' + uid).on('value', snap => {
@@ -1276,6 +1415,22 @@
                     }
                 });
             });
+        });
+    }
+
+    function loadSubscribers(uid) {
+        if (!uid) return;
+        db.ref('sites/' + SITE + '/subscribers/' + uid).on('value', snap => {
+            const data = snap.val() || {};
+            document.getElementById('subscribersCount').textContent = Object.keys(data).length;
+        });
+    }
+
+    function loadSubscriptions(uid) {
+        if (!uid) return;
+        db.ref('sites/' + SITE + '/subscriptions/' + uid).on('value', snap => {
+            const data = snap.val() || {};
+            document.getElementById('subscriptionsCount').textContent = Object.keys(data).length;
         });
     }
 
@@ -1389,7 +1544,7 @@
     }
 
     // ================================================================
-    // ЧАТ
+    // ЧАТ (ГРУППОВОЙ И ЛИЧНЫЙ)
     // ================================================================
     function loadChat(path) {
         if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
@@ -1437,6 +1592,14 @@
         else if (document.getElementById('peoplePage').classList.contains('active')) goToPeople();
         else if (document.getElementById('profilePage').classList.contains('active')) goToProfile();
         else goToFeed();
+    };
+
+    window.openDM = function(userId) {
+        if (!userId) return;
+        CURRENT_ROOM = 'dm_' + userId;
+        document.getElementById('chatView').classList.add('active');
+        setActivePage(null);
+        loadChat('dms/' + SITE + '/' + [USER_UID, userId].sort().join('_') + '/messages');
     };
 
     // ================================================================
@@ -1495,8 +1658,9 @@
     loadPeople();
     setActivePage('feedPage');
 
-    console.log('🏛️ METAIMPERIYA (БЕЛАЯ ТЕМА + ПОЛНОЕ РЕДАКТИРОВАНИЕ)');
-    console.log('📝 В редакторе: бегущая строка, фрейм, кнопки, хэштеги');
+    console.log('🏛️ METAIMPERIYA С GOOGLE-ВХОДОМ И ПЛЕЕРОМ!');
+    console.log('🎵 Плеер: ONE IN BILLION');
+    console.log('🔑 Имя берётся из Google-аккаунта');
     console.log('🏴‍☠️ Админ-пароль: 12345');
 
 })();
