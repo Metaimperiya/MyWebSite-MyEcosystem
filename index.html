@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>METAIMPERIYA</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* ===== ТОПБАР ===== */
         .topbar {
             background: #fff; padding: 8px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: space-between; align-items: center;
@@ -27,15 +26,10 @@
             flex-wrap: wrap;
             gap: 4px;
         }
-        .topbar .left { display: flex; align-items: center; gap: 6px; }
-        .topbar .left .menu-btn {
-            background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #1877f2;
-        }
-        .topbar .left .logo {
+        .topbar .logo {
             font-size: 1rem; font-weight: 700; color: #1877f2; cursor: pointer;
         }
 
-        /* ===== ПЛЕЕР ===== */
         .player {
             background: #0a0a12; color: #0f0; border: 2px solid #0f0;
             padding: 3px 12px; border-radius: 30px; font-family: monospace;
@@ -44,11 +38,7 @@
             min-width: 120px;
         }
         .player .track-name { font-size: 0.5rem; max-width: 50px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        .player .play-btn {
-            background: #0f0; border: none; padding: 2px 8px; cursor: pointer;
-            font-weight: 700; font-size: 0.6rem; border-radius: 20px; color: #000;
-        }
-        .player .play-btn:hover { background: #0d0; }
+        .player .play-btn { background: #0f0; border: none; padding: 2px 8px; cursor: pointer; font-weight: 700; font-size: 0.6rem; border-radius: 20px; color: #000; }
         .player .nav-btn { background: none; border: none; color: #0f0; cursor: pointer; font-size: 0.8rem; padding: 0 2px; }
         .eq-bars { display: flex; align-items: center; gap: 2px; height: 16px; }
         .eq-bars .bar { width: 2px; background: #0f0; border-radius: 2px; height: 4px; transition: height 0.08s; }
@@ -63,7 +53,6 @@
         .topbar .right .name { font-weight: 600; font-size: 0.7rem; cursor: pointer; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .topbar .right .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.8rem; padding: 0 4px; }
 
-        /* ===== МЕНЮ ===== */
         .hor-menu {
             background: #fff; padding: 4px 10px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: center; gap: 4px;
@@ -76,44 +65,6 @@
         }
         .hor-menu button:hover { background: #f0f0f0; }
         .hor-menu button.active { color: #1877f2; background: #e8f0fe; }
-
-        /* ===== САЙДБАР ===== */
-        .sidebar {
-            position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
-            background: #fff; border-right: 1px solid #ddd;
-            transition: left 0.3s; z-index: 1000; overflow-y: auto; padding: 14px;
-        }
-        .sidebar.open { left: 0; }
-        .sidebar .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-        .sidebar .head h3 { font-size: 1rem; color: #1877f2; }
-        .sidebar .head .close { background: none; border: none; font-size: 1.3rem; cursor: pointer; }
-        .sidebar .user {
-            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-            background: #f5f5f5; border-radius: 10px; margin-bottom: 12px;
-        }
-        .sidebar .user .avatar-wrap { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
-        .sidebar .user .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .sidebar .user .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.8rem; }
-        .sidebar .user .name { font-weight: 600; font-size: 0.85rem; }
-
-        .sidebar .nav-item {
-            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-            border-radius: 8px; cursor: pointer; color: #555; font-size: 0.85rem;
-            border: 1px solid transparent; margin-bottom: 2px;
-        }
-        .sidebar .nav-item:hover { background: #f0f0f0; }
-        .sidebar .nav-item.active { background: #e8f0fe; color: #1877f2; border-color: #1877f2; }
-        .sidebar .footer { margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd; }
-        .sidebar .footer .create-btn {
-            background: #1877f2; color: #fff; border: none; border-radius: 40px;
-            padding: 6px; width: 100%; font-weight: 700; cursor: pointer; font-size: 0.75rem;
-        }
-
-        .overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.3); z-index: 999; display: none;
-        }
-        .overlay.show { display: block; }
 
         .container { max-width: 700px; margin: 0 auto; padding: 8px 10px 60px; }
         .page { display: none; }
@@ -211,7 +162,7 @@
         .post .stats button:hover { background: #f0f2f5; color: #1877f2; }
         .post .stats button.liked { color: #1877f2; }
 
-        /* ===== КОММЕНТАРИИ (ИСПРАВЛЕНЫ) ===== */
+        /* ===== КОММЕНТАРИИ ===== */
         .comments { margin-top: 6px; border-top: 1px solid #eee; padding-top: 6px; }
         .comments .toggle { background: none; border: none; color: #1877f2; cursor: pointer; font-size: 0.65rem; }
         .comments .list { display: none; }
@@ -384,12 +335,9 @@
 
 <!-- ===== ТОПБАР ===== -->
 <div class="topbar">
-    <div class="left">
-        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
-    </div>
+    <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
     
-    <div class="player" id="player">
+    <div class="player">
         <button class="nav-btn" onclick="prevTrack()">⏮</button>
         <button class="play-btn" id="playBtn" onclick="playMusic()">▶</button>
         <button class="nav-btn" onclick="nextTrack()">⏭</button>
@@ -415,24 +363,8 @@
     <button class="active" id="hFeed" onclick="goToFeed()">📰 Лента</button>
     <button id="hGroups" onclick="goToGroups()">👥 Группы</button>
     <button id="hPeople" onclick="goToPeople()">👤 Люди</button>
-    <button id="hProfile" onclick="goToProfile()">Профиль</button>
+    <button id="hProfile" onclick="goToProfile()">👤 Профиль</button>
 </div>
-
-<!-- ===== САЙДБАР ===== -->
-<div class="sidebar" id="sidebar">
-    <div class="head"><h3>📱 Меню</h3><button class="close" onclick="closeSidebar()">✕</button></div>
-    <div class="user">
-        <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
-        <div><div class="name" id="sName">Гость</div></div>
-    </div>
-    <div class="nav-item active" onclick="goToFeed();closeSidebar();">📰 Лента</div>
-    <div class="nav-item" onclick="goToGroups();closeSidebar();">👥 Группы</div>
-    <div class="nav-item" onclick="goToPeople();closeSidebar();">👤 Люди</div>
-    <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
-    <div class="footer"><button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button></div>
-</div>
-
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
 <!-- ===== КОНТЕЙНЕР ===== -->
 <div class="container">
@@ -667,20 +599,6 @@
     initAudio();
 
     // ================================================================
-    // ВЫХОД
-    // ================================================================
-    window.logout = function() {
-        if (!confirm('Выйти из аккаунта?')) return;
-        auth.signOut();
-        localStorage.removeItem('dc_u_' + SITE);
-        USER = null;
-        USER_UID = null;
-        updateUI();
-        document.getElementById('loginModal').classList.add('open');
-        closeSidebar();
-    };
-
-    // ================================================================
     // СОСТОЯНИЕ
     // ================================================================
     const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
@@ -697,12 +615,11 @@
     let showStat = 'friends';
 
     // ================================================================
-    // AUTH - GOOGLE (ИСПРАВЛЕНО)
+    // AUTH - GOOGLE (БЕРЁМ ИЗ GOOGLE)
     // ================================================================
     auth.onAuthStateChanged(user => {
         if (user) {
             USER_UID = user.uid;
-            // ===== БЕРЁМ ИМЯ ТОЛЬКО ИЗ GOOGLE =====
             USER = user.displayName || user.email || 'User';
             localStorage.setItem('dc_u_' + SITE, USER);
             db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, email: user.email || 'anon' });
@@ -730,6 +647,42 @@
             }
         });
     });
+
+    // ================================================================
+    // ВЫХОД (ЧТОБЫ МЕНЯТЬ АККАУНТ)
+    // ================================================================
+    window.logout = function() {
+        if (!confirm('Выйти из аккаунта и сменить пользователя?')) return;
+        auth.signOut();
+        localStorage.removeItem('dc_u_' + SITE);
+        USER = null;
+        USER_UID = null;
+        updateUI();
+        document.getElementById('loginModal').classList.add('open');
+        // Очищаем чат
+        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        document.getElementById('chatView').classList.remove('active');
+    };
+
+    // ================================================================
+    // UI
+    // ================================================================
+    function updateUI() {
+        const topAvatar = document.getElementById('topAvatar');
+        const name = document.getElementById('topName');
+        const dot = document.getElementById('adminDot');
+
+        if (USER) {
+            name.textContent = USER;
+            renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+            if (IS_ADMIN) dot.classList.add('active');
+            else dot.classList.remove('active');
+        } else {
+            topAvatar.innerHTML = `<span class="letter">?</span>`;
+            name.textContent = 'Гость';
+            dot.classList.remove('active');
+        }
+    }
 
     window.closeLogin = function() {
         document.getElementById('loginModal').classList.remove('open');
@@ -790,44 +743,6 @@
             else { container.innerHTML = `<span class="letter">${letter || '?'}</span>`; }
         });
     }
-
-    // ================================================================
-    // UI
-    // ================================================================
-    function updateUI() {
-        const topAvatar = document.getElementById('topAvatar');
-        const sAvatar = document.getElementById('sAvatar');
-        const name = document.getElementById('topName');
-        const sName = document.getElementById('sName');
-        const dot = document.getElementById('adminDot');
-
-        if (USER) {
-            name.textContent = USER;
-            sName.textContent = USER;
-            renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-            renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-            if (IS_ADMIN) dot.classList.add('active');
-            else dot.classList.remove('active');
-        } else {
-            topAvatar.innerHTML = `<span class="letter">?</span>`;
-            sAvatar.innerHTML = `<span class="letter">?</span>`;
-            name.textContent = 'Гость';
-            sName.textContent = 'Гость';
-            dot.classList.remove('active');
-        }
-    }
-
-    // ================================================================
-    // САЙДБАР
-    // ================================================================
-    window.toggleSidebar = function() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('overlay').classList.toggle('show');
-    };
-    window.closeSidebar = function() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-    };
 
     // ================================================================
     // НАВИГАЦИЯ
@@ -913,7 +828,7 @@
     }
 
     // ================================================================
-    // ОТРИСОВКА ПОСТА
+    // РЕНДЕР ПОСТА
     // ================================================================
     function renderPost(p, type) {
         const div = document.createElement('div');
@@ -953,7 +868,6 @@
             hashtagsHtml += '</div>';
         }
 
-        // ===== ТРИ ТОЧКИ =====
         let menuHtml = '';
         if (p.author === USER || IS_ADMIN) {
             menuHtml = `
@@ -1033,7 +947,7 @@
     });
 
     // ================================================================
-    // КОММЕНТАРИИ
+    // КОММЕНТАРИИ (РАБОТАЮТ)
     // ================================================================
     function getPostPath(type) {
         return type === 'group' ? 'group_posts/' + currentGroup : 'feed_posts';
@@ -1432,7 +1346,6 @@
         document.getElementById('chatView').classList.add('active');
         setActivePage(null);
         loadChat('rooms/' + SITE + '_' + id + '/messages');
-        closeSidebar();
     };
 
     window.openCreateRoom = function() {
@@ -1592,7 +1505,6 @@
         document.getElementById('fileInput').value = '';
     }
 
-    // ===== ФОТО =====
     document.getElementById('fileInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -1672,10 +1584,9 @@
     loadPeople();
     setActivePage('feedPage');
 
-    console.log('🏛️ METAIMPERIYA - ИСПРАВЛЕННАЯ ВЕРСИЯ!');
-    console.log('🔑 Google-вход: имя берётся из аккаунта');
-    console.log('📰 Три точки на постах (редактировать/удалить)');
-    console.log('💬 Комментарии: текст виден чётко');
+    console.log('🏛️ METAIMPERIYA - ПРОСТАЯ ВЕРСИЯ БЕЗ САЙДБАРА');
+    console.log('🔑 Google-вход: имя из аккаунта');
+    console.log('🚪 Выход - меняем аккаунт');
     console.log('🏴‍☠️ Админ-пароль: 12345');
 
 })();
