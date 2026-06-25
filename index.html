@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>MicroSocial</title>
     
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -17,115 +18,69 @@
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
-
         .topbar {
-            background: #ffffff;
-            padding: 10px 16px;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: #fff; padding: 10px 16px; border-bottom: 1px solid #ddd;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
         }
-        .topbar .logo {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1877f2;
-            cursor: pointer;
-        }
-        .topbar .menu {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
+        .topbar .logo { font-size: 1.2rem; font-weight: 700; color: #1877f2; cursor: pointer; }
+        .topbar .menu { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .topbar .menu button {
-            background: none;
-            border: none;
-            color: #555;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 8px;
+            background: none; border: none; color: #555; font-weight: 600;
+            font-size: 0.8rem; cursor: pointer; padding: 4px 8px; border-radius: 8px;
         }
         .topbar .menu button:hover { background: #f0f0f0; }
         .topbar .menu button.active { color: #1877f2; background: #e8f0fe; }
-        .topbar .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .topbar .user-info { display: flex; align-items: center; gap: 8px; }
         .topbar .user-info .avatar {
             width: 32px; height: 32px; border-radius: 50%;
             background: #1877f2; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.8rem;
-            cursor: pointer;
+            font-weight: 700; font-size: 0.8rem; cursor: pointer;
         }
-        .topbar .user-info .name {
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-        }
+        .topbar .user-info .name { font-weight: 600; font-size: 0.85rem; cursor: pointer; }
         .topbar .user-info .logout {
             background: none; border: 1px solid #ddd;
             border-radius: 20px; padding: 4px 12px;
             cursor: pointer; font-size: 0.7rem;
         }
-
-        .container { max-width: 700px; margin: 0 auto; padding: 16px; }
+        .container { max-width: 700px; margin: 0 auto; padding: 12px; }
 
         /* Профиль */
         .profile-page { display: none; }
         .profile-page.active { display: block; }
         .profile-page .header {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #fff; border-radius: 12px; padding: 20px;
+            text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 16px;
         }
         .profile-page .header .big-avatar {
             width: 80px; height: 80px; border-radius: 50%;
             background: #1877f2; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; font-weight: 700;
-            margin: 0 auto 10px;
+            font-size: 2rem; font-weight: 700; margin: 0 auto 10px;
         }
         .profile-page .header .name { font-size: 1.3rem; font-weight: 700; }
         .profile-page .header .bio { color: #888; font-size: 0.85rem; margin-top: 4px; }
+        .profile-page .header .edit-btn {
+            background: #1877f2; color: #fff; border: none;
+            border-radius: 20px; padding: 6px 20px; margin-top: 10px;
+            cursor: pointer; font-weight: 600;
+        }
 
         .post-form {
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #fff; border-radius: 12px; padding: 16px;
+            margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .post-form textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            resize: vertical;
-            min-height: 60px;
-            font-family: inherit;
-            font-size: 0.9rem;
+            width: 100%; padding: 10px; border: 1px solid #ddd;
+            border-radius: 8px; resize: vertical; min-height: 60px;
+            font-family: inherit; font-size: 0.9rem;
         }
-        .post-form .actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
+        .post-form .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
         .post-form .actions button {
-            padding: 6px 20px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
+            padding: 6px 20px; border: none; border-radius: 20px;
+            font-weight: 600; cursor: pointer;
         }
         .post-form .actions .submit { background: #1877f2; color: #fff; }
         .post-form .actions .submit:hover { background: #4a9eff; }
@@ -135,72 +90,48 @@
         .feed-page.active { display: block; }
 
         .post {
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #fff; border-radius: 12px; padding: 16px;
+            margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .post .author {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
+        .post .author { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .post .author .avatar {
             width: 36px; height: 36px; border-radius: 50%;
             background: #1877f2; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700;
+            font-weight: 700; cursor: pointer;
         }
         .post .author .name { font-weight: 600; cursor: pointer; }
         .post .author .name:hover { text-decoration: underline; }
         .post .author .time { color: #999; font-size: 0.7rem; margin-left: auto; }
         .post .text { font-size: 0.95rem; line-height: 1.5; margin-bottom: 8px; }
+        .post .repost-info {
+            color: #888; font-size: 0.75rem; margin-bottom: 6px;
+            background: #f5f5f5; padding: 4px 10px; border-radius: 6px;
+        }
         .post .stats {
-            display: flex;
-            gap: 16px;
-            font-size: 0.8rem;
-            color: #888;
-            border-top: 1px solid #eee;
-            padding-top: 8px;
-            margin-top: 8px;
+            display: flex; gap: 16px; font-size: 0.8rem; color: #888;
+            border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px;
+            flex-wrap: wrap;
         }
         .post .stats button {
-            background: none;
-            border: none;
-            color: #888;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.8rem;
+            background: none; border: none; color: #888;
+            cursor: pointer; display: flex; align-items: center; gap: 4px;
+            font-size: 0.75rem;
         }
         .post .stats button:hover { color: #1877f2; }
         .post .stats button.liked { color: #1877f2; }
 
-        .comments {
-            margin-top: 10px;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
-        }
+        .comments { margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
         .comments .toggle {
-            background: none;
-            border: none;
-            color: #1877f2;
-            cursor: pointer;
-            font-size: 0.8rem;
-            margin-bottom: 8px;
+            background: none; border: none; color: #1877f2;
+            cursor: pointer; font-size: 0.8rem; margin-bottom: 8px;
         }
         .comments .toggle:hover { text-decoration: underline; }
         .comments .list { display: none; }
         .comments .list.open { display: block; }
         .comments .comment {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 6px;
-            padding: 6px 0;
-            border-bottom: 1px solid #f0f0f0;
+            display: flex; gap: 10px; margin-bottom: 6px;
+            padding: 6px 0; border-bottom: 1px solid #f0f0f0;
         }
         .comments .comment .avatar {
             width: 24px; height: 24px; border-radius: 50%;
@@ -215,195 +146,124 @@
         .comments .comment .del {
             background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.6rem;
         }
-        .comments .input-wrap {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
+        .comments .input-wrap { display: flex; gap: 8px; margin-top: 8px; }
         .comments .input-wrap input {
-            flex: 1;
-            padding: 6px 12px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            outline: none;
+            flex: 1; padding: 6px 12px; border: 1px solid #ddd;
+            border-radius: 20px; font-size: 0.8rem; outline: none;
         }
         .comments .input-wrap input:focus { border-color: #1877f2; }
         .comments .input-wrap button {
-            background: #1877f2;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            padding: 4px 16px;
-            cursor: pointer;
+            background: #1877f2; color: #fff; border: none;
+            border-radius: 20px; padding: 4px 16px; cursor: pointer;
             font-weight: 600;
         }
-        .comments .input-wrap button:hover { background: #4a9eff; }
 
         .rooms-page { display: none; }
         .rooms-page.active { display: block; }
-        .rooms-page .room-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+        .rooms-page .room-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .rooms-page .room-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px;
+            background: #fff; border-radius: 12px; padding: 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
+            cursor: pointer; transition: all 0.2s; text-align: center;
         }
         .rooms-page .room-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .rooms-page .room-card .icon { font-size: 2rem; }
         .rooms-page .room-card .name { font-weight: 600; margin-top: 6px; }
         .rooms-page .room-card .count { color: #888; font-size: 0.75rem; }
 
-        .chat-view {
-            display: none;
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px;
+        .dm-page { display: none; }
+        .dm-page.active { display: block; }
+        .dm-page .dm-list { display: flex; flex-direction: column; gap: 8px; }
+        .dm-page .dm-item {
+            background: #fff; border-radius: 12px; padding: 12px 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: 500px;
-            flex-direction: column;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .dm-page .dm-item:hover { transform: translateX(4px); }
+        .dm-page .dm-item .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: #1877f2; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+        }
+        .dm-page .dm-item .info { flex: 1; }
+        .dm-page .dm-item .info .name { font-weight: 600; }
+        .dm-page .dm-item .info .last { color: #888; font-size: 0.75rem; }
+
+        .chat-view {
+            display: none; background: #fff; border-radius: 12px;
+            padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 500px; flex-direction: column;
         }
         .chat-view.active { display: flex; }
         .chat-view .back {
-            background: none;
-            border: none;
-            color: #1877f2;
-            cursor: pointer;
-            font-weight: 600;
-            margin-bottom: 8px;
+            background: none; border: none; color: #1877f2;
+            cursor: pointer; font-weight: 600; margin-bottom: 8px;
         }
-        .chat-view .messages {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 8px;
-        }
+        .chat-view .messages { flex: 1; overflow-y: auto; margin-bottom: 8px; }
         .chat-view .messages .msg {
-            padding: 6px 10px;
-            margin-bottom: 4px;
-            background: #f5f5f5;
-            border-radius: 8px;
+            padding: 6px 10px; margin-bottom: 4px;
+            background: #f5f5f5; border-radius: 8px;
         }
         .chat-view .messages .msg .author { font-weight: 600; font-size: 0.8rem; }
         .chat-view .messages .msg .text { font-size: 0.9rem; }
         .chat-view .messages .msg .time { color: #999; font-size: 0.6rem; margin-left: 6px; }
-        .chat-view .input-wrap {
-            display: flex;
-            gap: 8px;
-        }
+        .chat-view .input-wrap { display: flex; gap: 8px; }
         .chat-view .input-wrap input {
-            flex: 1;
-            padding: 8px 14px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            outline: none;
-            font-size: 0.9rem;
+            flex: 1; padding: 8px 14px; border: 1px solid #ddd;
+            border-radius: 20px; outline: none; font-size: 0.9rem;
         }
         .chat-view .input-wrap input:focus { border-color: #1877f2; }
         .chat-view .input-wrap button {
-            background: #1877f2;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            padding: 0 20px;
-            font-weight: 600;
+            background: #1877f2; color: #fff; border: none;
+            border-radius: 20px; padding: 0 20px; font-weight: 600;
             cursor: pointer;
         }
 
-        /* Модалка входа */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 9999;
+            justify-content: center; align-items: center;
         }
         .modal.open { display: flex; }
         .modal .box {
-            background: #fff;
-            border-radius: 14px;
-            padding: 24px;
-            max-width: 400px;
-            width: 90%;
+            background: #fff; border-radius: 14px; padding: 24px;
+            max-width: 400px; width: 90%;
         }
         .modal .box h3 { margin-bottom: 8px; }
-        .modal .box input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin: 6px 0;
+        .modal .box input, .modal .box textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd;
+            border-radius: 8px; margin: 6px 0; font-family: inherit;
         }
-        .modal .box .btns {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            margin-top: 8px;
-        }
+        .modal .box textarea { min-height: 60px; resize: vertical; }
+        .modal .box .btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
         .modal .box .btns button {
-            padding: 6px 20px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
+            padding: 6px 20px; border: none; border-radius: 20px;
+            font-weight: 600; cursor: pointer;
         }
         .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
         .modal .box .btns .save { background: #1877f2; color: #fff; }
 
         .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            margin: 8px 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; width: 100%; padding: 10px;
+            background: #fff; border: 1px solid #ddd; border-radius: 40px;
+            font-weight: 600; cursor: pointer; margin: 8px 0;
         }
         .google-btn:hover { background: #f5f5f5; }
         .google-btn img { width: 20px; height: 20px; }
         .divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #bbb;
-            font-size: 0.75rem;
-            margin: 8px 0;
+            display: flex; align-items: center; gap: 12px;
+            color: #bbb; font-size: 0.75rem; margin: 8px 0;
         }
         .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #ddd;
-        }
+        .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
 
-        /* Список аккаунтов для выбора */
-        .account-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            margin: 12px 0;
-        }
+        .account-list { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0; }
         .account-list .acc {
-            background: #f5f5f5;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            border: 2px solid transparent;
+            background: #f5f5f5; padding: 10px; border-radius: 8px;
+            text-align: center; cursor: pointer; border: 2px solid transparent;
             transition: all 0.2s;
         }
         .account-list .acc:hover { border-color: #1877f2; background: #e8f0fe; }
@@ -411,29 +271,23 @@
             width: 40px; height: 40px; border-radius: 50%;
             background: #1877f2; color: #fff;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 4px;
-            font-weight: 700;
+            margin: 0 auto 4px; font-weight: 700;
         }
         .account-list .acc .name { font-weight: 600; font-size: 0.8rem; }
 
         .admin-dot {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            border: 2px solid #ddd;
-            cursor: pointer;
-            background: #f0f0f0;
-            z-index: 99;
+            position: fixed; bottom: 10px; right: 10px;
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 2px solid #ddd; cursor: pointer;
+            background: #f0f0f0; z-index: 99;
         }
         .admin-dot.active { background: #e67e22; border-color: #e67e22; }
 
         @media (max-width: 600px) {
             .rooms-page .room-list { grid-template-columns: 1fr; }
             .account-list { grid-template-columns: 1fr 1fr; }
-            .topbar .menu button { font-size: 0.7rem; padding: 4px 6px; }
+            .topbar .menu button { font-size: 0.65rem; padding: 4px 6px; }
+            .topbar .logo { font-size: 1rem; }
         }
     </style>
 </head>
@@ -445,6 +299,7 @@
     <div class="menu">
         <button class="active" id="menuFeed" onclick="goToFeed()">Лента</button>
         <button id="menuRooms" onclick="goToRooms()">Комнаты</button>
+        <button id="menuDM" onclick="goToDM()">💬 Личка</button>
         <button id="menuProfile" onclick="goToProfile()">Профиль</button>
     </div>
     <div class="user-info">
@@ -462,7 +317,8 @@
         <div class="header">
             <div class="big-avatar" id="profileAvatar">?</div>
             <div class="name" id="profileName">Гость</div>
-            <div class="bio" id="profileBio">Выберите аккаунт</div>
+            <div class="bio" id="profileBio">Настройте свой профиль</div>
+            <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
         </div>
         <div class="post-form">
             <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
@@ -485,9 +341,15 @@
         <div class="room-list" id="roomList"></div>
     </div>
 
-    <!-- ЧАТ В КОМНАТЕ -->
+    <!-- СТРАНИЦА ЛИЧКИ -->
+    <div class="dm-page" id="dmPage">
+        <h3 style="margin-bottom:12px;">💬 Личные сообщения</h3>
+        <div class="dm-list" id="dmList"></div>
+    </div>
+
+    <!-- ЧАТ В КОМНАТЕ / ЛИЧКЕ -->
     <div class="chat-view" id="chatView">
-        <button class="back" onclick="closeChat()">← Назад к комнатам</button>
+        <button class="back" onclick="closeChat()">← Назад</button>
         <div class="messages" id="chatMessages"></div>
         <div class="input-wrap">
             <input type="text" id="chatInput" placeholder="Сообщение..." />
@@ -523,6 +385,19 @@
     </div>
 </div>
 
+<!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+<div class="modal" id="editProfileModal">
+    <div class="box">
+        <h3>✏️ Редактировать профиль</h3>
+        <input type="text" id="editName" placeholder="Имя">
+        <textarea id="editBio" placeholder="О себе..."></textarea>
+        <div class="btns">
+            <button class="cancel" onclick="closeEditProfile()">Отмена</button>
+            <button class="save" onclick="saveProfile()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
 <!-- МОДАЛКА АДМИНА -->
 <div class="modal" id="adminModal">
     <div class="box">
@@ -538,7 +413,7 @@
 <script>
 (function() {
     // ================================================================
-    // FIREBASE
+    // FIREBASE (ОДИН ПРОЕКТ)
     // ================================================================
     const FB_CONFIG = {
         apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
@@ -574,16 +449,16 @@
     // КОМНАТЫ (В КОДЕ)
     // ================================================================
     const ROOMS = [
-        { id: 'general', name: '🌍 Общий', desc: 'Для всех' },
-        { id: 'sport', name: '⚽ Спорт', desc: 'Обсуждение спорта' },
-        { id: 'games', name: '🎮 Игры', desc: 'Игровые обсуждения' },
-        { id: 'movies', name: '🎬 Кино', desc: 'Фильмы и сериалы' },
-        { id: 'music', name: '🎵 Музыка', desc: 'Музыкальные предпочтения' },
-        { id: 'tech', name: '💻 Технологии', desc: 'IT, гаджеты, AI' },
-        { id: 'food', name: '🍕 Еда', desc: 'Рецепты и кулинария' },
-        { id: 'travel', name: '✈️ Путешествия', desc: 'Страны и приключения' },
-        { id: 'fashion', name: '👗 Мода', desc: 'Стиль и тренды' },
-        { id: 'science', name: '🔬 Наука', desc: 'Открытия и технологии' }
+        { id: 'general', name: '🌍 Общий' },
+        { id: 'sport', name: '⚽ Спорт' },
+        { id: 'games', name: '🎮 Игры' },
+        { id: 'movies', name: '🎬 Кино' },
+        { id: 'music', name: '🎵 Музыка' },
+        { id: 'tech', name: '💻 Технологии' },
+        { id: 'food', name: '🍕 Еда' },
+        { id: 'travel', name: '✈️ Путешествия' },
+        { id: 'fashion', name: '👗 Мода' },
+        { id: 'science', name: '🔬 Наука' }
     ];
 
     // ================================================================
@@ -592,9 +467,10 @@
     const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
     let USER = null;
     let USER_UID = null;
-    let USER_ACCOUNT = null; // выбранный аккаунт из ACCOUNTS
+    let USER_ACCOUNT = null;
     let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
     let CURRENT_ROOM = null;
+    let CURRENT_DM = null;
     let chatUnsub = null;
 
     // ================================================================
@@ -607,23 +483,27 @@
             USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
             if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
             
-            // Проверяем, есть ли у пользователя аккаунт
             const accId = localStorage.getItem('dc_acc_' + SITE);
             if (accId) {
                 const acc = ACCOUNTS.find(a => a.id === accId);
                 if (acc) USER_ACCOUNT = acc;
             }
             
-            db.ref('sites/' + SITE + '/users/' + USER_UID).set({ 
+            // Сохраняем профиль в Firebase (аккаунт)
+            const profileRef = db.ref('sites/' + SITE + '/users/' + USER_UID);
+            profileRef.update({ 
                 name: USER, 
-                email: user.email,
-                account: USER_ACCOUNT ? USER_ACCOUNT.id : null 
+                email: user.email || 'anon',
+                account: USER_ACCOUNT ? USER_ACCOUNT.id : null,
+                bio: USER_ACCOUNT ? USER_ACCOUNT.bio : '',
+                avatar: USER_ACCOUNT ? USER_ACCOUNT.avatar : USER.charAt(0).toUpperCase()
             });
             
             updateUI();
             loadFeed();
             loadProfilePosts();
             loadRooms();
+            loadDMList();
             closeLogin();
         } else {
             USER = null;
@@ -631,7 +511,6 @@
             USER_ACCOUNT = null;
             document.getElementById('loginModal').classList.add('open');
             updateUI();
-            // Показываем список аккаунтов
             renderAccounts();
         }
     });
@@ -668,13 +547,18 @@
         localStorage.setItem('dc_u_' + SITE, USER);
         updateUI();
         closeLogin();
-        // Если есть UID - обновляем в базе
         if (USER_UID) {
-            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, account: accId });
+            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
+                name: USER, 
+                account: accId,
+                bio: acc.bio,
+                avatar: acc.avatar
+            });
         }
         loadFeed();
         loadProfilePosts();
         loadRooms();
+        loadDMList();
     };
 
     // ================================================================
@@ -695,7 +579,7 @@
             logout.style.display = 'inline-block';
             profileAvatar.textContent = USER_ACCOUNT.avatar;
             profileName.textContent = USER_ACCOUNT.name;
-            profileBio.textContent = USER_ACCOUNT.bio;
+            profileBio.textContent = USER_ACCOUNT.bio || 'Настройте свой профиль';
             if (IS_ADMIN) dot.classList.add('active');
             else dot.classList.remove('active');
         } else if (USER) {
@@ -705,7 +589,7 @@
             logout.style.display = 'inline-block';
             profileAvatar.textContent = initial;
             profileName.textContent = USER;
-            profileBio.textContent = 'Без аккаунта';
+            profileBio.textContent = 'Настройте свой профиль';
             dot.classList.remove('active');
         } else {
             avatar.textContent = '?';
@@ -723,8 +607,14 @@
         localStorage.removeItem('dc_u_' + SITE);
         localStorage.removeItem('dc_acc_' + SITE);
         USER_ACCOUNT = null;
-        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') {
+                db.ref(chatUnsub).off('value');
+            }
+            chatUnsub = null; 
+        }
         CURRENT_ROOM = null;
+        CURRENT_DM = null;
         document.getElementById('chatView').classList.remove('active');
     };
 
@@ -742,6 +632,7 @@
             loadFeed();
             loadProfilePosts();
             loadRooms();
+            loadDMList();
             closeLogin();
         }).catch(e => alert('Ошибка: ' + e.message));
     };
@@ -760,6 +651,7 @@
         });
         if (pageId === 'feedPage') document.getElementById('menuFeed').classList.add('active');
         else if (pageId === 'roomsPage') document.getElementById('menuRooms').classList.add('active');
+        else if (pageId === 'dmPage') document.getElementById('menuDM').classList.add('active');
         else if (pageId === 'profilePage') document.getElementById('menuProfile').classList.add('active');
     }
 
@@ -767,8 +659,12 @@
         if (!USER) { alert('Войдите!'); return; }
         setActivePage('feedPage');
         document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
         CURRENT_ROOM = null;
+        CURRENT_DM = null;
         loadFeed();
     };
 
@@ -776,17 +672,38 @@
         if (!USER) { alert('Войдите!'); return; }
         setActivePage('roomsPage');
         document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
         CURRENT_ROOM = null;
+        CURRENT_DM = null;
         loadRooms();
+    };
+
+    window.goToDM = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        setActivePage('dmPage');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
+        CURRENT_ROOM = null;
+        CURRENT_DM = null;
+        loadDMList();
     };
 
     window.goToProfile = function() {
         if (!USER) { alert('Войдите!'); return; }
         setActivePage('profilePage');
         document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
         CURRENT_ROOM = null;
+        CURRENT_DM = null;
         loadProfilePosts();
     };
 
@@ -813,7 +730,37 @@
     };
 
     // ================================================================
-    // ЛЕНТА
+    // РЕДАКТИРОВАНИЕ ПРОФИЛЯ
+    // ================================================================
+    window.openEditProfile = function() {
+        document.getElementById('editName').value = USER || '';
+        document.getElementById('editBio').value = USER_ACCOUNT ? USER_ACCOUNT.bio : '';
+        document.getElementById('editProfileModal').classList.add('open');
+    };
+    window.closeEditProfile = function() {
+        document.getElementById('editProfileModal').classList.remove('open');
+    };
+    window.saveProfile = function() {
+        const name = document.getElementById('editName').value.trim();
+        const bio = document.getElementById('editBio').value.trim();
+        if (!name) { alert('Введите имя'); return; }
+        
+        USER = name;
+        localStorage.setItem('dc_u_' + SITE, USER);
+        if (USER_ACCOUNT) {
+            USER_ACCOUNT.bio = bio;
+        }
+        if (USER_UID) {
+            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
+        }
+        updateUI();
+        closeEditProfile();
+        loadProfilePosts();
+        loadFeed();
+    };
+
+    // ================================================================
+    // ЛЕНТА (ПОСТЫ + РЕПОСТЫ)
     // ================================================================
     function loadFeed() {
         db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
@@ -839,14 +786,21 @@
         div.dataset.id = p.id;
 
         const isLiked = localStorage.getItem('lk_' + p.id + '_' + USER_UID) === '1';
+        const isReposted = localStorage.getItem('rp_' + p.id + '_' + USER_UID) === '1';
+
+        let repostInfo = '';
+        if (p.repostFrom) {
+            repostInfo = `<div class="repost-info">🔁 Репост от ${esc(p.repostFrom)}</div>`;
+        }
 
         div.innerHTML = `
             <div class="author">
-                <div class="avatar">${esc((p.author || '?').charAt(0).toUpperCase())}</div>
+                <div class="avatar" onclick="goToProfile()">${esc((p.author || '?').charAt(0).toUpperCase())}</div>
                 <span class="name" onclick="goToProfile()">${esc(p.author || 'Аноним')}</span>
                 <span class="time">${p.time || ''}</span>
                 ${IS_ADMIN ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.7rem;margin-left:auto;">🗑</button>` : ''}
             </div>
+            ${repostInfo}
             <div class="text">${esc(p.text || '')}</div>
             <div class="stats">
                 <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">
@@ -855,6 +809,10 @@
                 <button onclick="toggleComments('${p.id}')">
                     💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
                 </button>
+                <button onclick="repostPost('${p.id}')">
+                    🔁 <span id="repostCount_${p.id}">${p.repostCount || 0}</span>
+                </button>
+                <button onclick="repostToRoom('${p.id}')" title="Репостнуть в комнату">📤 В комнату</button>
             </div>
             <div class="comments" id="comments_${p.id}">
                 <button class="toggle" onclick="toggleComments('${p.id}')">💬 Показать комментарии</button>
@@ -886,7 +844,8 @@
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             timestamp: Date.now(),
             likes: 0,
-            commentCount: 0
+            commentCount: 0,
+            repostCount: 0
         }).then(() => {
             document.getElementById('postInput').value = '';
             loadProfilePosts();
@@ -933,6 +892,71 @@
             ref.transaction(v => (v || 0) + 1);
             localStorage.setItem(key, '1');
         }
+    };
+
+    // ================================================================
+    // РЕПОСТЫ
+    // ================================================================
+    window.repostPost = function(postId) {
+        if (!USER) { alert('Войдите!'); return; }
+        const key = 'rp_' + postId + '_' + USER_UID;
+        if (localStorage.getItem(key) === '1') {
+            alert('Вы уже репостнули этот пост');
+            return;
+        }
+        
+        db.ref('sites/' + SITE + '/feed_posts/' + postId).once('value', snap => {
+            const p = snap.val();
+            if (!p) return;
+            
+            // Создаём репост в ленте
+            db.ref('sites/' + SITE + '/feed_posts').push({
+                author: USER,
+                text: p.text || '',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now(),
+                likes: 0,
+                commentCount: 0,
+                repostCount: 0,
+                repostFrom: p.author || 'Аноним',
+                originalId: postId
+            });
+            
+            // Увеличиваем счётчик репостов
+            db.ref('sites/' + SITE + '/feed_posts/' + postId + '/repostCount').transaction(v => (v || 0) + 1);
+            localStorage.setItem(key, '1');
+            alert('✅ Пост репостнут!');
+        });
+    };
+
+    window.repostToRoom = function(postId) {
+        if (!USER) { alert('Войдите!'); return; }
+        const roomId = prompt('Введите ID комнаты (general, sport, games, movies, music, tech, food, travel, fashion, science):');
+        if (!roomId) return;
+        
+        // Проверяем, существует ли комната
+        const room = ROOMS.find(r => r.id === roomId);
+        if (!room) {
+            alert('❌ Комната не найдена');
+            return;
+        }
+        
+        db.ref('sites/' + SITE + '/feed_posts/' + postId).once('value', snap => {
+            const p = snap.val();
+            if (!p) return;
+            
+            // Отправляем пост в комнату как сообщение
+            db.ref('rooms/' + SITE + '_' + roomId + '/messages').push({
+                nick: USER,
+                text: '📢 Репост из ленты: ' + (p.text || ''),
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now(),
+                isPost: true,
+                repostFrom: p.author || 'Аноним'
+            });
+            
+            alert('✅ Пост отправлен в комнату ' + room.name);
+        });
     };
 
     // ================================================================
@@ -1011,7 +1035,7 @@
     };
 
     // ================================================================
-    // КОМНАТЫ (ГРУППЫ)
+    // КОМНАТЫ
     // ================================================================
     function loadRooms() {
         const list = document.getElementById('roomList');
@@ -1038,23 +1062,65 @@
 
     window.openRoom = function(roomId) {
         CURRENT_ROOM = roomId;
+        CURRENT_DM = null;
         document.getElementById('chatView').classList.add('active');
         setActivePage(null);
-        loadChat(roomId);
+        loadRoomChat(roomId);
     };
 
-    window.closeChat = function() {
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+    // ================================================================
+    // ЛИЧКА (DM)
+    // ================================================================
+    function loadDMList() {
+        if (!USER_UID) return;
+        const list = document.getElementById('dmList');
+        list.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/users').once('value', snap => {
+            const users = snap.val() || {};
+            const keys = Object.keys(users).filter(k => k !== USER_UID);
+            
+            if (!keys.length) {
+                list.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Нет других пользователей</div>';
+                return;
+            }
+            
+            list.innerHTML = keys.map(k => {
+                const u = users[k];
+                const name = u.name || 'Аноним';
+                const initial = name.charAt(0).toUpperCase();
+                return `<div class="dm-item" onclick="openDM('${k}')">
+                    <div class="avatar">${initial}</div>
+                    <div class="info">
+                        <div class="name">${esc(name)}</div>
+                        <div class="last">Написать сообщение</div>
+                    </div>
+                </div>`;
+            }).join('');
+        });
+    }
+
+    function getDMId(uid1, uid2) {
+        const ids = [uid1, uid2].sort();
+        return ids.join('_');
+    }
+
+    window.openDM = function(userId) {
+        CURRENT_DM = userId;
         CURRENT_ROOM = null;
-        goToRooms();
+        document.getElementById('chatView').classList.add('active');
+        setActivePage(null);
+        loadDMChat(userId);
     };
 
     // ================================================================
     // ЧАТ В КОМНАТЕ
     // ================================================================
-    function loadChat(roomId) {
-        if (chatUnsub) { db.ref(chatUnsub).off('value'); chatUnsub = null; }
+    function loadRoomChat(roomId) {
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
         const box = document.getElementById('chatMessages');
         box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">⏳ Загрузка...</div>';
         const path = 'rooms/' + SITE + '_' + roomId + '/messages';
@@ -1080,24 +1146,93 @@
         });
     }
 
+    // ================================================================
+    // ЧАТ В ЛИЧКЕ (DM)
+    // ================================================================
+    function loadDMChat(userId) {
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
+        const box = document.getElementById('chatMessages');
+        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">⏳ Загрузка...</div>';
+        const dmId = getDMId(USER_UID, userId);
+        const path = 'dms/' + SITE + '/' + dmId + '/messages';
+        chatUnsub = path;
+        db.ref(path).orderByChild('timestamp').on('value', snap => {
+            box.innerHTML = '';
+            if (!snap.exists()) {
+                box.innerHTML = '<div style="color:#bbb;text-align:center;padding:30px;">Нет сообщений 👋</div>';
+                return;
+            }
+            snap.forEach(s => {
+                const m = s.val();
+                const div = document.createElement('div');
+                div.className = 'msg';
+                div.innerHTML = `
+                    <span class="author">${esc(m.nick || '?')}</span>
+                    <span class="time">${m.time || ''}</span>
+                    <div class="text">${esc(m.text || '')}</div>
+                `;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    // ================================================================
+    // ОТПРАВКА СООБЩЕНИЙ (ЧАТ / ЛИЧКА)
+    // ================================================================
     window.sendChat = function() {
-        if (!CURRENT_ROOM || !USER) { alert('Выберите комнату и войдите'); return; }
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if (!text) return;
         
-        db.ref('rooms/' + SITE + '_' + CURRENT_ROOM + '/messages').push({
-            nick: USER,
-            text: text,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: Date.now()
-        });
-        input.value = '';
+        if (CURRENT_ROOM) {
+            // Отправка в комнату
+            db.ref('rooms/' + SITE + '_' + CURRENT_ROOM + '/messages').push({
+                nick: USER,
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now()
+            });
+            input.value = '';
+        } else if (CURRENT_DM) {
+            // Отправка в личку
+            const dmId = getDMId(USER_UID, CURRENT_DM);
+            db.ref('dms/' + SITE + '/' + dmId + '/messages').push({
+                from: USER_UID,
+                nick: USER,
+                text: text,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now()
+            });
+            input.value = '';
+        } else {
+            alert('Выберите чат');
+        }
     };
 
     document.getElementById('chatInput').addEventListener('keypress', e => {
         if (e.key === 'Enter') sendChat();
     });
+
+    window.closeChat = function() {
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
+        CURRENT_ROOM = null;
+        CURRENT_DM = null;
+        if (document.getElementById('roomsPage').classList.contains('active')) {
+            goToRooms();
+        } else if (document.getElementById('dmPage').classList.contains('active')) {
+            goToDM();
+        } else {
+            goToFeed();
+        }
+    };
 
     // ================================================================
     // УТИЛИТЫ
@@ -1110,8 +1245,8 @@
     db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
         if (!snap.exists()) {
             const posts = [
-                { author: '📢 Админ', text: 'Добро пожаловать в MicroSocial!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2 },
-                { author: '🚀 Орг', text: 'Завтра в 19:00 встреча в общем чате!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1 }
+                { author: '📢 Админ', text: 'Добро пожаловать в MicroSocial! Теперь с репостами и личкой!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
+                { author: '🚀 Орг', text: 'Завтра в 19:00 встреча в общем чате!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, repostCount: 0 }
             ];
             posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
         }
@@ -1124,10 +1259,13 @@
     updateUI();
     loadFeed();
     loadRooms();
+    loadDMList();
     setActivePage('feedPage');
     console.log('📱 MicroSocial запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345');
     console.log('📋 10 аккаунтов готовы!');
+    console.log('🔁 Репосты работают!');
+    console.log('💬 Личка работает!');
 })();
 </script>
 </body>
