@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* ===== ТОПБАР С ПЛЕЕРОМ ===== */
         .topbar {
             background: #fff; padding: 8px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: space-between; align-items: center;
@@ -35,7 +34,7 @@
             font-size: 1.1rem; font-weight: 700; color: #1877f2; cursor: pointer;
         }
 
-        /* ===== ПЛЕЕР ===== */
+        /* Плеер */
         .player {
             background: #0a0a12; color: #0f0; border: 2px solid #0f0;
             padding: 4px 14px; border-radius: 30px; font-family: monospace;
@@ -43,34 +42,15 @@
             flex: 0 1 auto;
             min-width: 140px;
         }
-        .player .track-name {
-            font-size: 0.6rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 80px;
-        }
+        .player .track-name { font-size: 0.6rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
         .player .play-btn {
             background: #0f0; border: none; padding: 4px 14px;
             cursor: pointer; font-weight: 700; font-size: 0.7rem;
-            border-radius: 20px; color: #000;
-            transition: 0.2s;
+            border-radius: 20px; color: #000; transition: 0.2s;
         }
         .player .play-btn:hover { background: #0d0; transform: scale(1.05); }
-        .player .play-btn:active { transform: scale(0.95); }
-        .player .eq-bars {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            height: 18px;
-        }
-        .player .eq-bars .bar {
-            width: 3px;
-            background: #0f0;
-            border-radius: 2px;
-            height: 4px;
-            transition: height 0.08s;
-        }
+        .player .eq-bars { display: flex; align-items: center; gap: 2px; height: 18px; }
+        .player .eq-bars .bar { width: 3px; background: #0f0; border-radius: 2px; height: 4px; transition: height 0.08s; }
 
         .topbar .right { display: flex; align-items: center; gap: 8px; }
         .topbar .right .avatar-wrap {
@@ -84,7 +64,6 @@
             max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* ===== ГОРИЗОНТАЛЬНОЕ МЕНЮ ===== */
         .hor-menu {
             background: #fff; padding: 6px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: center; gap: 8px;
@@ -99,7 +78,6 @@
         .hor-menu button:hover { background: #f0f0f0; }
         .hor-menu button.active { color: #1877f2; background: #e8f0fe; }
 
-        /* ===== САЙДБАР ===== */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
             background: #fff; border-right: 1px solid #ddd;
@@ -113,10 +91,7 @@
             display: flex; align-items: center; gap: 10px; padding: 10px 14px;
             background: #f5f5f5; border-radius: 10px; margin-bottom: 14px;
         }
-        .sidebar .user .avatar-wrap {
-            width: 38px; height: 38px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; display: flex; align-items: center; justify-content: center;
-        }
+        .sidebar .user .avatar-wrap { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .sidebar .user .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .sidebar .user .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.9rem; }
         .sidebar .user .name { font-weight: 600; font-size: 0.9rem; }
@@ -133,6 +108,12 @@
             background: #1877f2; color: #fff; border: none; border-radius: 40px;
             padding: 8px; width: 100%; font-weight: 700; cursor: pointer; font-size: 0.8rem;
         }
+        .sidebar .footer .logout-btn {
+            background: #ffebee; color: #c62828; border: 1px solid #ef9a9a;
+            border-radius: 40px; padding: 8px; width: 100%; font-weight: 700;
+            cursor: pointer; font-size: 0.8rem; margin-top: 6px;
+        }
+        .sidebar .footer .logout-btn:hover { background: #ffcdd2; }
 
         .overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -190,27 +171,19 @@
             color: #e67e22; font-weight: 700; overflow: hidden; white-space: nowrap;
             margin-bottom: 8px; border: 1px solid #eee;
         }
-        .post .marquee span {
-            display: inline-block; animation: scroll 14s linear infinite;
-            padding-left: 100%;
-        }
+        .post .marquee span { display: inline-block; animation: scroll 14s linear infinite; padding-left: 100%; }
         @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         .post .author { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-        .post .author .avatar-wrap {
-            width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; display: flex; align-items: center; justify-content: center;
-        }
+        .post .author .avatar-wrap { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
         .post .author .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .post .author .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.7rem; }
         .post .name { font-weight: 600; font-size: 0.85rem; color: #1877f2; cursor: pointer; }
         .post .time { color: #999; font-size: 0.55rem; margin-left: 8px; }
         .post .text { margin: 6px 0; word-break: break-word; font-size: 0.9rem; line-height: 1.5; color: #333; }
         .post .post-img { max-width: 100%; max-height: 350px; border-radius: 10px; margin: 6px 0; border: 1px solid #eee; cursor: pointer; }
-        
         .post .link-preview { margin: 8px 0 4px 0; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; background: #f5f5f5; }
         .post .link-preview iframe { width: 100%; height: 300px; border: none; display: block; }
-        
         .post .buttons-wrap { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
         .post .buttons-wrap .btn-item {
             display: block; background: #1877f2; color: #fff;
@@ -219,7 +192,6 @@
             font-size: 0.85rem; transition: 0.2s; cursor: pointer;
         }
         .post .buttons-wrap .btn-item:hover { background: #4a9eff; transform: scale(1.01); }
-        
         .post .hashtags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px 0; padding-top: 8px; border-top: 1px solid #eee; }
         .post .hashtags .tag { color: #1877f2; font-size: 0.7rem; background: #e8f0fe; padding: 2px 12px; border-radius: 20px; border: 1px solid #d0e4ff; cursor: pointer; }
 
@@ -271,6 +243,7 @@
         .profile-header .actions .msg-btn { background: #1877f2; color: #fff; }
         .profile-header .actions .friend-btn { background: #e4e6eb; color: #555; }
         .profile-header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
+        .profile-header .actions .back-btn { background: #e4e6eb; color: #555; }
 
         .profile-stats { display: flex; gap: 16px; justify-content: center; margin: 6px 0; font-size: 0.7rem; color: #888; }
         .profile-stats span { cursor: pointer; }
@@ -361,18 +334,10 @@
         }
         .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
         .modal .box .btns .save { background: #e67e22; color: #fff; }
-        .modal .box .btns .save:hover { background: #d35400; }
         .modal .box .btn-group { display: flex; gap: 6px; margin-bottom: 6px; align-items: center; }
         .modal .box .btn-group input { margin-bottom: 0; flex: 1; }
-        .modal .box .btn-group .btn-remove {
-            background: #ffebee; color: #c62828; border: none;
-            border-radius: 30px; padding: 6px 12px; cursor: pointer; font-size: 0.7rem;
-        }
-        .modal .box .btn-add {
-            background: #f0f0f0; border: 1px solid #ddd; color: #e67e22;
-            padding: 4px 14px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; margin-top: 4px;
-        }
-        .modal .box .btn-add:hover { background: #e5e5e5; }
+        .modal .box .btn-group .btn-remove { background: #ffebee; color: #c62828; border: none; border-radius: 30px; padding: 6px 12px; cursor: pointer; font-size: 0.7rem; }
+        .modal .box .btn-add { background: #f0f0f0; border: 1px solid #ddd; color: #e67e22; padding: 4px 14px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; margin-top: 4px; }
 
         .google-btn {
             display: flex; align-items: center; justify-content: center;
@@ -414,7 +379,6 @@
         <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
     </div>
     
-    <!-- ===== ПЛЕЕР ===== -->
     <div class="player" id="player">
         <span class="track-name" id="trackName">ONE IN BILLION</span>
         <button class="play-btn" id="playBtn" onclick="playMusic()">▶</button>
@@ -452,7 +416,10 @@
     <div class="nav-item" onclick="goToGroups();closeSidebar();">👥 Группы</div>
     <div class="nav-item" onclick="goToPeople();closeSidebar();">👤 Люди</div>
     <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
-    <div class="footer"><button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button></div>
+    <div class="footer">
+        <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
+        <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+    </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -460,7 +427,7 @@
 <!-- ===== КОНТЕЙНЕР ===== -->
 <div class="container">
 
-    <!-- ===== ЛЕНТА ===== -->
+    <!-- ===== ЛЕНТА (ГЛАВНАЯ) ===== -->
     <div class="page feed-page active" id="feedPage">
         <div class="post-form">
             <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
@@ -485,6 +452,22 @@
         <div class="group-list" id="groupList"></div>
     </div>
 
+    <!-- ===== ГРУППОВАЯ ЛЕНТА (посты в группе) ===== -->
+    <div class="page feed-page" id="groupFeedPage" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h3 style="font-size:0.9rem;" id="groupFeedTitle">📰 Группа</h3>
+            <button onclick="goToGroups()" style="background:#e4e6eb;border:none;border-radius:20px;padding:4px 14px;cursor:pointer;font-weight:600;font-size:0.7rem;">← Назад</button>
+        </div>
+        <div class="post-form">
+            <textarea id="groupPostInput" placeholder="Пост в группе..."></textarea>
+            <div class="actions">
+                <button class="submit" onclick="submitGroupPost()">📤 Опубликовать</button>
+                <button class="cancel" onclick="document.getElementById('groupPostInput').value='';">Очистить</button>
+            </div>
+        </div>
+        <div id="groupFeed"></div>
+    </div>
+
     <!-- ===== ЛЮДИ ===== -->
     <div class="page people-page" id="peoplePage">
         <h3 style="margin-bottom:8px;font-size:0.9rem;">👤 Люди</h3>
@@ -507,12 +490,15 @@
             <div class="actions" id="profileActions">
                 <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
                 <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
+                <button class="back-btn" onclick="goToFeed()">← Назад</button>
             </div>
         </div>
         <div class="friends-section" id="friendsSection">
             <h4>🤝 Друзья</h4>
             <div class="friend-list" id="friendList"></div>
         </div>
+        <h4 style="margin:6px 0 4px;font-size:0.8rem;color:#555;">📰 Посты пользователя</h4>
+        <div id="profilePosts"></div>
     </div>
 
     <!-- ===== ЧАТ ===== -->
@@ -641,7 +627,7 @@
             document.getElementById('playBtn').textContent = '▶';
             stopEq();
         } else {
-            audio.play().catch(e => console.log('Ошибка воспроизведения:', e));
+            audio.play().catch(e => console.log('Ошибка:', e));
             isPlaying = true;
             document.getElementById('playBtn').textContent = '⏸';
             startEq();
@@ -658,10 +644,7 @@
     }
 
     function stopEq() {
-        if (eqInterval) {
-            clearInterval(eqInterval);
-            eqInterval = null;
-        }
+        if (eqInterval) { clearInterval(eqInterval); eqInterval = null; }
         document.querySelectorAll('.eq-bars .bar').forEach(bar => bar.style.height = '4px');
     }
 
@@ -686,14 +669,14 @@
     let pendingImageFile = null;
     let EDITING_ID = null;
     let showStat = 'friends';
+    let currentGroup = null;
 
     // ================================================================
-    // AUTH - GOOGLE (ИСПРАВЛЕНО!)
+    // AUTH - GOOGLE
     // ================================================================
     auth.onAuthStateChanged(user => {
         if (user) {
             USER_UID = user.uid;
-            // ===== БЕРЁМ ИМЯ ИЗ GOOGLE, НЕ ИЗ LOCALSTORAGE! =====
             USER = user.displayName || user.email || user.uid.slice(0, 8);
             localStorage.setItem('dc_u_' + SITE, USER);
             db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, email: user.email || 'anon' });
@@ -721,6 +704,20 @@
             }
         });
     });
+
+    // ================================================================
+    // ВЫХОД
+    // ================================================================
+    window.logout = function() {
+        if (!confirm('Выйти из аккаунта?')) return;
+        auth.signOut();
+        localStorage.removeItem('dc_u_' + SITE);
+        USER = null;
+        USER_UID = null;
+        updateUI();
+        document.getElementById('loginModal').classList.add('open');
+        closeSidebar();
+    };
 
     // ================================================================
     // АВАТАРКИ
@@ -824,41 +821,52 @@
     // НАВИГАЦИЯ
     // ================================================================
     function setActivePage(pageId) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        if (pageId) document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.page').forEach(el => {
+            if (el.id !== 'groupFeedPage') el.classList.remove('active');
+        });
+        if (pageId) {
+            const el = document.getElementById(pageId);
+            if (el) el.classList.add('active');
+        }
         document.querySelectorAll('.hor-menu button').forEach(el => el.classList.remove('active'));
-        if (pageId === 'feedPage') document.getElementById('hFeed').classList.add('active');
-        else if (pageId === 'groupsPage') document.getElementById('hGroups').classList.add('active');
-        else if (pageId === 'peoplePage') document.getElementById('hPeople').classList.add('active');
-        else if (pageId === 'profilePage') document.getElementById('hProfile').classList.add('active');
+        const map = { feedPage: 'hFeed', groupsPage: 'hGroups', peoplePage: 'hPeople', profilePage: 'hProfile' };
+        if (map[pageId]) document.getElementById(map[pageId]).classList.add('active');
+        
+        // Скрываем групповую ленту если не активна
+        if (pageId !== 'groupFeedPage') {
+            document.getElementById('groupFeedPage').style.display = 'none';
+        }
     }
 
     window.goToFeed = function() {
         if (!USER) { alert('Войдите!'); return; }
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('feedPage');
         document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null; }
+        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
         CURRENT_ROOM = null;
         loadFeed();
     };
 
     window.goToGroups = function() {
         if (!USER) { alert('Войдите!'); return; }
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('groupsPage');
         document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null; }
+        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
         CURRENT_ROOM = null;
         loadGroups();
     };
 
     window.goToPeople = function() {
         if (!USER) { alert('Войдите!'); return; }
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('peoplePage');
         document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null; }
+        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
         CURRENT_ROOM = null;
         loadPeople();
     };
@@ -866,10 +874,11 @@
     window.goToProfile = function() {
         if (!USER) { alert('Войдите!'); return; }
         VIEWING_USER = null;
+        currentGroup = null;
+        document.getElementById('groupFeedPage').style.display = 'none';
         setActivePage('profilePage');
         document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null; }
+        if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
         CURRENT_ROOM = null;
         loadProfile();
     };
@@ -886,7 +895,7 @@
     }
 
     // ================================================================
-    // ЛЕНТА
+    // ЛЕНТА (ГЛАВНАЯ)
     // ================================================================
     function loadFeed() {
         if (!USER_UID) {
@@ -904,17 +913,71 @@
                     el.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;">Нет постов</div>';
                     return;
                 }
-                keys.forEach(k => { const p = data[k];
-                    p.id = k;
-                    el.appendChild(renderPost(p)); });
+                keys.forEach(k => { const p = data[k]; p.id = k; el.appendChild(renderPost(p, 'feed')); });
             });
         });
     }
 
     // ================================================================
+    // ЛЕНТА ГРУППЫ
+    // ================================================================
+    window.openGroupFeed = function(groupId, groupName) {
+        currentGroup = groupId;
+        document.getElementById('groupFeedTitle').textContent = '📰 ' + groupName;
+        document.getElementById('groupFeedPage').style.display = 'block';
+        setActivePage(null);
+        loadGroupFeed(groupId);
+    };
+
+    function loadGroupFeed(groupId) {
+        const el = document.getElementById('groupFeed');
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/group_posts/' + groupId).orderByChild('timestamp').on('value', snap => {
+            el.innerHTML = '';
+            const data = snap.val() || {};
+            const keys = Object.keys(data).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
+            if (!keys.length) {
+                el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Нет постов в группе</div>';
+                return;
+            }
+            keys.forEach(k => { const p = data[k]; p.id = k; el.appendChild(renderPost(p, 'group')); });
+        });
+    }
+
+    window.submitGroupPost = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        if (!currentGroup) { alert('Выберите группу'); return; }
+        const text = document.getElementById('groupPostInput').value.trim();
+        if (!text) { alert('Введите текст'); return; }
+
+        const hashtags = extractHashtags(text);
+        const postData = {
+            author: USER,
+            authorUid: USER_UID,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            edited: false
+        };
+
+        const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+        if (linkMatch) postData.link = linkMatch[1];
+
+        db.ref('sites/' + SITE + '/group_posts/' + currentGroup).push(postData);
+        document.getElementById('groupPostInput').value = '';
+    };
+
+    // ================================================================
     // ОТРИСОВКА ПОСТА
     // ================================================================
-    function renderPost(p) {
+    function renderPost(p, type) {
         const div = document.createElement('div');
         div.className = 'post';
         div.dataset.id = p.id;
@@ -954,21 +1017,18 @@
 
         let actionsHtml = `
             <div class="stats">
-                <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">
+                <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
                     👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
                 </button>
-                <button onclick="toggleComments('${p.id}')">
+                <button onclick="toggleComments('${p.id}', '${type}')">
                     💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
-                </button>
-                <button onclick="repostPost('${p.id}')">
-                    🔁 <span id="repostCount_${p.id}">${p.repostCount || 0}</span>
                 </button>
         `;
         if (p.author === USER || IS_ADMIN) {
-            actionsHtml += `<button style="color:#e67e22;border:1px solid #e67e22;" onclick="openEdit('${p.id}')">✏️ Ред.</button>`;
+            actionsHtml += `<button style="color:#e67e22;border:1px solid #e67e22;" onclick="openEdit('${p.id}', '${type}')">✏️ Ред.</button>`;
         }
         if (IS_ADMIN) {
-            actionsHtml += `<button style="color:#e74c3c;border:1px solid #e74c3c;" onclick="deletePost('${p.id}')">🗑</button>`;
+            actionsHtml += `<button style="color:#e74c3c;border:1px solid #e74c3c;" onclick="deletePost('${p.id}', '${type}')">🗑</button>`;
         }
         actionsHtml += `</div>`;
 
@@ -986,12 +1046,12 @@
             ${hashtagsHtml}
             ${actionsHtml}
             <div class="comments" id="comments_${p.id}">
-                <button class="toggle" onclick="toggleComments('${p.id}')">💬 Показать</button>
+                <button class="toggle" onclick="toggleComments('${p.id}', '${type}')">💬 Показать</button>
                 <div class="list" id="commentsList_${p.id}">
                     <div id="commentsContainer_${p.id}"></div>
                     <div class="input-wrap">
                         <input type="text" id="commentInput_${p.id}" placeholder="Комментарий...">
-                        <button onclick="submitComment('${p.id}')">→</button>
+                        <button onclick="submitComment('${p.id}', '${type}')">→</button>
                     </div>
                 </div>
             </div>
@@ -1002,109 +1062,20 @@
             if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
         }
 
-        loadComments(p.id);
+        loadComments(p.id, type);
         return div;
     }
 
     // ================================================================
-    // ПОИСК ПО ХЭШТЕГУ
-    // ================================================================
-    window.searchByTag = function(tag) {
-        const input = document.getElementById('postInput');
-        if (input) {
-            input.value = tag + ' ';
-            input.focus();
-        }
-    };
-
-    // ================================================================
-    // ОТПРАВКА ПОСТА
-    // ================================================================
-    window.submitPost = function() {
-        if (!USER) { alert('Войдите!'); return; }
-        const text = document.getElementById('postInput').value.trim();
-        if (!text && !pendingImageFile) { alert('Введите текст или добавьте фото'); return; }
-
-        const hashtags = extractHashtags(text);
-        const postData = {
-            author: USER,
-            authorUid: USER_UID,
-            text: text || '📷',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: Date.now(),
-            likes: 0,
-            commentCount: 0,
-            repostCount: 0,
-            hashtags: hashtags,
-            marquee: null,
-            link: null,
-            buttons: [],
-            edited: false
-        };
-
-        const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
-        if (linkMatch) postData.link = linkMatch[1];
-
-        if (pendingImageFile) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                postData.img = e.target.result;
-                db.ref('sites/' + SITE + '/feed_posts').push(postData);
-                clearPostForm();
-            };
-            reader.readAsDataURL(pendingImageFile);
-        } else {
-            db.ref('sites/' + SITE + '/feed_posts').push(postData);
-            clearPostForm();
-        }
-    };
-
-    function extractHashtags(text) {
-        if (!text) return [];
-        const matches = text.match(/#[\wа-яё]+/gi) || [];
-        return matches.slice(0, 8);
-    }
-
-    function clearPostForm() {
-        document.getElementById('postInput').value = '';
-        pendingImage = null;
-        pendingImageFile = null;
-        document.getElementById('previewBox').classList.remove('visible');
-        document.getElementById('fileInput').value = '';
-    }
-
-    // ================================================================
-    // ФОТО
-    // ================================================================
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (!file.type.startsWith('image/')) { alert('Только изображения!'); this.value = ''; return; }
-        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); this.value = ''; return; }
-
-        pendingImageFile = file;
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            pendingImage = ev.target.result;
-            document.getElementById('previewImg').src = pendingImage;
-            document.getElementById('previewName').textContent = file.name.slice(0, 18);
-            document.getElementById('previewBox').classList.add('visible');
-        };
-        reader.readAsDataURL(file);
-    });
-
-    window.removeImage = function() {
-        pendingImage = null;
-        pendingImageFile = null;
-        document.getElementById('previewBox').classList.remove('visible');
-        document.getElementById('fileInput').value = '';
-    };
-
-    // ================================================================
     // КОММЕНТАРИИ
     // ================================================================
-    function loadComments(postId) {
-        db.ref('sites/' + SITE + '/comments/' + postId).orderByChild('timestamp').on('value', snap => {
+    function getPostPath(type) {
+        return type === 'group' ? 'group_posts/' + currentGroup : 'feed_posts';
+    }
+
+    function loadComments(postId, type) {
+        const path = getPostPath(type);
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').orderByChild('timestamp').on('value', snap => {
             const container = document.getElementById('commentsContainer_' + postId);
             if (!container) return;
             container.innerHTML = '';
@@ -1114,7 +1085,7 @@
             const count = keys.length;
             const countEl = document.getElementById('commentCount_' + postId);
             if (countEl) countEl.textContent = count;
-            db.ref('sites/' + SITE + '/feed_posts/' + postId + '/commentCount').set(count);
+            db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(count);
 
             if (!keys.length) {
                 container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;padding:4px 0;">Нет комментариев</div>';
@@ -1133,7 +1104,7 @@
                         <span class="time">${c.time || ''}</span>
                         <div>${esc(c.text || '')}</div>
                     </div>
-                    ${(c.author === USER || IS_ADMIN) ? `<button onclick="deleteComment('${postId}','${k}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.55rem;">✕</button>` : ''}
+                    ${(c.author === USER || IS_ADMIN) ? `<button onclick="deleteComment('${postId}','${k}','${type}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.55rem;">✕</button>` : ''}
                 `;
                 container.appendChild(div);
                 if (c.authorUid) {
@@ -1144,7 +1115,7 @@
         });
     }
 
-    window.toggleComments = function(postId) {
+    window.toggleComments = function(postId, type) {
         const list = document.getElementById('commentsList_' + postId);
         const toggle = document.querySelector(`#comments_${postId} .toggle`);
         if (list) {
@@ -1153,13 +1124,14 @@
         }
     };
 
-    window.submitComment = function(postId) {
+    window.submitComment = function(postId, type) {
         if (!USER) { alert('Войдите!'); return; }
         const input = document.getElementById('commentInput_' + postId);
         const text = input.value.trim();
         if (!text) return;
 
-        db.ref('sites/' + SITE + '/comments/' + postId).push({
+        const path = getPostPath(type);
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
             author: USER,
             authorUid: USER_UID,
             text: text,
@@ -1173,20 +1145,22 @@
         if (toggle) toggle.textContent = '▲ Скрыть';
     };
 
-    window.deleteComment = function(postId, commentId) {
+    window.deleteComment = function(postId, commentId, type) {
         if (!confirm('Удалить комментарий?')) return;
-        db.ref('sites/' + SITE + '/comments/' + postId + '/' + commentId).remove();
+        const path = getPostPath(type);
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
     };
 
     // ================================================================
-    // ЛАЙКИ И РЕПОСТЫ
+    // ЛАЙКИ
     // ================================================================
-    window.toggleLike = function(postId) {
+    window.toggleLike = function(postId, type) {
         if (!USER) { alert('Войдите!'); return; }
         const key = 'lk_' + postId + '_' + USER_UID;
         const liked = localStorage.getItem(key) === '1';
+        const path = getPostPath(type);
 
-        const ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/likes');
+        const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/likes');
         if (liked) {
             ref.transaction(v => Math.max(0, (v || 0) - 1));
             localStorage.removeItem(key);
@@ -1196,57 +1170,21 @@
         }
     };
 
-    window.repostPost = function(postId) {
-        if (!USER) { alert('Войдите!'); return; }
-        const key = 'rp_' + postId + '_' + USER_UID;
-        if (localStorage.getItem(key) === '1') {
-            alert('Вы уже репостнули этот пост');
-            return;
-        }
-
-        db.ref('sites/' + SITE + '/feed_posts/' + postId).once('value', snap => {
-            const p = snap.val();
-            if (!p) return;
-
-            db.ref('sites/' + SITE + '/feed_posts').push({
-                author: USER,
-                authorUid: USER_UID,
-                text: p.text || '',
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now(),
-                likes: 0,
-                commentCount: 0,
-                repostCount: 0,
-                repostFrom: p.author || 'Аноним',
-                originalId: postId,
-                img: p.img || null,
-                marquee: p.marquee || null,
-                link: p.link || null,
-                buttons: p.buttons || [],
-                hashtags: p.hashtags || [],
-                edited: false
-            });
-
-            db.ref('sites/' + SITE + '/feed_posts/' + postId + '/repostCount').transaction(v => (v || 0) + 1);
-            localStorage.setItem(key, '1');
-            alert('✅ Пост репостнут!');
-        });
-    };
-
-    window.deletePost = function(id) {
+    window.deletePost = function(id, type) {
         if (!IS_ADMIN || !confirm('Удалить пост?')) return;
-        db.ref('sites/' + SITE + '/feed_posts/' + id).remove();
-        db.ref('sites/' + SITE + '/comments/' + id).remove();
+        const path = getPostPath(type);
+        db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
     };
 
     // ================================================================
-    // ===== ПОЛНОЕ РЕДАКТИРОВАНИЕ =====
+    // РЕДАКТИРОВАНИЕ
     // ================================================================
-    window.openEdit = function(id) {
-        EDITING_ID = id;
+    window.openEdit = function(id, type) {
+        EDITING_ID = { id: id, type: type };
         document.getElementById('editModal').classList.add('open');
+        const path = getPostPath(type);
 
-        db.ref('sites/' + SITE + '/feed_posts/' + id).once('value', snap => {
+        db.ref('sites/' + SITE + '/' + path + '/' + id).once('value', snap => {
             const p = snap.val();
             if (!p) return;
 
@@ -1287,6 +1225,8 @@
 
     window.saveEdit = function() {
         if (!EDITING_ID) return;
+        const { id, type } = EDITING_ID;
+        const path = getPostPath(type);
 
         const marquee = document.getElementById('editMarquee').value.trim();
         const text = document.getElementById('editText').value.trim();
@@ -1311,7 +1251,7 @@
             editedAt: Date.now()
         };
 
-        db.ref('sites/' + SITE + '/feed_posts/' + EDITING_ID).update(updates);
+        db.ref('sites/' + SITE + '/' + path + '/' + id).update(updates);
         closeEdit();
         alert('✅ Пост обновлён!');
     };
@@ -1319,7 +1259,9 @@
     window.deleteEditPost = function() {
         if (!EDITING_ID) return;
         if (!confirm('🗑 Удалить пост навсегда?')) return;
-        db.ref('sites/' + SITE + '/feed_posts/' + EDITING_ID).remove();
+        const { id, type } = EDITING_ID;
+        const path = getPostPath(type);
+        db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
         closeEdit();
     };
 
@@ -1346,6 +1288,27 @@
         loadFriends(uid);
         loadSubscribers(uid);
         loadSubscriptions(uid);
+        loadProfilePosts(uid);
+    }
+
+    function loadProfilePosts(uid) {
+        const container = document.getElementById('profilePosts');
+        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:10px;font-size:0.75rem;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
+            container.innerHTML = '';
+            const data = snap.val() || {};
+            const keys = Object.keys(data).filter(k => data[k].authorUid === uid).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
+            if (!keys.length) {
+                container.innerHTML = '<div style="text-align:center;padding:10px;color:#bbb;font-size:0.75rem;">Нет постов</div>';
+                return;
+            }
+            keys.forEach(k => {
+                const p = data[k];
+                p.id = k;
+                container.appendChild(renderPost(p, 'feed'));
+            });
+        });
     }
 
     function showProfileActions(uid) {
@@ -1354,6 +1317,7 @@
             actions.innerHTML = `
                 <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
                 <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
+                <button class="back-btn" onclick="goToFeed()">← Назад</button>
             `;
             return;
         }
@@ -1363,6 +1327,7 @@
             <button class="friend-btn ${isFriend ? 'added' : ''}" onclick="toggleFriend('${uid}')">
                 ${isFriend ? '✅ В друзьях' : '➕ Добавить в друзья'}
             </button>
+            <button class="back-btn" onclick="goToFeed()">← Назад</button>
         `;
     }
 
@@ -1488,6 +1453,7 @@
                 <div class="icon">${g.name.split(' ')[0]}</div>
                 <div class="name">${g.name}</div>
                 <div class="count">💬 <span class="count">0</span></div>
+                <div style="margin-top:4px;font-size:0.6rem;color:#1877f2;cursor:pointer;" onclick="event.stopPropagation();openGroupFeed('${g.id}','${g.name}')">📰 Лента группы</div>
             </div>`;
         }).join('');
     }
@@ -1544,7 +1510,7 @@
     }
 
     // ================================================================
-    // ЧАТ (ГРУППОВОЙ И ЛИЧНЫЙ)
+    // ЧАТ
     // ================================================================
     function loadChat(path) {
         if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
@@ -1591,7 +1557,10 @@
         if (document.getElementById('groupsPage').classList.contains('active')) goToGroups();
         else if (document.getElementById('peoplePage').classList.contains('active')) goToPeople();
         else if (document.getElementById('profilePage').classList.contains('active')) goToProfile();
-        else goToFeed();
+        else if (document.getElementById('groupFeedPage').style.display !== 'none') {
+            document.getElementById('groupFeedPage').style.display = 'none';
+            goToGroups();
+        } else goToFeed();
     };
 
     window.openDM = function(userId) {
@@ -1600,6 +1569,94 @@
         document.getElementById('chatView').classList.add('active');
         setActivePage(null);
         loadChat('dms/' + SITE + '/' + [USER_UID, userId].sort().join('_') + '/messages');
+    };
+
+    // ================================================================
+    // ОБЩИЕ УТИЛИТЫ
+    // ================================================================
+    function extractHashtags(text) {
+        if (!text) return [];
+        const matches = text.match(/#[\wа-яё]+/gi) || [];
+        return matches.slice(0, 8);
+    }
+
+    window.searchByTag = function(tag) {
+        const input = document.getElementById('postInput');
+        if (input) {
+            input.value = tag + ' ';
+            input.focus();
+        }
+    };
+
+    window.submitPost = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        const text = document.getElementById('postInput').value.trim();
+        if (!text && !pendingImageFile) { alert('Введите текст или добавьте фото'); return; }
+
+        const hashtags = extractHashtags(text);
+        const postData = {
+            author: USER,
+            authorUid: USER_UID,
+            text: text || '📷',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            edited: false
+        };
+
+        const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+        if (linkMatch) postData.link = linkMatch[1];
+
+        if (pendingImageFile) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                postData.img = e.target.result;
+                db.ref('sites/' + SITE + '/feed_posts').push(postData);
+                clearPostForm();
+            };
+            reader.readAsDataURL(pendingImageFile);
+        } else {
+            db.ref('sites/' + SITE + '/feed_posts').push(postData);
+            clearPostForm();
+        }
+    };
+
+    function clearPostForm() {
+        document.getElementById('postInput').value = '';
+        pendingImage = null;
+        pendingImageFile = null;
+        document.getElementById('previewBox').classList.remove('visible');
+        document.getElementById('fileInput').value = '';
+    }
+
+    // ===== ФОТО =====
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { alert('Только изображения!'); this.value = ''; return; }
+        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); this.value = ''; return; }
+
+        pendingImageFile = file;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            pendingImage = ev.target.result;
+            document.getElementById('previewImg').src = pendingImage;
+            document.getElementById('previewName').textContent = file.name.slice(0, 18);
+            document.getElementById('previewBox').classList.add('visible');
+        };
+        reader.readAsDataURL(file);
+    });
+
+    window.removeImage = function() {
+        pendingImage = null;
+        pendingImageFile = null;
+        document.getElementById('previewBox').classList.remove('visible');
+        document.getElementById('fileInput').value = '';
     };
 
     // ================================================================
@@ -1638,12 +1695,11 @@
         if (!snap.exists()) {
             const posts = [
                 { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в METAIMPERIYA!', time: '12:00',
-                    timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0, img: null,
-                marquee: null, link: null, buttons: [], hashtags: ['#Добро'] },
+                    timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, hashtags: ['#Добро'], img: null,
+                marquee: null, link: null, buttons: [] },
                 { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30',
-                    timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, repostCount: 0, img: null,
-                marquee: '📅 Встреча завтра!', link: null, buttons: [{ label: '🔗 Ссылка', url: 'https://meet.google.com/' }],
-                    hashtags: ['#Встреча'] }
+                    timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, hashtags: ['#Встреча'], img: null,
+                marquee: '📅 Встреча завтра!', link: null, buttons: [{ label: '🔗 Ссылка', url: 'https://meet.google.com/' }] }
             ];
             posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
         }
@@ -1658,9 +1714,11 @@
     loadPeople();
     setActivePage('feedPage');
 
-    console.log('🏛️ METAIMPERIYA С GOOGLE-ВХОДОМ И ПЛЕЕРОМ!');
+    console.log('🏛️ METAIMPERIYA С ЛЕНТАМИ В ГРУППАХ И ПРОФИЛЕ!');
+    console.log('📰 В каждой группе своя лента');
+    console.log('👤 В профиле своя лента');
+    console.log('🚪 Выход из профиля - в меню');
     console.log('🎵 Плеер: ONE IN BILLION');
-    console.log('🔑 Имя берётся из Google-аккаунта');
     console.log('🏴‍☠️ Админ-пароль: 12345');
 
 })();
