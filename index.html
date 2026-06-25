@@ -907,7 +907,12 @@
             })
             .catch((error) => {
                 console.error('❌ Ошибка входа:', error);
-                alert('Ошибка входа: ' + error.message);
+                // Если попап заблокирован - используем редирект
+                if (error.code === 'auth/popup-blocked') {
+                    auth.signInWithRedirect(provider);
+                } else {
+                    alert('Ошибка входа: ' + error.message);
+                }
             });
     });
 
@@ -1078,6 +1083,7 @@
         document.getElementById('navFeed').classList.add('active');
         document.getElementById('navRooms').classList.remove('active');
         CUR_ROOM = '';
+        updateRoomTitle(null);
         closeSidebar();
     };
 
@@ -1092,8 +1098,57 @@
     };
 
     // ================================================================
-    // КОМНАТЫ
+    // КОМНАТЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ (ШАГ 1)
     // ================================================================
+    function updateRoomTitle(roomName) {
+        const title = document.querySelector('.topbar .title');
+        if (roomName) {
+            title.innerHTML = '💬 ' + roomName;
+        } else {
+            title.innerHTML = 'Deep<span>Chat</span>';
+        }
+    }
+
+    window.openRoom = function(roomId, roomName) {
+        if (!USER) { 
+            alert('Сначала войдите!'); 
+            return; 
+        }
+        
+        // Проверяем, существует ли комната в базе
+        db.ref('sites/' + SITE + '/rooms/' + roomId).once('value')
+            .then(snap => {
+                if (!snap.exists()) {
+                    // Если комната не существует — создаём её
+                    return db.ref('sites/' + SITE + '/rooms/' + roomId).set({
+                        name: roomName || 'Обсуждение',
+                        createdAt: Date.now(),
+                        count: 0,
+                        createdBy: USER_UID || 'anon'
+                    }).then(() => {
+                        console.log('✅ Комната создана:', roomId);
+                    });
+                }
+                return Promise.resolve();
+            })
+            .then(() => {
+                // Открываем комнату
+                CUR_ROOM = roomId;
+                updateRoomTitle(roomName || 'Обсуждение');
+                document.getElementById('feedSection').classList.add('hidden');
+                document.getElementById('chatSection').classList.add('show');
+                document.getElementById('navRooms').classList.add('active');
+                document.getElementById('navFeed').classList.remove('active');
+                closeSidebar();
+                loadChat(roomId);
+                loadRooms(); // Обновляем список комнат
+            })
+            .catch(err => {
+                console.error('❌ Ошибка открытия комнаты:', err);
+                alert('Ошибка: ' + err.message);
+            });
+    };
+
     function loadRooms() {
         db.ref('sites/'+SITE+'/rooms').orderByChild('createdAt').on('value', snap => {
             const data = snap.val() || {};
@@ -1106,28 +1161,14 @@
             list.innerHTML = keys.map(k => {
                 const r = data[k];
                 const ac = k === CUR_ROOM ? 'active' : '';
+                const count = r.count || 0;
                 return `<div class="room ${ac}" onclick="openRoom('${k}','${r.name || 'Комната'}')">
                     <span># ${r.name || '?'}</span>
-                    <span class="count">${r.count || 0}</span>
+                    <span class="count">${count}</span>
                 </div>`;
             }).join('');
         });
     }
-
-    window.openRoom = function(roomId, roomName) {
-        if (!USER) { alert('Сначала введите имя!'); return; }
-        CUR_ROOM = roomId;
-        document.getElementById('feedSection').classList.add('hidden');
-        document.getElementById('chatSection').classList.add('show');
-        document.getElementById('navRooms').classList.add('active');
-        document.getElementById('navFeed').classList.remove('active');
-        closeSidebar();
-        loadChat(roomId);
-        document.querySelectorAll('.room').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.room').forEach(el => {
-            if (el.textContent.includes(roomName)) el.classList.add('active');
-        });
-    };
 
     window.openCreateRoom = function() {
         if (!IS_ROOM_ADMIN) { alert('⛔ Только для админа!'); return; }
@@ -1295,9 +1336,25 @@
         const input = document.getElementById('chatInput');
         const text = input.value.trim();
         if (!text) return;
-        db.ref(chatPath(CUR_ROOM)).push({ nick: USER, text, time: now(), timestamp: Date.now(), likes: 0, img: null, edited: false, isPost: false });
+        
+        // Отправляем сообщение
+        const msgRef = db.ref(chatPath(CUR_ROOM)).push({ 
+            nick: USER, 
+            text, 
+            time: now(), 
+            timestamp: Date.now(), 
+            likes: 0, 
+            img: null, 
+            edited: false, 
+            isPost: false 
+        });
+        
+        // Обновляем счётчик в комнате (ШАГ 2)
+        db.ref('sites/'+SITE+'/rooms/'+CUR_ROOM+'/count').transaction(v => (v||0)+1);
+        
         input.value = '';
     };
+    
     document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') chatSend(); });
 
     window.chatLike = function(id, roomId) {
@@ -1314,6 +1371,8 @@
     window.chatDel = function(id, roomId) {
         if (!confirm('Удалить?')) return;
         db.ref(chatPath(roomId)+'/'+id).remove();
+        // Обновляем счётчик (ШАГ 2)
+        db.ref('sites/'+SITE+'/rooms/'+roomId+'/count').transaction(v => Math.max(0, (v||0)-1));
     };
 
     // Admin publish
@@ -1350,6 +1409,8 @@
             document.getElementById('apBtns').innerHTML = '';
             document.getElementById('chatAdminForm').classList.remove('open');
             document.querySelector('.admin-bar .title button').textContent = '▼ Открыть';
+            // Обновляем счётчик (ШАГ 2)
+            db.ref('sites/'+SITE+'/rooms/'+CUR_ROOM+'/count').transaction(v => (v||0)+1);
         });
     };
 
@@ -1396,6 +1457,8 @@
         if (!CHAT_EDIT_ID || !confirm('Удалить?')) return;
         const { msgId, roomId } = CHAT_EDIT_ID;
         db.ref(chatPath(roomId)+'/'+msgId).remove();
+        // Обновляем счётчик (ШАГ 2)
+        db.ref('sites/'+SITE+'/rooms/'+roomId+'/count').transaction(v => Math.max(0, (v||0)-1));
         closeEdit();
     };
 
