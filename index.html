@@ -3,24 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAIMPERIYA</title>
+    <title>DeepChat · Post Constructor</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#0a0a12; color:#eee; font-family:system-ui; padding:12px; }
         .container { max-width:720px; margin:0 auto; }
         .header { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #222; }
         .header h1 { color:#ff8c00; cursor:pointer; }
-        .header .right { display:flex; align-items:center; gap:8px; }
-        .header .right .avatar-wrap {
-            width:32px; height:32px; border-radius:50%; overflow:hidden;
-            background:#ff8c00; cursor:pointer; display:flex; align-items:center; justify-content:center;
-        }
-        .header .right .avatar-wrap img { width:100%; height:100%; object-fit:cover; }
-        .header .right .avatar-wrap .letter { color:#0b0b0f; font-weight:700; font-size:0.8rem; }
-        
         .chat-panel { background:#10101a; border-radius:20px; border:1px solid #262633; overflow:hidden; display:flex; flex-direction:column; height:80vh; margin-top:12px; }
         #messages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px; }
         
@@ -29,25 +20,56 @@
         .post .marquee span { display:inline-block; animation:scroll 12s linear infinite; color:#ff8c00; font-weight:600; font-size:0.95rem; padding-left:20px; }
         @keyframes scroll { 0% { transform:translateX(100%); } 100% { transform:translateX(-100%); } }
         
-        .post .author { display:flex; align-items:center; gap:8px; }
-        .post .author .avatar-wrap {
-            width:28px; height:28px; border-radius:50%; overflow:hidden;
-            background:#ff8c00; display:flex; align-items:center; justify-content:center;
-        }
-        .post .author .avatar-wrap img { width:100%; height:100%; object-fit:cover; }
-        .post .author .avatar-wrap .letter { color:#0b0b0f; font-weight:700; font-size:0.6rem; }
         .post .name { color:#ffaa44; font-weight:700; }
         .post .time { color:#666; font-size:0.65rem; margin-left:10px; }
         .post .text { margin:6px 0; word-break:break-word; font-size:0.95rem; line-height:1.5; }
         .post .text .link-hidden { color:#555; font-size:0.8rem; }
         .post img { max-width:100%; max-height:250px; border-radius:12px; margin:6px 0; border:1px solid #333; cursor:pointer; }
         
-        .post .link-preview { margin:8px 0 4px 0; border:1px solid #333; border-radius:12px; overflow:hidden; background:#0f0f1a; width:100%; }
-        .post .link-preview iframe { width:100%; height:450px; border:none; display:block; }
+        /* ===== ФРЕЙМ (широкий) ===== */
+        .post .link-preview { 
+            margin:8px 0 4px 0; 
+            border:1px solid #333; 
+            border-radius:12px; 
+            overflow:hidden; 
+            background:#0f0f1a; 
+            width:100%; 
+        }
+        .post .link-preview iframe { 
+            width:100%; 
+            height:450px; 
+            border:none; 
+            display:block; 
+        }
         
-        .post .buttons { display:flex; flex-direction:column; gap:6px; margin:8px 0; }
-        .post .buttons .btn-item { display:block; background:#ff8c00; border:none; border-radius:12px; padding:12px 18px; text-align:center; text-decoration:none; color:#0b0b0f; font-weight:700; font-size:0.95rem; transition:0.2s; cursor:pointer; }
-        .post .buttons .btn-item:hover { background:#ffa033; transform:scale(1.01); }
+        /* ===== КНОПКИ (только текст, ссылка скрыта внутри) ===== */
+        .post .buttons { 
+            display:flex; 
+            flex-direction:column; 
+            gap:6px; 
+            margin:8px 0; 
+        }
+        .post .buttons .btn-item { 
+            display:block;
+            background:#ff8c00; 
+            border:none; 
+            border-radius:12px; 
+            padding:12px 18px; 
+            text-align:center;
+            text-decoration:none; 
+            color:#0b0b0f; 
+            font-weight:700;
+            font-size:0.95rem;
+            transition:0.2s; 
+            cursor:pointer;
+        }
+        .post .buttons .btn-item:hover { 
+            background:#ffa033; 
+            transform:scale(1.01);
+        }
+        .post .buttons .btn-item:active {
+            transform:scale(0.97);
+        }
         
         .post .hashtags { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px 0; padding-top:8px; border-top:1px solid #222; }
         .post .hashtags .tag { color:#66aaff; font-size:0.75rem; background:#0f0f1a; padding:2px 12px; border-radius:20px; border:1px solid #222; }
@@ -91,13 +113,8 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1 id="brandTitle">🌀 METAIMPERIYA</h1>
-        <div class="right">
-            <span style="font-size:0.7rem;color:#666;" id="userName">Гость</span>
-            <div class="avatar-wrap" id="topAvatar" onclick="uploadAvatar()">
-                <span class="letter">?</span>
-            </div>
-        </div>
+        <h1 id="brandTitle">🌀 DeepChat</h1>
+        <span style="font-size:0.7rem;color:#666;">📝 конструктор постов</span>
     </div>
 
     <div class="chat-panel">
@@ -142,103 +159,38 @@
 </div>
 
 <script>
-// ================================================================
-// FIREBASE (БАЗА + СТОРАДЖ)
-// ================================================================
+// ===== FIREBASE =====
 const config = {
     apiKey: "AIzaSyC5L2GQ-2CYj-GNYsHENASdvKVF68rsEb0",
     databaseURL: "https://mychatapp-2c141-default-rtdb.firebaseio.com",
-    storageBucket: "mychatapp-2c141.appspot.com"
 };
 firebase.initializeApp(config);
 const db = firebase.database();
-const storage = firebase.storage();
 
-// ================================================================
-// СОСТОЯНИЕ
-// ================================================================
-let currentUser = localStorage.getItem('metaimperiya_user') || 'anon';
-let currentUserUID = 'user_' + Date.now();
+// ===== СОСТОЯНИЕ =====
+let currentUser = localStorage.getItem('deepchat_user') || 'anon';
 let pendingImage = null;
-let pendingImageFile = null;
 let roomId = 'room_001';
 let editingId = null;
-let avatarUrlCache = {};
 
-// ================================================================
-// АДМИНКА
-// ================================================================
+// ===== АДМИНКА =====
 function adminLogin() {
     const pwd = prompt('🔐 Введите пароль админа:');
     if (pwd === '12345') {
-        localStorage.setItem('metaimperiya_admin', 'true');
+        localStorage.setItem('deepchat_admin', 'true');
         alert('✅ Админ-режим ВКЛЮЧЕН!');
         location.reload();
     } else {
         alert('❌ Неверный пароль');
     }
 }
-const isAdmin = localStorage.getItem('metaimperiya_admin') === 'true';
+const isAdmin = localStorage.getItem('deepchat_admin') === 'true';
 
-// ================================================================
-// АВАТАРКИ
-// ================================================================
-window.uploadAvatar = function() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*, .gif';
-    input.onchange = function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Максимум 5 МБ');
-            return;
-        }
-        const path = 'avatars/' + currentUserUID + '/' + Date.now() + '_' + file.name;
-        const ref = storage.ref(path);
-        const uploadTask = ref.put(file);
-        uploadTask.on('state_changed',
-            null,
-            function(error) {
-                console.error('Ошибка загрузки:', error);
-                alert('Ошибка: ' + error.message);
-            },
-            function() {
-                ref.getDownloadURL().then(function(url) {
-                    db.ref('users/' + currentUserUID + '/avatarUrl').set(url);
-                    renderAvatar(currentUserUID);
-                    alert('✅ Аватарка обновлена!');
-                });
-            }
-        );
-    };
-    input.click();
-};
-
-function renderAvatar(uid) {
-    db.ref('users/' + uid + '/avatarUrl').once('value', snap => {
-        const url = snap.val();
-        const containers = document.querySelectorAll('.avatar-wrap');
-        containers.forEach(el => {
-            if (url) {
-                el.innerHTML = `<img src="${url}" />`;
-            } else {
-                const letter = (currentUser || '?').charAt(0).toUpperCase();
-                el.innerHTML = `<span class="letter">${letter}</span>`;
-            }
-        });
-    });
-}
-
-// ================================================================
-// DOM
-// ================================================================
+// ===== DOM =====
 const messagesDiv = document.getElementById('messages');
 const msgInput = document.getElementById('msgInput');
 
-// ================================================================
-// ПОДПИСКА
-// ================================================================
+// ===== ПОДПИСКА =====
 const msgRef = db.ref(`rooms/${roomId}/messages`);
 msgRef.orderByChild('timestamp').on('value', snap => {
     messagesDiv.innerHTML = '';
@@ -250,51 +202,81 @@ msgRef.orderByChild('timestamp').on('value', snap => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });
 
-// ================================================================
-// ОТРИСОВКА ПОСТА
-// ================================================================
+// ===== ОТРИСОВКА ПОСТА =====
 function renderPost(m) {
     const div = document.createElement('div');
     div.className = 'post';
     
-    let marqueeHtml = m.marquee ? `<div class="marquee"><span>${escapeHtml(m.marquee)}</span></div>` : '';
+    // Бегущая строка
+    let marqueeHtml = '';
+    if (m.marquee) {
+        marqueeHtml = `<div class="marquee"><span>${escapeHtml(m.marquee)}</span></div>`;
+    }
+    
+    // Текст
     let textHtml = escapeHtml(m.text || '');
     const linkMatch = (m.text || '').match(/(https?:\/\/[^\s]+)/);
-    if (linkMatch && m.link) textHtml = textHtml.replace(linkMatch[1], `<span class="link-hidden">${linkMatch[1]}</span>`);
-    let imgHtml = m.img ? `<img src="${m.img}" onclick="window.open(this.src)">` : '';
+    if (linkMatch && m.link) {
+        textHtml = textHtml.replace(linkMatch[1], `<span class="link-hidden">${linkMatch[1]}</span>`);
+    }
     
+    // Фото
+    let imgHtml = '';
+    if (m.img) {
+        imgHtml = `<img src="${m.img}" onclick="window.open(this.src)">`;
+    }
+    
+    // ===== КНОПКИ (ТОЛЬКО ТЕКСТ, ССЫЛКА ВНУТРИ) =====
     let buttonsHtml = '';
     if (m.buttons && m.buttons.length > 0) {
         buttonsHtml = '<div class="buttons">';
         m.buttons.forEach(btn => {
-            if (btn.url) buttonsHtml += `<a href="${escapeHtml(btn.url)}" target="_blank" class="btn-item">${escapeHtml(btn.label || '🔗 Перейти')}</a>`;
+            if (btn.url) {
+                buttonsHtml += `
+                    <a href="${escapeHtml(btn.url)}" target="_blank" class="btn-item">
+                        ${escapeHtml(btn.label || '🔗 Перейти')}
+                    </a>
+                `;
+            }
         });
         buttonsHtml += '</div>';
     }
     
-    let previewHtml = m.link ? `<div class="link-preview"><iframe src="${m.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>` : '';
+    // ===== ФРЕЙМ =====
+    let previewHtml = '';
+    if (m.link) {
+        previewHtml = `<div class="link-preview"><iframe src="${m.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
+    }
+    
+    // Хэштеги
     let hashtagsHtml = '';
     if (m.hashtags && m.hashtags.length > 0) {
         hashtagsHtml = '<div class="hashtags">';
-        m.hashtags.forEach(tag => hashtagsHtml += `<span class="tag">${escapeHtml(tag)}</span>`);
+        m.hashtags.forEach(tag => {
+            hashtagsHtml += `<span class="tag">${escapeHtml(tag)}</span>`;
+        });
         hashtagsHtml += '</div>';
     }
     
+    // Действия
     let actionsHtml = `
         <button onclick="likeMsg('${m.id}')">👍 ${m.likes || 0}</button>
         <button onclick="replyMsg('${m.id}','${escapeHtml(m.nick)}')">💬 ответ</button>
     `;
-    if (m.nick === currentUser || isAdmin) actionsHtml += `<button class="edit-btn" onclick="openEdit('${m.id}')">✏️ ред.</button>`;
-    if (m.nick === currentUser || isAdmin) actionsHtml += `<button class="del-btn" onclick="deleteMsg('${m.id}')">🗑</button>`;
+    if (m.nick === currentUser) {
+        actionsHtml += `<button class="edit-btn" onclick="openEdit('${m.id}')">✏️ ред.</button>`;
+    }
+    if (m.nick === currentUser || isAdmin) {
+        actionsHtml += `<button class="del-btn" onclick="deleteMsg('${m.id}')">🗑</button>`;
+    }
     
     div.innerHTML = `
-        <div class="author">
-            <span class="avatar-wrap"><span class="letter">${escapeHtml((m.nick || '?').charAt(0).toUpperCase())}</span></span>
+        ${marqueeHtml}
+        <div>
             <span class="name">${escapeHtml(m.nick)}</span>
             <span class="time">${m.time || ''}</span>
             ${m.edited ? ' <span style="color:#666;font-size:0.6rem;">(ред.)</span>' : ''}
         </div>
-        ${marqueeHtml}
         <div class="text">${textHtml}</div>
         ${imgHtml}
         ${buttonsHtml}
@@ -306,66 +288,154 @@ function renderPost(m) {
     messagesDiv.appendChild(div);
 }
 
-// ================================================================
-// ОТПРАВКА
-// ================================================================
+// ===== ОТПРАВКА =====
 function sendMessage() {
     const text = msgInput.value.trim();
-    if (!text && !pendingImageFile) return;
+    if (!text && !pendingImage) return;
     
-    if (pendingImageFile) {
-        const file = pendingImageFile;
-        const path = 'images/' + Date.now() + '_' + file.name;
-        const ref = storage.ref(path);
-        const uploadTask = ref.put(file);
-        uploadTask.on('state_changed',
-            null,
-            function(error) {
-                console.error('Ошибка загрузки фото:', error);
-                alert('Ошибка: ' + error.message);
-            },
-            function() {
-                ref.getDownloadURL().then(function(url) {
-                    sendPostData(text, url);
-                });
-            }
-        );
-    } else {
-        sendPostData(text, null);
-    }
-}
-
-function sendPostData(text, imgUrl) {
     const data = {
-        nick: currentUser || 'Аноним',
+        nick: currentUser,
         text: text || '📷',
         time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
         timestamp: Date.now(),
         likes: 0,
-        img: imgUrl || null,
+        img: pendingImage || null,
         link: null,
         marquee: null,
         buttons: [],
         hashtags: [],
         edited: false
     };
+    
     const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
-    if (linkMatch) data.link = linkMatch[1];
+    if (linkMatch) {
+        data.link = linkMatch[1];
+    }
+    
     msgRef.push(data);
     msgInput.value = '';
     pendingImage = null;
-    pendingImageFile = null;
     document.getElementById('previewBox').classList.remove('visible');
 }
 
-// ================================================================
-// ФОТО
-// ================================================================
+// ===== УДАЛЕНИЕ =====
+function deleteMsg(id) {
+    if (!confirm('Удалить этот пост?')) return;
+    db.ref(`rooms/${roomId}/messages/${id}`).remove();
+}
+
+// ===== РЕДАКТИРОВАНИЕ =====
+function openEdit(id) {
+    editingId = id;
+    document.getElementById('editModal').classList.add('active');
+    
+    db.ref(`rooms/${roomId}/messages/${id}`).once('value', snap => {
+        const m = snap.val();
+        if (!m) return;
+        
+        document.getElementById('editMarquee').value = m.marquee || '';
+        document.getElementById('editText').value = m.text || '';
+        document.getElementById('editLink').value = m.link || '';
+        document.getElementById('editHashtags').value = (m.hashtags || []).join(' ');
+        
+        const container = document.getElementById('editButtonsContainer');
+        container.innerHTML = '';
+        const btns = m.buttons || [];
+        btns.forEach((btn, i) => {
+            addButtonField(btn.label, btn.url);
+        });
+        if (btns.length === 0) {
+            addButtonField('', '');
+        }
+    });
+}
+
+function addButtonField(label = '', url = '') {
+    const container = document.getElementById('editButtonsContainer');
+    const div = document.createElement('div');
+    div.className = 'btn-group';
+    div.innerHTML = `
+        <input class="btn-label-input" placeholder="Текст кнопки" value="${escapeHtml(label)}">
+        <input class="btn-url-input" placeholder="Ссылка" value="${escapeHtml(url)}">
+        <button class="btn-remove" onclick="removeButtonField(this)">✕</button>
+    `;
+    container.appendChild(div);
+}
+
+function removeButtonField(btn) {
+    const group = btn.parentElement;
+    if (document.getElementById('editButtonsContainer').children.length > 1) {
+        group.remove();
+    } else {
+        group.querySelector('.btn-label-input').value = '';
+        group.querySelector('.btn-url-input').value = '';
+    }
+}
+
+function saveEdit() {
+    if (!editingId) return;
+    
+    const marquee = document.getElementById('editMarquee').value.trim();
+    const text = document.getElementById('editText').value.trim();
+    const link = document.getElementById('editLink').value.trim();
+    const hashtagsRaw = document.getElementById('editHashtags').value.trim();
+    const hashtags = hashtagsRaw ? hashtagsRaw.split(/\s+/).filter(t => t.startsWith('#')) : [];
+    
+    const buttons = [];
+    const groups = document.querySelectorAll('#editButtonsContainer .btn-group');
+    groups.forEach(g => {
+        const label = g.querySelector('.btn-label-input').value.trim();
+        const url = g.querySelector('.btn-url-input').value.trim();
+        if (url) {
+            buttons.push({ label: label || '🔗 Перейти', url });
+        }
+    });
+    
+    const updates = {
+        marquee: marquee || null,
+        text: text || '📝',
+        link: link || null,
+        buttons: buttons,
+        hashtags: hashtags,
+        edited: true,
+        editedAt: Date.now()
+    };
+    
+    db.ref(`rooms/${roomId}/messages/${editingId}`).update(updates);
+    closeEdit();
+}
+
+function deletePost() {
+    if (!editingId) return;
+    if (confirm('Удалить пост навсегда?')) {
+        db.ref(`rooms/${roomId}/messages/${editingId}`).remove();
+        closeEdit();
+    }
+}
+
+function closeEdit() {
+    document.getElementById('editModal').classList.remove('active');
+    editingId = null;
+}
+
+// ===== ЛАЙК =====
+function likeMsg(id) {
+    const key = `liked_${id}_${currentUser}`;
+    if (localStorage.getItem(key)) return;
+    db.ref(`rooms/${roomId}/messages/${id}/likes`).transaction(v => (v || 0) + 1);
+    localStorage.setItem(key, 'true');
+}
+
+function replyMsg(id, nick) {
+    msgInput.value = `@${nick} `;
+    msgInput.focus();
+}
+
+// ===== ФОТО =====
 document.getElementById('fileInput').addEventListener('change', e => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
-        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
-        pendingImageFile = file;
+        if (file.size > 2*1024*1024) return alert('Максимум 2MB');
         const reader = new FileReader();
         reader.onload = ev => {
             pendingImage = ev.target.result;
@@ -379,92 +449,8 @@ document.getElementById('fileInput').addEventListener('change', e => {
 
 function removeImage() {
     pendingImage = null;
-    pendingImageFile = null;
     document.getElementById('previewBox').classList.remove('visible');
     document.getElementById('fileInput').value = '';
-}
-
-// ================================================================
-// ОСТАЛЬНОЕ
-// ================================================================
-function deleteMsg(id) {
-    if (!confirm('Удалить этот пост?')) return;
-    db.ref(`rooms/${roomId}/messages/${id}`).remove();
-}
-
-function openEdit(id) {
-    editingId = id;
-    document.getElementById('editModal').classList.add('active');
-    db.ref(`rooms/${roomId}/messages/${id}`).once('value', snap => {
-        const m = snap.val();
-        if (!m) return;
-        document.getElementById('editMarquee').value = m.marquee || '';
-        document.getElementById('editText').value = m.text || '';
-        document.getElementById('editLink').value = m.link || '';
-        document.getElementById('editHashtags').value = (m.hashtags || []).join(' ');
-        document.getElementById('editButtonsContainer').innerHTML = '';
-        (m.buttons || []).forEach(btn => addButtonField(btn.label, btn.url));
-        if ((m.buttons || []).length === 0) addButtonField('', '');
-    });
-}
-
-function addButtonField(label = '', url = '') {
-    const container = document.getElementById('editButtonsContainer');
-    const div = document.createElement('div');
-    div.className = 'btn-group';
-    div.innerHTML = `
-        <input class="btn-label-input" placeholder="Текст" value="${escapeHtml(label)}">
-        <input class="btn-url-input" placeholder="Ссылка" value="${escapeHtml(url)}">
-        <button class="btn-remove" onclick="removeButtonField(this)">✕</button>
-    `;
-    container.appendChild(div);
-}
-
-function removeButtonField(btn) {
-    const group = btn.parentElement;
-    if (document.getElementById('editButtonsContainer').children.length > 1) group.remove();
-    else { group.querySelector('.btn-label-input').value = ''; group.querySelector('.btn-url-input').value = ''; }
-}
-
-function saveEdit() {
-    if (!editingId) return;
-    const marquee = document.getElementById('editMarquee').value.trim();
-    const text = document.getElementById('editText').value.trim();
-    const link = document.getElementById('editLink').value.trim();
-    const hashtagsRaw = document.getElementById('editHashtags').value.trim();
-    const hashtags = hashtagsRaw ? hashtagsRaw.split(/\s+/).filter(t => t.startsWith('#')) : [];
-    const buttons = [];
-    document.querySelectorAll('#editButtonsContainer .btn-group').forEach(g => {
-        const label = g.querySelector('.btn-label-input').value.trim();
-        const url = g.querySelector('.btn-url-input').value.trim();
-        if (url) buttons.push({ label: label || '🔗 Перейти', url });
-    });
-    const updates = { marquee: marquee || null, text: text || '📝', link: link || null, buttons, hashtags, edited: true, editedAt: Date.now() };
-    db.ref(`rooms/${roomId}/messages/${editingId}`).update(updates);
-    closeEdit();
-}
-
-function deletePost() {
-    if (!editingId || !confirm('Удалить пост навсегда?')) return;
-    db.ref(`rooms/${roomId}/messages/${editingId}`).remove();
-    closeEdit();
-}
-
-function closeEdit() {
-    document.getElementById('editModal').classList.remove('active');
-    editingId = null;
-}
-
-function likeMsg(id) {
-    const key = `liked_${id}_${currentUser}`;
-    if (localStorage.getItem(key)) return;
-    db.ref(`rooms/${roomId}/messages/${id}/likes`).transaction(v => (v || 0) + 1);
-    localStorage.setItem(key, 'true');
-}
-
-function replyMsg(id, nick) {
-    msgInput.value = `@${nick} `;
-    msgInput.focus();
 }
 
 function escapeHtml(str) {
@@ -474,25 +460,14 @@ function escapeHtml(str) {
 
 msgInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
-// ================================================================
-// НИК
-// ================================================================
+// ===== НИК =====
 if (currentUser === 'anon') {
     const nick = prompt('Введите ваш ник:');
     if (nick) {
         currentUser = nick;
-        localStorage.setItem('metaimperiya_user', nick);
-        document.getElementById('userName').textContent = nick;
+        localStorage.setItem('deepchat_user', nick);
     }
 }
-
-// ================================================================
-// ЗАПУСК
-// ================================================================
-renderAvatar(currentUserUID);
-console.log('🏛️ METAIMPERIYA запущена!');
-console.log('🏴‍☠️ Админ-пароль: 12345');
-console.log('📷 Клик по аватарке → загрузка фото!');
 </script>
 </body>
 </html>
