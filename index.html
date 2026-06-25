@@ -45,7 +45,6 @@
         }
         .container { max-width: 700px; margin: 0 auto; padding: 12px; }
 
-        /* ===== ПРОФИЛЬ ===== */
         .profile-page { display: none; }
         .profile-page.active { display: block; }
         .profile-page .header {
@@ -74,7 +73,6 @@
         .profile-page .header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
         .profile-page .header .actions .edit-btn { background: #e4e6eb; color: #555; }
 
-        /* ===== ДРУЗЬЯ И ПОДПИСКИ ===== */
         .profile-stats {
             display: flex; gap: 16px; justify-content: center; margin: 8px 0;
             font-size: 0.8rem; color: #888;
@@ -105,7 +103,6 @@
             font-size: 0.5rem; font-weight: 700;
         }
 
-        /* ===== СТРАНИЦЫ ===== */
         .pages-section {
             background: #fff; border-radius: 12px; padding: 16px;
             margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -123,7 +120,6 @@
             font-weight: 600; margin-top: 8px; width: 100%;
         }
 
-        /* ===== ПОСТ-ФОРМА ===== */
         .post-form {
             background: #fff; border-radius: 12px; padding: 16px;
             margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -142,7 +138,6 @@
         .post-form .actions .submit:hover { background: #4a9eff; }
         .post-form .actions .cancel { background: #e4e6eb; color: #555; }
 
-        /* ===== ЛЕНТА ===== */
         .feed-page { display: none; }
         .feed-page.active { display: block; }
 
@@ -214,7 +209,6 @@
             font-weight: 600;
         }
 
-        /* ===== ГРУППЫ ===== */
         .groups-page { display: none; }
         .groups-page.active { display: block; }
         .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -228,7 +222,6 @@
         .groups-page .group-card .name { font-weight: 600; margin-top: 6px; }
         .groups-page .group-card .count { color: #888; font-size: 0.75rem; }
 
-        /* ===== ЧАТ ===== */
         .chat-view {
             display: none; background: #fff; border-radius: 12px;
             padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -259,7 +252,6 @@
             cursor: pointer;
         }
 
-        /* ===== МОДАЛКИ ===== */
         .modal {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 9999;
@@ -348,7 +340,7 @@
 
 <div class="container">
 
-    <!-- ПРОФИЛЬ (здесь всё: и личка, и друзья, и подписки) -->
+    <!-- ПРОФИЛЬ -->
     <div class="profile-page" id="profilePage">
         <div class="header">
             <div class="big-avatar" id="profileAvatar">?</div>
@@ -364,25 +356,21 @@
             </div>
         </div>
         
-        <!-- Друзья -->
         <div class="friends-section" id="friendsSection">
             <h4>🤝 Друзья</h4>
             <div class="friend-list" id="friendList"></div>
         </div>
         
-        <!-- Подписчики -->
         <div class="subscribers-section" id="subscribersSection" style="display:none;">
             <h4>👀 Подписчики</h4>
             <div class="subscriber-list" id="subscriberList"></div>
         </div>
         
-        <!-- Подписки -->
         <div class="subscriptions-section" id="subscriptionsSection" style="display:none;">
             <h4>📌 Подписки</h4>
             <div class="subscription-list" id="subscriptionList"></div>
         </div>
         
-        <!-- Страницы -->
         <div class="pages-section" id="pagesSection">
             <h4>📄 Мои страницы</h4>
             <div id="pageList"></div>
@@ -410,7 +398,7 @@
         <div class="group-list" id="groupList"></div>
     </div>
 
-    <!-- ЧАТ (всплывает поверх) -->
+    <!-- ЧАТ -->
     <div class="chat-view" id="chatView">
         <button class="back" onclick="closeChat()">← Назад</button>
         <div class="messages" id="chatMessages"></div>
@@ -546,35 +534,63 @@
     let showStat = 'friends';
 
     // ================================================================
-    // AUTH
+    // AUTH - ИСПРАВЛЕННАЯ ВЕРСИЯ (ВСЕГДА ПОКАЗЫВАЕТ ВЫБОР ПРИ GOOGLE)
     // ================================================================
     auth.onAuthStateChanged(user => {
         if (user) {
-            USER_UID = user.uid;
-            let saved = localStorage.getItem('dc_u_' + SITE);
-            USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
-            if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
+            // Проверяем, заходим ли мы через Google
+            const isGoogle = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
             
-            const accId = localStorage.getItem('dc_acc_' + SITE);
-            if (accId) {
-                const acc = ACCOUNTS.find(a => a.id === accId);
-                if (acc) USER_ACCOUNT = acc;
+            if (isGoogle) {
+                // При входе через Google - ВСЕГДА показываем выбор аккаунта
+                USER_UID = user.uid;
+                USER = user.displayName || user.email || user.uid.slice(0, 8);
+                localStorage.setItem('dc_u_' + SITE, USER);
+                localStorage.setItem('dc_google_' + SITE, '1');
+                
+                // Сохраняем пользователя в Firebase
+                db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
+                    name: USER, 
+                    email: user.email || 'anon',
+                    googleId: user.uid
+                });
+                
+                // ВСЕГДА показываем модалку выбора аккаунта
+                document.getElementById('loginModal').classList.add('open');
+                renderAccounts();
+                updateUI();
+                return; // ВАЖНО! Выходим, чтобы не продолжать дальше
             }
             
-            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
-                name: USER, 
-                email: user.email || 'anon',
-                account: USER_ACCOUNT ? USER_ACCOUNT.id : null,
-                bio: USER_ACCOUNT ? USER_ACCOUNT.bio : '',
-                avatar: USER_ACCOUNT ? USER_ACCOUNT.avatar : USER.charAt(0).toUpperCase()
-            });
-            
-            updateUI();
-            loadFeed();
-            loadProfile();
-            loadGroups();
-            closeLogin();
+            // --- Обычный вход (не Google) ---
+            if (user) {
+                USER_UID = user.uid;
+                let saved = localStorage.getItem('dc_u_' + SITE);
+                USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
+                if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
+                
+                const accId = localStorage.getItem('dc_acc_' + SITE);
+                if (accId) {
+                    const acc = ACCOUNTS.find(a => a.id === accId);
+                    if (acc) USER_ACCOUNT = acc;
+                }
+                
+                db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
+                    name: USER, 
+                    email: user.email || 'anon',
+                    account: USER_ACCOUNT ? USER_ACCOUNT.id : null,
+                    bio: USER_ACCOUNT ? USER_ACCOUNT.bio : '',
+                    avatar: USER_ACCOUNT ? USER_ACCOUNT.avatar : USER.charAt(0).toUpperCase()
+                });
+                
+                updateUI();
+                loadFeed();
+                loadProfile();
+                loadGroups();
+                closeLogin();
+            }
         } else {
+            // Пользователь вышел
             USER = null;
             USER_UID = null;
             USER_ACCOUNT = null;
@@ -659,11 +675,18 @@
         }
     }
 
+    // ================================================================
+    // LOGOUT - ПОЛНОСТЬЮ СБРАСЫВАЕТ ВСЁ
+    // ================================================================
     window.logout = function() {
         auth.signOut();
         localStorage.removeItem('dc_u_' + SITE);
         localStorage.removeItem('dc_acc_' + SITE);
+        localStorage.removeItem('dc_google_' + SITE);
+        USER = null;
+        USER_UID = null;
         USER_ACCOUNT = null;
+        VIEWING_USER = null;
         if (chatUnsub) { 
             if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
             chatUnsub = null; 
@@ -671,6 +694,9 @@
         CURRENT_ROOM = null;
         CURRENT_DM = null;
         document.getElementById('chatView').classList.remove('active');
+        updateUI();
+        document.getElementById('loginModal').classList.add('open');
+        renderAccounts();
     };
 
     window.closeLogin = function() {
@@ -749,7 +775,7 @@
     };
 
     // ================================================================
-    // ПРОФИЛЬ (загрузка данных пользователя)
+    // ПРОФИЛЬ
     // ================================================================
     function loadProfile() {
         const uid = VIEWING_USER || USER_UID;
@@ -773,9 +799,6 @@
         });
     }
 
-    // ================================================================
-    // ПРОФИЛЬ: ДЕЙСТВИЯ
-    // ================================================================
     function showProfileActions(uid) {
         const actions = document.getElementById('profileActions');
         if (!uid || uid === USER_UID) {
@@ -856,7 +879,7 @@
     }
 
     // ================================================================
-    // ПОДПИСКИ И ПОДПИСЧИКИ
+    // ПОДПИСКИ
     // ================================================================
     function checkSubscription(uid) {
         if (!USER_UID) return false;
@@ -952,7 +975,7 @@
     }
 
     // ================================================================
-    // ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ В ПРОФИЛЕ
+    // ПЕРЕКЛЮЧЕНИЕ РАЗДЕЛОВ
     // ================================================================
     window.toggleStat = function(type) {
         document.getElementById('friendsSection').style.display = type === 'friends' ? 'block' : 'none';
@@ -1007,7 +1030,7 @@
     };
 
     // ================================================================
-    // РЕДАКТИРОВАНИЕ ПРОФИЛЯ
+    // РЕДАКТИРОВАНИЕ
     // ================================================================
     window.openEditProfile = function() {
         document.getElementById('editName').value = USER || '';
@@ -1037,7 +1060,7 @@
     };
 
     // ================================================================
-    // ПРОСМОТР ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ
+    // ПРОСМОТР ПРОФИЛЯ
     // ================================================================
     window.viewUserProfile = function(uid) {
         if (!uid) return;
@@ -1409,7 +1432,7 @@
     }
 
     // ================================================================
-    // ЧАТ В ЛИЧКЕ (DM)
+    // ЧАТ В ЛИЧКЕ
     // ================================================================
     function loadDMChat(userId) {
         if (chatUnsub) { 
@@ -1503,7 +1526,7 @@
     db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
         if (!snap.exists()) {
             const posts = [
-                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в MicroSocial! Теперь всё в профиле: друзья, подписки, личка!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
+                { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в MicroSocial!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 2, repostCount: 0 },
                 { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 1, repostCount: 0 }
             ];
             posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
@@ -1521,7 +1544,8 @@
     console.log('📱 MicroSocial запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345');
     console.log('📋 10 аккаунтов готовы!');
-    console.log('👤 Всё в профиле: друзья, подписки, личка!');
+    console.log('👤 При входе через Google всегда открывается выбор аккаунта!');
+    console.log('🔁 Выход полностью сбрасывает выбор аккаунта!');
 })();
 </script>
 </body>
