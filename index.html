@@ -209,6 +209,7 @@
             font-weight: 600;
         }
 
+        /* ГРУППЫ */
         .groups-page { display: none; }
         .groups-page.active { display: block; }
         .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -222,6 +223,28 @@
         .groups-page .group-card .name { font-weight: 600; margin-top: 6px; }
         .groups-page .group-card .count { color: #888; font-size: 0.75rem; }
 
+        /* ЛЮДИ */
+        .people-page { display: none; }
+        .people-page.active { display: block; }
+        .people-page .people-list { display: flex; flex-direction: column; gap: 8px; }
+        .people-page .people-item {
+            background: #fff; border-radius: 12px; padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .people-page .people-item:hover { transform: translateX(4px); }
+        .people-page .people-item .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: #1877f2; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+        }
+        .people-page .people-item .info { flex: 1; }
+        .people-page .people-item .info .name { font-weight: 600; }
+        .people-page .people-item .info .status { color: #888; font-size: 0.75rem; }
+
+        /* ЧАТ (ЛИЧКА) */
         .chat-view {
             display: none; background: #fff; border-radius: 12px;
             padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -291,21 +314,6 @@
         .divider::before,
         .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
 
-        .account-list { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0; }
-        .account-list .acc {
-            background: #f5f5f5; padding: 10px; border-radius: 8px;
-            text-align: center; cursor: pointer; border: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .account-list .acc:hover { border-color: #1877f2; background: #e8f0fe; }
-        .account-list .acc .avatar {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: #1877f2; color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 4px; font-weight: 700;
-        }
-        .account-list .acc .name { font-weight: 600; font-size: 0.8rem; }
-
         .admin-dot {
             position: fixed; bottom: 10px; right: 10px;
             width: 14px; height: 14px; border-radius: 50%;
@@ -316,7 +324,6 @@
 
         @media (max-width: 600px) {
             .groups-page .group-list { grid-template-columns: 1fr; }
-            .account-list { grid-template-columns: 1fr 1fr; }
             .topbar .menu button { font-size: 0.6rem; padding: 4px 5px; }
             .topbar .logo { font-size: 0.9rem; }
         }
@@ -329,7 +336,8 @@
     <div class="menu">
         <button class="active" id="menuFeed" onclick="goToFeed()">📰 Лента</button>
         <button id="menuGroups" onclick="goToGroups()">👥 Группы</button>
-        <button id="menuProfile" onclick="goToProfile()">👤 Профиль</button>
+        <button id="menuPeople" onclick="goToPeople()">👤 Люди</button>
+        <button id="menuProfile" onclick="goToProfile()">Профиль</button>
     </div>
     <div class="user-info">
         <div class="avatar" id="topAvatar" onclick="goToProfile()">?</div>
@@ -398,6 +406,12 @@
         <div class="group-list" id="groupList"></div>
     </div>
 
+    <!-- ЛЮДИ -->
+    <div class="people-page" id="peoplePage">
+        <h3 style="margin-bottom:12px;">👤 Люди</h3>
+        <div class="people-list" id="peopleList"></div>
+    </div>
+
     <!-- ЧАТ -->
     <div class="chat-view" id="chatView">
         <button class="back" onclick="closeChat()">← Назад</button>
@@ -419,9 +433,7 @@
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" />
             Войти через Google
         </button>
-        <div class="divider">или выберите аккаунт</div>
-        <div class="account-list" id="accountList"></div>
-        <div class="divider">или создайте новый</div>
+        <div class="divider">или</div>
         <input type="text" id="nameInput" placeholder="Введите имя..." maxlength="24">
         <div class="btns">
             <button class="cancel" onclick="closeLogin()">Отмена</button>
@@ -488,22 +500,6 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     // ================================================================
-    // АККАУНТЫ (В КОДЕ)
-    // ================================================================
-    const ACCOUNTS = [
-        { id: 'user1', name: 'Алексей', avatar: 'А', bio: 'Люблю спорт и путешествия' },
-        { id: 'user2', name: 'Марина', avatar: 'М', bio: 'Фотограф, кофеманка' },
-        { id: 'user3', name: 'Сергей', avatar: 'С', bio: 'IT-разработчик' },
-        { id: 'user4', name: 'Елена', avatar: 'Е', bio: 'Дизайнер интерьеров' },
-        { id: 'user5', name: 'Михаил', avatar: 'М', bio: 'Музыкант' },
-        { id: 'user6', name: 'Анна', avatar: 'А', bio: 'Психолог' },
-        { id: 'user7', name: 'Дмитрий', avatar: 'Д', bio: 'Блогер' },
-        { id: 'user8', name: 'Ольга', avatar: 'О', bio: 'Учитель английского' },
-        { id: 'user9', name: 'Иван', avatar: 'И', bio: 'Спортсмен' },
-        { id: 'user10', name: 'Наталья', avatar: 'Н', bio: 'Маркетолог' }
-    ];
-
-    // ================================================================
     // ГРУППЫ (В КОДЕ)
     // ================================================================
     const GROUPS = [
@@ -525,7 +521,6 @@
     const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
     let USER = null;
     let USER_UID = null;
-    let USER_ACCOUNT = null;
     let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
     let CURRENT_ROOM = null;
     let CURRENT_DM = null;
@@ -534,70 +529,33 @@
     let showStat = 'friends';
 
     // ================================================================
-    // AUTH - ИСПРАВЛЕННАЯ ВЕРСИЯ (ВСЕГДА ПОКАЗЫВАЕТ ВЫБОР ПРИ GOOGLE)
+    // AUTH
     // ================================================================
     auth.onAuthStateChanged(user => {
         if (user) {
-            // Проверяем, заходим ли мы через Google
-            const isGoogle = user.providerData && user.providerData.some(p => p.providerId === 'google.com');
+            USER_UID = user.uid;
+            let saved = localStorage.getItem('dc_u_' + SITE);
+            USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
+            if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
             
-            if (isGoogle) {
-                // При входе через Google - ВСЕГДА показываем выбор аккаунта
-                USER_UID = user.uid;
-                USER = user.displayName || user.email || user.uid.slice(0, 8);
-                localStorage.setItem('dc_u_' + SITE, USER);
-                localStorage.setItem('dc_google_' + SITE, '1');
-                
-                // Сохраняем пользователя в Firebase
-                db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
-                    name: USER, 
-                    email: user.email || 'anon',
-                    googleId: user.uid
-                });
-                
-                // ВСЕГДА показываем модалку выбора аккаунта
-                document.getElementById('loginModal').classList.add('open');
-                renderAccounts();
-                updateUI();
-                return; // ВАЖНО! Выходим, чтобы не продолжать дальше
-            }
+            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
+                name: USER, 
+                email: user.email || 'anon',
+                avatar: USER.charAt(0).toUpperCase()
+            });
             
-            // --- Обычный вход (не Google) ---
-            if (user) {
-                USER_UID = user.uid;
-                let saved = localStorage.getItem('dc_u_' + SITE);
-                USER = saved || user.displayName || user.email || user.uid.slice(0, 8);
-                if (!saved) localStorage.setItem('dc_u_' + SITE, USER);
-                
-                const accId = localStorage.getItem('dc_acc_' + SITE);
-                if (accId) {
-                    const acc = ACCOUNTS.find(a => a.id === accId);
-                    if (acc) USER_ACCOUNT = acc;
-                }
-                
-                db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
-                    name: USER, 
-                    email: user.email || 'anon',
-                    account: USER_ACCOUNT ? USER_ACCOUNT.id : null,
-                    bio: USER_ACCOUNT ? USER_ACCOUNT.bio : '',
-                    avatar: USER_ACCOUNT ? USER_ACCOUNT.avatar : USER.charAt(0).toUpperCase()
-                });
-                
-                updateUI();
-                loadFeed();
-                loadProfile();
-                loadGroups();
-                closeLogin();
-            }
+            updateUI();
+            loadFeed();
+            loadProfile();
+            loadGroups();
+            loadPeople();
+            closeLogin();
         } else {
-            // Пользователь вышел
             USER = null;
             USER_UID = null;
-            USER_ACCOUNT = null;
             VIEWING_USER = null;
             document.getElementById('loginModal').classList.add('open');
             updateUI();
-            renderAccounts();
         }
     });
 
@@ -612,41 +570,6 @@
     });
 
     // ================================================================
-    // АККАУНТЫ
-    // ================================================================
-    function renderAccounts() {
-        const list = document.getElementById('accountList');
-        list.innerHTML = ACCOUNTS.map(acc => `
-            <div class="acc" onclick="selectAccount('${acc.id}')">
-                <div class="avatar">${acc.avatar}</div>
-                <div class="name">${acc.name}</div>
-            </div>
-        `).join('');
-    }
-
-    window.selectAccount = function(accId) {
-        const acc = ACCOUNTS.find(a => a.id === accId);
-        if (!acc) return;
-        localStorage.setItem('dc_acc_' + SITE, accId);
-        USER_ACCOUNT = acc;
-        USER = acc.name;
-        localStorage.setItem('dc_u_' + SITE, USER);
-        updateUI();
-        closeLogin();
-        if (USER_UID) {
-            db.ref('sites/' + SITE + '/users/' + USER_UID).update({ 
-                name: USER, 
-                account: accId,
-                bio: acc.bio,
-                avatar: acc.avatar
-            });
-        }
-        loadFeed();
-        loadProfile();
-        loadGroups();
-    };
-
-    // ================================================================
     // UI
     // ================================================================
     function updateUI() {
@@ -655,18 +578,12 @@
         const logout = document.getElementById('logoutBtn');
         const dot = document.getElementById('adminDot');
 
-        if (USER && USER_ACCOUNT) {
-            avatar.textContent = USER_ACCOUNT.avatar;
-            name.textContent = USER_ACCOUNT.name;
+        if (USER) {
+            avatar.textContent = USER.charAt(0).toUpperCase();
+            name.textContent = USER;
             logout.style.display = 'inline-block';
             if (IS_ADMIN) dot.classList.add('active');
             else dot.classList.remove('active');
-        } else if (USER) {
-            const initial = USER.charAt(0).toUpperCase();
-            avatar.textContent = initial;
-            name.textContent = USER;
-            logout.style.display = 'inline-block';
-            dot.classList.remove('active');
         } else {
             avatar.textContent = '?';
             name.textContent = 'Гость';
@@ -675,18 +592,11 @@
         }
     }
 
-    // ================================================================
-    // LOGOUT - ПОЛНОСТЬЮ СБРАСЫВАЕТ ВСЁ
-    // ================================================================
     window.logout = function() {
         auth.signOut();
         localStorage.removeItem('dc_u_' + SITE);
-        localStorage.removeItem('dc_acc_' + SITE);
-        localStorage.removeItem('dc_google_' + SITE);
         USER = null;
         USER_UID = null;
-        USER_ACCOUNT = null;
-        VIEWING_USER = null;
         if (chatUnsub) { 
             if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
             chatUnsub = null; 
@@ -696,7 +606,6 @@
         document.getElementById('chatView').classList.remove('active');
         updateUI();
         document.getElementById('loginModal').classList.add('open');
-        renderAccounts();
     };
 
     window.closeLogin = function() {
@@ -713,6 +622,7 @@
             loadFeed();
             loadProfile();
             loadGroups();
+            loadPeople();
             closeLogin();
         }).catch(e => alert('Ошибка: ' + e.message));
     };
@@ -731,6 +641,7 @@
         });
         if (pageId === 'feedPage') document.getElementById('menuFeed').classList.add('active');
         else if (pageId === 'groupsPage') document.getElementById('menuGroups').classList.add('active');
+        else if (pageId === 'peoplePage') document.getElementById('menuPeople').classList.add('active');
         else if (pageId === 'profilePage') document.getElementById('menuProfile').classList.add('active');
     }
 
@@ -758,6 +669,19 @@
         CURRENT_ROOM = null;
         CURRENT_DM = null;
         loadGroups();
+    };
+
+    window.goToPeople = function() {
+        if (!USER) { alert('Войдите!'); return; }
+        setActivePage('peoplePage');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) { 
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null; 
+        }
+        CURRENT_ROOM = null;
+        CURRENT_DM = null;
+        loadPeople();
     };
 
     window.goToProfile = function() {
@@ -1034,7 +958,7 @@
     // ================================================================
     window.openEditProfile = function() {
         document.getElementById('editName').value = USER || '';
-        document.getElementById('editBio').value = USER_ACCOUNT ? USER_ACCOUNT.bio : '';
+        document.getElementById('editBio').value = '';
         document.getElementById('editProfileModal').classList.add('open');
     };
     window.closeEditProfile = function() {
@@ -1047,9 +971,6 @@
         
         USER = name;
         localStorage.setItem('dc_u_' + SITE, USER);
-        if (USER_ACCOUNT) {
-            USER_ACCOUNT.bio = bio;
-        }
         if (USER_UID) {
             db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
         }
@@ -1383,6 +1304,38 @@
     };
 
     // ================================================================
+    // ЛЮДИ
+    // ================================================================
+    function loadPeople() {
+        if (!USER_UID) return;
+        const list = document.getElementById('peopleList');
+        list.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Загрузка...</div>';
+        
+        db.ref('sites/' + SITE + '/users').once('value', snap => {
+            const users = snap.val() || {};
+            const keys = Object.keys(users).filter(k => k !== USER_UID);
+            
+            if (!keys.length) {
+                list.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Нет других пользователей</div>';
+                return;
+            }
+            
+            list.innerHTML = keys.map(k => {
+                const u = users[k];
+                const name = u.name || 'Аноним';
+                const initial = name.charAt(0).toUpperCase();
+                return `<div class="people-item" onclick="viewUserProfile('${k}')">
+                    <div class="avatar">${initial}</div>
+                    <div class="info">
+                        <div class="name">${esc(name)}</div>
+                        <div class="status">Нажмите, чтобы открыть профиль</div>
+                    </div>
+                </div>`;
+            }).join('');
+        });
+    }
+
+    // ================================================================
     // ЛИЧКА (DM)
     // ================================================================
     function getDMId(uid1, uid2) {
@@ -1510,6 +1463,8 @@
         CURRENT_DM = null;
         if (document.getElementById('groupsPage').classList.contains('active')) {
             goToGroups();
+        } else if (document.getElementById('peoplePage').classList.contains('active')) {
+            goToPeople();
         } else {
             goToFeed();
         }
@@ -1536,16 +1491,14 @@
     // ================================================================
     // ЗАПУСК
     // ================================================================
-    renderAccounts();
     updateUI();
     loadFeed();
     loadGroups();
+    loadPeople();
     setActivePage('feedPage');
     console.log('📱 MicroSocial запущен!');
     console.log('🏴‍☠️ Админ-пароль: 12345');
-    console.log('📋 10 аккаунтов готовы!');
-    console.log('👤 При входе через Google всегда открывается выбор аккаунта!');
-    console.log('🔁 Выход полностью сбрасывает выбор аккаунта!');
+    console.log('👤 Раздел "Люди" показывает всех пользователей!');
 })();
 </script>
 </body>
