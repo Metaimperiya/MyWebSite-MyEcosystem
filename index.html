@@ -20,11 +20,19 @@
             padding-bottom: 60px;
         }
 
-        /* ТОПБАР */
+        /* ТОПБАР С ПЛЕЕРОМ */
         .topbar {
-            background: #fff; padding: 6px 10px; border-bottom: 1px solid #ddd;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
+            background: #fff; 
+            padding: 6px 10px; 
+            border-bottom: 1px solid #ddd;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 4px;
         }
         .topbar .left { display: flex; align-items: center; gap: 6px; }
         .topbar .left .menu-btn {
@@ -34,7 +42,92 @@
             font-size: 1rem; font-weight: 700; color: #1877f2; cursor: pointer;
             letter-spacing: 1px;
         }
-        .topbar .right { display: flex; align-items: center; gap: 6px; }
+        
+        /* ПЛЕЕР В ТОПБАРЕ */
+        .player-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #0a0a12;
+            padding: 4px 12px 4px 8px;
+            border-radius: 40px;
+            border: 1px solid #333;
+            flex: 0 1 auto;
+            min-width: 180px;
+            max-width: 320px;
+        }
+        .player-wrap .track-name {
+            color: #0f0;
+            font-size: 0.55rem;
+            font-family: monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70px;
+        }
+        .player-wrap .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .player-wrap .player-controls button {
+            background: none;
+            border: none;
+            color: #0f0;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 2px 4px;
+            transition: 0.2s;
+            border-radius: 4px;
+        }
+        .player-wrap .player-controls button:hover {
+            background: rgba(0,255,0,0.1);
+            transform: scale(1.1);
+        }
+        .player-wrap .player-controls button:active {
+            transform: scale(0.9);
+        }
+        .player-wrap .player-controls .play-btn {
+            font-size: 1rem;
+            color: #0f0;
+            background: rgba(0,255,0,0.1);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .player-wrap .player-controls .play-btn:hover {
+            background: rgba(0,255,0,0.2);
+        }
+        
+        /* ЭКВАЛАЙЗЕР - ПОЛОСОЧКИ */
+        .equalizer {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 20px;
+            margin-left: 4px;
+        }
+        .equalizer .bar {
+            width: 3px;
+            background: #0f0;
+            border-radius: 2px;
+            transition: height 0.08s ease;
+            height: 4px;
+            opacity: 0.7;
+        }
+        .equalizer .bar.active {
+            opacity: 1;
+        }
+
+        .topbar .right { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            flex-wrap: wrap;
+        }
         .topbar .right .notif-btn {
             background: none; border: none; font-size: 1.1rem; cursor: pointer; position: relative;
         }
@@ -53,7 +146,7 @@
             max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* ГОРИЗОНТАЛЬНОЕ МЕНЮ */
+        /* ОСТАЛЬНЫЕ СТИЛИ (из предыдущего кода) */
         .hor-menu {
             background: #fff; padding: 4px 12px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: center; gap: 6px;
@@ -68,7 +161,6 @@
         .hor-menu button:hover { background: #f0f0f0; }
         .hor-menu button.active { color: #1877f2; background: #e8f0fe; }
 
-        /* САЙДБАР */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
             background: #fff; border-right: 1px solid #ddd;
@@ -158,124 +250,25 @@
             align-items: center;
             justify-content: center;
         }
-        .post .author .avatar-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .post .author .avatar-wrap .letter {
-            color: #0b0b0f;
-            font-weight: 700;
-            font-size: 0.6rem;
-        }
-        .post .name {
-            color: #ffaa44;
-            font-weight: 700;
-        }
-        .post .time {
-            color: #666;
-            font-size: 0.65rem;
-            margin-left: 10px;
-        }
-        .post .text {
-            margin: 6px 0;
-            word-break: break-word;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-        .post .text .link-hidden {
-            color: #555;
-            font-size: 0.8rem;
-        }
-        .post img {
-            max-width: 100%;
-            max-height: 250px;
-            border-radius: 12px;
-            margin: 6px 0;
-            border: 1px solid #333;
-            cursor: pointer;
-        }
-        .post .link-preview {
-            margin: 8px 0 4px 0;
-            border: 1px solid #333;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #0f0f1a;
-            width: 100%;
-        }
-        .post .link-preview iframe {
-            width: 100%;
-            height: 450px;
-            border: none;
-            display: block;
-        }
-        .post .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin: 8px 0;
-        }
-        .post .buttons .btn-item {
-            display: block;
-            background: #ff8c00;
-            border: none;
-            border-radius: 12px;
-            padding: 12px 18px;
-            text-align: center;
-            text-decoration: none;
-            color: #0b0b0f;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-        .post .buttons .btn-item:hover {
-            background: #ffa033;
-            transform: scale(1.01);
-        }
-        .post .hashtags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin: 8px 0 4px 0;
-            padding-top: 8px;
-            border-top: 1px solid #222;
-        }
-        .post .hashtags .tag {
-            color: #66aaff;
-            font-size: 0.75rem;
-            background: #0f0f1a;
-            padding: 2px 12px;
-            border-radius: 20px;
-            border: 1px solid #222;
-        }
-        .post .actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-        .post .actions button {
-            background: #222233;
-            border: 1px solid #333349;
-            color: #ccc;
-            padding: 2px 14px;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-        .post .actions button.edit-btn {
-            background: #2a2a3a;
-            border-color: #ff8c00;
-            color: #ff8c00;
-        }
-        .post .actions button.del-btn {
-            background: #4a1a1a;
-            border-color: #6a1a1a;
-            color: #ff6666;
-        }
+        .post .author .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .post .author .avatar-wrap .letter { color: #0b0b0f; font-weight: 700; font-size: 0.6rem; }
+        .post .name { color: #ffaa44; font-weight: 700; }
+        .post .time { color: #666; font-size: 0.65rem; margin-left: 10px; }
+        .post .text { margin: 6px 0; word-break: break-word; font-size: 0.95rem; line-height: 1.5; }
+        .post .text .link-hidden { color: #555; font-size: 0.8rem; }
+        .post img { max-width: 100%; max-height: 250px; border-radius: 12px; margin: 6px 0; border: 1px solid #333; cursor: pointer; }
+        .post .link-preview { margin: 8px 0 4px 0; border: 1px solid #333; border-radius: 12px; overflow: hidden; background: #0f0f1a; width: 100%; }
+        .post .link-preview iframe { width: 100%; height: 450px; border: none; display: block; }
+        .post .buttons { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+        .post .buttons .btn-item { display: block; background: #ff8c00; border: none; border-radius: 12px; padding: 12px 18px; text-align: center; text-decoration: none; color: #0b0b0f; font-weight: 700; font-size: 0.95rem; transition: 0.2s; cursor: pointer; }
+        .post .buttons .btn-item:hover { background: #ffa033; transform: scale(1.01); }
+        .post .hashtags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px 0; padding-top: 8px; border-top: 1px solid #222; }
+        .post .hashtags .tag { color: #66aaff; font-size: 0.75rem; background: #0f0f1a; padding: 2px 12px; border-radius: 20px; border: 1px solid #222; }
+        .post .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .post .actions button { background: #222233; border: 1px solid #333349; color: #ccc; padding: 2px 14px; border-radius: 40px; font-size: 0.7rem; cursor: pointer; }
+        .post .actions button.edit-btn { background: #2a2a3a; border-color: #ff8c00; color: #ff8c00; }
+        .post .actions button.del-btn { background: #4a1a1a; border-color: #6a1a1a; color: #ff6666; }
 
-        /* СТИЛИ ДЛЯ ФОРМЫ ПОСТА (ИЗ ПЕРВОГО КОДА) */
         .post-form {
             background: #10101a;
             border-radius: 20px;
@@ -285,543 +278,142 @@
             margin-bottom: 10px;
             color: #eee;
         }
-        .post-form .input-row {
-            display: flex;
-            gap: 10px;
-        }
-        .post-form .input-row input {
-            flex: 1;
-            padding: 12px 18px;
-            background: #181825;
-            border: 1px solid #323245;
-            border-radius: 60px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-        }
-        .post-form .input-row input:focus {
-            border-color: #ff8c00;
-        }
-        .post-form .input-row button {
-            background: #ff8c00;
-            border: none;
-            border-radius: 60px;
-            padding: 0 24px;
-            font-weight: 700;
-            color: #0b0b0f;
-            cursor: pointer;
-        }
-        .post-form .file-label {
-            background: #222235;
-            padding: 4px 16px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            border: 1px solid #3e3e55;
-            cursor: pointer;
-            display: inline-block;
-            margin-top: 6px;
-        }
-        .post-form .hidden {
-            display: none;
-        }
-        .post-form .preview-box {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            background: #181825;
-            padding: 4px 14px 4px 4px;
-            border-radius: 40px;
-            margin-top: 6px;
-            border: 1px solid #3a3a50;
-        }
-        .post-form .preview-box.visible {
-            display: flex;
-        }
-        .post-form .preview-box img {
-            width: 40px;
-            height: 40px;
-            border-radius: 30px;
-            object-fit: cover;
-        }
-        .post-form .remove-pic {
-            background: #6a1a1a;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 2px 12px;
-            cursor: pointer;
-        }
+        .post-form .input-row { display: flex; gap: 10px; }
+        .post-form .input-row input { flex: 1; padding: 12px 18px; background: #181825; border: 1px solid #323245; border-radius: 60px; color: white; font-size: 0.9rem; outline: none; }
+        .post-form .input-row input:focus { border-color: #ff8c00; }
+        .post-form .input-row button { background: #ff8c00; border: none; border-radius: 60px; padding: 0 24px; font-weight: 700; color: #0b0b0f; cursor: pointer; }
+        .post-form .file-label { background: #222235; padding: 4px 16px; border-radius: 40px; font-size: 0.75rem; border: 1px solid #3e3e55; cursor: pointer; display: inline-block; margin-top: 6px; }
+        .post-form .hidden { display: none; }
+        .post-form .preview-box { display: none; align-items: center; gap: 10px; background: #181825; padding: 4px 14px 4px 4px; border-radius: 40px; margin-top: 6px; border: 1px solid #3a3a50; }
+        .post-form .preview-box.visible { display: flex; }
+        .post-form .preview-box img { width: 40px; height: 40px; border-radius: 30px; object-fit: cover; }
+        .post-form .remove-pic { background: #6a1a1a; color: white; border: none; border-radius: 30px; padding: 2px 12px; cursor: pointer; }
 
-        /* СТИЛИ ДЛЯ ПРОФИЛЯ И ГРУПП (ИЗ ВТОРОГО КОДА) */
-        .profile-page .header {
-            background: #fff;
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 8px;
-        }
-        .profile-page .header .avatar-wrap {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto 6px;
-            background: #1877f2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .profile-page .header .avatar-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .profile-page .header .avatar-wrap .letter {
-            color: #fff;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-        .profile-page .header .name {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #222;
-        }
-        .profile-page .header .bio {
-            color: #888;
-            font-size: 0.7rem;
-            margin-top: 2px;
-        }
-        .profile-page .header .actions {
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-            margin-top: 6px;
-            flex-wrap: wrap;
-        }
-        .profile-page .header .actions button {
-            padding: 3px 10px;
-            border: none;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.6rem;
-        }
-        .profile-page .header .actions .msg-btn {
-            background: #1877f2;
-            color: #fff;
-        }
-        .profile-page .header .actions .friend-btn {
-            background: #e4e6eb;
-            color: #555;
-        }
-        .profile-page .header .actions .friend-btn.added {
-            background: #e8f0fe;
-            color: #1877f2;
-        }
-        .profile-page .header .actions .edit-btn {
-            background: #e4e6eb;
-            color: #555;
-        }
-        .profile-page .header .actions .avatar-btn {
-            background: #333;
-            color: #fff;
-        }
+        .profile-page .header { background: #fff; border-radius: 10px; padding: 12px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 8px; }
+        .profile-page .header .avatar-wrap { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; margin: 0 auto 6px; background: #1877f2; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .profile-page .header .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-page .header .avatar-wrap .letter { color: #fff; font-size: 2rem; font-weight: 700; }
+        .profile-page .header .name { font-size: 1rem; font-weight: 700; color: #222; }
+        .profile-page .header .bio { color: #888; font-size: 0.7rem; margin-top: 2px; }
+        .profile-page .header .actions { display: flex; gap: 4px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+        .profile-page .header .actions button { padding: 3px 10px; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 0.6rem; }
+        .profile-page .header .actions .msg-btn { background: #1877f2; color: #fff; }
+        .profile-page .header .actions .friend-btn { background: #e4e6eb; color: #555; }
+        .profile-page .header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
+        .profile-page .header .actions .edit-btn { background: #e4e6eb; color: #555; }
+        .profile-page .header .actions .avatar-btn { background: #333; color: #fff; }
 
-        .profile-stats {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin: 4px 0;
-            font-size: 0.65rem;
-            color: #888;
-        }
-        .profile-stats span {
-            cursor: pointer;
-        }
+        .profile-stats { display: flex; gap: 10px; justify-content: center; margin: 4px 0; font-size: 0.65rem; color: #888; }
+        .profile-stats span { cursor: pointer; }
 
-        .friends-section,
-        .subscribers-section,
-        .subscriptions-section {
-            background: #fff;
-            border-radius: 10px;
-            padding: 8px 10px;
-            margin-bottom: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .friends-section h4,
-        .subscribers-section h4,
-        .subscriptions-section h4 {
-            margin-bottom: 4px;
-            color: #555;
-            font-size: 0.75rem;
-        }
-        .friend-list,
-        .subscriber-list,
-        .subscription-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        .friend-item {
-            background: #f0f2f5;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.65rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-        }
-        .friend-item .avatar-wrap {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #1877f2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .friend-item .avatar-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .friend-item .avatar-wrap .letter {
-            color: #fff;
-            font-size: 0.4rem;
-            font-weight: 700;
-        }
+        .friends-section, .subscribers-section, .subscriptions-section { background: #fff; border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .friends-section h4, .subscribers-section h4, .subscriptions-section h4 { margin-bottom: 4px; color: #555; font-size: 0.75rem; }
+        .friend-list, .subscriber-list, .subscription-list { display: flex; flex-wrap: wrap; gap: 4px; }
+        .friend-item { background: #f0f2f5; padding: 2px 8px; border-radius: 12px; font-size: 0.65rem; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .friend-item .avatar-wrap { width: 16px; height: 16px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .friend-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.4rem; font-weight: 700; }
 
-        .pages-section {
-            background: #fff;
-            border-radius: 10px;
-            padding: 8px 10px;
-            margin-bottom: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .pages-section h4 {
-            margin-bottom: 4px;
-            color: #555;
-            font-size: 0.75rem;
-        }
-        .pages-section .page-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 3px 8px;
-            background: #f5f5f5;
-            border-radius: 4px;
-            margin-bottom: 3px;
-            font-size: 0.7rem;
-        }
-        .pages-section .create-page-btn {
-            background: #1877f2;
-            color: #fff;
-            border: none;
-            border-radius: 16px;
-            padding: 3px 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.65rem;
-            width: 100%;
-        }
+        .pages-section { background: #fff; border-radius: 10px; padding: 8px 10px; margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .pages-section h4 { margin-bottom: 4px; color: #555; font-size: 0.75rem; }
+        .pages-section .page-item { display: flex; justify-content: space-between; align-items: center; padding: 3px 8px; background: #f5f5f5; border-radius: 4px; margin-bottom: 3px; font-size: 0.7rem; }
+        .pages-section .create-page-btn { background: #1877f2; color: #fff; border: none; border-radius: 16px; padding: 3px 10px; cursor: pointer; font-weight: 600; font-size: 0.65rem; width: 100%; }
 
-        .groups-page .group-list {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-        .groups-page .group-card {
-            background: #fff;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .groups-page .group-card:hover {
-            transform: translateY(-2px);
-        }
-        .groups-page .group-card .icon {
-            font-size: 1.5rem;
-        }
-        .groups-page .group-card .name {
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-        .groups-page .group-card .count {
-            color: #888;
-            font-size: 0.6rem;
-        }
+        .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .groups-page .group-card { background: #fff; border-radius: 10px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; text-align: center; transition: all 0.2s; }
+        .groups-page .group-card:hover { transform: translateY(-2px); }
+        .groups-page .group-card .icon { font-size: 1.5rem; }
+        .groups-page .group-card .name { font-weight: 600; font-size: 0.75rem; }
+        .groups-page .group-card .count { color: #888; font-size: 0.6rem; }
 
-        .people-page .people-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .people-page .people-item {
-            background: #fff;
-            border-radius: 10px;
-            padding: 8px 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .people-page .people-item .avatar-wrap {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #1877f2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .people-page .people-item .avatar-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .people-page .people-item .avatar-wrap .letter {
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.7rem;
-        }
-        .people-page .people-item .info {
-            flex: 1;
-        }
-        .people-page .people-item .info .name {
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-        .people-page .people-item .info .status {
-            color: #888;
-            font-size: 0.6rem;
-        }
+        .people-page .people-list { display: flex; flex-direction: column; gap: 4px; }
+        .people-page .people-item { background: #fff; border-radius: 10px; padding: 8px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .people-page .people-item .avatar-wrap { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .people-page .people-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .people-page .people-item .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.7rem; }
+        .people-page .people-item .info { flex: 1; }
+        .people-page .people-item .info .name { font-weight: 600; font-size: 0.75rem; }
+        .people-page .people-item .info .status { color: #888; font-size: 0.6rem; }
 
-        .chat-view {
-            display: none;
-            background: #fff;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: 65vh;
-            flex-direction: column;
-        }
-        .chat-view.active {
-            display: flex;
-        }
-        .chat-view .back {
-            background: none;
-            border: none;
-            color: #1877f2;
-            cursor: pointer;
-            font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 0.75rem;
-        }
-        .chat-view .messages {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 4px;
-        }
-        .chat-view .messages .msg {
-            padding: 4px 8px;
-            margin-bottom: 2px;
-            background: #f5f5f5;
-            border-radius: 6px;
-            font-size: 0.75rem;
-        }
-        .chat-view .messages .msg .author {
-            font-weight: 600;
-            font-size: 0.65rem;
-        }
-        .chat-view .messages .msg .time {
-            color: #999;
-            font-size: 0.45rem;
-            margin-left: 3px;
-        }
-        .chat-view .input-wrap {
-            display: flex;
-            gap: 4px;
-        }
-        .chat-view .input-wrap input {
-            flex: 1;
-            padding: 4px 10px;
-            border: 1px solid #ddd;
-            border-radius: 16px;
-            outline: none;
-            font-size: 0.75rem;
-        }
-        .chat-view .input-wrap input:focus {
-            border-color: #1877f2;
-        }
-        .chat-view .input-wrap button {
-            background: #1877f2;
-            color: #fff;
-            border: none;
-            border-radius: 16px;
-            padding: 0 14px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
+        .chat-view { display: none; background: #fff; border-radius: 10px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: 65vh; flex-direction: column; }
+        .chat-view.active { display: flex; }
+        .chat-view .back { background: none; border: none; color: #1877f2; cursor: pointer; font-weight: 600; margin-bottom: 4px; font-size: 0.75rem; }
+        .chat-view .messages { flex: 1; overflow-y: auto; margin-bottom: 4px; }
+        .chat-view .messages .msg { padding: 4px 8px; margin-bottom: 2px; background: #f5f5f5; border-radius: 6px; font-size: 0.75rem; }
+        .chat-view .messages .msg .author { font-weight: 600; font-size: 0.65rem; }
+        .chat-view .messages .msg .time { color: #999; font-size: 0.45rem; margin-left: 3px; }
+        .chat-view .input-wrap { display: flex; gap: 4px; }
+        .chat-view .input-wrap input { flex: 1; padding: 4px 10px; border: 1px solid #ddd; border-radius: 16px; outline: none; font-size: 0.75rem; }
+        .chat-view .input-wrap input:focus { border-color: #1877f2; }
+        .chat-view .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 16px; padding: 0 14px; font-weight: 600; cursor: pointer; font-size: 0.7rem; }
 
-        /* МОДАЛКИ */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.open {
-            display: flex;
-        }
-        .modal .box {
-            background: #fff;
-            border-radius: 12px;
-            padding: 16px;
-            max-width: 360px;
-            width: 92%;
-            max-height: 75vh;
-            overflow-y: auto;
-        }
-        .modal .box h3 {
-            margin-bottom: 4px;
-            font-size: 0.9rem;
-        }
-        .modal .box input,
-        .modal .box textarea {
-            width: 100%;
-            padding: 6px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin: 3px 0;
-            font-family: inherit;
-            font-size: 0.8rem;
-        }
-        .modal .box textarea {
-            min-height: 40px;
-            resize: vertical;
-        }
-        .modal .box .btns {
-            display: flex;
-            gap: 4px;
-            justify-content: flex-end;
-            margin-top: 4px;
-        }
-        .modal .box .btns button {
-            padding: 3px 14px;
-            border: none;
-            border-radius: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-        .modal .box .btns .cancel {
-            background: #e4e6eb;
-            color: #555;
-        }
-        .modal .box .btns .save {
-            background: #1877f2;
-            color: #fff;
-        }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
+        .modal.open { display: flex; }
+        .modal .box { background: #fff; border-radius: 12px; padding: 16px; max-width: 360px; width: 92%; max-height: 75vh; overflow-y: auto; }
+        .modal .box h3 { margin-bottom: 4px; font-size: 0.9rem; }
+        .modal .box input, .modal .box textarea { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 6px; margin: 3px 0; font-family: inherit; font-size: 0.8rem; }
+        .modal .box textarea { min-height: 40px; resize: vertical; }
+        .modal .box .btns { display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px; }
+        .modal .box .btns button { padding: 3px 14px; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 0.7rem; }
+        .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
+        .modal .box .btns .save { background: #1877f2; color: #fff; }
 
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            width: 100%;
-            padding: 6px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            margin: 4px 0;
-            font-size: 0.8rem;
-        }
-        .google-btn:hover {
-            background: #f5f5f5;
-        }
-        .google-btn img {
-            width: 16px;
-            height: 16px;
-        }
+        .google-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 6px; background: #fff; border: 1px solid #ddd; border-radius: 40px; font-weight: 600; cursor: pointer; margin: 4px 0; font-size: 0.8rem; }
+        .google-btn:hover { background: #f5f5f5; }
+        .google-btn img { width: 16px; height: 16px; }
+        .divider { display: flex; align-items: center; gap: 8px; color: #bbb; font-size: 0.65rem; margin: 4px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
 
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #bbb;
-            font-size: 0.65rem;
-            margin: 4px 0;
-        }
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #ddd;
-        }
-
-        .admin-dot {
-            position: fixed;
-            bottom: 6px;
-            right: 6px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            border: 2px solid #ddd;
-            cursor: pointer;
-            background: #f0f0f0;
-            z-index: 99;
-        }
-        .admin-dot.active {
-            background: #e67e22;
-            border-color: #e67e22;
-        }
+        .admin-dot { position: fixed; bottom: 6px; right: 6px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; background: #f0f0f0; z-index: 99; }
+        .admin-dot.active { background: #e67e22; border-color: #e67e22; }
 
         @media (max-width: 480px) {
-            .topbar .right .name {
-                display: none;
-            }
-            .groups-page .group-list {
-                grid-template-columns: 1fr 1fr;
-            }
+            .topbar .right .name { display: none; }
+            .topbar .left .logo { font-size: 0.8rem; }
+            .player-wrap { min-width: 140px; max-width: 200px; padding: 2px 8px 2px 4px; }
+            .player-wrap .track-name { max-width: 40px; font-size: 0.45rem; }
+            .player-wrap .player-controls button { font-size: 0.7rem; }
+            .player-wrap .player-controls .play-btn { width: 20px; height: 20px; font-size: 0.8rem; }
+            .equalizer .bar { width: 2px; }
+            .groups-page .group-list { grid-template-columns: 1fr 1fr; }
         }
         @media (min-width: 768px) {
-            .topbar .left .logo {
-                font-size: 1.2rem;
-            }
-            .hor-menu button {
-                font-size: 0.85rem;
-                padding: 8px 20px;
-            }
+            .topbar .left .logo { font-size: 1.2rem; }
+            .hor-menu button { font-size: 0.85rem; padding: 8px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ТОПБАР -->
+    <!-- ТОПБАР С ПЛЕЕРОМ -->
     <div class="topbar">
         <div class="left">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
             <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
         </div>
+        
+        <!-- ПЛЕЕР -->
+        <div class="player-wrap" id="playerWrap">
+            <span class="track-name" id="trackName">ONE IN BILLION</span>
+            <div class="player-controls">
+                <button onclick="prevTrack()" title="Назад">⏮</button>
+                <button class="play-btn" id="playBtn" onclick="playMusic()">▶</button>
+                <button onclick="nextTrack()" title="Вперёд">⏭</button>
+            </div>
+            <div class="equalizer" id="equalizer">
+                <div class="bar" id="bar0"></div>
+                <div class="bar" id="bar1"></div>
+                <div class="bar" id="bar2"></div>
+                <div class="bar" id="bar3"></div>
+                <div class="bar" id="bar4"></div>
+                <div class="bar" id="bar5"></div>
+                <div class="bar" id="bar6"></div>
+                <div class="bar" id="bar7"></div>
+                <div class="bar" id="bar8"></div>
+                <div class="bar" id="bar9"></div>
+            </div>
+        </div>
+
         <div class="right">
             <button class="notif-btn" onclick="openNotifications()" id="notifBtn">
                 🔔
@@ -873,9 +465,8 @@
     <!-- КОНТЕЙНЕР -->
     <div class="container" id="container">
 
-        <!-- ЛЕНТА (ИЗ ПЕРВОГО КОДА) -->
+        <!-- ЛЕНТА -->
         <div class="page feed-page active" id="feedPage">
-            <!-- ФОРМА ПОСТА -->
             <div class="post-form">
                 <div class="input-row">
                     <input type="text" id="msgInput" placeholder="Напиши пост или вставь ссылку...">
@@ -889,23 +480,22 @@
                     <button class="remove-pic" onclick="removeImage()">✕</button>
                 </div>
             </div>
-            <!-- ПОСТЫ -->
             <div id="feed"></div>
         </div>
 
-        <!-- ГРУППЫ (ИЗ ВТОРОГО КОДА) -->
+        <!-- ГРУППЫ -->
         <div class="page groups-page" id="groupsPage">
             <h3 style="margin-bottom:6px;font-size:0.85rem;">👥 Группы</h3>
             <div class="group-list" id="groupList"></div>
         </div>
 
-        <!-- ЛЮДИ (ИЗ ВТОРОГО КОДА) -->
+        <!-- ЛЮДИ -->
         <div class="page people-page" id="peoplePage">
             <h3 style="margin-bottom:6px;font-size:0.85rem;">👤 Люди</h3>
             <div class="people-list" id="peopleList"></div>
         </div>
 
-        <!-- ПРОФИЛЬ (ИЗ ВТОРОГО КОДА) -->
+        <!-- ПРОФИЛЬ -->
         <div class="page profile-page" id="profilePage">
             <div class="header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()">
@@ -947,7 +537,7 @@
             </div>
         </div>
 
-        <!-- ЧАТ (ИЗ ВТОРОГО КОДА) -->
+        <!-- ЧАТ -->
         <div class="chat-view" id="chatView">
             <button class="back" onclick="closeChat()">← Назад</button>
             <div class="messages" id="chatMessages"></div>
@@ -961,7 +551,7 @@
     <!-- АДМИН ТОЧКА -->
     <div class="admin-dot" id="adminDot" onclick="openAdminLogin()"></div>
 
-    <!-- МОДАЛКА ВХОДА -->
+    <!-- МОДАЛКИ -->
     <div class="modal" id="loginModal">
         <div class="box">
             <h3>👤 Вход в METAIMPERIYA</h3>
@@ -978,7 +568,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
     <div class="modal" id="editProfileModal">
         <div class="box">
             <h3>✏️ Редактировать</h3>
@@ -991,7 +580,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА (ИЗ ПЕРВОГО КОДА) -->
     <div id="editModal" class="modal">
         <div class="box">
             <h2 style="color:#ff8c00;margin-bottom:8px;">✏️ Редактировать пост</h2>
@@ -999,11 +587,9 @@
             <textarea id="editText" placeholder="Текст поста" style="min-height:60px;"></textarea>
             <input type="url" id="editLink" placeholder="Ссылка для превью (iframe)">
             <input type="text" id="editHashtags" placeholder="Хэштеги: #chat #smm #dating">
-
             <div style="margin:8px 0 4px 0;color:#888;font-size:0.8rem;">🔘 Кнопки (до 5 штук)</div>
             <div id="editButtonsContainer"></div>
             <button onclick="addButtonField()" style="background:#222;color:#ff8c00;border:1px solid #333;border-radius:30px;padding:6px 16px;cursor:pointer;font-size:0.8rem;margin-top:4px;">➕ Добавить кнопку</button>
-
             <div class="btns" style="margin-top:12px;">
                 <button class="save" onclick="saveEdit()">💾 Сохранить</button>
                 <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
@@ -1012,7 +598,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА СОЗДАНИЯ СТРАНИЦЫ -->
     <div class="modal" id="createPageModal">
         <div class="box">
             <h3>📄 Создать страницу</h3>
@@ -1025,7 +610,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА СОЗДАНИЯ ГРУППЫ -->
     <div class="modal" id="createRoomModal">
         <div class="box">
             <h3>📝 Новая группа</h3>
@@ -1037,7 +621,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА НАСТРОЕК -->
     <div class="modal" id="settingsModal">
         <div class="box">
             <h3>⚙️ Настройки</h3>
@@ -1048,7 +631,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА УВЕДОМЛЕНИЙ -->
     <div class="modal" id="notifModal">
         <div class="box">
             <h3>🔔 Уведомления</h3>
@@ -1059,7 +641,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА АДМИНА -->
     <div class="modal" id="adminModal">
         <div class="box">
             <h3>🏴‍☠️ Админ</h3>
@@ -1106,6 +687,116 @@
                 { id: 'fashion', name: '👗 Мода' },
                 { id: 'science', name: '🔬 Наука' }
             ];
+
+            // ================================================================
+            // ПЛЕЕР
+            // ================================================================
+            const PLAYLIST = [
+                { name: 'ONE IN BILLION', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/ONE-IN-BILLION.mp3' }
+            ];
+            let currentTrack = 0;
+            let isPlaying = false;
+            let audio = null;
+            let analyser = null;
+            let dataArray = null;
+            let animationId = null;
+
+            function initAudio() {
+                if (!audio) {
+                    audio = new Audio(PLAYLIST[currentTrack].url);
+                    audio.crossOrigin = 'anonymous';
+                    audio.addEventListener('ended', () => {
+                        isPlaying = false;
+                        document.getElementById('playBtn').textContent = '▶';
+                        stopVisualizer();
+                    });
+                    // Создаем аудио контекст для визуализации
+                    try {
+                        const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                        analyser = ctx.createAnalyser();
+                        analyser.fftSize = 64;
+                        const source = ctx.createMediaElementSource(audio);
+                        source.connect(analyser);
+                        analyser.connect(ctx.destination);
+                        dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    } catch (e) {
+                        console.log('Визуализация не поддерживается');
+                    }
+                }
+                document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+            }
+
+            function startVisualizer() {
+                if (!analyser || !dataArray) return;
+                if (animationId) cancelAnimationFrame(animationId);
+                
+                function updateBars() {
+                    analyser.getByteFrequencyData(dataArray);
+                    const bars = document.querySelectorAll('.equalizer .bar');
+                    const len = Math.min(dataArray.length, bars.length);
+                    for (let i = 0; i < len; i++) {
+                        const val = dataArray[i] / 255;
+                        const height = 2 + val * 16;
+                        bars[i].style.height = height + 'px';
+                        bars[i].classList.add('active');
+                    }
+                    animationId = requestAnimationFrame(updateBars);
+                }
+                updateBars();
+            }
+
+            function stopVisualizer() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                const bars = document.querySelectorAll('.equalizer .bar');
+                bars.forEach(bar => {
+                    bar.style.height = '4px';
+                    bar.classList.remove('active');
+                });
+            }
+
+            window.playMusic = function() {
+                initAudio();
+                if (!audio) return;
+                
+                if (isPlaying) {
+                    audio.pause();
+                    isPlaying = false;
+                    document.getElementById('playBtn').textContent = '▶';
+                    stopVisualizer();
+                } else {
+                    audio.play().catch(e => console.log('Ошибка воспроизведения:', e));
+                    isPlaying = true;
+                    document.getElementById('playBtn').textContent = '⏸';
+                    startVisualizer();
+                }
+            };
+
+            window.prevTrack = function() {
+                currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
+                if (audio) {
+                    audio.src = PLAYLIST[currentTrack].url;
+                    if (isPlaying) {
+                        audio.play().catch(e => console.log('Ошибка:', e));
+                        startVisualizer();
+                    }
+                }
+                document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+            };
+
+            window.nextTrack = function() {
+                currentTrack = (currentTrack + 1) % PLAYLIST.length;
+                if (audio) {
+                    audio.src = PLAYLIST[currentTrack].url;
+                    if (isPlaying) {
+                        audio.play().catch(e => console.log('Ошибка:', e));
+                        startVisualizer();
+                    }
+                }
+                document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+            };
 
             // ================================================================
             // СОСТОЯНИЕ
@@ -1402,7 +1093,7 @@
             }
 
             // ================================================================
-            // ЛЕНТА (ИЗ ПЕРВОГО КОДА)
+            // ЛЕНТА
             // ================================================================
             function loadFeed() {
                 if (!USER_UID) {
@@ -1434,7 +1125,7 @@
             }
 
             // ================================================================
-            // ОТРИСОВКА ПОСТА (ИЗ ПЕРВОГО КОДА)
+            // ОТРИСОВКА ПОСТА
             // ================================================================
             function renderPost(p) {
                 const div = document.createElement('div');
@@ -1500,7 +1191,7 @@
             }
 
             // ================================================================
-            // ОТПРАВКА ПОСТА (ИЗ ПЕРВОГО КОДА)
+            // ОТПРАВКА ПОСТА
             // ================================================================
             window.sendMessage = function() {
                 const text = document.getElementById('msgInput').value.trim();
@@ -1583,7 +1274,7 @@
             };
 
             // ================================================================
-            // РЕДАКТИРОВАНИЕ ПОСТА (ИЗ ПЕРВОГО КОДА)
+            // РЕДАКТИРОВАНИЕ ПОСТА
             // ================================================================
             window.openEdit = function(id) {
                 editingId = id;
@@ -1655,7 +1346,7 @@
             };
 
             // ================================================================
-            // ЛАЙКИ И ОТВЕТЫ (ИЗ ПЕРВОГО КОДА)
+            // ЛАЙКИ И ОТВЕТЫ
             // ================================================================
             window.likeMsg = function(id) {
                 const key = `liked_${id}_${USER_UID}`;
@@ -1675,7 +1366,7 @@
             };
 
             // ================================================================
-            // ПРОФИЛЬ (ИЗ ВТОРОГО КОДА)
+            // ПРОФИЛЬ
             // ================================================================
             function loadProfile() {
                 const uid = VIEWING_USER || USER_UID;
@@ -1737,7 +1428,7 @@
             }
 
             // ================================================================
-            // ДРУЗЬЯ (ИЗ ВТОРОГО КОДА)
+            // ДРУЗЬЯ
             // ================================================================
             function checkFriend(uid) {
                 if (!USER_UID) return false;
@@ -1871,7 +1562,7 @@
             }
 
             // ================================================================
-            // ПОДПИСКИ (ИЗ ВТОРОГО КОДА)
+            // ПОДПИСКИ
             // ================================================================
             window.toggleSubscription = function(uid) {
                 if (!USER_UID || !uid || uid === USER_UID) return;
@@ -2411,7 +2102,7 @@
             db.ref('sites/' + SITE + '/feed_posts').once('value', snap => {
                 if (!snap.exists()) {
                     const posts = [
-                        { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в METAIMPERIYA!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 0, repostCount: 0 },
+                        { author: '📢 Админ', authorUid: 'admin', text: 'Добро пожаловать в METAIMPERIYA! 🎵 Слушай ONE IN BILLION в плеере!', time: '12:00', timestamp: Date.now() - 3600000, likes: 5, commentCount: 0, repostCount: 0 },
                         { author: '🚀 Орг', authorUid: 'org', text: 'Завтра в 19:00 встреча в группе "Общий"!', time: '11:30', timestamp: Date.now() - 7200000, likes: 3, commentCount: 0, repostCount: 0 }
                     ];
                     posts.forEach(p => db.ref('sites/' + SITE + '/feed_posts').push(p));
@@ -2426,7 +2117,12 @@
             loadGroups();
             loadPeople();
             setActivePage('feedPage');
+            
+            // Инициализируем плеер
+            initAudio();
+            
             console.log('🏛️ METAIMPERIYA запущена!');
+            console.log('🎵 Плеер с ONE IN BILLION!');
             console.log('🏴‍☠️ Админ-пароль: 12345');
             console.log('📷 Аватарки работают (JPG, PNG, GIF)!');
 
