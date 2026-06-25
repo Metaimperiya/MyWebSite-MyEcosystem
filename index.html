@@ -12,24 +12,19 @@
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #f0f2f5;
-            color: #222;
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            min-height: 100vh;
-        }
+        body { background:#0a0a12; color:#eee; font-family:system-ui; min-height:100vh; }
 
         .topbar {
-            background: #fff; padding: 6px 10px; border-bottom: 1px solid #ddd;
+            background: #0f0f1a; padding: 6px 10px; border-bottom: 1px solid #262633;
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100;
         }
         .topbar .left { display: flex; align-items: center; gap: 6px; }
         .topbar .left .menu-btn {
-            background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #1877f2;
+            background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #ff8c00;
         }
         .topbar .left .logo {
-            font-size: 1rem; font-weight: 700; color: #1877f2; cursor: pointer;
+            font-size: 1rem; font-weight: 700; color: #ff8c00; cursor: pointer;
             letter-spacing: 1px;
         }
         .topbar .right { display: flex; align-items: center; gap: 6px; }
@@ -42,70 +37,66 @@
         }
         .topbar .right .avatar-wrap {
             width: 28px; height: 28px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            background: #ff8c00; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        .topbar .right .avatar-wrap img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        .topbar .right .avatar-wrap .letter {
-            color: #fff; font-weight: 700; font-size: 0.7rem;
-        }
+        .topbar .right .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .topbar .right .avatar-wrap .letter { color: #0b0b0f; font-weight: 700; font-size: 0.7rem; }
         .topbar .right .name {
-            font-weight: 600; font-size: 0.7rem; cursor: pointer;
+            font-weight: 600; font-size: 0.7rem; cursor: pointer; color:#eee;
             max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
         .hor-menu {
-            background: #fff; padding: 4px 12px; border-bottom: 1px solid #ddd;
+            background: #0f0f1a; padding: 4px 12px; border-bottom: 1px solid #262633;
             display: flex; justify-content: center; gap: 6px;
             position: sticky; top: 42px; z-index: 99; overflow-x: auto;
             max-width: 700px; margin: 0 auto;
         }
         .hor-menu button {
-            background: none; border: none; color: #555; font-weight: 600;
+            background: none; border: none; color: #888; font-weight: 600;
             font-size: 0.75rem; cursor: pointer; padding: 6px 16px; border-radius: 8px;
             white-space: nowrap; flex: 0 1 auto;
         }
-        .hor-menu button:hover { background: #f0f0f0; }
-        .hor-menu button.active { color: #1877f2; background: #e8f0fe; }
+        .hor-menu button:hover { background: #1a1a2a; }
+        .hor-menu button.active { color: #ff8c00; background: #1a1a2a; }
 
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
-            background: #fff; border-right: 1px solid #ddd;
+            background: #0f0f1a; border-right: 1px solid #262633;
             transition: left 0.3s; z-index: 1000; overflow-y: auto; padding: 12px;
         }
         .sidebar.open { left: 0; }
         .sidebar .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .sidebar .head h3 { font-size: 1rem; color: #1877f2; }
-        .sidebar .head .close { background: none; border: none; font-size: 1.3rem; cursor: pointer; }
+        .sidebar .head h3 { font-size: 1rem; color: #ff8c00; }
+        .sidebar .head .close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color:#888; }
         .sidebar .user {
             display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-            background: #f5f5f5; border-radius: 10px; margin-bottom: 12px;
+            background: #14141f; border-radius: 10px; margin-bottom: 12px;
         }
         .sidebar .user .avatar-wrap {
             width: 34px; height: 34px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; display: flex; align-items: center; justify-content: center;
+            background: #ff8c00; display: flex; align-items: center; justify-content: center;
         }
         .sidebar .user .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .sidebar .user .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.85rem; }
-        .sidebar .user .name { font-weight: 600; font-size: 0.85rem; }
+        .sidebar .user .avatar-wrap .letter { color: #0b0b0f; font-weight: 700; font-size: 0.85rem; }
+        .sidebar .user .name { font-weight: 600; font-size: 0.85rem; color:#eee; }
 
         .sidebar .nav-item {
             display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-            border-radius: 8px; cursor: pointer; color: #555; font-size: 0.85rem;
+            border-radius: 8px; cursor: pointer; color: #888; font-size: 0.85rem;
             border: 1px solid transparent; margin-bottom: 2px;
         }
-        .sidebar .nav-item:hover { background: #f0f0f0; }
-        .sidebar .nav-item.active { background: #e8f0fe; color: #1877f2; border-color: #1877f2; }
-        .sidebar .footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd; }
+        .sidebar .nav-item:hover { background: #14141f; color:#eee; }
+        .sidebar .nav-item.active { background: #1a1a2a; color: #ff8c00; border-color: #ff8c00; }
+        .sidebar .footer { margin-top: 16px; padding-top: 12px; border-top: 1px solid #262633; }
         .sidebar .footer .create-btn {
-            background: #1877f2; color: #fff; border: none; border-radius: 40px;
+            background: #ff8c00; color: #0b0b0f; border: none; border-radius: 40px;
             padding: 6px; width: 100%; font-weight: 700; cursor: pointer; font-size: 0.75rem;
         }
 
         .overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.3); z-index: 999; display: none;
+            background: rgba(0,0,0,0.6); z-index: 999; display: none;
         }
         .overlay.show { display: block; }
 
@@ -113,16 +104,15 @@
         .page { display: none; }
         .page.active { display: block; }
 
+        /* ===== ПРОФИЛЬ ===== */
         .profile-page .header {
-            background: #fff; border-radius: 10px; padding: 12px;
-            text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 8px;
+            background: #10101a; border-radius: 10px; padding: 12px;
+            text-align: center; border:1px solid #262633; margin-bottom: 8px;
         }
         .profile-page .header .avatar-wrap {
             width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
-            margin: 0 auto 6px; background: #1877f2; display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            position: relative;
+            margin: 0 auto 6px; background: #ff8c00; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; position: relative;
         }
         .profile-page .header .avatar-wrap:hover::after {
             content: '📷'; position: absolute; bottom: 0; left: 0; right: 0;
@@ -130,206 +120,252 @@
             display: flex; align-items: center; justify-content: center; height: 30%;
         }
         .profile-page .header .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-page .header .avatar-wrap .letter { color: #fff; font-size: 2rem; font-weight: 700; }
-        .profile-page .header .name { font-size: 1rem; font-weight: 700; }
+        .profile-page .header .avatar-wrap .letter { color: #0b0b0f; font-size: 2rem; font-weight: 700; }
+        .profile-page .header .name { font-size: 1rem; font-weight: 700; color:#eee; }
         .profile-page .header .bio { color: #888; font-size: 0.7rem; margin-top: 2px; }
         .profile-page .header .actions { display: flex; gap: 4px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
         .profile-page .header .actions button {
             padding: 3px 10px; border: none; border-radius: 16px;
             font-weight: 600; cursor: pointer; font-size: 0.6rem;
         }
-        .profile-page .header .actions .msg-btn { background: #1877f2; color: #fff; }
-        .profile-page .header .actions .friend-btn { background: #e4e6eb; color: #555; }
-        .profile-page .header .actions .friend-btn.added { background: #e8f0fe; color: #1877f2; }
-        .profile-page .header .actions .edit-btn { background: #e4e6eb; color: #555; }
+        .profile-page .header .actions .msg-btn { background: #ff8c00; color: #0b0b0f; }
+        .profile-page .header .actions .friend-btn { background: #222233; color: #ccc; border:1px solid #333349; }
+        .profile-page .header .actions .friend-btn.added { background: #1a1a2a; color: #ff8c00; border-color:#ff8c00; }
+        .profile-page .header .actions .edit-btn { background: #222233; color: #ccc; border:1px solid #333349; }
 
         .profile-stats {
             display: flex; gap: 10px; justify-content: center; margin: 4px 0;
             font-size: 0.65rem; color: #888;
         }
         .profile-stats span { cursor: pointer; }
+        .profile-stats span:hover { color:#ff8c00; }
 
-        .friends-section, .subscribers-section, .subscriptions-section {
-            background: #fff; border-radius: 10px; padding: 8px 10px;
-            margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .friends-section, .subscribers-section, .subscriptions-section, .pages-section {
+            background: #10101a; border-radius: 10px; padding: 8px 10px;
+            margin-bottom: 6px; border:1px solid #262633;
         }
-        .friends-section h4, .subscribers-section h4, .subscriptions-section h4 {
-            margin-bottom: 4px; color: #555; font-size: 0.75rem;
+        .friends-section h4, .subscribers-section h4, .subscriptions-section h4, .pages-section h4 {
+            margin-bottom: 4px; color: #888; font-size: 0.75rem;
         }
         .friend-list, .subscriber-list, .subscription-list {
             display: flex; flex-wrap: wrap; gap: 4px;
         }
         .friend-item {
-            background: #f0f2f5; padding: 2px 8px; border-radius: 12px;
+            background: #14141f; padding: 2px 8px; border-radius: 12px;
             font-size: 0.65rem; display: flex; align-items: center; gap: 4px; cursor: pointer;
+            border:1px solid #262633; color:#ccc;
         }
+        .friend-item:hover { background: #1a1a2a; border-color:#ff8c00; }
         .friend-item .avatar-wrap {
             width: 16px; height: 16px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; display: flex; align-items: center; justify-content: center;
+            background: #ff8c00; display: flex; align-items: center; justify-content: center;
         }
         .friend-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.4rem; font-weight: 700; }
+        .friend-item .avatar-wrap .letter { color: #0b0b0f; font-size: 0.4rem; font-weight: 700; }
 
-        .pages-section {
-            background: #fff; border-radius: 10px; padding: 8px 10px;
-            margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .pages-section h4 { margin-bottom: 4px; color: #555; font-size: 0.75rem; }
         .pages-section .page-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 3px 8px; background: #f5f5f5; border-radius: 4px; margin-bottom: 3px;
-            font-size: 0.7rem;
+            padding: 3px 8px; background: #14141f; border-radius: 4px; margin-bottom: 3px;
+            font-size: 0.7rem; color:#ccc; border:1px solid #262633;
         }
         .pages-section .create-page-btn {
-            background: #1877f2; color: #fff; border: none;
+            background: #ff8c00; color: #0b0b0f; border: none;
             border-radius: 16px; padding: 3px 10px; cursor: pointer;
             font-weight: 600; font-size: 0.65rem; width: 100%;
         }
 
+        /* ===== ПОСТ-ФОРМА ===== */
         .post-form {
-            background: #fff; border-radius: 10px; padding: 8px 10px;
-            margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #10101a; border:1px solid #262633; border-radius: 10px; padding: 8px 10px;
+            margin-bottom: 6px;
         }
         .post-form textarea {
-            width: 100%; padding: 6px; border: 1px solid #ddd;
-            border-radius: 6px; resize: vertical; min-height: 40px;
-            font-family: inherit; font-size: 0.75rem;
+            width: 100%; padding: 6px; background:#0f0f1a; border:1px solid #262633; border-radius:6px;
+            resize: vertical; min-height: 40px; font-family: inherit; font-size:0.75rem; color:#eee;
         }
+        .post-form textarea:focus { outline:none; border-color:#ff8c00; }
         .post-form .actions { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
         .post-form .actions button {
             padding: 3px 12px; border: none; border-radius: 16px;
             font-weight: 600; cursor: pointer; font-size: 0.65rem;
         }
-        .post-form .actions .submit { background: #1877f2; color: #fff; }
-        .post-form .actions .cancel { background: #e4e6eb; color: #555; }
+        .post-form .actions .submit { background: #ff8c00; color: #0b0b0f; }
+        .post-form .actions .cancel { background: #222233; color: #888; border:1px solid #333349; }
 
+        /* ===== ПОСТ ===== */
         .post {
-            background: #fff; border-radius: 10px; padding: 10px;
-            margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #10101a; border:1px solid #262633; border-radius: 10px; padding: 10px;
+            margin-bottom: 6px;
         }
         .post .author { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
         .post .author .avatar-wrap {
             width: 28px; height: 28px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            background: #ff8c00; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
         .post .author .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .post .author .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.6rem; }
-        .post .author .name { font-weight: 600; font-size: 0.75rem; cursor: pointer; }
-        .post .author .time { color: #999; font-size: 0.5rem; margin-left: auto; }
-        .post .text { font-size: 0.8rem; line-height: 1.3; margin-bottom: 4px; }
+        .post .author .avatar-wrap .letter { color: #0b0b0f; font-weight: 700; font-size: 0.6rem; }
+        .post .author .name { font-weight: 600; font-size: 0.75rem; cursor: pointer; color:#ffaa44; }
+        .post .author .name:hover { text-decoration:underline; }
+        .post .author .time { color: #666; font-size: 0.5rem; margin-left: auto; }
+
+        .post .marquee {
+            background: #0f0f1a; padding: 6px 0; overflow: hidden; white-space: nowrap;
+            border-radius: 8px; margin-bottom: 8px; border: 1px solid #262633;
+        }
+        .post .marquee span {
+            display: inline-block; animation: scroll 12s linear infinite;
+            color: #ff8c00; font-weight: 600; font-size: 0.85rem; padding-left: 20px;
+        }
+        @keyframes scroll { 0% { transform:translateX(100%); } 100% { transform:translateX(-100%); } }
+
+        .post .text { font-size: 0.85rem; line-height: 1.4; margin: 6px 0; color:#eee; }
+        .post .text .link-hidden { color: #555; font-size: 0.8rem; }
+        .post img {
+            max-width: 100%; max-height: 250px; border-radius: 12px;
+            margin: 6px 0; border: 1px solid #262633; cursor: pointer;
+        }
+
+        .post .link-preview {
+            margin: 8px 0 4px 0; border:1px solid #262633; border-radius:12px;
+            overflow:hidden; background:#0f0f1a; width:100%;
+        }
+        .post .link-preview iframe {
+            width:100%; height:350px; border:none; display:block;
+        }
+
+        .post .buttons {
+            display:flex; flex-direction:column; gap:6px; margin:8px 0;
+        }
+        .post .buttons .btn-item {
+            display:block; background:#ff8c00; border:none; border-radius:12px;
+            padding:12px 18px; text-align:center; text-decoration:none;
+            color:#0b0b0f; font-weight:700; font-size:0.9rem; transition:0.2s; cursor:pointer;
+        }
+        .post .buttons .btn-item:hover { background:#ffa033; transform:scale(1.01); }
+
+        .post .hashtags { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px 0; padding-top:8px; border-top:1px solid #262633; }
+        .post .hashtags .tag { color:#66aaff; font-size:0.7rem; background:#0f0f1a; padding:2px 12px; border-radius:20px; border:1px solid #262633; }
+
         .post .stats {
             display: flex; gap: 8px; font-size: 0.6rem; color: #888;
-            border-top: 1px solid #eee; padding-top: 4px; margin-top: 4px;
+            border-top: 1px solid #262633; padding-top: 4px; margin-top: 4px;
             flex-wrap: wrap;
         }
         .post .stats button {
             background: none; border: none; color: #888; cursor: pointer;
             display: flex; align-items: center; gap: 2px; font-size: 0.6rem;
         }
-        .post .stats button:hover { color: #1877f2; }
-        .post .stats button.liked { color: #1877f2; }
+        .post .stats button:hover { color: #ff8c00; }
+        .post .stats button.liked { color: #ff8c00; }
 
-        .comments { margin-top: 6px; border-top: 1px solid #eee; padding-top: 6px; }
+        .comments {
+            margin-top: 6px; border-top: 1px solid #262633; padding-top: 6px;
+        }
         .comments .toggle {
-            background: none; border: none; color: #1877f2;
+            background: none; border: none; color: #ff8c00;
             cursor: pointer; font-size: 0.65rem; margin-bottom: 3px;
         }
         .comments .list { display: none; }
         .comments .list.open { display: block; }
         .comments .comment {
-            display: flex; gap: 6px; margin-bottom: 3px; padding: 3px 0; border-bottom: 1px solid #f5f5f5;
+            display: flex; gap: 6px; margin-bottom: 3px; padding: 3px 0; border-bottom: 1px solid #1a1a2a;
         }
         .comments .comment .avatar-wrap {
             width: 18px; height: 18px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; display: flex; align-items: center; justify-content: center;
+            background: #ff8c00; display: flex; align-items: center; justify-content: center;
         }
         .comments .comment .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .comments .comment .avatar-wrap .letter { color: #fff; font-size: 0.4rem; font-weight: 700; }
-        .comments .comment .body { flex: 1; font-size: 0.7rem; }
-        .comments .comment .body .name { font-weight: 600; }
-        .comments .comment .body .time { color: #999; font-size: 0.45rem; margin-left: 3px; }
+        .comments .comment .avatar-wrap .letter { color: #0b0b0f; font-size: 0.4rem; font-weight: 700; }
+        .comments .comment .body { flex: 1; font-size: 0.7rem; color:#ccc; }
+        .comments .comment .body .name { font-weight: 600; color:#ffaa44; }
+        .comments .comment .body .time { color: #666; font-size: 0.45rem; margin-left: 3px; }
+        .comments .comment .del {
+            background:none; border:none; color:#e74c3c; cursor:pointer; font-size:0.5rem;
+        }
         .comments .input-wrap { display: flex; gap: 4px; margin-top: 4px; }
         .comments .input-wrap input {
-            flex: 1; padding: 3px 8px; border: 1px solid #ddd;
-            border-radius: 14px; font-size: 0.65rem; outline: none;
+            flex: 1; padding: 3px 8px; background:#0f0f1a; border:1px solid #262633;
+            border-radius: 14px; font-size: 0.65rem; outline: none; color:#eee;
         }
-        .comments .input-wrap input:focus { border-color: #1877f2; }
+        .comments .input-wrap input:focus { border-color: #ff8c00; }
         .comments .input-wrap button {
-            background: #1877f2; color: #fff; border: none;
+            background: #ff8c00; color: #0b0b0f; border: none;
             border-radius: 14px; padding: 2px 10px; cursor: pointer;
             font-weight: 600; font-size: 0.6rem;
         }
 
+        /* ===== ГРУППЫ ===== */
         .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .groups-page .group-card {
-            background: #fff; border-radius: 10px; padding: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #10101a; border:1px solid #262633; border-radius: 10px; padding: 10px;
             cursor: pointer; text-align: center; transition: all 0.2s;
         }
-        .groups-page .group-card:hover { transform: translateY(-2px); }
+        .groups-page .group-card:hover { transform: translateY(-2px); border-color:#ff8c00; }
         .groups-page .group-card .icon { font-size: 1.5rem; }
-        .groups-page .group-card .name { font-weight: 600; font-size: 0.75rem; }
+        .groups-page .group-card .name { font-weight: 600; font-size: 0.75rem; color:#eee; }
         .groups-page .group-card .count { color: #888; font-size: 0.6rem; }
 
+        /* ===== ЛЮДИ ===== */
         .people-page .people-list { display: flex; flex-direction: column; gap: 4px; }
         .people-page .people-item {
-            background: #fff; border-radius: 10px; padding: 8px 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: #10101a; border:1px solid #262633; border-radius: 10px; padding: 8px 12px;
             cursor: pointer; display: flex; align-items: center; gap: 8px;
         }
+        .people-page .people-item:hover { border-color:#ff8c00; }
         .people-page .people-item .avatar-wrap {
             width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
-            background: #1877f2; display: flex; align-items: center; justify-content: center;
+            background: #ff8c00; display: flex; align-items: center; justify-content: center;
         }
         .people-page .people-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .people-page .people-item .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.7rem; }
+        .people-page .people-item .avatar-wrap .letter { color: #0b0b0f; font-weight: 700; font-size: 0.7rem; }
         .people-page .people-item .info { flex: 1; }
-        .people-page .people-item .info .name { font-weight: 600; font-size: 0.75rem; }
+        .people-page .people-item .info .name { font-weight: 600; font-size: 0.75rem; color:#eee; }
         .people-page .people-item .info .status { color: #888; font-size: 0.6rem; }
 
+        /* ===== ЧАТ ===== */
         .chat-view {
-            display: none; background: #fff; border-radius: 10px;
-            padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            height: 65vh; flex-direction: column;
+            display: none; background: #10101a; border:1px solid #262633; border-radius: 10px;
+            padding: 10px; height: 65vh; flex-direction: column;
         }
         .chat-view.active { display: flex; }
         .chat-view .back {
-            background: none; border: none; color: #1877f2;
+            background: none; border: none; color: #ff8c00;
             cursor: pointer; font-weight: 600; margin-bottom: 4px; font-size: 0.75rem;
         }
         .chat-view .messages { flex: 1; overflow-y: auto; margin-bottom: 4px; }
         .chat-view .messages .msg {
             padding: 4px 8px; margin-bottom: 2px;
-            background: #f5f5f5; border-radius: 6px; font-size: 0.75rem;
+            background: #0f0f1a; border:1px solid #262633; border-radius: 6px; font-size: 0.75rem; color:#ccc;
         }
-        .chat-view .messages .msg .author { font-weight: 600; font-size: 0.65rem; }
-        .chat-view .messages .msg .time { color: #999; font-size: 0.45rem; margin-left: 3px; }
+        .chat-view .messages .msg .author { font-weight: 600; font-size: 0.65rem; color:#ffaa44; }
+        .chat-view .messages .msg .time { color: #666; font-size: 0.45rem; margin-left: 3px; }
         .chat-view .input-wrap { display: flex; gap: 4px; }
         .chat-view .input-wrap input {
-            flex: 1; padding: 4px 10px; border: 1px solid #ddd;
-            border-radius: 16px; outline: none; font-size: 0.75rem;
+            flex: 1; padding: 4px 10px; background:#0f0f1a; border:1px solid #262633;
+            border-radius: 16px; outline: none; font-size: 0.75rem; color:#eee;
         }
-        .chat-view .input-wrap input:focus { border-color: #1877f2; }
+        .chat-view .input-wrap input:focus { border-color: #ff8c00; }
         .chat-view .input-wrap button {
-            background: #1877f2; color: #fff; border: none;
+            background: #ff8c00; color: #0b0b0f; border: none;
             border-radius: 16px; padding: 0 14px; font-weight: 600;
             cursor: pointer; font-size: 0.7rem;
         }
 
+        /* ===== МОДАЛКИ ===== */
         .modal {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 9999;
+            background: rgba(0,0,0,0.7); z-index: 9999;
             justify-content: center; align-items: center;
         }
         .modal.open { display: flex; }
         .modal .box {
-            background: #fff; border-radius: 12px; padding: 16px;
+            background: #14141f; border:1px solid #262633; border-radius: 12px; padding: 16px;
             max-width: 360px; width: 92%; max-height: 75vh; overflow-y: auto;
         }
-        .modal .box h3 { margin-bottom: 4px; font-size: 0.9rem; }
+        .modal .box h3 { margin-bottom: 4px; font-size: 0.9rem; color:#ff8c00; }
         .modal .box input, .modal .box textarea {
-            width: 100%; padding: 6px; border: 1px solid #ddd;
-            border-radius: 6px; margin: 3px 0; font-family: inherit; font-size: 0.8rem;
+            width: 100%; padding: 6px; background:#0f0f1a; border:1px solid #262633;
+            border-radius: 6px; margin: 3px 0; font-family: inherit; font-size: 0.8rem; color:#eee;
         }
         .modal .box textarea { min-height: 40px; resize: vertical; }
         .modal .box .btns { display: flex; gap: 4px; justify-content: flex-end; margin-top: 4px; }
@@ -337,32 +373,32 @@
             padding: 3px 14px; border: none; border-radius: 16px;
             font-weight: 600; cursor: pointer; font-size: 0.7rem;
         }
-        .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
-        .modal .box .btns .save { background: #1877f2; color: #fff; }
+        .modal .box .btns .cancel { background: #222233; color: #888; border:1px solid #333349; }
+        .modal .box .btns .save { background: #ff8c00; color: #0b0b0f; }
 
         .google-btn {
             display: flex; align-items: center; justify-content: center;
             gap: 6px; width: 100%; padding: 6px;
-            background: #fff; border: 1px solid #ddd; border-radius: 40px;
-            font-weight: 600; cursor: pointer; margin: 4px 0; font-size: 0.8rem;
+            background: #0f0f1a; border:1px solid #262633; border-radius: 40px;
+            font-weight: 600; cursor: pointer; margin: 4px 0; font-size: 0.8rem; color:#eee;
         }
-        .google-btn:hover { background: #f5f5f5; }
+        .google-btn:hover { background: #1a1a2a; border-color:#ff8c00; }
         .google-btn img { width: 16px; height: 16px; }
 
         .divider {
             display: flex; align-items: center; gap: 8px;
-            color: #bbb; font-size: 0.65rem; margin: 4px 0;
+            color: #555; font-size: 0.65rem; margin: 4px 0;
         }
         .divider::before,
-        .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
+        .divider::after { content: ''; flex: 1; height: 1px; background: #262633; }
 
         .admin-dot {
             position: fixed; bottom: 6px; right: 6px;
             width: 10px; height: 10px; border-radius: 50%;
-            border: 2px solid #ddd; cursor: pointer;
-            background: #f0f0f0; z-index: 99;
+            border: 2px solid #262633; cursor: pointer;
+            background: #0f0f1a; z-index: 99;
         }
-        .admin-dot.active { background: #e67e22; border-color: #e67e22; }
+        .admin-dot.active { background: #ff8c00; border-color: #ff8c00; }
 
         @media (max-width: 480px) {
             .topbar .right .name { display: none; }
@@ -414,7 +450,7 @@
         </div>
         <div>
             <div class="name" id="sName">Гость</div>
-            <div style="font-size:0.6rem;color:#888;">онлайн</div>
+            <div style="font-size:0.6rem;color:#666;">онлайн</div>
         </div>
     </div>
     <div class="nav-item active" onclick="goToFeed(); closeSidebar();">📰 Лента</div>
@@ -440,13 +476,13 @@
 
     <!-- ГРУППЫ -->
     <div class="page groups-page" id="groupsPage">
-        <h3 style="margin-bottom:6px;font-size:0.85rem;">👥 Группы</h3>
+        <h3 style="margin-bottom:6px;font-size:0.85rem;color:#888;">👥 Группы</h3>
         <div class="group-list" id="groupList"></div>
     </div>
 
     <!-- ЛЮДИ -->
     <div class="page people-page" id="peoplePage">
-        <h3 style="margin-bottom:6px;font-size:0.85rem;">👤 Люди</h3>
+        <h3 style="margin-bottom:6px;font-size:0.85rem;color:#888;">👤 Люди</h3>
         <div class="people-list" id="peopleList"></div>
     </div>
 
@@ -536,7 +572,7 @@
         <h3>✏️ Редактировать</h3>
         <input type="text" id="editName" placeholder="Имя">
         <textarea id="editBio" placeholder="О себе..."></textarea>
-        <button onclick="removeAvatar()" style="width:100%;padding:4px;background:#fdedec;border:1px solid #e74c3c;border-radius:6px;color:#c0392b;font-weight:700;cursor:pointer;font-size:0.7rem;margin-top:4px;">🗑 Удалить аватарку</button>
+        <button onclick="removeAvatar()" style="width:100%;padding:4px;background:#2a1a1a;border:1px solid #6a1a1a;border-radius:6px;color:#ff6666;font-weight:700;cursor:pointer;font-size:0.7rem;margin-top:4px;">🗑 Удалить аватарку</button>
         <div class="btns">
             <button class="cancel" onclick="closeEditProfile()">Отмена</button>
             <button class="save" onclick="saveProfile()">Сохранить</button>
@@ -573,7 +609,7 @@
 <div class="modal" id="settingsModal">
     <div class="box">
         <h3>⚙️ Настройки</h3>
-        <button onclick="logout()" style="width:100%;padding:6px;background:#fdedec;border:1px solid #e74c3c;border-radius:6px;color:#c0392b;font-weight:700;cursor:pointer;margin-top:6px;font-size:0.8rem;">🚪 Выйти</button>
+        <button onclick="logout()" style="width:100%;padding:6px;background:#2a1a1a;border:1px solid #6a1a1a;border-radius:6px;color:#ff6666;font-weight:700;cursor:pointer;margin-top:6px;font-size:0.8rem;">🚪 Выйти</button>
         <div class="btns">
             <button class="cancel" onclick="closeSettings()">Закрыть</button>
         </div>
@@ -949,7 +985,7 @@
     // ================================================================
     function loadFeed() {
         if (!USER_UID) {
-            document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;font-size:0.8rem;">Войдите, чтобы видеть ленту</div>';
+            document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:20px;color:#555;font-size:0.8rem;">Войдите, чтобы видеть ленту</div>';
             return;
         }
         
@@ -965,7 +1001,7 @@
                     .sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
                 
                 if (!keys.length) {
-                    feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;font-size:0.8rem;">Нет постов от ваших подписок</div>';
+                    feed.innerHTML = '<div style="text-align:center;padding:20px;color:#555;font-size:0.8rem;">Нет постов от ваших подписок</div>';
                     return;
                 }
                 
@@ -1134,7 +1170,7 @@
     function loadFriends(uid) {
         if (!uid) return;
         const container = document.getElementById('friendList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Загрузка...</div>';
+        container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Загрузка...</div>';
         
         db.ref('sites/' + SITE + '/friends/' + uid).once('value', snap => {
             const data = snap.val() || {};
@@ -1142,7 +1178,7 @@
             document.getElementById('friendsCount').textContent = keys.length;
             
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Нет друзей</div>';
+                container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Нет друзей</div>';
                 return;
             }
             
@@ -1198,7 +1234,7 @@
     function loadSubscribers(uid) {
         if (!uid) return;
         const container = document.getElementById('subscriberList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Загрузка...</div>';
+        container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Загрузка...</div>';
         
         db.ref('sites/' + SITE + '/subscribers/' + uid).once('value', snap => {
             const data = snap.val() || {};
@@ -1206,7 +1242,7 @@
             document.getElementById('subscribersCount').textContent = keys.length;
             
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Нет подписчиков</div>';
+                container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Нет подписчиков</div>';
                 return;
             }
             
@@ -1236,7 +1272,7 @@
     function loadSubscriptions(uid) {
         if (!uid) return;
         const container = document.getElementById('subscriptionList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Загрузка...</div>';
+        container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Загрузка...</div>';
         
         db.ref('sites/' + SITE + '/subscriptions/' + uid).once('value', snap => {
             const data = snap.val() || {};
@@ -1244,7 +1280,7 @@
             document.getElementById('subscriptionsCount').textContent = keys.length;
             
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Нет подписок</div>';
+                container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Нет подписок</div>';
                 return;
             }
             
@@ -1286,13 +1322,13 @@
     function loadPages(uid) {
         if (!uid) return;
         const container = document.getElementById('pageList');
-        container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Загрузка...</div>';
+        container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Загрузка...</div>';
         
         db.ref('sites/' + SITE + '/pages/' + uid).on('value', snap => {
             const data = snap.val() || {};
             const keys = Object.keys(data);
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.65rem;">Нет страниц</div>';
+                container.innerHTML = '<div style="color:#555;font-size:0.65rem;">Нет страниц</div>';
                 return;
             }
             container.innerHTML = keys.map(k => {
@@ -1407,7 +1443,7 @@
             if (!list) return;
             const sorted = keys.sort((a,b) => (data[b].timestamp||0) - (data[a].timestamp||0));
             if (!sorted.length) {
-                list.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.75rem;">Нет уведомлений</div>';
+                list.innerHTML = '<div style="color:#555;text-align:center;padding:8px;font-size:0.75rem;">Нет уведомлений</div>';
                 return;
             }
             list.innerHTML = sorted.map(k => {
@@ -1419,8 +1455,8 @@
                 else if (n.type === 'like') text = `👍 ${esc(n.from)} поставил лайк`;
                 else if (n.type === 'comment') text = `💬 ${esc(n.from)} прокомментировал`;
                 else text = `📢 ${esc(n.from)} сделал что-то`;
-                return `<div style="padding:3px 0;border-bottom:1px solid #f0f0f0;font-size:0.7rem;${n.read ? 'color:#888;' : 'font-weight:600;'}">
-                    ${text} <span style="color:#999;font-size:0.5rem;">${new Date(n.timestamp).toLocaleTimeString()}</span>
+                return `<div style="padding:3px 0;border-bottom:1px solid #1a1a2a;font-size:0.7rem;${n.read ? 'color:#555;' : 'color:#eee;font-weight:600;'}">
+                    ${text} <span style="color:#555;font-size:0.5rem;">${new Date(n.timestamp).toLocaleTimeString()}</span>
                 </div>`;
             }).join('');
         });
@@ -1477,6 +1513,27 @@
         const letter = (p.author || '?').charAt(0).toUpperCase();
         const avatarHtml = `<span class="avatar-wrap" id="post-avatar-${p.id}"><span class="letter">${letter}</span></span>`;
 
+        let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
+        let textHtml = esc(p.text || '');
+        const linkMatch = (p.text || '').match(/(https?:\/\/[^\s]+)/);
+        if (linkMatch && p.link) textHtml = textHtml.replace(linkMatch[1], `<span class="link-hidden">${linkMatch[1]}</span>`);
+        let imgHtml = p.img ? `<img src="${p.img}" onclick="window.open(this.src)">` : '';
+        let buttonsHtml = '';
+        if (p.buttons && p.buttons.length > 0) {
+            buttonsHtml = '<div class="buttons">';
+            p.buttons.forEach(btn => {
+                if (btn.url) buttonsHtml += `<a href="${esc(btn.url)}" target="_blank" class="btn-item">${esc(btn.label || '🔗 Перейти')}</a>`;
+            });
+            buttonsHtml += '</div>';
+        }
+        let previewHtml = p.link ? `<div class="link-preview"><iframe src="${p.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>` : '';
+        let hashtagsHtml = '';
+        if (p.hashtags && p.hashtags.length > 0) {
+            hashtagsHtml = '<div class="hashtags">';
+            p.hashtags.forEach(tag => hashtagsHtml += `<span class="tag">${esc(tag)}</span>`);
+            hashtagsHtml += '</div>';
+        }
+
         div.innerHTML = `
             <div class="author">
                 ${avatarHtml}
@@ -1484,7 +1541,12 @@
                 <span class="time">${p.time || ''}</span>
                 ${IS_ADMIN ? `<button onclick="deletePost('${p.id}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.5rem;">🗑</button>` : ''}
             </div>
-            <div class="text">${esc(p.text || '')}</div>
+            ${marqueeHtml}
+            <div class="text">${textHtml}</div>
+            ${imgHtml}
+            ${buttonsHtml}
+            ${previewHtml}
+            ${hashtagsHtml}
             <div class="stats">
                 <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}')">
                     👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
@@ -1540,14 +1602,14 @@
     function loadProfilePosts(uid) {
         if (!uid) return;
         const container = document.getElementById('profilePosts');
-        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">Загрузка...</div>';
+        container.innerHTML = '<div style="color:#555;text-align:center;padding:8px;font-size:0.7rem;">Загрузка...</div>';
         
         db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
             container.innerHTML = '';
             const data = snap.val() || {};
             const keys = Object.keys(data).filter(k => data[k].authorUid === uid).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
             if (!keys.length) {
-                container.innerHTML = '<div style="text-align:center;padding:8px;color:#bbb;font-size:0.7rem;">Нет постов</div>';
+                container.innerHTML = '<div style="text-align:center;padding:8px;color:#555;font-size:0.7rem;">Нет постов</div>';
                 return;
             }
             keys.forEach(k => {
@@ -1639,7 +1701,7 @@
             db.ref('sites/' + SITE + '/feed_posts/' + postId + '/commentCount').set(count);
 
             if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;font-size:0.6rem;padding:3px 0;">Нет комментариев</div>';
+                container.innerHTML = '<div style="color:#555;font-size:0.6rem;padding:3px 0;">Нет комментариев</div>';
                 return;
             }
 
@@ -1766,14 +1828,14 @@
     function loadPeople() {
         if (!USER_UID) return;
         const list = document.getElementById('peopleList');
-        list.innerHTML = '<div style="text-align:center;padding:8px;color:#bbb;font-size:0.7rem;">Загрузка...</div>';
+        list.innerHTML = '<div style="text-align:center;padding:8px;color:#555;font-size:0.7rem;">Загрузка...</div>';
         
         db.ref('sites/' + SITE + '/users').once('value', snap => {
             const users = snap.val() || {};
             const keys = Object.keys(users).filter(k => k !== USER_UID);
             
             if (!keys.length) {
-                list.innerHTML = '<div style="text-align:center;padding:8px;color:#bbb;font-size:0.7rem;">Нет других пользователей</div>';
+                list.innerHTML = '<div style="text-align:center;padding:8px;color:#555;font-size:0.7rem;">Нет других пользователей</div>';
                 return;
             }
             
@@ -1826,13 +1888,13 @@
             chatUnsub = null; 
         }
         const box = document.getElementById('chatMessages');
-        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">⏳ Загрузка...</div>';
+        box.innerHTML = '<div style="color:#555;text-align:center;padding:8px;font-size:0.7rem;">⏳ Загрузка...</div>';
         const path = 'rooms/' + SITE + '_' + roomId + '/messages';
         chatUnsub = path;
         db.ref(path).orderByChild('timestamp').on('value', snap => {
             box.innerHTML = '';
             if (!snap.exists()) {
-                box.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">Сообщений нет 👋</div>';
+                box.innerHTML = '<div style="color:#555;text-align:center;padding:8px;font-size:0.7rem;">Сообщений нет 👋</div>';
                 return;
             }
             snap.forEach(s => {
@@ -1859,14 +1921,14 @@
             chatUnsub = null; 
         }
         const box = document.getElementById('chatMessages');
-        box.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">⏳ Загрузка...</div>';
+        box.innerHTML = '<div style="color:#555;text-align:center;padding:8px;font-size:0.7rem;">⏳ Загрузка...</div>';
         const dmId = getDMId(USER_UID, userId);
         const path = 'dms/' + SITE + '/' + dmId + '/messages';
         chatUnsub = path;
         db.ref(path).orderByChild('timestamp').on('value', snap => {
             box.innerHTML = '';
             if (!snap.exists()) {
-                box.innerHTML = '<div style="color:#bbb;text-align:center;padding:8px;font-size:0.7rem;">Нет сообщений 👋</div>';
+                box.innerHTML = '<div style="color:#555;text-align:center;padding:8px;font-size:0.7rem;">Нет сообщений 👋</div>';
                 return;
             }
             snap.forEach(s => {
@@ -1965,6 +2027,7 @@
     console.log('🏛️ METAIMPERIYA запущена!');
     console.log('🏴‍☠️ Админ-пароль: 12345');
     console.log('📷 Клик по аватарке в профиле → загрузка фото/GIF!');
+    console.log('🎨 Тёмная тема!');
 })();
 </script>
 </body>
