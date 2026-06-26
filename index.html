@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAIMPERIYA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>METAIMPERIYA - Социальная сеть</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -264,9 +264,16 @@
             gap: 12px;
             padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.15s;
         }
         
-        .user-item:last-child { border-bottom: none; }
+        .user-item:hover {
+            background: #f5f7fa;
+            border-radius: 8px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
         
         .user-item .avatar {
             width: 40px;
@@ -338,6 +345,8 @@
         
         .btn:hover { background: #4a9eff; }
         .btn:active { transform: scale(0.96); }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
         
         .hidden { display: none; }
         
@@ -500,11 +509,111 @@
         
         .profile-option .remove-btn:hover { color: #e74c3c; }
         
+        .chat-view {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            height: 70vh;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        
+        .chat-view.active { display: flex; }
+        
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 12px;
+        }
+        
+        .chat-header .title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .chat-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+            padding: 4px 8px;
+        }
+        
+        .chat-header .close-btn:hover { color: #333; }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+        
+        .chat-messages .msg {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #f5f7fa;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        
+        .chat-messages .msg .author {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1877f2;
+        }
+        
+        .chat-messages .msg .time {
+            color: #999;
+            font-size: 11px;
+            margin-left: 6px;
+        }
+        
+        .chat-input-wrap {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chat-input-wrap input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .chat-input-wrap input:focus {
+            border-color: #1877f2;
+        }
+        
+        .chat-input-wrap button {
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .chat-input-wrap button:hover { background: #4a9eff; }
+        .chat-input-wrap button:active { transform: scale(0.95); }
+        
         @media (max-width: 480px) {
             .profile-card { padding: 30px 16px 20px; }
             .profile-avatar { width: 100px; height: 100px; font-size: 40px; }
             .profile-name { font-size: 20px; }
             .room-grid { grid-template-columns: 1fr; }
+            .modal-content { padding: 16px; }
         }
     </style>
 </head>
@@ -553,6 +662,19 @@
     </div>
 </div>
 
+<!-- ===== ЧАТ ===== -->
+<div class="chat-view" id="chatView">
+    <div class="chat-header">
+        <span class="title" id="chatTitle">💬 Чат</span>
+        <button class="close-btn" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Сообщение...">
+        <button onclick="sendChat()">→</button>
+    </div>
+</div>
+
 <!-- ===== КОНТЕКСТНОЕ МЕНЮ ===== -->
 <div class="context-menu" id="contextMenu">
     <button class="menu-item" onclick="editProfile();closeContextMenu();">
@@ -569,7 +691,29 @@
 
 <div class="context-overlay" id="contextOverlay"></div>
 
-<!-- ===== МОДАЛКИ ===== -->
+<!-- ===== МОДАЛКА ПРОСМОТРА ПРОФИЛЯ ===== -->
+<div class="modal" id="profileViewModal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0;">👤 Профиль</h3>
+            <button onclick="closeProfileView()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">✕</button>
+        </div>
+        
+        <div class="avatar" id="viewAvatar" style="width: 100px; height: 100px; border-radius: 50%; background: #1877f2; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: white; overflow: hidden;">
+            <span id="viewAvatarLetter">?</span>
+        </div>
+        
+        <div style="font-size: 22px; font-weight: 700; margin-bottom: 4px;" id="viewName">Имя</div>
+        <div style="color: #888; font-size: 14px; margin-bottom: 8px;" id="viewEmail">email@example.com</div>
+        <div style="color: #555; font-size: 15px; margin-bottom: 16px;" id="viewBio">О себе</div>
+        
+        <div id="viewActions" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <!-- Кнопки добавляются динамически -->
+        </div>
+    </div>
+</div>
+
+<!-- ===== МОДАЛКА ВХОДА ===== -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
         <h3>👤 Вход</h3>
@@ -589,6 +733,7 @@
     </div>
 </div>
 
+<!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ===== -->
 <div class="modal" id="editProfileModal">
     <div class="modal-content">
         <h3>✏️ Редактировать профиль</h3>
@@ -639,7 +784,6 @@ function cancelRequest(key) {
 }
 
 function safeFirebaseQuery(key, ref, callback) {
-    // Отменяем старый запрос с таким же ключом
     cancelRequest(key);
     
     let isCancelled = false;
@@ -677,7 +821,6 @@ function cancelAllRequests() {
     activeRequests.clear();
 }
 
-// Очистка при закрытии страницы
 window.addEventListener('beforeunload', function() {
     cancelAllRequests();
     closeContextMenu();
@@ -692,6 +835,9 @@ let USER_UID = null;
 let SAVED_PROFILES = [];
 let currentTab = 'groups';
 let avatarCache = null;
+let CURRENT_ROOM = null;
+let chatUnsub = null;
+
 let menuState = {
     isOpen: false,
     isAnimating: false
@@ -770,7 +916,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Клик по аватарке в профиле
 document.addEventListener('DOMContentLoaded', function() {
     const profileAvatar = document.getElementById('profileAvatar');
     if (profileAvatar) {
@@ -1058,7 +1203,7 @@ function loadData() {
 }
 
 // ================================================================
-// ПРОФИЛЬ (С ОТМЕНОЙ ЗАПРОСОВ)
+// ПРОФИЛЬ
 // ================================================================
 function loadProfile() {
     if (!USER_UID) return;
@@ -1104,7 +1249,7 @@ function loadProfile() {
 }
 
 // ================================================================
-// ЛЮДИ (С ОТМЕНОЙ ЗАПРОСОВ)
+// ЛЮДИ (С КЛИКАБЕЛЬНЫМИ ЮЗЕРАМИ)
 // ================================================================
 function loadPeople() {
     if (!USER_UID) return;
@@ -1133,7 +1278,7 @@ function loadPeople() {
                     `<span>${letter}</span>`;
                 
                 html += `
-                    <div class="user-item">
+                    <div class="user-item" onclick="viewProfile('${k}')">
                         <div class="avatar">${avatarHtml}</div>
                         <div class="info">
                             <div class="name">${name}</div>
@@ -1148,7 +1293,7 @@ function loadPeople() {
 }
 
 // ================================================================
-// ГРУППЫ (С ОТМЕНОЙ ЗАПРОСОВ)
+// ГРУППЫ
 // ================================================================
 function loadRooms() {
     if (!USER_UID) return;
@@ -1213,6 +1358,205 @@ window.joinRoom = function(roomId) {
     });
     alert('✅ Вы вошли в группу!');
     loadRooms();
+};
+
+// ================================================================
+// СОЦИАЛЬНЫЙ СЛОЙ
+// ================================================================
+
+// ----- ПРОСМОТР ПРОФИЛЯ -----
+function viewProfile(uid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (uid === USER_UID) { 
+        alert('Это ваш профиль'); 
+        goToProfile();
+        return; 
+    }
+    
+    const modal = document.getElementById('profileViewModal');
+    const avatar = document.getElementById('viewAvatar');
+    const avatarLetter = document.getElementById('viewAvatarLetter');
+    const nameEl = document.getElementById('viewName');
+    const emailEl = document.getElementById('viewEmail');
+    const bioEl = document.getElementById('viewBio');
+    const actions = document.getElementById('viewActions');
+    
+    modal.classList.add('open');
+    nameEl.textContent = 'Загрузка...';
+    bioEl.textContent = '';
+    emailEl.textContent = '';
+    avatarLetter.textContent = '?';
+    actions.innerHTML = '<span style="color:#888;">Загрузка...</span>';
+    
+    safeFirebaseQuery(
+        'viewProfile_' + uid,
+        db.ref('sites/' + SITE + '/all_users/' + uid),
+        (snap) => {
+            const user = snap.val();
+            if (!user) {
+                nameEl.textContent = 'Пользователь не найден';
+                actions.innerHTML = '<span style="color:#e74c3c;">❌ Пользователь удален</span>';
+                return;
+            }
+            
+            const name = user.name || 'Аноним';
+            const email = user.email || '';
+            const bio = user.bio || 'Привет! 👋';
+            const avatarUrl = user.avatarUrl || null;
+            
+            nameEl.textContent = name;
+            emailEl.textContent = email;
+            bioEl.textContent = bio;
+            
+            if (avatarUrl) {
+                avatar.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+            } else {
+                avatar.innerHTML = `<span id="viewAvatarLetter">${name.charAt(0).toUpperCase()}</span>`;
+            }
+            
+            checkFriendStatus(uid, (isFriend) => {
+                actions.innerHTML = `
+                    <button class="btn" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
+                    <button class="btn ${isFriend ? 'btn-danger' : 'btn'}" onclick="${isFriend ? `removeFriend('${uid}')` : `addFriend('${uid}')`}">
+                        ${isFriend ? '❌ Удалить из друзей' : '➕ Добавить в друзья'}
+                    </button>
+                `;
+            });
+        }
+    );
+}
+
+function closeProfileView() {
+    document.getElementById('profileViewModal').classList.remove('open');
+}
+
+// ----- ДРУЗЬЯ -----
+function checkFriendStatus(targetUid, callback) {
+    if (!USER_UID) { callback(false); return; }
+    
+    safeFirebaseQuery(
+        'checkFriend_' + targetUid,
+        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid),
+        (snap) => {
+            callback(snap.val() === true);
+        }
+    );
+}
+
+function addFriend(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (targetUid === USER_UID) { alert('Нельзя добавить себя'); return; }
+    
+    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
+        if (snap.val() === true) {
+            alert('✅ Уже в друзьях');
+            return;
+        }
+        
+        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).set(true);
+        db.ref('sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID).set(true);
+        
+        alert('✅ Пользователь добавлен в друзья!');
+        closeProfileView();
+        loadPeople();
+        loadProfile();
+    });
+}
+
+function removeFriend(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (!confirm('Удалить из друзей?')) return;
+    
+    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).remove();
+    db.ref('sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID).remove();
+    
+    alert('❌ Пользователь удален из друзей');
+    closeProfileView();
+    loadPeople();
+    loadProfile();
+}
+
+// ----- ЛИЧКА (ЧАТ) -----
+function openPrivateChat(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
+    
+    const chatId = [USER_UID, targetUid].sort().join('_');
+    const path = 'dms/' + SITE + '/' + chatId + '/messages';
+    
+    closeProfileView();
+    
+    CURRENT_ROOM = chatId;
+    document.getElementById('chatView').classList.add('active');
+    
+    // Скрываем все вкладки
+    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+    
+    loadChat(path);
+    closeSidebar();
+    
+    db.ref('sites/' + SITE + '/all_users/' + targetUid).once('value', snap => {
+        const user = snap.val() || {};
+        const name = user.name || 'Собеседник';
+        document.getElementById('chatTitle').textContent = '💬 ' + name;
+    });
+}
+
+// ================================================================
+// ЧАТ (ОБНОВЛЕННЫЙ)
+// ================================================================
+function loadChat(path) {
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">⏳ Загрузка...</div>';
+    chatUnsub = path;
+    db.ref(path).orderByChild('timestamp').on('value', snap => {
+        box.innerHTML = '';
+        if (!snap.exists()) { 
+            box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">Сообщений нет</div>'; 
+            return; 
+        }
+        snap.forEach(s => {
+            const m = s.val();
+            const div = document.createElement('div');
+            div.className = 'msg';
+            div.innerHTML = `<span class="author">${esc(m.nick||'?')}</span><span class="time">${m.time||''}</span><div>${esc(m.text||'')}</div>`;
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+window.sendChat = function() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text || !CURRENT_ROOM) return;
+    
+    const path = 'dms/' + SITE + '/' + CURRENT_ROOM + '/messages';
+    db.ref(path).push({
+        nick: USER,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+    });
+    input.value = '';
+};
+
+document.getElementById('chatInput').addEventListener('keypress', e => { 
+    if (e.key === 'Enter') sendChat(); 
+});
+
+window.closeChat = function() {
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+    showTab(currentTab);
 };
 
 // ================================================================
@@ -1288,16 +1632,21 @@ window.saveProfile = function() {
 };
 
 // ================================================================
+// УТИЛИТЫ
+// ================================================================
+const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
+
+// ================================================================
 // ЗАПУСК
 // ================================================================
 loadSavedProfiles();
 showTab('groups');
 
-console.log('✅ METAIMPERIYA - ОПТИМИЗИРОВАННЫЙ КОД');
-console.log(`📊 Управление запросами: activeRequests Map`);
-console.log('🎯 Отмена запросов при переключении табов');
-console.log('🧹 Очистка beforeunload');
-console.log('📋 Чистые функции без конфликтов');
+console.log('✅ METAIMPERIYA - СОЦИАЛЬНАЯ СЕТЬ ГОТОВА');
+console.log('📊 Управление запросами: activeRequests Map');
+console.log('👥 viewProfile - просмотр профилей');
+console.log('🤝 addFriend/removeFriend - система друзей');
+console.log('💬 openPrivateChat - личные сообщения');
 </script>
 </body>
 </html>
