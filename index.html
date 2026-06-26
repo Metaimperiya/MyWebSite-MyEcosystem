@@ -21,162 +21,43 @@
             min-height: 100vh;
         }
         
-        /* ===== ХЕДЕР ===== */
+        /* ===== ХЕДЕР - ТОЛЬКО АВАТАРКА ===== */
         .header {
-            background: #1877f2;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 16px;
-            margin-bottom: 20px;
+            background: transparent;
+            padding: 8px 0 16px 0;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
-            position: relative;
-        }
-        
-        .header h2 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        
-        .header .right-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 4px;
         }
         
         .header .avatar-small {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: #1877f2;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 18px;
+            color: white;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.3);
             cursor: pointer;
             transition: all 0.2s;
+            border: 2px solid #1877f2;
             flex-shrink: 0;
         }
         
         .header .avatar-small:hover {
             transform: scale(1.05);
-            border-color: white;
+            box-shadow: 0 2px 12px rgba(24, 119, 242, 0.3);
         }
         
         .header .avatar-small img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-        
-        .header .settings-btn {
-            background: rgba(255,255,255,0.15);
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            transition: all 0.2s;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-        
-        .header .settings-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-        
-        .header .settings-btn:active {
-            transform: scale(0.9);
-        }
-        
-        /* ===== ВЫПАДАЮЩЕЕ МЕНЮ ===== */
-        .header-menu-dropdown {
-            position: absolute;
-            top: 58px;
-            right: 0;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            padding: 8px 0;
-            min-width: 200px;
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-            transition: all 0.2s ease;
-            z-index: 100;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .header-menu-dropdown.open {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-        
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-            cursor: pointer;
-            transition: background 0.15s;
-            font-family: inherit;
-        }
-        
-        .menu-item:hover {
-            background: #f5f7fa;
-        }
-        
-        .menu-item .icon {
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        
-        .menu-item.danger {
-            color: #e74c3c;
-        }
-        
-        .menu-item.danger:hover {
-            background: #fef0ef;
-        }
-        
-        .menu-divider {
-            height: 1px;
-            background: #eee;
-            margin: 4px 16px;
-        }
-        
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 99;
-            display: none;
-        }
-        
-        .menu-overlay.active {
-            display: block;
         }
         
         /* ===== ВКЛАДКИ ===== */
@@ -215,33 +96,34 @@
         .profile-card {
             background: white;
             border-radius: 20px;
-            padding: 30px 20px 25px;
+            padding: 40px 20px 30px;
             text-align: center;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             margin-bottom: 20px;
         }
         
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             background: #1877f2;
             margin: 0 auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 700;
             color: white;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
+            border: 3px solid #1877f2;
         }
         
         .profile-avatar:hover {
             transform: scale(1.02);
-            box-shadow: 0 4px 16px rgba(24, 119, 242, 0.3);
+            box-shadow: 0 4px 20px rgba(24, 119, 242, 0.3);
         }
         
         .profile-avatar img {
@@ -255,10 +137,10 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             color: white;
-            font-size: 11px;
-            padding: 4px;
+            font-size: 12px;
+            padding: 6px;
             opacity: 0;
             transition: opacity 0.2s;
         }
@@ -268,7 +150,7 @@
         }
         
         .profile-name {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
             color: #1a1a1a;
             margin-bottom: 4px;
@@ -286,6 +168,84 @@
             line-height: 1.5;
             max-width: 80%;
             margin: 0 auto;
+        }
+        
+        /* ===== КОНТЕКСТНОЕ МЕНЮ ===== */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            padding: 8px 0;
+            min-width: 200px;
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 1000;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .context-menu.open {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        
+        .context-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+        
+        .context-menu .menu-item:hover {
+            background: #f5f7fa;
+        }
+        
+        .context-menu .menu-item .icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .context-menu .menu-item.danger {
+            color: #e74c3c;
+        }
+        
+        .context-menu .menu-item.danger:hover {
+            background: #fef0ef;
+        }
+        
+        .context-menu .menu-divider {
+            height: 1px;
+            background: #eee;
+            margin: 4px 16px;
+        }
+        
+        .context-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            display: none;
+        }
+        
+        .context-overlay.active {
+            display: block;
         }
         
         /* ===== КАРТОЧКИ ===== */
@@ -397,7 +357,7 @@
             right: 0;
             bottom: 0;
             background: rgba(0,0,0,0.5);
-            z-index: 999;
+            z-index: 9999;
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -550,50 +510,26 @@
         
         /* ===== АДАПТИВ ===== */
         @media (max-width: 480px) {
-            .profile-card { padding: 24px 16px 20px; }
-            .profile-avatar { width: 80px; height: 80px; font-size: 32px; }
-            .profile-name { font-size: 19px; }
+            .profile-card { padding: 30px 16px 20px; }
+            .profile-avatar { width: 100px; height: 100px; font-size: 40px; }
+            .profile-name { font-size: 20px; }
             .room-grid { grid-template-columns: 1fr; }
-            .header-menu-dropdown { min-width: 170px; right: 0; top: 52px; }
-            .header h2 { font-size: 17px; }
         }
     </style>
 </head>
 <body>
 
-<!-- ===== ХЕДЕР ===== -->
+<!-- ===== ХЕДЕР - ТОЛЬКО АВАТАРКА ===== -->
 <div class="header">
-    <h2>🏠 METAIMPERIYA</h2>
-    <div class="right-group">
-        <div class="avatar-small" id="headerAvatar" onclick="toggleHeaderMenu()">
-            <span>?</span>
-        </div>
-        <button class="settings-btn" id="settingsBtn" onclick="toggleHeaderMenu()">
-            ⚙️
-        </button>
-        
-        <div class="header-menu-dropdown" id="headerMenu">
-            <button class="menu-item" onclick="editProfile();closeHeaderMenu();">
-                <span class="icon">✏️</span> Редактировать
-            </button>
-            <button class="menu-item" onclick="uploadAvatar();closeHeaderMenu();">
-                <span class="icon">📷</span> Сменить аватар
-            </button>
-            <div class="menu-divider"></div>
-            <button class="menu-item danger" onclick="logout();closeHeaderMenu();">
-                <span class="icon">🚪</span> Выйти
-            </button>
-        </div>
-        
-        <div class="menu-overlay" id="headerMenuOverlay" onclick="closeHeaderMenu()"></div>
+    <div class="avatar-small" id="headerAvatar" onclick="goToProfile()">
+        <span>?</span>
     </div>
 </div>
 
-<!-- ===== ВКЛАДКИ ===== -->
+<!-- ===== ВКЛАДКИ (ТОЛЬКО ГРУППЫ И ЛЮДИ) ===== -->
 <div class="tab-bar">
     <button class="tab active" onclick="showTab('groups')">👥 Группы</button>
     <button class="tab" onclick="showTab('people')">👤 Люди</button>
-    <button class="tab" onclick="showTab('profile')">👤 Профиль</button>
 </div>
 
 <!-- ===== ГРУППЫ ===== -->
@@ -615,9 +551,9 @@
 <!-- ===== ПРОФИЛЬ ===== -->
 <div id="profileTab" class="hidden">
     <div class="profile-card">
-        <div class="profile-avatar" id="profileAvatar" onclick="uploadAvatar()">
+        <div class="profile-avatar" id="profileAvatar" onclick="openProfileMenu(event)">
             <span id="avatarLetter">?</span>
-            <span class="avatar-hint">📷 Сменить</span>
+            <span class="avatar-hint">👆 Нажми для меню</span>
         </div>
         
         <div class="profile-name" id="profileName">Имя</div>
@@ -625,6 +561,22 @@
         <div class="profile-bio" id="profileBio">Привет! 👋</div>
     </div>
 </div>
+
+<!-- ===== КОНТЕКСТНОЕ МЕНЮ (ПОЯВЛЯЕТСЯ ПРИ КЛИКЕ НА БОЛЬШУЮ АВАТАРКУ) ===== -->
+<div class="context-menu" id="contextMenu">
+    <button class="menu-item" onclick="editProfile();closeContextMenu();">
+        <span class="icon">✏️</span> Редактировать профиль
+    </button>
+    <button class="menu-item" onclick="uploadAvatar();closeContextMenu();">
+        <span class="icon">📷</span> Сменить аватар
+    </button>
+    <div class="menu-divider"></div>
+    <button class="menu-item danger" onclick="logout();closeContextMenu();">
+        <span class="icon">🚪</span> Выйти
+    </button>
+</div>
+
+<div class="context-overlay" id="contextOverlay" onclick="closeContextMenu()"></div>
 
 <!-- ===== МОДАЛКА ВХОДА ===== -->
 <div class="modal" id="loginModal">
@@ -686,35 +638,39 @@ const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
 let USER = null;
 let USER_UID = null;
 let SAVED_PROFILES = [];
+let currentTab = 'groups';
 
 // ================================================================
-// МЕНЮ В ХЕДЕРЕ
+// КОНТЕКСТНОЕ МЕНЮ (ПРИ КЛИКЕ НА БОЛЬШУЮ АВАТАРКУ)
 // ================================================================
-function toggleHeaderMenu() {
-    const menu = document.getElementById('headerMenu');
-    const overlay = document.getElementById('headerMenuOverlay');
+function openProfileMenu(event) {
+    event.stopPropagation();
+    const menu = document.getElementById('contextMenu');
+    const overlay = document.getElementById('contextOverlay');
     
-    if (menu.classList.contains('open')) {
-        menu.classList.remove('open');
-        overlay.classList.remove('active');
-    } else {
-        menu.classList.add('open');
-        overlay.classList.add('active');
-    }
+    // Позиционируем меню под аватаркой
+    const avatar = document.getElementById('profileAvatar');
+    const rect = avatar.getBoundingClientRect();
+    
+    menu.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+    menu.style.top = (rect.bottom + 10) + 'px';
+    
+    menu.classList.add('open');
+    overlay.classList.add('active');
 }
 
-function closeHeaderMenu() {
-    document.getElementById('headerMenu').classList.remove('open');
-    document.getElementById('headerMenuOverlay').classList.remove('active');
+function closeContextMenu() {
+    document.getElementById('contextMenu').classList.remove('open');
+    document.getElementById('contextOverlay').classList.remove('active');
 }
 
+// Закрываем при клике вне меню
 document.addEventListener('click', function(e) {
-    const menu = document.getElementById('headerMenu');
-    const btn = document.getElementById('settingsBtn');
-    const avatar = document.getElementById('headerAvatar');
+    const menu = document.getElementById('contextMenu');
+    const avatar = document.getElementById('profileAvatar');
     if (menu && menu.classList.contains('open')) {
-        if (!menu.contains(e.target) && !btn.contains(e.target) && !avatar.contains(e.target)) {
-            closeHeaderMenu();
+        if (!menu.contains(e.target) && !avatar.contains(e.target)) {
+            closeContextMenu();
         }
     }
 });
@@ -815,6 +771,7 @@ window.loginWithSavedProfile = function(uid) {
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadData();
+        showTab(currentTab);
     }).catch(e => alert('Ошибка входа: ' + e.message));
 };
 
@@ -845,6 +802,7 @@ auth.onAuthStateChanged(user => {
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadData();
+        showTab(currentTab);
     } else {
         USER = null;
         USER_UID = null;
@@ -887,12 +845,13 @@ window.loginName = function() {
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadData();
+        showTab(currentTab);
     }).catch(e => alert('Ошибка: ' + e.message));
 };
 
 window.logout = function() {
     if (!confirm('Выйти из профиля?')) return;
-    closeHeaderMenu();
+    closeContextMenu();
     auth.signOut().then(() => {
         localStorage.removeItem('dc_u_' + SITE);
         USER = null;
@@ -900,11 +859,12 @@ window.logout = function() {
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
+        showTab('groups');
     }).catch(e => alert('Ошибка выхода: ' + e.message));
 };
 
 // ================================================================
-// UI (ОБНОВЛЕНО - ТОЛЬКО АВАТАРКА)
+// UI (ОБНОВЛЕНО)
 // ================================================================
 function updateUI() {
     const headerAvatar = document.getElementById('headerAvatar');
@@ -922,6 +882,35 @@ function updateUI() {
         headerAvatar.innerHTML = '<span>?</span>';
     }
 }
+
+// ================================================================
+// НАВИГАЦИЯ
+// ================================================================
+window.goToProfile = function() {
+    currentTab = 'profile';
+    showTab('profile');
+};
+
+window.showTab = function(tab) {
+    currentTab = tab;
+    
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-bar .tab').forEach(t => {
+        const text = t.textContent.trim();
+        if ((tab === 'groups' && text.includes('Группы')) ||
+            (tab === 'people' && text.includes('Люди'))) {
+            t.classList.add('active');
+        }
+    });
+    
+    document.getElementById('groupsTab').classList.toggle('hidden', tab !== 'groups');
+    document.getElementById('peopleTab').classList.toggle('hidden', tab !== 'people');
+    document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
+    
+    if (tab === 'groups') loadRooms();
+    if (tab === 'people') loadPeople();
+    if (tab === 'profile') loadProfile();
+};
 
 // ================================================================
 // ЗАГРУЗКА ДАННЫХ
@@ -952,10 +941,10 @@ function loadProfile() {
         document.getElementById('profileBio').textContent = bio;
         
         if (u.avatarUrl) {
-            avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">📷 Сменить</span>`;
+            avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">👆 Нажми для меню</span>`;
         } else {
             letter.textContent = name.charAt(0).toUpperCase();
-            avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span><span class="avatar-hint">📷 Сменить</span>`;
+            avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span><span class="avatar-hint">👆 Нажми для меню</span>`;
         }
     });
 }
@@ -1062,7 +1051,7 @@ window.joinRoom = function(roomId) {
 // ================================================================
 window.uploadAvatar = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
-    closeHeaderMenu();
+    closeContextMenu();
     
     const input = document.createElement('input');
     input.type = 'file';
@@ -1095,7 +1084,7 @@ window.uploadAvatar = function() {
 // РЕДАКТИРОВАНИЕ
 // ================================================================
 window.editProfile = function() {
-    closeHeaderMenu();
+    closeContextMenu();
     document.getElementById('editProfileModal').classList.add('open');
     document.getElementById('editName').value = USER || '';
     document.getElementById('editBio').value = '';
@@ -1130,38 +1119,16 @@ window.saveProfile = function() {
 };
 
 // ================================================================
-// ВКЛАДКИ
-// ================================================================
-window.showTab = function(tab) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-bar .tab').forEach(t => {
-        const text = t.textContent.trim();
-        if ((tab === 'groups' && text.includes('Группы')) ||
-            (tab === 'people' && text.includes('Люди')) ||
-            (tab === 'profile' && text.includes('Профиль'))) {
-            t.classList.add('active');
-        }
-    });
-    
-    document.getElementById('groupsTab').classList.toggle('hidden', tab !== 'groups');
-    document.getElementById('peopleTab').classList.toggle('hidden', tab !== 'people');
-    document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
-    
-    if (tab === 'groups') loadRooms();
-    if (tab === 'people') loadPeople();
-    if (tab === 'profile') loadProfile();
-};
-
-// ================================================================
 // ЗАПУСК
 // ================================================================
 loadSavedProfiles();
 showTab('groups');
 
-console.log('✅ METAIMPERIYA - ВСЕ РАБОТАЕТ!');
-console.log('📱 В хедере аватарка и шестеренка');
-console.log('🎯 Меню открывается по клику');
-console.log('📋 Вкладки: Группы → Люди → Профиль');
+console.log('✅ METAIMPERIYA - МАКСИМАЛЬНО УПРОЩЕН!');
+console.log('📱 В хедере только аватарка');
+console.log('🎯 Клик по аватарке → переход в профиль');
+console.log('👆 Клик по большой аватарке → меню');
+console.log('📋 Вкладки: Группы → Люди');
 </script>
 </body>
 </html>
