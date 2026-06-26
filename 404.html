@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAIMPERIYA</title>
+    <script>
+        // Получаем путь из URL
+        const path = window.location.pathname;
+        const username = path.substring(1);
+        
+        if (username && username !== '') {
+            // Сохраняем username в localStorage
+            localStorage.setItem('metaimperiya_username', username);
+            // Перенаправляем на главную
+            window.location.href = '/';
+        } else {
+            window.location.href = '/';
+        }
+    </script>
+</head>
+<body>
+    <p>⏳ Перенаправление...</p>
+</body>
+</html>
