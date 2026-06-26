@@ -133,7 +133,6 @@
             font-weight: 600;
         }
         
-        /* ===== USER LIST ===== */
         .user-item {
             display: flex;
             align-items: center;
@@ -259,6 +258,7 @@
             text-align: center;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
             margin-bottom: 12px;
+            position: relative;
         }
         
         .profile-page .back-btn {
@@ -275,11 +275,171 @@
             border-radius: 8px;
             transition: all 0.2s;
             font-family: inherit;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         
         .profile-page .back-btn:hover { background: #f0f7ff; }
         
+        /* ===== MORE VERT MENU ===== */
+        .profile-more-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #65676b;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            line-height: 1;
+        }
+        
+        .profile-more-btn:hover {
+            background: #f0f2f5;
+            color: #1877f2;
+        }
+        
+        .profile-more-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .profile-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 220px;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 100;
+            border: 1px solid #e4e6eb;
+        }
+        
+        .profile-dropdown.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        
+        .profile-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: #050505;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+        
+        .profile-dropdown .dropdown-item:hover {
+            background: #f0f2f5;
+        }
+        
+        .profile-dropdown .dropdown-item .icon {
+            font-size: 16px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .profile-dropdown .dropdown-item.danger {
+            color: #e74c3c;
+        }
+        
+        .profile-dropdown .dropdown-item.danger:hover {
+            background: #fef0ef;
+        }
+        
+        .profile-dropdown .dropdown-divider {
+            height: 1px;
+            background: #e4e6eb;
+            margin: 4px 16px;
+        }
+        
+        .profile-dropdown .toggle-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #050505;
+            cursor: default;
+        }
+        
+        .profile-dropdown .toggle-wrap .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .profile-dropdown .toggle-wrap .toggle-label .icon {
+            font-size: 16px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: #e4e6eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .toggle-switch.active {
+            background: #1877f2;
+        }
+        
+        .toggle-switch .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            left: 20px;
+        }
+        
+        .profile-dropdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 99;
+            display: none;
+        }
+        
+        .profile-dropdown-overlay.active {
+            display: block;
+        }
+        
+        /* ===== PROFILE AVATAR ===== */
         .profile-page .profile-avatar {
             width: 100px;
             height: 100px;
@@ -294,9 +454,34 @@
             color: #65676b;
             overflow: hidden;
             border: 3px solid #e4e6eb;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .profile-page .profile-avatar:hover {
+            border-color: #1877f2;
+            transform: scale(1.02);
         }
         
         .profile-page .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .profile-page .profile-avatar .avatar-hint {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 10px;
+            padding: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .profile-page .profile-avatar:hover .avatar-hint {
+            opacity: 1;
+        }
         
         .profile-page .profile-name {
             font-size: 22px;
@@ -421,6 +606,13 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        
+        .stat-private {
+            color: #65676b;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px 0;
         }
         
         .chat-window {
@@ -791,6 +983,7 @@
             .profile-page .profile-avatar { width: 80px; height: 80px; font-size: 32px; }
             .profile-page .profile-name { font-size: 19px; }
             .chat-window { width: calc(100% - 20px); right: 10px; bottom: 10px; height: 400px; }
+            .profile-dropdown { right: 0; min-width: 180px; }
         }
     </style>
 </head>
@@ -853,8 +1046,7 @@
 <!-- ===== CONTEXT MENU ===== -->
 <div class="context-menu" id="contextMenu">
     <button class="menu-item" onclick="editProfile();closeContextMenu();">
-        <span class="icon">✏️</span> Редактировать
-    </button>
+        <span class="icon">✏️</span> Редактировать    </button>
     <button class="menu-item" onclick="uploadAvatar();closeContextMenu();">
         <span class="icon">📷</span> Сменить аватар
     </button>
@@ -983,6 +1175,7 @@ function cancelAllRequests() {
 window.addEventListener('beforeunload', function() {
     cancelAllRequests();
     closeContextMenu();
+    closeProfileDropdown();
     if (window.friendListeners) {
         Object.values(window.friendListeners).forEach(unsubscribe => {
             if (typeof unsubscribe === 'function') unsubscribe();
@@ -1006,62 +1199,44 @@ let notifUnsub = null;
 let currentFriendTab = 'friends';
 let viewingProfileUid = null;
 let activeStatToggle = null;
+let profilePrivacy = { hideFriends: false };
 window.friendListeners = {};
 
 let menuState = { isOpen: false, isAnimating: false };
+let dropdownState = { isOpen: false };
 
 // ================================================================
-// КОНТЕКСТНОЕ МЕНЮ
+// МЕНЮ "ТРИ ТОЧКИ" В ПРОФИЛЕ
 // ================================================================
-function openProfileMenu(event) {
-    if (menuState.isAnimating) return;
-    event.stopPropagation();
-    event.preventDefault();
+
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    const overlay = document.getElementById('profileDropdownOverlay');
+    if (!dropdown) return;
     
-    const menu = document.getElementById('contextMenu');
-    const overlay = document.getElementById('contextOverlay');
-    const avatar = document.getElementById('profileAvatar');
-    if (!menu || !avatar) return;
-    if (menu.classList.contains('open')) {
-        closeContextMenu();
-        return;
+    if (dropdown.classList.contains('open')) {
+        closeProfileDropdown();
+    } else {
+        dropdown.classList.add('open');
+        overlay.classList.add('active');
+        dropdownState.isOpen = true;
     }
-    const rect = avatar.getBoundingClientRect();
-    const menuWidth = 200;
-    const leftPos = Math.max(10, rect.left + rect.width / 2 - menuWidth / 2);
-    const topPos = Math.min(rect.bottom + 10, window.innerHeight - 250);
-    menu.style.left = leftPos + 'px';
-    menu.style.top = topPos + 'px';
-    menuState.isAnimating = true;
-    menu.classList.add('open');
-    overlay.classList.add('active');
-    setTimeout(() => {
-        menuState.isAnimating = false;
-        menuState.isOpen = true;
-    }, 200);
 }
 
-function closeContextMenu() {
-    if (menuState.isAnimating) return;
-    const menu = document.getElementById('contextMenu');
-    const overlay = document.getElementById('contextOverlay');
-    menuState.isAnimating = true;
-    if (menu) menu.classList.remove('open');
+function closeProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    const overlay = document.getElementById('profileDropdownOverlay');
+    if (dropdown) dropdown.classList.remove('open');
     if (overlay) overlay.classList.remove('active');
-    setTimeout(() => {
-        menuState.isAnimating = false;
-        menuState.isOpen = false;
-    }, 200);
+    dropdownState.isOpen = false;
 }
 
 document.addEventListener('click', function(e) {
-    const menu = document.getElementById('contextMenu');
-    const avatar = document.getElementById('profileAvatar');
-    if (!menu || !menu.classList.contains('open')) return;
-    const isClickInsideMenu = menu.contains(e.target);
-    const isClickOnAvatar = avatar && (e.target === avatar || avatar.contains(e.target));
-    if (!isClickInsideMenu && !isClickOnAvatar) {
-        closeContextMenu();
+    const dropdown = document.getElementById('profileDropdown');
+    const btn = document.getElementById('profileMoreBtn');
+    if (!dropdown || !dropdown.classList.contains('open')) return;
+    if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+        closeProfileDropdown();
     }
 });
 
@@ -1234,6 +1409,7 @@ window.loginName = function() {
 window.logout = function() {
     if (!confirm('Выйти из профиля?')) return;
     closeContextMenu();
+    closeProfileDropdown();
     cancelAllRequests();
     if (notifUnsub) { notifUnsub(); notifUnsub = null; }
     if (window.friendListeners) {
@@ -1300,6 +1476,7 @@ function refreshAvatarCache() {
 function navigateToFeed() {
     viewingProfileUid = null;
     activeStatToggle = null;
+    closeProfileDropdown();
     document.getElementById('groupsPage').classList.add('active');
     document.getElementById('groupsPage').classList.remove('hidden');
     document.getElementById('peoplePage').classList.remove('active');
@@ -1316,9 +1493,7 @@ function navigateToFeed() {
 
 function showTab(tab) {
     if (viewingProfileUid) {
-        // Если мы в профиле - возвращаемся на ленту
         navigateToFeed();
-        // и потом переключаем на нужную вкладку
         setTimeout(() => {
             showTabInternal(tab);
         }, 100);
@@ -1346,6 +1521,7 @@ function showTabInternal(tab) {
     document.getElementById('profilePage').classList.add('hidden');
     viewingProfileUid = null;
     activeStatToggle = null;
+    closeProfileDropdown();
     
     if (tab === 'groups') loadRooms();
     if (tab === 'people') loadPeople();
@@ -1361,6 +1537,7 @@ function navigateToProfile(uid) {
     
     viewingProfileUid = uid;
     activeStatToggle = null;
+    closeProfileDropdown();
     
     document.querySelectorAll('.page').forEach(p => {
         p.classList.remove('active');
@@ -1373,6 +1550,10 @@ function navigateToProfile(uid) {
     
     renderProfile(uid);
 }
+
+// ================================================================
+// РЕНДЕР ПРОФИЛЯ
+// ================================================================
 
 function renderProfile(uid) {
     const container = document.getElementById('profileContent');
@@ -1393,17 +1574,44 @@ function renderProfile(uid) {
         const bio = user.bio || 'Привет! 👋';
         const avatarUrl = user.avatarUrl || null;
         
+        // Загружаем настройки приватности
+        if (isOwnProfile) {
+            db.ref('sites/' + SITE + '/users/' + uid + '/settings/hideFriends').once('value', snap => {
+                profilePrivacy.hideFriends = snap.val() === true;
+            });
+        } else {
+            db.ref('sites/' + SITE + '/users/' + uid + '/settings/hideFriends').once('value', snap => {
+                profilePrivacy.hideFriends = snap.val() === true;
+            });
+        }
+        
         const avatarHtml = avatarUrl ? 
             `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">` : 
             `<span>${name.charAt(0).toUpperCase()}</span>`;
         
-        let actionsHtml = '';
-        
+        // Формируем меню "три точки"
+        let dropdownItems = '';
         if (isOwnProfile) {
-            actionsHtml = `
-                <button class="btn-action" onclick="editProfile()">✏️ Редактировать</button>
-                <button class="btn-action" onclick="uploadAvatar()">📷 Аватар</button>
-                <button class="btn-action" style="background:#e74c3c;color:white;" onclick="logout()">🚪 Выйти</button>
+            dropdownItems = `
+                <button class="dropdown-item" onclick="editProfile();closeProfileDropdown();">
+                    <span class="icon">✏️</span> Редактировать
+                </button>
+                <button class="dropdown-item" onclick="uploadAvatar();closeProfileDropdown();">
+                    <span class="icon">📷</span> Сменить аватар
+                </button>
+                <div class="dropdown-divider"></div>
+                <div class="toggle-wrap">
+                    <span class="toggle-label">
+                        <span class="icon">🔒</span> Скрыть список друзей
+                    </span>
+                    <div class="toggle-switch ${profilePrivacy.hideFriends ? 'active' : ''}" id="privacyToggle" onclick="togglePrivacy(event)">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item danger" onclick="logout();closeProfileDropdown();">
+                    <span class="icon">🚪</span> Выйти
+                </button>
             `;
         } else {
             // Проверяем статус дружбы для чужого профиля
@@ -1411,55 +1619,47 @@ function renderProfile(uid) {
                 const status = snap.val();
                 let friendBtn = '';
                 if (status === 'friend') {
-                    friendBtn = `<button class="btn-action" onclick="removeFriend('${uid}')" style="background:#e74c3c;color:white;">❌ Удалить из друзей</button>`;
+                    friendBtn = `<button class="dropdown-item danger" onclick="removeFriend('${uid}');closeProfileDropdown();">
+                        <span class="icon">❌</span> Удалить из друзей
+                    </button>`;
                 } else if (status === 'pending') {
-                    db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap2 => {
-                        const fromThem = snap2.val() === 'pending';
-                        if (fromThem) {
-                            document.querySelector('#profileContent .profile-actions').innerHTML = `
-                                <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
-                                <button class="btn-action" onclick="acceptFriendRequest('${uid}')" style="background:#27ae60;color:white;">✅ Принять</button>
-                                <button class="btn-action" onclick="declineFriendRequest('${uid}')" style="background:#e74c3c;color:white;">❌ Отклонить</button>
-                            `;
-                        } else {
-                            document.querySelector('#profileContent .profile-actions').innerHTML = `
-                                <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
-                                <button class="btn-action" style="cursor:default;opacity:0.7;">⏳ Запрос отправлен</button>
-                            `;
-                        }
-                    });
-                    return;
+                    friendBtn = `<button class="dropdown-item" style="cursor:default;opacity:0.7;">
+                        <span class="icon">⏳</span> Запрос отправлен
+                    </button>`;
                 } else {
-                    friendBtn = `<button class="btn-action" onclick="sendFriendRequest('${uid}')">➕ Добавить в друзья</button>`;
+                    friendBtn = `<button class="dropdown-item" onclick="sendFriendRequest('${uid}');closeProfileDropdown();">
+                        <span class="icon">➕</span> Добавить в друзья
+                    </button>`;
                 }
-                document.querySelector('#profileContent .profile-actions').innerHTML = `
-                    <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
-                    ${friendBtn}
-                `;
+                
+                const dropdown = document.getElementById('profileDropdown');
+                if (dropdown) {
+                    const items = dropdown.querySelector('.dropdown-items');
+                    if (items) {
+                        items.innerHTML = `
+                            <button class="dropdown-item" onclick="openPrivateChat('${uid}');closeProfileDropdown();">
+                                <span class="icon">✉️</span> Написать сообщение
+                            </button>
+                            ${friendBtn}
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item danger" onclick="alert('⚠️ Жалоба отправлена');closeProfileDropdown();">
+                                <span class="icon">🚫</span> Пожаловаться
+                            </button>
+                        `;
+                    }
+                }
             });
-            // Возвращаемся, так как actions обновятся асинхронно
-            if (document.querySelector('#profileContent .profile-actions')) {
-                // уже обновится в колбэке выше
-            }
         }
         
-        container.innerHTML = `
-            <div class="profile-page">
-                <button class="back-btn" onclick="navigateToFeed()">← Назад</button>
-                
-                <div class="profile-avatar" id="profileAvatar" onclick="${isOwnProfile ? 'openProfileMenu(event)' : ''}" style="cursor:${isOwnProfile ? 'pointer' : 'default'}">
-                    ${avatarHtml}
-                </div>
-                
-                <div class="profile-name">${name}</div>
-                <div class="profile-email">${email}</div>
-                <div class="profile-bio">${bio}</div>
-                
-                <div class="profile-actions">
-                    ${isOwnProfile ? actionsHtml : ''}
-                </div>
-                
-                ${isOwnProfile ? `
+        // Строим HTML профиля
+        let actionsHtml = '';
+        let statHtml = '';
+        
+        if (isOwnProfile) {
+            actionsHtml = `
+                <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
+            `;
+            statHtml = `
                 <div class="stat-toggles">
                     <button class="stat-toggle active" onclick="toggleStatList('friends', this)">
                         🤝 Друзья <span class="count" id="friendsCount">0</span>
@@ -1471,25 +1671,118 @@ function renderProfile(uid) {
                         👀 Подписчики <span class="count" id="followersCount">0</span>
                     </button>
                 </div>
-                
                 <div class="stat-container open" id="statContainer">
                     <div id="statListContent"></div>
                 </div>
-                ` : ''}
+            `;
+        } else {
+            // Для чужого профиля - проверяем статус дружбы
+            db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
+                const status = snap.val();
+                let mainBtn = '';
+                if (status === 'friend') {
+                    mainBtn = `<button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Написать сообщение</button>`;
+                } else if (status === 'pending') {
+                    mainBtn = `<button class="btn-action" style="cursor:default;opacity:0.7;">⏳ Запрос отправлен</button>`;
+                } else {
+                    mainBtn = `<button class="btn-action" onclick="sendFriendRequest('${uid}')">➕ Добавить в друзья</button>`;
+                }
+                document.querySelector('#profileContent .profile-actions').innerHTML = mainBtn;
+            });
+            
+            // Показываем только кнопку "Сообщение", остальное в меню
+            actionsHtml = `
+                <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
+            `;
+            
+            // Проверяем приватность для отображения статистики
+            if (!profilePrivacy.hideFriends) {
+                statHtml = `
+                    <div class="stat-toggles">
+                        <button class="stat-toggle active" onclick="toggleStatList('friends', this)">
+                            🤝 Друзья <span class="count" id="friendsCount">0</span>
+                        </button>
+                        <button class="stat-toggle" onclick="toggleStatList('following', this)">
+                            📌 Подписки <span class="count" id="subscriptionsCount">0</span>
+                        </button>
+                        <button class="stat-toggle" onclick="toggleStatList('followers', this)">
+                            👀 Подписчики <span class="count" id="followersCount">0</span>
+                        </button>
+                    </div>
+                    <div class="stat-container open" id="statContainer">
+                        <div id="statListContent"></div>
+                    </div>
+                `;
+            } else {
+                statHtml = `
+                    <div class="stat-private">🔒 Списки скрыты владельцем профиля</div>
+                `;
+            }
+        }
+        
+        container.innerHTML = `
+            <div class="profile-page">
+                <button class="back-btn" onclick="navigateToFeed()">← Назад</button>
+                
+                <button class="profile-more-btn" id="profileMoreBtn" onclick="toggleProfileDropdown()">⋮</button>
+                
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-items">
+                        ${isOwnProfile ? dropdownItems : ''}
+                    </div>
+                </div>
+                <div class="profile-dropdown-overlay" id="profileDropdownOverlay" onclick="closeProfileDropdown()"></div>
+                
+                <div class="profile-avatar" id="profileAvatar" onclick="${isOwnProfile ? 'openProfileMenu(event)' : ''}" style="cursor:${isOwnProfile ? 'pointer' : 'default'}">
+                    ${avatarHtml}
+                    ${isOwnProfile ? '<span class="avatar-hint">📷 Сменить</span>' : ''}
+                </div>
+                
+                <div class="profile-name">${name}</div>
+                <div class="profile-email">${email}</div>
+                <div class="profile-bio">${bio}</div>
+                
+                <div class="profile-actions">
+                    ${isOwnProfile ? actionsHtml : ''}
+                </div>
+                
+                ${statHtml}
             </div>
         `;
-        
-        // Если это не свой профиль - обновляем действия
-        if (!isOwnProfile) {
-            // Действия обновятся в колбэке выше
-        }
         
         // Если свой профиль - загружаем списки
         if (isOwnProfile) {
             updateCounters();
             loadStatList('friends');
+        } else {
+            // Для чужого профиля обновляем действия в колбэке выше
+            if (!profilePrivacy.hideFriends) {
+                updateCountersForUid(uid);
+                loadStatListForUid('friends', uid);
+            }
         }
     });
+}
+
+// ================================================================
+// ПРИВАТНОСТЬ - Toggle
+// ================================================================
+
+function togglePrivacy(event) {
+    event.stopPropagation();
+    if (!USER_UID) return;
+    
+    const toggle = document.getElementById('privacyToggle');
+    if (!toggle) return;
+    
+    const newState = !toggle.classList.contains('active');
+    toggle.classList.toggle('active', newState);
+    profilePrivacy.hideFriends = newState;
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/settings/hideFriends').set(newState);
+    
+    // Перерисовываем профиль
+    if (viewingProfileUid) renderProfile(viewingProfileUid);
 }
 
 // ================================================================
@@ -1498,7 +1791,6 @@ function renderProfile(uid) {
 
 function toggleStatList(type, btn) {
     if (!btn) {
-        // Находим кнопку
         const btns = document.querySelectorAll('.stat-toggle');
         btns.forEach(b => {
             const text = b.textContent.trim();
@@ -1513,7 +1805,6 @@ function toggleStatList(type, btn) {
     const container = document.getElementById('statContainer');
     if (!container) return;
     
-    // Если кликнули по уже активной - закрываем
     if (activeStatToggle === type && container.classList.contains('open')) {
         container.classList.remove('open');
         activeStatToggle = null;
@@ -1521,7 +1812,6 @@ function toggleStatList(type, btn) {
         return;
     }
     
-    // Открываем новый список
     document.querySelectorAll('.stat-toggle').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     container.classList.add('open');
@@ -1594,6 +1884,119 @@ function renderStatList(container, uids, title, type) {
     
     container.innerHTML = html;
 }
+
+function updateCountersForUid(uid) {
+    if (!uid) return;
+    db.ref('sites/' + SITE + '/friends/' + uid).once('value', snap => {
+        const data = snap.val() || {};
+        const friends = Object.keys(data).filter(k => data[k] === 'friend');
+        const el = document.getElementById('friendsCount');
+        if (el) el.textContent = friends.length;
+    });
+    db.ref('sites/' + SITE + '/followers/' + uid).once('value', snap => {
+        const data = snap.val() || {};
+        const el = document.getElementById('followersCount');
+        if (el) el.textContent = Object.keys(data).length;
+    });
+    db.ref('sites/' + SITE + '/followers').once('value', snap => {
+        const allFollowers = snap.val() || {};
+        let count = 0;
+        for (const [targetUid, followers] of Object.entries(allFollowers)) {
+            if (followers && followers[uid] === true) {
+                count++;
+            }
+        }
+        const el = document.getElementById('subscriptionsCount');
+        if (el) el.textContent = count;
+    });
+}
+
+function loadStatListForUid(type, uid) {
+    const container = document.getElementById('statListContent');
+    if (!container) return;
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">⏳ Загрузка...</div>';
+    
+    if (type === 'friends') {
+        db.ref('sites/' + SITE + '/friends/' + uid).once('value', snap => {
+            const data = snap.val() || {};
+            const friends = Object.keys(data).filter(k => data[k] === 'friend');
+            renderStatList(container, friends, 'Друзья', 'friends');
+        });
+    } else if (type === 'followers') {
+        db.ref('sites/' + SITE + '/followers/' + uid).once('value', snap => {
+            const data = snap.val() || {};
+            const followers = Object.keys(data);
+            renderStatList(container, followers, 'Подписчики', 'followers');
+        });
+    } else if (type === 'following') {
+        db.ref('sites/' + SITE + '/followers').once('value', snap => {
+            const allFollowers = snap.val() || {};
+            const following = [];
+            for (const [targetUid, followers] of Object.entries(allFollowers)) {
+                if (followers && followers[uid] === true) {
+                    following.push(targetUid);
+                }
+            }
+            renderStatList(container, following, 'Подписки', 'following');
+        });
+    }
+}
+
+// ================================================================
+// КОНТЕКСТНОЕ МЕНЮ (для аватарки)
+// ================================================================
+
+function openProfileMenu(event) {
+    if (menuState.isAnimating) return;
+    event.stopPropagation();
+    event.preventDefault();
+    
+    const menu = document.getElementById('contextMenu');
+    const overlay = document.getElementById('contextOverlay');
+    const avatar = document.getElementById('profileAvatar');
+    if (!menu || !avatar) return;
+    if (menu.classList.contains('open')) {
+        closeContextMenu();
+        return;
+    }
+    const rect = avatar.getBoundingClientRect();
+    const menuWidth = 200;
+    const leftPos = Math.max(10, rect.left + rect.width / 2 - menuWidth / 2);
+    const topPos = Math.min(rect.bottom + 10, window.innerHeight - 250);
+    menu.style.left = leftPos + 'px';
+    menu.style.top = topPos + 'px';
+    menuState.isAnimating = true;
+    menu.classList.add('open');
+    overlay.classList.add('active');
+    setTimeout(() => {
+        menuState.isAnimating = false;
+        menuState.isOpen = true;
+    }, 200);
+}
+
+function closeContextMenu() {
+    if (menuState.isAnimating) return;
+    const menu = document.getElementById('contextMenu');
+    const overlay = document.getElementById('contextOverlay');
+    menuState.isAnimating = true;
+    if (menu) menu.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+    setTimeout(() => {
+        menuState.isAnimating = false;
+        menuState.isOpen = false;
+    }, 200);
+}
+
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('contextMenu');
+    const avatar = document.getElementById('profileAvatar');
+    if (!menu || !menu.classList.contains('open')) return;
+    const isClickInsideMenu = menu.contains(e.target);
+    const isClickOnAvatar = avatar && (e.target === avatar || avatar.contains(e.target));
+    if (!isClickInsideMenu && !isClickOnAvatar) {
+        closeContextMenu();
+    }
+});
 
 // ================================================================
 // АТОМАРНОЕ ОБНОВЛЕНИЕ СТАТУСА ДРУЖБЫ
@@ -1699,7 +2102,7 @@ function declineFriendRequest(targetUid) {
 }
 
 // ================================================================
-// ЛЮДИ - С КЛИКАБЕЛЬНЫМИ ЭЛЕМЕНТАМИ (SPA)
+// ЛЮДИ
 // ================================================================
 
 function loadPeople() {
@@ -1724,7 +2127,6 @@ function loadPeople() {
             const u = users[k];
             renderInlineUser(el, k, u);
         });
-        // Запускаем слушатели
         keys.forEach(k => {
             listenFriendStatus(k);
         });
@@ -1744,7 +2146,6 @@ function renderInlineUser(container, uid, userData) {
     itemDiv.id = 'user-item-' + uid;
     const avatarHtml = avatarUrl ? `<img src="${avatarUrl}" alt="${esc(name)}">` : `<span>${letter}</span>`;
     
-    // Весь блок кликабельный, но кнопки имеют stopPropagation
     itemDiv.innerHTML = `
         <div class="avatar">${avatarHtml}</div>
         <div class="info">
@@ -1760,23 +2161,15 @@ function renderInlineUser(container, uid, userData) {
         </div>
     `;
     
-    // Клик по блоку (кроме кнопок) открывает профиль
     itemDiv.addEventListener('click', function(e) {
-        // Проверяем, что клик не по кнопке
         if (!e.target.closest('.btn-action')) {
             navigateToProfile(uid);
         }
     });
     
     container.appendChild(itemDiv);
-    
-    // Запускаем слушатель
     listenFriendStatus(uid);
 }
-
-// ================================================================
-// СЛУШАТЕЛЬ ДЛЯ ОБНОВЛЕНИЯ КНОПОК
-// ================================================================
 
 function listenFriendStatus(targetUid) {
     if (!USER_UID || !targetUid) return;
@@ -1834,6 +2227,7 @@ function updateFriendButtonInline(uid, status) {
 // ================================================================
 // ГРУППЫ
 // ================================================================
+
 function loadRooms() {
     if (!USER_UID) return;
     const el = document.getElementById('roomsList');
@@ -2013,6 +2407,7 @@ function openPrivateChat(targetUid) {
     const path = 'dms/' + SITE + '/' + chatId + '/messages';
     closeNotifications();
     closeContextMenu();
+    closeProfileDropdown();
     CURRENT_ROOM = chatId;
     document.getElementById('chatWindow').classList.add('active');
     db.ref('sites/' + SITE + '/all_users/' + targetUid).once('value', snap => {
@@ -2121,6 +2516,7 @@ function updateCounters() {
 window.uploadAvatar = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
     closeContextMenu();
+    closeProfileDropdown();
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -2151,6 +2547,7 @@ window.uploadAvatar = function() {
 
 window.editProfile = function() {
     closeContextMenu();
+    closeProfileDropdown();
     document.getElementById('editProfileModal').classList.add('open');
     document.getElementById('editName').value = USER || '';
     document.getElementById('editBio').value = '';
@@ -2200,10 +2597,10 @@ function loadData() {
 loadSavedProfiles();
 navigateToFeed();
 
-console.log('✅ METAIMPERIYA - SPA НАВИГАЦИЯ ГОТОВА!');
-console.log('🔹 Клик по пользователю → открывается профиль в контенте');
-console.log('🔹 Кнопки в списке имеют stopPropagation');
-console.log('🔹 Списки в профиле открываются/закрываются по клику');
+console.log('✅ METAIMPERIYA - ПРОФИЛЬ С МЕНЮ "ТРИ ТОЧКИ" ГОТОВ!');
+console.log('🔹 Меню "три точки" в правом верхнем углу');
+console.log('🔹 Приватность: скрытие списков друзей');
+console.log('🔹 Чистый профиль с одной главной кнопкой');
 </script>
 </body>
 </html>
