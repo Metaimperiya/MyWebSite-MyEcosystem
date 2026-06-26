@@ -3,7 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>METAIMPERIYA</title>
+    
+    <!-- ===== SEO META ТЕГИ (ЗАПОЛНЯЮТСЯ ДИНАМИЧЕСКИ) ===== -->
+    <title id="seoTitle">METAIMPERIYA - Социальная сеть</title>
+    <meta name="description" id="seoDescription" content="Социальная сеть нового поколения">
+    <meta name="keywords" id="seoKeywords" content="социальная сеть, общение, друзья">
+    
+    <!-- Open Graph для соцсетей -->
+    <meta property="og:title" id="ogTitle" content="METAIMPERIYA">
+    <meta property="og:description" id="ogDescription" content="Социальная сеть нового поколения">
+    <meta property="og:type" content="website">
+    <meta property="og:url" id="ogUrl" content="https://metaimperiya.com">
+    <meta property="og:image" id="ogImage" content="https://metaimperiya.com/og-image.jpg">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitterTitle" content="METAIMPERIYA">
+    <meta name="twitter:description" id="twitterDescription" content="Социальная сеть нового поколения">
+    <meta name="twitter:image" id="twitterImage" content="https://metaimperiya.com/og-image.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" id="canonicalUrl" href="https://metaimperiya.com/">
+    
+    <!-- Robots (индексация) -->
+    <meta name="robots" id="robotsMeta" content="index, follow">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -949,6 +972,46 @@
             .admin-panel { flex-direction: column; }
             .admin-panel .btn-action { width: 100%; justify-content: center; }
         }
+        
+        /* ===== SEO-PAGE STYLES ===== */
+        .seo-page {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+        }
+        .seo-page .seo-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #050505;
+            margin-bottom: 12px;
+        }
+        .seo-page .seo-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .seo-page .seo-meta {
+            color: #65676b;
+            font-size: 13px;
+            padding: 12px 0;
+            border-top: 1px solid #e4e6eb;
+            margin-top: 16px;
+        }
+        .seo-page .seo-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .seo-page .seo-keywords .tag {
+            background: #e4e6eb;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #65676b;
+        }
     </style>
 </head>
 <body>
@@ -978,6 +1041,9 @@
     <button class="btn-action admin-only" onclick="adminShowUsers()" style="background:#8e44ad;color:white;">👥 Список пользователей</button>
     <button class="btn-action admin-only" onclick="adminSetUsernamePrompt()" style="background:#2980b9;color:white;">✏️ Установить username</button>
     <button class="btn-action admin-only" onclick="adminRemoveUsernamePrompt()" style="background:#e67e22;color:white;">🗑 Удалить username</button>
+    <!-- ===== SEO АДМИНКА ===== -->
+    <button class="btn-action admin-only" onclick="adminManageSEO()" style="background:#16a085;color:white;">🔍 Управление SEO</button>
+    <button class="btn-action admin-only" onclick="adminGenerateSitemap()" style="background:#2c3e50;color:white;">🗺 Sitemap</button>
 </div>
 
 <!-- ===== TABS ===== -->
@@ -1003,6 +1069,11 @@
 
 <div id="profilePage" class="page hidden">
     <div id="profileContent"></div>
+</div>
+
+<!-- ===== SEO PAGE ===== -->
+<div id="seoPage" class="page hidden">
+    <div id="seoContent"></div>
 </div>
 
 <!-- ===== CHAT WINDOW ===== -->
@@ -1077,6 +1148,17 @@
     </div>
 </div>
 
+<!-- ===== SEO MODAL ===== -->
+<div class="modal" id="seoModal">
+    <div class="modal-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;">🔍 Управление SEO</h3>
+            <button onclick="closeSEOModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">✕</button>
+        </div>
+        <div id="seoModalContent"></div>
+    </div>
+</div>
+
 <script>
 // ================================================================
 // FIREBASE
@@ -1098,8 +1180,478 @@ const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 // ================================================================
-// АДМИН - ХАРДКОД UID
+// SEO - ГЕНЕРАЦИЯ МЕТА-ТЕГОВ
 // ================================================================
+
+function generateMeta(data) {
+    if (!data) {
+        // Дефолтные мета-теги
+        document.getElementById('seoTitle').textContent = 'METAIMPERIYA - Социальная сеть';
+        document.getElementById('seoDescription').textContent = 'Социальная сеть нового поколения для общения и знакомств';
+        document.getElementById('seoKeywords').textContent = 'социальная сеть, общение, друзья, сообщества';
+        document.getElementById('ogTitle').content = 'METAIMPERIYA';
+        document.getElementById('ogDescription').content = 'Социальная сеть нового поколения';
+        document.getElementById('ogUrl').content = window.location.href;
+        document.getElementById('canonicalUrl').href = window.location.href;
+        document.title = 'METAIMPERIYA';
+        return;
+    }
+    
+    // Устанавливаем мета-теги из данных
+    if (data.title) {
+        document.getElementById('seoTitle').textContent = data.title + ' | METAIMPERIYA';
+        document.getElementById('ogTitle').content = data.title + ' | METAIMPERIYA';
+        document.getElementById('twitterTitle').content = data.title + ' | METAIMPERIYA';
+        document.title = data.title + ' | METAIMPERIYA';
+    }
+    
+    if (data.description) {
+        document.getElementById('seoDescription').textContent = data.description;
+        document.getElementById('ogDescription').content = data.description;
+        document.getElementById('twitterDescription').content = data.description;
+    }
+    
+    if (data.keywords) {
+        document.getElementById('seoKeywords').textContent = data.keywords;
+    }
+    
+    if (data.image) {
+        document.getElementById('ogImage').content = data.image;
+        document.getElementById('twitterImage').content = data.image;
+    }
+    
+    if (data.canonical) {
+        document.getElementById('canonicalUrl').href = data.canonical;
+    }
+    
+    // Роботы
+    if (data.noindex) {
+        document.getElementById('robotsMeta').content = 'noindex, nofollow';
+    } else {
+        document.getElementById('robotsMeta').content = 'index, follow';
+    }
+    
+    // Обновляем URL в OG
+    document.getElementById('ogUrl').content = window.location.href;
+}
+
+// ================================================================
+// SEO - ЗАГРУЗКА СТРАНИЦЫ ПО ПУТИ
+// ================================================================
+
+function loadSEOPage(path) {
+    // Убираем слеш в начале
+    const slug = path.startsWith('/') ? path.substring(1) : path;
+    if (!slug) return false;
+    
+    console.log(`🔍 SEO: Загрузка страницы для /${slug}`);
+    
+    // Проверяем сначала в users_by_name (пользователи)
+    db.ref('sites/' + SITE + '/users_by_name/' + slug).once('value', snap => {
+        const uid = snap.val();
+        if (uid) {
+            // Это пользователь - загружаем его профиль с SEO
+            db.ref('sites/' + SITE + '/all_users/' + uid).once('value', userSnap => {
+                const user = userSnap.val();
+                if (user) {
+                    const seoData = {
+                        title: user.name || slug,
+                        description: user.bio || `Профиль пользователя ${user.name || slug} в METAIMPERIYA`,
+                        keywords: `${user.name || slug}, профиль, пользователь, социальная сеть`,
+                        canonical: window.location.href,
+                        image: user.avatarUrl || 'https://metaimperiya.com/og-image.jpg'
+                    };
+                    generateMeta(seoData);
+                    renderSEOPage(user, 'user', slug);
+                    return true;
+                }
+            });
+            return true;
+        }
+        
+        // Проверяем группы
+        db.ref('sites/' + SITE + '/groups/' + slug).once('value', snap => {
+            const group = snap.val();
+            if (group) {
+                const seoData = {
+                    title: group.name || slug,
+                    description: group.description || `Группа ${group.name || slug} в METAIMPERIYA`,
+                    keywords: `${group.name || slug}, группа, сообщество, социальная сеть`,
+                    canonical: window.location.href,
+                    image: group.image || 'https://metaimperiya.com/og-image.jpg'
+                };
+                generateMeta(seoData);
+                renderSEOPage(group, 'group', slug);
+                return true;
+            }
+            
+            // Проверяем SEO-страницы
+            db.ref('sites/' + SITE + '/pages_seo/' + slug).once('value', snap => {
+                const page = snap.val();
+                if (page) {
+                    const seoData = {
+                        title: page.title || slug,
+                        description: page.description || `Страница ${slug} в METAIMPERIYA`,
+                        keywords: page.keywords || `${slug}, страница, контент`,
+                        canonical: window.location.href,
+                        image: page.image || 'https://metaimperiya.com/og-image.jpg'
+                    };
+                    generateMeta(seoData);
+                    renderSEOPage(page, 'page', slug);
+                    return true;
+                }
+                
+                // Ничего не найдено - 404
+                document.getElementById('seoTitle').textContent = 'Страница не найдена | METAIMPERIYA';
+                document.getElementById('seoDescription').textContent = 'Запрашиваемая страница не существует';
+                document.getElementById('robotsMeta').content = 'noindex, nofollow';
+                document.title = 'Страница не найдена | METAIMPERIYA';
+                renderSEOPage(null, 'notfound', slug);
+                return false;
+            });
+        });
+    });
+    
+    return true;
+}
+
+// ================================================================
+// SEO - ОТРИСОВКА СТРАНИЦЫ
+// ================================================================
+
+function renderSEOPage(data, type, slug) {
+    const container = document.getElementById('seoContent');
+    if (!container) return;
+    
+    // Скрываем все другие страницы
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.classList.add('hidden');
+    });
+    
+    document.getElementById('seoPage').classList.remove('hidden');
+    document.getElementById('seoPage').classList.add('active');
+    
+    if (type === 'notfound') {
+        container.innerHTML = `
+            <div class="seo-page" style="text-align:center;padding:60px 20px;">
+                <div style="font-size:80px;margin-bottom:20px;">🔍</div>
+                <div class="seo-title">Страница не найдена</div>
+                <div class="seo-content" style="color:#65676b;">
+                    Страница <strong>/${esc(slug)}</strong> не существует
+                </div>
+                <button class="btn-action" onclick="navigateToFeed()" style="background:#1877f2;color:white;padding:10px 30px;margin-top:20px;">
+                    🏠 На главную
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    if (type === 'user') {
+        const avatarHtml = data.avatarUrl ? 
+            `<img src="${data.avatarUrl}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">` : 
+            `<span style="font-size:48px;">${(data.name || '?').charAt(0).toUpperCase()}</span>`;
+        
+        container.innerHTML = `
+            <div class="seo-page">
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+                    <div style="width:80px;height:80px;border-radius:50%;background:#e4e6eb;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#65676b;overflow:hidden;">
+                        ${avatarHtml}
+                    </div>
+                    <div>
+                        <div class="seo-title">${esc(data.name || slug)}</div>
+                        <div style="color:#65676b;font-size:14px;">@${esc(slug)}</div>
+                        <div style="color:#65676b;font-size:14px;margin-top:4px;">${esc(data.bio || 'Привет! 👋')}</div>
+                    </div>
+                </div>
+                <div class="seo-meta">
+                    <div>📧 ${esc(data.email || '')}</div>
+                    <div style="margin-top:4px;">🔗 <a href="${window.location.href}" style="color:#1877f2;text-decoration:none;">${window.location.href}</a></div>
+                    ${data.isAdmin ? '<div style="margin-top:4px;color:#e67e22;">👑 Администратор</div>' : ''}
+                </div>
+                <div class="seo-keywords">
+                    <span class="tag">👤 Пользователь</span>
+                    <span class="tag">@${esc(slug)}</span>
+                    ${data.bio ? `<span class="tag">${esc(data.bio.split(' ').slice(0,3).join(' '))}</span>` : ''}
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    if (type === 'group') {
+        container.innerHTML = `
+            <div class="seo-page">
+                <div class="seo-title">👥 ${esc(data.name || slug)}</div>
+                <div class="seo-content">${esc(data.description || 'Группа в METAIMPERIYA')}</div>
+                <div class="seo-meta">
+                    <div>📅 Создана: ${data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Неизвестно'}</div>
+                    <div style="margin-top:4px;">🔗 <a href="${window.location.href}" style="color:#1877f2;text-decoration:none;">${window.location.href}</a></div>
+                </div>
+                <div class="seo-keywords">
+                    <span class="tag">👥 Группа</span>
+                    <span class="tag">${esc(slug)}</span>
+                    <span class="tag">Сообщество</span>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    if (type === 'page') {
+        container.innerHTML = `
+            <div class="seo-page">
+                <div class="seo-title">${esc(data.title || slug)}</div>
+                <div class="seo-content">${esc(data.content || data.description || 'Страница в METAIMPERIYA')}</div>
+                ${data.content_template ? `<div style="margin-top:16px;padding:16px;background:#f8f9fa;border-radius:8px;">${data.content_template}</div>` : ''}
+                <div class="seo-meta">
+                    <div>🔗 <a href="${window.location.href}" style="color:#1877f2;text-decoration:none;">${window.location.href}</a></div>
+                    ${data.keywords ? `<div style="margin-top:4px;">📌 Ключевые слова: ${esc(data.keywords)}</div>` : ''}
+                </div>
+                ${data.keywords ? `
+                    <div class="seo-keywords">
+                        ${data.keywords.split(',').map(k => `<span class="tag">${esc(k.trim())}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        return;
+    }
+}
+
+// ================================================================
+// SEO - УПРАВЛЕНИЕ (АДМИН)
+// ================================================================
+
+function adminManageSEO() {
+    if (!isAdmin) {
+        console.warn('❌ Доступ запрещен: не админ');
+        return;
+    }
+    
+    const modal = document.getElementById('seoModal');
+    const content = document.getElementById('seoModalContent');
+    modal.classList.add('open');
+    
+    content.innerHTML = `
+        <div style="margin-bottom:16px;">
+            <label style="font-weight:600;display:block;margin-bottom:4px;font-size:14px;">Путь (username или groupname)</label>
+            <input type="text" id="seoPath" placeholder="например: playerlikee" style="width:100%;padding:10px;border:1px solid #e4e6eb;border-radius:8px;font-size:14px;">
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="font-weight:600;display:block;margin-bottom:4px;font-size:14px;">Заголовок (Title)</label>
+            <input type="text" id="seoTitleInput" placeholder="Заголовок страницы" style="width:100%;padding:10px;border:1px solid #e4e6eb;border-radius:8px;font-size:14px;">
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="font-weight:600;display:block;margin-bottom:4px;font-size:14px;">Описание (Description)</label>
+            <textarea id="seoDescriptionInput" placeholder="Описание страницы" style="width:100%;padding:10px;border:1px solid #e4e6eb;border-radius:8px;font-size:14px;min-height:60px;resize:vertical;"></textarea>
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="font-weight:600;display:block;margin-bottom:4px;font-size:14px;">Ключевые слова (Keywords)</label>
+            <input type="text" id="seoKeywordsInput" placeholder="ключевые слова через запятую" style="width:100%;padding:10px;border:1px solid #e4e6eb;border-radius:8px;font-size:14px;">
+        </div>
+        <div style="margin-bottom:16px;">
+            <label style="font-weight:600;display:block;margin-bottom:4px;font-size:14px;">Содержание (HTML)</label>
+            <textarea id="seoContentInput" placeholder="HTML-контент страницы" style="width:100%;padding:10px;border:1px solid #e4e6eb;border-radius:8px;font-size:14px;min-height:100px;resize:vertical;"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <button class="btn-action" onclick="adminSaveSEO()" style="background:#1877f2;color:white;flex:1;">💾 Сохранить</button>
+            <button class="btn-action" onclick="adminDeleteSEO()" style="background:#e74c3c;color:white;">🗑 Удалить</button>
+        </div>
+        <div id="seoStatus" style="margin-top:12px;font-size:13px;color:#65676b;"></div>
+    `;
+    
+    // Загружаем данные если есть
+    const path = document.getElementById('seoPath');
+    if (path) {
+        path.addEventListener('input', function() {
+            const slug = this.value.trim();
+            if (slug) {
+                db.ref('sites/' + SITE + '/pages_seo/' + slug).once('value', snap => {
+                    const data = snap.val();
+                    if (data) {
+                        document.getElementById('seoTitleInput').value = data.title || '';
+                        document.getElementById('seoDescriptionInput').value = data.description || '';
+                        document.getElementById('seoKeywordsInput').value = data.keywords || '';
+                        document.getElementById('seoContentInput').value = data.content || data.content_template || '';
+                        document.getElementById('seoStatus').textContent = '✅ Данные загружены';
+                        document.getElementById('seoStatus').style.color = '#27ae60';
+                    } else {
+                        document.getElementById('seoStatus').textContent = 'ℹ️ Нет данных для этого пути';
+                        document.getElementById('seoStatus').style.color = '#65676b';
+                    }
+                });
+            }
+        });
+    }
+}
+
+function closeSEOModal() {
+    document.getElementById('seoModal').classList.remove('open');
+}
+
+function adminSaveSEO() {
+    if (!isAdmin) {
+        console.warn('❌ Доступ запрещен: не админ');
+        return;
+    }
+    
+    const path = document.getElementById('seoPath').value.trim();
+    const title = document.getElementById('seoTitleInput').value.trim();
+    const description = document.getElementById('seoDescriptionInput').value.trim();
+    const keywords = document.getElementById('seoKeywordsInput').value.trim();
+    const content = document.getElementById('seoContentInput').value.trim();
+    
+    if (!path) {
+        document.getElementById('seoStatus').textContent = '❌ Введите путь';
+        document.getElementById('seoStatus').style.color = '#e74c3c';
+        return;
+    }
+    
+    if (!title) {
+        document.getElementById('seoStatus').textContent = '❌ Введите заголовок';
+        document.getElementById('seoStatus').style.color = '#e74c3c';
+        return;
+    }
+    
+    const data = {
+        title: title,
+        description: description || title,
+        keywords: keywords || title,
+        content: content || description || title,
+        updatedAt: Date.now()
+    };
+    
+    db.ref('sites/' + SITE + '/pages_seo/' + path).set(data).then(() => {
+        document.getElementById('seoStatus').textContent = '✅ SEO-данные сохранены!';
+        document.getElementById('seoStatus').style.color = '#27ae60';
+        // Обновляем SEO карту
+        updateSEOIndex();
+    }).catch(err => {
+        document.getElementById('seoStatus').textContent = '❌ Ошибка: ' + err.message;
+        document.getElementById('seoStatus').style.color = '#e74c3c';
+        console.error(err);
+    });
+}
+
+function adminDeleteSEO() {
+    if (!isAdmin) {
+        console.warn('❌ Доступ запрещен: не админ');
+        return;
+    }
+    
+    const path = document.getElementById('seoPath').value.trim();
+    if (!path) {
+        document.getElementById('seoStatus').textContent = '❌ Введите путь';
+        document.getElementById('seoStatus').style.color = '#e74c3c';
+        return;
+    }
+    
+    if (!confirm(`Удалить SEO-данные для /${path}?`)) return;
+    
+    db.ref('sites/' + SITE + '/pages_seo/' + path).remove().then(() => {
+        document.getElementById('seoStatus').textContent = '✅ SEO-данные удалены';
+        document.getElementById('seoStatus').style.color = '#27ae60';
+        updateSEOIndex();
+    }).catch(err => {
+        document.getElementById('seoStatus').textContent = '❌ Ошибка: ' + err.message;
+        document.getElementById('seoStatus').style.color = '#e74c3c';
+        console.error(err);
+    });
+}
+
+// ================================================================
+// SEO - ГЕНЕРАЦИЯ SITEMAP
+// ================================================================
+
+let seoIndexCache = null;
+
+function updateSEOIndex() {
+    db.ref('sites/' + SITE + '/pages_seo').once('value', snap => {
+        const data = snap.val() || {};
+        seoIndexCache = Object.keys(data);
+        console.log(`🗺 SEO индекс обновлен: ${seoIndexCache.length} страниц`);
+    });
+    
+    // Также собираем пользователей с username
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        const usernames = [];
+        Object.keys(users).forEach(uid => {
+            if (users[uid].username) {
+                usernames.push(users[uid].username);
+            }
+        });
+        if (!seoIndexCache) seoIndexCache = [];
+        usernames.forEach(u => {
+            if (!seoIndexCache.includes(u)) {
+                seoIndexCache.push(u);
+            }
+        });
+        console.log(`🗺 Полный SEO индекс: ${seoIndexCache.length} страниц (включая пользователей)`);
+    });
+}
+
+function adminGenerateSitemap() {
+    if (!isAdmin) {
+        console.warn('❌ Доступ запрещен: не админ');
+        return;
+    }
+    
+    // Собираем все пути
+    const paths = seoIndexCache || [];
+    
+    // Добавляем пользователей с username
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        Object.keys(users).forEach(uid => {
+            if (users[uid].username && !paths.includes(users[uid].username)) {
+                paths.push(users[uid].username);
+            }
+        });
+        
+        // Добавляем группы
+        db.ref('sites/' + SITE + '/groups').once('value', snap => {
+            const groups = snap.val() || {};
+            Object.keys(groups).forEach(key => {
+                if (!paths.includes(key)) {
+                    paths.push(key);
+                }
+            });
+            
+            // Генерируем sitemap.xml
+            const baseUrl = window.location.origin;
+            let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+            xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+            xml += `  <url>\n    <loc>${baseUrl}/</loc>\n    <priority>1.0</priority>\n  </url>\n`;
+            
+            paths.forEach(path => {
+                if (path && path.trim() !== '') {
+                    xml += `  <url>\n    <loc>${baseUrl}/${path}</loc>\n    <priority>0.8</priority>\n    <changefreq>weekly</changefreq>\n  </url>\n`;
+                }
+            });
+            
+            xml += '</urlset>';
+            
+            // Скачиваем файл
+            const blob = new Blob([xml], {type: 'application/xml'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sitemap.xml';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert(`✅ Sitemap сгенерирован! ${paths.length + 1} страниц`);
+        });
+    });
+}
+
+// ================================================================
+// АДМИН - UID (ХАРДКОД)
+// ================================================================
+
 const ADMIN_UIDS = [
     "ayXehcol9FgAQU6tZuup7aSaRoV2",
     "pWB0nGVvVXc4je6466ss7IwBm9G2",
@@ -1108,7 +1660,7 @@ const ADMIN_UIDS = [
 let isAdmin = false;
 
 // ================================================================
-// АДМИН-ФУНКЦИИ: УПРАВЛЕНИЕ USERNAME (РУЧНОЕ)
+// АДМИН-ФУНКЦИИ: УПРАВЛЕНИЕ USERNAME
 // ================================================================
 
 function adminSetUsername(uid, customUsername) {
@@ -1122,23 +1674,22 @@ function adminSetUsername(uid, customUsername) {
         return;
     }
     
-    // Проверяем, что username не занят
     db.ref('sites/' + SITE + '/users_by_name/' + customUsername).once('value', snap => {
         if (snap.val() && snap.val() !== uid) {
             alert(`❌ Username "${customUsername}" уже занят!`);
             return;
         }
         
-        // Сохраняем username
         const updates = {};
         updates['sites/' + SITE + '/users_by_name/' + customUsername] = uid;
         updates['sites/' + SITE + '/users/' + uid + '/username'] = customUsername;
         updates['sites/' + SITE + '/all_users/' + uid + '/username'] = customUsername;
         
         db.ref().update(updates).then(() => {
-            alert(`✅ Username "${customUsername}" привязан к пользователю!`);
+            alert(`✅ Username "${customUsername}" привязан!`);
             loadPeople();
             if (viewingProfileUid) renderProfile(viewingProfileUid);
+            updateSEOIndex();
         }).catch(err => {
             console.error('❌ Ошибка:', err);
             alert('Ошибка сохранения');
@@ -1157,7 +1708,6 @@ function adminRemoveUsername(uid) {
         return;
     }
     
-    // Получаем текущий username
     db.ref('sites/' + SITE + '/users/' + uid + '/username').once('value', snap => {
         const username = snap.val();
         if (!username) {
@@ -1165,7 +1715,7 @@ function adminRemoveUsername(uid) {
             return;
         }
         
-        if (!confirm(`Удалить username "${username}" у пользователя?`)) return;
+        if (!confirm(`Удалить username "${username}"?`)) return;
         
         const updates = {};
         updates['sites/' + SITE + '/users_by_name/' + username] = null;
@@ -1176,6 +1726,7 @@ function adminRemoveUsername(uid) {
             alert(`✅ Username "${username}" удален!`);
             loadPeople();
             if (viewingProfileUid) renderProfile(viewingProfileUid);
+            updateSEOIndex();
         }).catch(err => {
             console.error('❌ Ошибка:', err);
             alert('Ошибка удаления');
@@ -1236,7 +1787,7 @@ function copyUid(uid) {
 function adminSetUsernamePrompt() {
     const uid = prompt('Введите UID пользователя:');
     if (!uid) return;
-    const username = prompt('Введите желаемый username (например: playerlikee):');
+    const username = prompt('Введите желаемый username:');
     if (!username) return;
     adminSetUsername(uid, username);
 }
@@ -1248,7 +1799,7 @@ function adminRemoveUsernamePrompt() {
 }
 
 // ================================================================
-// ОБРАБОТКА USERNAME ИЗ GITHUB PAGES
+// ОБРАБОТКА USERNAME ИЗ URL
 // ================================================================
 
 function handleGitHubUsername() {
@@ -1256,30 +1807,183 @@ function handleGitHubUsername() {
     
     if (username && username.trim() !== '') {
         console.log(`🔍 Найден username из URL: ${username}`);
+        localStorage.removeItem('metaimperiya_username');
         
+        // Проверяем пользователя
         db.ref('sites/' + SITE + '/users_by_name/' + username).once('value', snap => {
             const uid = snap.val();
-            
             if (uid) {
                 console.log(`✅ Найден пользователь: ${uid}`);
-                localStorage.removeItem('metaimperiya_username');
                 navigateToProfile(uid);
                 history.pushState(null, '', '/' + username);
-            } else {
-                console.log(`❌ Пользователь "${username}" не найден`);
-                localStorage.removeItem('metaimperiya_username');
-                showNotFound(username);
+                return;
             }
-        }).catch(err => {
-            console.error('❌ Ошибка поиска:', err);
-            localStorage.removeItem('metaimperiya_username');
+            
+            // Проверяем группу
+            db.ref('sites/' + SITE + '/groups/' + username).once('value', snap => {
+                if (snap.val()) {
+                    console.log(`✅ Найдена группа: ${username}`);
+                    // TODO: открыть группу
+                    showNotFound(username);
+                    return;
+                }
+                
+                // Проверяем SEO-страницу
+                db.ref('sites/' + SITE + '/pages_seo/' + username).once('value', snap => {
+                    if (snap.val()) {
+                        console.log(`✅ Найдена SEO-страница: ${username}`);
+                        loadSEOPage(username);
+                        return;
+                    }
+                    
+                    console.log(`❌ Ничего не найдено для "${username}"`);
+                    showNotFound(username);
+                });
+            });
         });
     }
 }
 
 // ================================================================
+// АДМИН-ФУНКЦИИ (БАЗОВЫЕ)
+// ================================================================
+
+function checkAdminAccess(uid) {
+    const wasAdmin = isAdmin;
+    isAdmin = ADMIN_UIDS.includes(uid);
+    if (wasAdmin !== isAdmin) updateAdminUI();
+    console.log(`👑 Админ-режим: ${isAdmin ? 'ВКЛЮЧЕН' : 'ВЫКЛЮЧЕН'}`);
+    return isAdmin;
+}
+
+function updateAdminUI() {
+    const body = document.body;
+    if (isAdmin) {
+        body.classList.add('admin-mode');
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-flex');
+        document.querySelectorAll('.user-item').forEach(item => {
+            const uid = item.id?.replace('user-item-', '');
+            if (uid && uid !== USER_UID) {
+                const actions = item.querySelector('.actions');
+                if (actions && !item.querySelector('.admin-delete-btn')) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-action admin-delete-btn';
+                    deleteBtn.style.cssText = 'background:#e74c3c;color:white;min-width:32px;padding:4px 8px;font-size:12px;';
+                    deleteBtn.innerHTML = '🗑';
+                    deleteBtn.title = 'Удалить пользователя';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm('Удалить пользователя?')) adminDeleteUser(uid);
+                    };
+                    actions.appendChild(deleteBtn);
+                }
+            }
+        });
+    } else {
+        body.classList.remove('admin-mode');
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.admin-delete-btn').forEach(el => el.remove());
+    }
+}
+
+function adminDeleteUser(uid) {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!uid || uid === USER_UID) { alert('Нельзя удалить себя'); return; }
+    if (!confirm('Удалить пользователя? Это необратимо!')) return;
+    
+    const updates = {};
+    updates['sites/' + SITE + '/users/' + uid] = null;
+    updates['sites/' + SITE + '/all_users/' + uid] = null;
+    updates['sites/' + SITE + '/friends/' + uid] = null;
+    updates['sites/' + SITE + '/followers/' + uid] = null;
+    updates['sites/' + SITE + '/notifications/' + uid] = null;
+    updates['sites/' + SITE + '/users_by_name/'] = null;
+    
+    db.ref().update(updates).then(() => {
+        alert('✅ Пользователь удален');
+        loadPeople();
+        loadRooms();
+        updateSEOIndex();
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка удаления');
+    });
+}
+
+function adminDeleteAllUsers() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Удалить ВСЕХ пользователей, кроме админов?')) return;
+    if (!confirm('Вы уверены? Это НЕОБРАТИМО!')) return;
+    
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        const updates = {};
+        Object.keys(users).forEach(uid => {
+            if (!ADMIN_UIDS.includes(uid) && uid !== USER_UID) {
+                updates['sites/' + SITE + '/users/' + uid] = null;
+                updates['sites/' + SITE + '/all_users/' + uid] = null;
+                updates['sites/' + SITE + '/friends/' + uid] = null;
+                updates['sites/' + SITE + '/followers/' + uid] = null;
+                updates['sites/' + SITE + '/notifications/' + uid] = null;
+            }
+        });
+        updates['sites/' + SITE + '/room_users/'] = null;
+        updates['sites/' + SITE + '/users_by_name/'] = null;
+        db.ref().update(updates).then(() => {
+            alert('✅ Все пользователи удалены');
+            loadPeople();
+            loadRooms();
+            updateSEOIndex();
+        }).catch(err => {
+            console.error('❌ Ошибка:', err);
+            alert('Ошибка удаления');
+        });
+    });
+}
+
+function adminClearRooms() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Очистить все комнаты?')) return;
+    db.ref('sites/' + SITE + '/rooms').remove().then(() => {
+        db.ref('sites/' + SITE + '/room_users/').remove();
+        alert('✅ Комнаты очищены');
+        loadRooms();
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка очистки');
+    });
+}
+
+function adminClearNotifications() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Очистить все уведомления?')) return;
+    db.ref('sites/' + SITE + '/notifications/').remove().then(() => {
+        alert('✅ Уведомления очищены');
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка очистки');
+    });
+}
+
+function adminExportData() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    db.ref('sites/' + SITE).once('value', snap => {
+        const data = snap.val();
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `metaimperiya_export_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+}
+
+// ================================================================
 // УПРАВЛЕНИЕ ЗАПРОСАМИ
 // ================================================================
+
 const activeRequests = new Map();
 
 function cancelRequest(key) {
@@ -1336,6 +2040,7 @@ window.addEventListener('beforeunload', function() {
 // ================================================================
 // СОСТОЯНИЕ
 // ================================================================
+
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
 let USER = null;
 let USER_UID = null;
@@ -1392,6 +2097,7 @@ document.addEventListener('click', function(e) {
 // ================================================================
 // СОХРАНЕННЫЕ ПРОФИЛИ
 // ================================================================
+
 function loadSavedProfiles() {
     try {
         const saved = localStorage.getItem('dc_profiles_' + SITE);
@@ -1465,7 +2171,7 @@ window.loginWithSavedProfile = function(uid) {
 };
 
 // ================================================================
-// ГЕНЕРАЦИЯ USERNAME (ТОЛЬКО ДЛЯ НОВЫХ ПОЛЬЗОВАТЕЛЕЙ)
+// ГЕНЕРАЦИЯ USERNAME
 // ================================================================
 
 function generateUsername(name) {
@@ -1525,6 +2231,7 @@ function saveUsername(uid, username) {
     db.ref('sites/' + SITE + '/users/' + uid + '/username').set(username);
     db.ref('sites/' + SITE + '/all_users/' + uid + '/username').set(username);
     console.log(`✅ Username "${username}" привязан к пользователю ${uid}`);
+    updateSEOIndex();
 }
 
 function updateUrl(username) {
@@ -1546,140 +2253,6 @@ function copyUsername(username) {
             setTimeout(() => { el.textContent = original; }, 1500);
         }
     }).catch(() => {});
-}
-
-// ================================================================
-// АДМИН-ФУНКЦИИ (БАЗОВЫЕ)
-// ================================================================
-
-function checkAdminAccess(uid) {
-    const wasAdmin = isAdmin;
-    isAdmin = ADMIN_UIDS.includes(uid);
-    if (wasAdmin !== isAdmin) updateAdminUI();
-    console.log(`👑 Админ-режим: ${isAdmin ? 'ВКЛЮЧЕН' : 'ВЫКЛЮЧЕН'}`);
-    return isAdmin;
-}
-
-function updateAdminUI() {
-    const body = document.body;
-    if (isAdmin) {
-        body.classList.add('admin-mode');
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'inline-flex');
-        document.querySelectorAll('.user-item').forEach(item => {
-            const uid = item.id?.replace('user-item-', '');
-            if (uid && uid !== USER_UID) {
-                const actions = item.querySelector('.actions');
-                if (actions && !item.querySelector('.admin-delete-btn')) {
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'btn-action admin-delete-btn';
-                    deleteBtn.style.cssText = 'background:#e74c3c;color:white;min-width:32px;padding:4px 8px;font-size:12px;';
-                    deleteBtn.innerHTML = '🗑';
-                    deleteBtn.title = 'Удалить пользователя';
-                    deleteBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        if (confirm('Удалить пользователя?')) adminDeleteUser(uid);
-                    };
-                    actions.appendChild(deleteBtn);
-                }
-            }
-        });
-    } else {
-        body.classList.remove('admin-mode');
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.admin-delete-btn').forEach(el => el.remove());
-    }
-}
-
-function adminDeleteUser(uid) {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!uid || uid === USER_UID) { alert('Нельзя удалить себя'); return; }
-    if (!confirm('Удалить пользователя? Это необратимо!')) return;
-    
-    const updates = {};
-    updates['sites/' + SITE + '/users/' + uid] = null;
-    updates['sites/' + SITE + '/all_users/' + uid] = null;
-    updates['sites/' + SITE + '/friends/' + uid] = null;
-    updates['sites/' + SITE + '/followers/' + uid] = null;
-    updates['sites/' + SITE + '/notifications/' + uid] = null;
-    updates['sites/' + SITE + '/users_by_name/'] = null;
-    
-    db.ref().update(updates).then(() => {
-        alert('✅ Пользователь удален');
-        loadPeople();
-        loadRooms();
-    }).catch(err => {
-        console.error('❌ Ошибка:', err);
-        alert('Ошибка удаления');
-    });
-}
-
-function adminDeleteAllUsers() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!confirm('Удалить ВСЕХ пользователей, кроме админов?')) return;
-    if (!confirm('Вы уверены? Это НЕОБРАТИМО!')) return;
-    
-    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
-        const users = snap.val() || {};
-        const updates = {};
-        Object.keys(users).forEach(uid => {
-            if (!ADMIN_UIDS.includes(uid) && uid !== USER_UID) {
-                updates['sites/' + SITE + '/users/' + uid] = null;
-                updates['sites/' + SITE + '/all_users/' + uid] = null;
-                updates['sites/' + SITE + '/friends/' + uid] = null;
-                updates['sites/' + SITE + '/followers/' + uid] = null;
-                updates['sites/' + SITE + '/notifications/' + uid] = null;
-            }
-        });
-        updates['sites/' + SITE + '/room_users/'] = null;
-        updates['sites/' + SITE + '/users_by_name/'] = null;
-        db.ref().update(updates).then(() => {
-            alert('✅ Все пользователи удалены');
-            loadPeople();
-            loadRooms();
-        }).catch(err => {
-            console.error('❌ Ошибка:', err);
-            alert('Ошибка удаления');
-        });
-    });
-}
-
-function adminClearRooms() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!confirm('Очистить все комнаты?')) return;
-    db.ref('sites/' + SITE + '/rooms').remove().then(() => {
-        db.ref('sites/' + SITE + '/room_users/').remove();
-        alert('✅ Комнаты очищены');
-        loadRooms();
-    }).catch(err => {
-        console.error('❌ Ошибка:', err);
-        alert('Ошибка очистки');
-    });
-}
-
-function adminClearNotifications() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!confirm('Очистить все уведомления?')) return;
-    db.ref('sites/' + SITE + '/notifications/').remove().then(() => {
-        alert('✅ Уведомления очищены');
-    }).catch(err => {
-        console.error('❌ Ошибка:', err);
-        alert('Ошибка очистки');
-    });
-}
-
-function adminExportData() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    db.ref('sites/' + SITE).once('value', snap => {
-        const data = snap.val();
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `metaimperiya_export_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    });
 }
 
 // ================================================================
@@ -1705,7 +2278,6 @@ auth.onAuthStateChanged(user => {
                 isAdmin: isAdmin
             };
             
-            // Генерируем username только если его нет
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/username').once('value', snap => {
                 const existingUsername = snap.val();
                 if (!existingUsername) {
@@ -1724,7 +2296,7 @@ auth.onAuthStateChanged(user => {
                         updateUI();
                         loadData();
                         loadNotifications();
-                        setTimeout(handleGitHubUsername, 300);
+                        handleInitialRoute();
                     });
                 } else {
                     currentUsername = existingUsername;
@@ -1736,7 +2308,7 @@ auth.onAuthStateChanged(user => {
                     updateUI();
                     loadData();
                     loadNotifications();
-                    setTimeout(handleGitHubUsername, 300);
+                    handleInitialRoute();
                 }
             });
         } else {
@@ -1744,7 +2316,7 @@ auth.onAuthStateChanged(user => {
             updateUI();
             loadData();
             loadNotifications();
-            setTimeout(handleGitHubUsername, 300);
+            handleInitialRoute();
         }
     } else {
         USER = null;
@@ -1799,7 +2371,7 @@ window.loginName = function() {
             updateUI();
             loadData();
             loadNotifications();
-            setTimeout(handleGitHubUsername, 300);
+            handleInitialRoute();
         });
     }).catch(e => alert('Ошибка: ' + e.message));
 };
@@ -1834,6 +2406,7 @@ window.logout = function() {
 // ================================================================
 // UI
 // ================================================================
+
 function updateUI() {
     const headerAvatar = document.getElementById('headerAvatar');
     if (!headerAvatar) return;
@@ -1874,12 +2447,14 @@ function navigateToFeed() {
     viewingProfileUid = null;
     activeStatToggle = null;
     closeProfileDropdown();
+    
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.classList.add('hidden');
+    });
+    
     document.getElementById('groupsPage').classList.add('active');
     document.getElementById('groupsPage').classList.remove('hidden');
-    document.getElementById('peoplePage').classList.remove('active');
-    document.getElementById('peoplePage').classList.add('hidden');
-    document.getElementById('profilePage').classList.remove('active');
-    document.getElementById('profilePage').classList.add('hidden');
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-bar .tab').forEach(t => {
         if (t.textContent.includes('Группы')) t.classList.add('active');
@@ -1890,6 +2465,8 @@ function navigateToFeed() {
         history.pushState(null, '', '/');
         document.title = 'METAIMPERIYA';
     }
+    // Сбрасываем мета-теги
+    generateMeta(null);
 }
 
 function showTab(tab) {
@@ -1912,18 +2489,24 @@ function showTabInternal(tab) {
         }
     });
     
-    document.getElementById('groupsPage').classList.toggle('active', tab === 'groups');
-    document.getElementById('groupsPage').classList.toggle('hidden', tab !== 'groups');
-    document.getElementById('peoplePage').classList.toggle('active', tab === 'people');
-    document.getElementById('peoplePage').classList.toggle('hidden', tab !== 'people');
-    document.getElementById('profilePage').classList.remove('active');
-    document.getElementById('profilePage').classList.add('hidden');
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.classList.add('hidden');
+    });
+    
+    if (tab === 'groups') {
+        document.getElementById('groupsPage').classList.add('active');
+        document.getElementById('groupsPage').classList.remove('hidden');
+        loadRooms();
+    } else if (tab === 'people') {
+        document.getElementById('peoplePage').classList.add('active');
+        document.getElementById('peoplePage').classList.remove('hidden');
+        loadPeople();
+    }
+    
     viewingProfileUid = null;
     activeStatToggle = null;
     closeProfileDropdown();
-    
-    if (tab === 'groups') loadRooms();
-    if (tab === 'people') loadPeople();
 }
 
 // ================================================================
@@ -1977,6 +2560,15 @@ function renderProfile(uid) {
         if (username) {
             updateUrl(username);
             document.title = `${name} | METAIMPERIYA`;
+            // SEO мета-теги для профиля
+            const seoData = {
+                title: name,
+                description: bio || `Профиль пользователя ${name} в METAIMPERIYA`,
+                keywords: `${name}, профиль, пользователь, социальная сеть`,
+                canonical: window.location.href,
+                image: avatarUrl || 'https://metaimperiya.com/og-image.jpg'
+            };
+            generateMeta(seoData);
         }
         
         if (isOwnProfile) {
@@ -2548,7 +3140,6 @@ function renderInlineUser(container, uid, userData) {
     itemDiv.id = 'user-item-' + uid;
     const avatarHtml = avatarUrl ? `<img src="${avatarUrl}" alt="${esc(name)}">` : `<span>${letter}</span>`;
     
-    // Ссылка на профиль через username
     const profileLink = username ? `/${username}` : `#`;
     const clickHandler = username ? `window.location.href='${profileLink}'` : `navigateToProfile('${uid}')`;
     
@@ -2967,7 +3558,7 @@ window.uploadAvatar = function() {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ (С СОХРАНЕНИЕМ USERNAME)
+// РЕДАКТИРОВАНИЕ
 // ================================================================
 
 window.editProfile = function() {
@@ -2990,12 +3581,10 @@ window.saveProfile = function() {
     USER = name;
     localStorage.setItem('dc_u_' + SITE, USER);
     
-    // Проверяем, есть ли уже username
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/username').once('value', snap => {
         const existingUsername = snap.val();
         
         if (existingUsername) {
-            // Обновляем только имя и био
             const updates = { name: USER, bio: bio };
             db.ref('sites/' + SITE + '/users/' + USER_UID).update(updates);
             db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(updates);
@@ -3011,7 +3600,6 @@ window.saveProfile = function() {
             updateUI();
             loadPeople();
         } else {
-            // Создаём новый username
             generateUsername(name).then(username => {
                 const updates = { name: USER, bio: bio, username: username };
                 
@@ -3051,27 +3639,53 @@ function loadData() {
 }
 
 // ================================================================
+// ОБРАБОТКА НАЧАЛЬНОГО РОУТА
+// ================================================================
+
+function handleInitialRoute() {
+    const path = window.location.pathname;
+    if (path && path !== '/' && path !== '/index.html') {
+        let slug = path.substring(1);
+        while (slug.endsWith('/')) {
+            slug = slug.slice(0, -1);
+        }
+        if (slug && slug.trim() !== '') {
+            // Проверяем SEO-страницу
+            db.ref('sites/' + SITE + '/pages_seo/' + slug).once('value', snap => {
+                if (snap.val()) {
+                    loadSEOPage(slug);
+                    return;
+                }
+                // Проверяем пользователя
+                db.ref('sites/' + SITE + '/users_by_name/' + slug).once('value', snap => {
+                    if (snap.val()) {
+                        localStorage.setItem('metaimperiya_username', slug);
+                        navigateToFeed();
+                        setTimeout(handleGitHubUsername, 200);
+                        return;
+                    }
+                });
+            });
+        }
+    }
+}
+
+// ================================================================
 // ПЕРЕХВАТ НАВИГАЦИИ НАЗАД/ВПЕРЕД
 // ================================================================
 
 window.addEventListener('popstate', function(e) {
-    const username = localStorage.getItem('metaimperiya_username');
-    if (username) {
-        localStorage.removeItem('metaimperiya_username');
-        handleGitHubUsername();
-    } else {
-        const path = window.location.pathname;
-        if (path && path !== '/' && path !== '/index.html') {
-            let username = path.substring(1);
-            while (username.endsWith('/')) {
-                username = username.slice(0, -1);
-            }
-            if (username && username.trim() !== '') {
-                localStorage.setItem('metaimperiya_username', username.trim());
-                navigateToFeed();
-                setTimeout(handleGitHubUsername, 200);
-            }
+    const path = window.location.pathname;
+    if (path && path !== '/' && path !== '/index.html') {
+        let slug = path.substring(1);
+        while (slug.endsWith('/')) {
+            slug = slug.slice(0, -1);
         }
+        if (slug && slug.trim() !== '') {
+            loadSEOPage(slug);
+        }
+    } else {
+        navigateToFeed();
     }
 });
 
@@ -3085,27 +3699,26 @@ navigateToFeed();
 window.addEventListener('load', function() {
     const path = window.location.pathname;
     if (path && path !== '/' && path !== '/index.html') {
-        let username = path.substring(1);
-        while (username.endsWith('/')) {
-            username = username.slice(0, -1);
+        let slug = path.substring(1);
+        while (slug.endsWith('/')) {
+            slug = slug.slice(0, -1);
         }
-        if (username && username.trim() !== '') {
-            localStorage.setItem('metaimperiya_username', username.trim());
-            setTimeout(handleGitHubUsername, 200);
+        if (slug && slug.trim() !== '') {
+            loadSEOPage(slug);
         }
     }
+    
+    // Обновляем SEO индекс
+    setTimeout(updateSEOIndex, 1000);
 });
 
-console.log('✅ METAIMPERIYA - ПОЛНАЯ ВЕРСИЯ С РУЧНЫМ УПРАВЛЕНИЕМ USERNAME!');
+console.log('✅ METAIMPERIYA - SEO-ОПТИМИЗИРОВАННЫЙ КОД ГОТОВ!');
+console.log('🔍 SEO-страницы: metaimperiya.com/path');
+console.log('🗺 Sitemap генерируется через админ-панель');
+console.log('👑 Админ-панель: управление SEO-страницами');
 console.log('🔗 Публичные профили: metaimperiya.com/username');
-console.log('👑 Админ-панель: установка/удаление username вручную');
-console.log('📋 adminShowUsers() - список всех пользователей с UID');
-console.log('🔹 Списки в профиле закрыты по умолчанию');
-console.log('🔹 Меню "три точки" в правом верхнем углу');
-console.log('🔹 Приватность: скрытие списков друзей');
 console.log('🔹 Друзья, подписки, подписчики');
-console.log('🔹 Личные сообщения с уведомлениями');
-console.log('📱 GitHub Pages: 404.html для обработки username');
+console.log('💬 Личные сообщения с уведомлениями');
 </script>
 </body>
 </html>
