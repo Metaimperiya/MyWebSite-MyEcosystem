@@ -1,2073 +1,1192 @@
 <!DOCTYPE html>
-
 <html lang="ru">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>METAIMPERIYA</title>
-
     
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
-
-
     <style>
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-
             background: #f0f2f5;
-
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
             padding: 20px;
-
             max-width: 600px;
-
             margin: 0 auto;
-
             min-height: 100vh;
-
         }
-
         
-
         /* ===== ХЕДЕР ===== */
-
         .header {
-
             background: #1877f2;
-
             color: white;
-
-            padding: 12px 20px;
-
+            padding: 15px 20px;
             border-radius: 16px;
-
             margin-bottom: 20px;
-
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
-
             box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
-
-            position: relative;
-
         }
-
         
-
         .header h2 {
-
             font-size: 20px;
-
             font-weight: 700;
-
         }
-
         
-
-        .header .right-group {
-
+        .header .user-info {
             display: flex;
-
             align-items: center;
-
-            gap: 8px;
-
+            gap: 12px;
         }
-
         
-
-        /* Аватарка в хедере */
-
         .header .avatar-small {
-
             width: 36px;
-
             height: 36px;
-
             border-radius: 50%;
-
             background: rgba(255,255,255,0.2);
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             font-weight: 700;
-
             font-size: 16px;
-
             overflow: hidden;
-
             border: 2px solid rgba(255,255,255,0.3);
-
-            cursor: pointer;
-
-            transition: all 0.2s;
-
-            flex-shrink: 0;
-
         }
-
         
-
-        .header .avatar-small:hover {
-
-            transform: scale(1.05);
-
-            border-color: white;
-
-        }
-
-        
-
         .header .avatar-small img {
-
             width: 100%;
-
             height: 100%;
-
             object-fit: cover;
-
         }
-
         
-
-        /* Кнопка шестеренки */
-
-        .header .settings-btn {
-
-            background: rgba(255,255,255,0.15);
-
-            border: none;
-
-            color: white;
-
-            font-size: 20px;
-
-            cursor: pointer;
-
-            padding: 6px;
-
-            border-radius: 50%;
-
-            transition: all 0.2s;
-
-            width: 36px;
-
-            height: 36px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            line-height: 1;
-
-        }
-
-        
-
-        .header .settings-btn:hover {
-
-            background: rgba(255,255,255,0.25);
-
-            transform: rotate(60deg);
-
-        }
-
-        
-
-        .header .settings-btn:active {
-
-            transform: rotate(60deg) scale(0.9);
-
-        }
-
-        
-
-        /* ===== ВЫПАДАЮЩЕЕ МЕНЮ В ХЕДЕРЕ ===== */
-
-        .header-menu-dropdown {
-
-            position: absolute;
-
-            top: 58px;
-
-            right: 0;
-
-            background: white;
-
-            border-radius: 16px;
-
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-
-            padding: 8px 0;
-
-            min-width: 200px;
-
-            opacity: 0;
-
-            transform: translateY(-10px) scale(0.95);
-
-            pointer-events: none;
-
-            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-
-            z-index: 100;
-
-            border: 1px solid rgba(0,0,0,0.05);
-
-            transform-origin: top right;
-
-        }
-
-        
-
-        .header-menu-dropdown.open {
-
-            opacity: 1;
-
-            transform: translateY(0) scale(1);
-
-            pointer-events: auto;
-
-        }
-
-        
-
-        /* Пункты меню */
-
-        .menu-item {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 12px 20px;
-
-            background: none;
-
-            border: none;
-
-            width: 100%;
-
-            text-align: left;
-
-            font-size: 14px;
-
-            font-weight: 500;
-
-            color: #333;
-
-            cursor: pointer;
-
-            transition: background 0.15s;
-
-            font-family: inherit;
-
-        }
-
-        
-
-        .menu-item:hover {
-
-            background: #f5f7fa;
-
-        }
-
-        
-
-        .menu-item:active {
-
-            background: #e8ecf1;
-
-        }
-
-        
-
-        .menu-item .icon {
-
-            font-size: 18px;
-
-            width: 24px;
-
-            text-align: center;
-
-            flex-shrink: 0;
-
-        }
-
-        
-
-        .menu-item.danger {
-
-            color: #e74c3c;
-
-        }
-
-        
-
-        .menu-item.danger:hover {
-
-            background: #fef0ef;
-
-        }
-
-        
-
-        .menu-divider {
-
-            height: 1px;
-
-            background: #eee;
-
-            margin: 4px 16px;
-
-        }
-
-        
-
-        .header .menu-overlay {
-
-            position: fixed;
-
-            top: 0;
-
-            left: 0;
-
-            right: 0;
-
-            bottom: 0;
-
-            z-index: 99;
-
-            display: none;
-
-        }
-
-        
-
-        .header .menu-overlay.active {
-
-            display: block;
-
-        }
-
-        
-
-        /* ===== ВКЛАДКИ ===== */
-
-        .tab-bar {
-
-            display: flex;
-
-            gap: 8px;
-
-            margin-bottom: 20px;
-
-            background: white;
-
-            border-radius: 16px;
-
-            padding: 6px;
-
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-
-        }
-
-        
-
-        .tab {
-
-            flex: 1;
-
-            padding: 10px;
-
-            text-align: center;
-
-            border: none;
-
-            background: none;
-
-            border-radius: 12px;
-
+        .header .user-name {
             font-weight: 600;
-
-            font-size: 14px;
-
-            color: #666;
-
-            cursor: pointer;
-
-            transition: all 0.2s;
-
-            font-family: inherit;
-
+            font-size: 15px;
         }
-
         
-
-        .tab:hover { background: #f5f7fa; }
-
-        .tab.active {
-
-            background: #1877f2;
-
-            color: white;
-
-        }
-
-        
-
         /* ===== ПРОФИЛЬ ===== */
-
         .profile-card {
-
             background: white;
-
             border-radius: 20px;
-
             padding: 30px 20px 25px;
-
             text-align: center;
-
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-
             position: relative;
-
             margin-bottom: 20px;
-
         }
-
         
-
+        /* ===== АВАТАРКА ===== */
         .profile-avatar {
-
             width: 100px;
-
             height: 100px;
-
             border-radius: 50%;
-
             background: #1877f2;
-
             margin: 0 auto 16px;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             font-size: 42px;
-
             font-weight: 700;
-
             color: white;
-
             overflow: hidden;
-
             cursor: pointer;
-
             transition: all 0.2s;
-
             position: relative;
-
         }
-
         
-
         .profile-avatar:hover {
-
             transform: scale(1.02);
-
             box-shadow: 0 4px 16px rgba(24, 119, 242, 0.3);
-
         }
-
         
-
         .profile-avatar img {
-
             width: 100%;
-
             height: 100%;
-
             object-fit: cover;
-
         }
-
         
-
         .profile-avatar .avatar-hint {
-
             position: absolute;
-
             bottom: 0;
-
             left: 0;
-
             right: 0;
-
             background: rgba(0,0,0,0.6);
-
             color: white;
-
             font-size: 11px;
-
             padding: 4px;
-
             opacity: 0;
-
             transition: opacity 0.2s;
-
         }
-
         
-
         .profile-avatar:hover .avatar-hint {
-
             opacity: 1;
-
         }
-
         
-
+        /* ===== ИМЯ И БИО ===== */
         .profile-name {
-
             font-size: 22px;
-
             font-weight: 700;
-
             color: #1a1a1a;
-
             margin-bottom: 4px;
-
         }
-
         
-
         .profile-email {
-
             font-size: 14px;
-
             color: #888;
-
             margin-bottom: 8px;
-
         }
-
         
-
         .profile-bio {
-
             font-size: 15px;
-
             color: #555;
-
             line-height: 1.5;
-
             max-width: 80%;
-
             margin: 0 auto;
-
         }
-
         
-
-        /* ===== КАРТОЧКИ ===== */
-
-        .card {
-
-            background: white;
-
-            border-radius: 16px;
-
-            padding: 16px;
-
-            margin-bottom: 12px;
-
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-
-        }
-
-        
-
-        .card h3 {
-
-            font-size: 16px;
-
-            color: #333;
-
-            margin-bottom: 12px;
-
-        }
-
-        
-
-        /* ===== ЛЮДИ ===== */
-
-        .user-item {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 10px 0;
-
-            border-bottom: 1px solid #f0f0f0;
-
-        }
-
-        
-
-        .user-item:last-child { border-bottom: none; }
-
-        
-
-        .user-item .avatar {
-
-            width: 40px;
-
-            height: 40px;
-
-            border-radius: 50%;
-
-            background: #1877f2;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            color: white;
-
-            font-weight: 700;
-
-            font-size: 16px;
-
-            flex-shrink: 0;
-
-            overflow: hidden;
-
-        }
-
-        
-
-        .user-item .avatar img {
-
-            width: 100%;
-
-            height: 100%;
-
-            object-fit: cover;
-
-        }
-
-        
-
-        .user-item .info .name {
-
-            font-weight: 600;
-
-            font-size: 15px;
-
-        }
-
-        
-
-        .user-item .info .email {
-
-            font-size: 13px;
-
-            color: #888;
-
-        }
-
-        
-
-        /* ===== ГРУППЫ ===== */
-
-        .room-grid {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr;
-
-            gap: 10px;
-
-        }
-
-        
-
-        .room-card {
-
-            background: #f8f9fa;
-
-            border-radius: 12px;
-
-            padding: 16px;
-
-            text-align: center;
-
-            cursor: pointer;
-
-            transition: all 0.2s;
-
-        }
-
-        
-
-        .room-card:hover {
-
-            background: #f0f2f5;
-
-            transform: translateY(-2px);
-
-        }
-
-        
-
-        .room-card .icon { font-size: 28px; }
-
-        .room-card .name { font-weight: 600; margin: 4px 0; font-size: 14px; }
-
-        .room-card .count { font-size: 13px; color: #888; }
-
-        
-
-        .btn {
-
-            background: #1877f2;
-
-            color: white;
-
-            border: none;
-
-            padding: 8px 16px;
-
-            border-radius: 10px;
-
-            font-weight: 600;
-
-            cursor: pointer;
-
-            font-size: 14px;
-
-            transition: all 0.2s;
-
-            font-family: inherit;
-
-        }
-
-        
-
-        .btn:hover { background: #4a9eff; }
-
-        .btn:active { transform: scale(0.96); }
-
-        
-
-        .hidden { display: none; }
-
-        
-
-        /* ===== МОДАЛКИ ===== */
-
-        .modal {
-
-            display: none;
-
-            position: fixed;
-
-            top: 0;
-
-            left: 0;
-
-            right: 0;
-
-            bottom: 0;
-
-            background: rgba(0,0,0,0.5);
-
-            z-index: 999;
-
-            justify-content: center;
-
-            align-items: center;
-
-            padding: 20px;
-
-        }
-
-        
-
-        .modal.open { display: flex; }
-
-        
-
-        .modal-content {
-
-            background: white;
-
-            border-radius: 20px;
-
-            padding: 24px;
-
-            max-width: 400px;
-
-            width: 100%;
-
-            animation: modalSlide 0.2s ease;
-
-        }
-
-        
-
-        @keyframes modalSlide {
-
-            from { transform: translateY(20px); opacity: 0; }
-
-            to { transform: translateY(0); opacity: 1; }
-
-        }
-
-        
-
-        .modal-content h3 {
-
-            font-size: 18px;
-
-            margin-bottom: 12px;
-
-        }
-
-        
-
-        .modal-content input {
-
-            width: 100%;
-
-            padding: 12px;
-
-            border: 1px solid #ddd;
-
-            border-radius: 12px;
-
-            margin: 6px 0;
-
-            font-size: 15px;
-
-            font-family: inherit;
-
-        }
-
-        
-
-        .modal-content input:focus {
-
-            outline: none;
-
-            border-color: #1877f2;
-
-        }
-
-        
-
-        .modal-content .btns {
-
-            display: flex;
-
-            gap: 10px;
-
-            margin-top: 12px;
-
-        }
-
-        
-
-        .modal-content .btns button {
-
-            flex: 1;
-
-            padding: 12px;
-
-            border: none;
-
-            border-radius: 12px;
-
-            font-weight: 600;
-
-            cursor: pointer;
-
-            font-family: inherit;
-
-            font-size: 15px;
-
-            transition: all 0.2s;
-
-        }
-
-        
-
-        .modal-content .btns .cancel {
-
-            background: #e8ecf1;
-
-            color: #333;
-
-        }
-
-        
-
-        .modal-content .btns .cancel:hover { background: #d5d9df; }
-
-        .modal-content .btns .save {
-
-            background: #1877f2;
-
-            color: white;
-
-        }
-
-        .modal-content .btns .save:hover { background: #4a9eff; }
-
-        
-
-        .google-btn {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 10px;
-
-            width: 100%;
-
-            padding: 12px;
-
-            background: white;
-
-            border: 1px solid #ddd;
-
-            border-radius: 12px;
-
-            cursor: pointer;
-
-            font-weight: 600;
-
-            font-size: 15px;
-
-            font-family: inherit;
-
-            transition: all 0.2s;
-
-        }
-
-        
-
-        .google-btn:hover { background: #f5f5f5; }
-
-        .google-btn img { width: 20px; }
-
-        
-
-        .profile-selector {
-
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 8px;
-
-            margin: 12px 0;
-
-        }
-
-        
-
-        .profile-option {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 12px;
-
-            padding: 12px;
-
-            border: 2px solid #eee;
-
-            border-radius: 12px;
-
-            cursor: pointer;
-
-            transition: all 0.2s;
-
-        }
-
-        
-
-        .profile-option:hover {
-
-            border-color: #1877f2;
-
-            background: #f5f9ff;
-
-        }
-
-        
-
-        .profile-option .avatar {
-
-            width: 36px;
-
-            height: 36px;
-
-            border-radius: 50%;
-
-            background: #1877f2;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            color: white;
-
-            font-weight: 700;
-
-            font-size: 14px;
-
-            flex-shrink: 0;
-
-            overflow: hidden;
-
-        }
-
-        
-
-        .profile-option .avatar img {
-
-            width: 100%;
-
-            height: 100%;
-
-            object-fit: cover;
-
-        }
-
-        
-
-        .profile-option .info .name { font-weight: 600; font-size: 14px; }
-
-        .profile-option .info .email { font-size: 12px; color: #888; }
-
-        
-
-        .profile-option .remove-btn {
-
-            margin-left: auto;
-
+        /* ===== КНОПКА ТРИ ТОЧКИ ===== */
+        .profile-menu-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
             background: none;
-
             border: none;
-
-            color: #ccc;
-
+            font-size: 24px;
+            color: #888;
             cursor: pointer;
-
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .profile-menu-btn:hover {
+            background: #f0f2f5;
+            color: #1877f2;
+        }
+        
+        .profile-menu-btn:active {
+            transform: scale(0.9);
+        }
+        
+        /* ===== ВЫПАДАЮЩЕЕ МЕНЮ ===== */
+        .profile-menu-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 16px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 200px;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 100;
+            border: 1px solid rgba(0,0,0,0.05);
+            transform-origin: top right;
+        }
+        
+        .profile-menu-dropdown.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        
+        /* Пункты меню */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+        
+        .menu-item:hover {
+            background: #f5f7fa;
+        }
+        
+        .menu-item:active {
+            background: #e8ecf1;
+        }
+        
+        .menu-item .icon {
             font-size: 18px;
-
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .menu-item.danger {
+            color: #e74c3c;
+        }
+        
+        .menu-item.danger:hover {
+            background: #fef0ef;
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background: #eee;
+            margin: 4px 16px;
+        }
+        
+        /* ===== ОВЕРЛЕЙ ДЛЯ ЗАКРЫТИЯ ===== */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 99;
+            display: none;
+        }
+        
+        .menu-overlay.active {
+            display: block;
+        }
+        
+        /* ===== ВКЛАДКИ ===== */
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 6px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border: none;
+            background: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .tab:hover { background: #f5f7fa; }
+        .tab.active {
+            background: #1877f2;
+            color: white;
+        }
+        
+        /* ===== КАРТОЧКИ ===== */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        
+        .card h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+        
+        /* ===== СПИСОК ЛЮДЕЙ ===== */
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .user-item:last-child { border-bottom: none; }
+        
+        .user-item .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .user-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-item .info .name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .user-item .info .email {
+            font-size: 13px;
+            color: #888;
+        }
+        
+        /* ===== КОМНАТЫ ===== */
+        .room-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .room-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .room-card:hover {
+            background: #f0f2f5;
+            transform: translateY(-2px);
+        }
+        
+        .room-card .icon { font-size: 28px; }
+        .room-card .name { font-weight: 600; margin: 4px 0; font-size: 14px; }
+        .room-card .count { font-size: 13px; color: #888; }
+        
+        .btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .btn:hover { background: #4a9eff; }
+        .btn:active { transform: scale(0.96); }
+        
+        .btn-secondary {
+            background: #e8ecf1;
+            color: #333;
+        }
+        
+        .btn-secondary:hover { background: #d5d9df; }
+        
+        .hidden { display: none; }
+        
+        /* ===== МОДАЛКИ ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal.open { display: flex; }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            animation: modalSlide 0.2s ease;
+        }
+        
+        @keyframes modalSlide {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-content h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin: 6px 0;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        
+        .modal-content input:focus {
+            outline: none;
+            border-color: #1877f2;
+        }
+        
+        .modal-content .btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .modal-content .btns button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        
+        .modal-content .btns .cancel {
+            background: #e8ecf1;
+            color: #333;
+        }
+        
+        .modal-content .btns .cancel:hover { background: #d5d9df; }
+        .modal-content .btns .save {
+            background: #1877f2;
+            color: white;
+        }
+        .modal-content .btns .save:hover { background: #4a9eff; }
+        
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .google-btn:hover { background: #f5f5f5; }
+        .google-btn img { width: 20px; }
+        
+        .profile-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        
+        .profile-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .profile-option:hover {
+            border-color: #1877f2;
+            background: #f5f9ff;
+        }
+        
+        .profile-option .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .profile-option .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-option .info .name { font-weight: 600; font-size: 14px; }
+        .profile-option .info .email { font-size: 12px; color: #888; }
+        
+        .profile-option .remove-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
             padding: 4px 8px;
-
         }
-
         
-
         .profile-option .remove-btn:hover { color: #e74c3c; }
-
         
-
         /* ===== АДАПТИВ ===== */
-
         @media (max-width: 480px) {
-
             .profile-card { padding: 24px 16px 20px; }
-
             .profile-avatar { width: 80px; height: 80px; font-size: 32px; }
-
             .profile-name { font-size: 19px; }
-
             .room-grid { grid-template-columns: 1fr; }
-
-            .header-menu-dropdown { min-width: 170px; right: 0; top: 52px; }
-
-            .header h2 { font-size: 17px; }
-
+            .profile-menu-dropdown { min-width: 170px; right: 8px; top: 54px; }
+            .profile-menu-btn { top: 12px; right: 8px; }
         }
-
     </style>
-
 </head>
-
 <body>
 
-
-
 <!-- ===== ХЕДЕР ===== -->
-
 <div class="header">
-
     <h2>🏠 METAIMPERIYA</h2>
-
-    <div class="right-group">
-
-        <!-- Аватарка -->
-
-        <div class="avatar-small" id="headerAvatar" onclick="toggleHeaderMenu()">
-
-            <span>?</span>
-
-        </div>
-
-        
-
-        <!-- Шестеренка -->
-
-        <button class="settings-btn" id="settingsBtn" onclick="toggleHeaderMenu()">
-
-            ⚙️
-
-        </button>
-
-        
-
-        <!-- Выпадающее меню -->
-
-        <div class="header-menu-dropdown" id="headerMenu">
-
-            <button class="menu-item" onclick="editProfile();closeHeaderMenu();">
-
-                <span class="icon">✏️</span> Редактировать
-
-            </button>
-
-            <button class="menu-item" onclick="uploadAvatar();closeHeaderMenu();">
-
-                <span class="icon">📷</span> Сменить аватарку
-
-            </button>
-
-            <div class="menu-divider"></div>
-
-            <button class="menu-item danger" onclick="logout();closeHeaderMenu();">
-
-                <span class="icon">🚪</span> Выйти
-
-            </button>
-
-        </div>
-
-        
-
-        <!-- Оверлей для закрытия меню -->
-
-        <div class="menu-overlay" id="headerMenuOverlay" onclick="closeHeaderMenu()"></div>
-
+    <div class="user-info">
+        <div class="avatar-small" id="headerAvatar"><span>?</span></div>
+        <span class="user-name" id="headerName">Гость</span>
     </div>
-
 </div>
 
-
-
-<!-- ===== ВКЛАДКИ (НОВЫЙ ПОРЯДОК) ===== -->
-
+<!-- ===== ВКЛАДКИ ===== -->
 <div class="tab-bar">
-
-    <button class="tab active" onclick="showTab('groups')">👥 Группы</button>
-
-    <button class="tab" onclick="showTab('people')">👤 Люди</button>
-
-    <button class="tab" onclick="showTab('profile')">👤 Профиль</button>
-
+    <button class="tab active" onclick="showTab('profile')">👤 Профиль</button>
+    <button class="tab" onclick="showTab('people')">👥 Люди</button>
+    <button class="tab" onclick="showTab('rooms')">🏠 Комнаты</button>
 </div>
-
-
-
-<!-- ===== ГРУППЫ ===== -->
-
-<div id="groupsTab">
-
-    <div class="card">
-
-        <h3>👥 Группы</h3>
-
-        <div id="roomsList" class="room-grid"></div>
-
-    </div>
-
-</div>
-
-
-
-<!-- ===== ЛЮДИ ===== -->
-
-<div id="peopleTab" class="hidden">
-
-    <div class="card">
-
-        <h3>👤 Все пользователи</h3>
-
-        <div id="peopleList"></div>
-
-    </div>
-
-</div>
-
-
 
 <!-- ===== ПРОФИЛЬ ===== -->
-
-<div id="profileTab" class="hidden">
-
+<div id="profileTab">
     <div class="profile-card">
-
-        <div class="profile-avatar" id="profileAvatar" onclick="uploadAvatar()">
-
-            <span id="avatarLetter">?</span>
-
-            <span class="avatar-hint">📷 Сменить</span>
-
-        </div>
-
+        <!-- Кнопка три точки -->
+        <button class="profile-menu-btn" id="menuToggle" onclick="toggleProfileMenu()">
+            ⋮
+        </button>
         
-
+        <!-- Выпадающее меню -->
+        <div class="profile-menu-dropdown" id="profileMenu">
+            <button class="menu-item" onclick="editProfile();closeProfileMenu();">
+                <span class="icon">✏️</span> Редактировать
+            </button>
+            <button class="menu-item" onclick="uploadAvatar();closeProfileMenu();">
+                <span class="icon">📷</span> Сменить аватарку
+            </button>
+            <div class="menu-divider"></div>
+            <button class="menu-item danger" onclick="logout();closeProfileMenu();">
+                <span class="icon">🚪</span> Выйти
+            </button>
+        </div>
+        
+        <!-- Оверлей для закрытия меню -->
+        <div class="menu-overlay" id="menuOverlay" onclick="closeProfileMenu()"></div>
+        
+        <!-- Аватарка -->
+        <div class="profile-avatar" id="profileAvatar" onclick="uploadAvatar()">
+            <span id="avatarLetter">?</span>
+            <span class="avatar-hint">📷 Сменить</span>
+        </div>
+        
+        <!-- Имя и био -->
         <div class="profile-name" id="profileName">Имя</div>
-
         <div class="profile-email" id="profileEmail">email@example.com</div>
-
         <div class="profile-bio" id="profileBio">Привет! 👋</div>
-
     </div>
-
 </div>
 
+<!-- ===== ЛЮДИ ===== -->
+<div id="peopleTab" class="hidden">
+    <div class="card">
+        <h3>👥 Все пользователи</h3>
+        <div id="peopleList"></div>
+    </div>
+</div>
 
+<!-- ===== КОМНАТЫ ===== -->
+<div id="roomsTab" class="hidden">
+    <div class="card">
+        <h3>🏠 Комнаты</h3>
+        <div id="roomsList" class="room-grid"></div>
+    </div>
+</div>
 
 <!-- ===== МОДАЛКА ВХОДА ===== -->
-
 <div class="modal" id="loginModal">
-
     <div class="modal-content">
-
         <h3>👤 Вход</h3>
-
         <button class="google-btn" id="googleBtn">
-
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
-
             Войти через Google
-
         </button>
-
         <div style="text-align:center;margin:10px 0;color:#bbb;">или</div>
-
         <div style="display:flex;gap:10px;">
-
             <input type="text" id="nameInput" placeholder="Введите имя" style="flex:1;">
-
             <button class="btn" onclick="loginName()" style="flex-shrink:0;">Войти</button>
-
         </div>
-
         <div id="savedProfiles" style="margin-top:16px;border-top:1px solid #eee;padding-top:16px;">
-
             <p style="color:#888;font-size:14px;margin-bottom:10px;">📱 Сохраненные профили:</p>
-
             <div id="profileSelector" class="profile-selector"></div>
-
         </div>
-
     </div>
-
 </div>
-
-
 
 <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ===== -->
-
 <div class="modal" id="editProfileModal">
-
     <div class="modal-content">
-
         <h3>✏️ Редактировать профиль</h3>
-
         <input type="text" id="editName" placeholder="Имя">
-
         <input type="text" id="editBio" placeholder="О себе">
-
         <div class="btns">
-
             <button class="cancel" onclick="closeEditProfile()">Отмена</button>
-
             <button class="save" onclick="saveProfile()">Сохранить</button>
-
         </div>
-
     </div>
-
 </div>
 
-
-
 <script>
-
 // ================================================================
-
 // FIREBASE
-
 // ================================================================
-
 const FB_CONFIG = {
-
     apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
-
     authDomain: "myecosystem-e6414.firebaseapp.com",
-
     databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
-
     projectId: "myecosystem-e6414",
-
     storageBucket: "myecosystem-e6414.firebasestorage.app",
-
     messagingSenderId: "426302111033",
-
     appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
-
 };
-
-
 
 firebase.initializeApp(FB_CONFIG);
-
 const db = firebase.database();
-
 const auth = firebase.auth();
-
 const storage = firebase.storage();
-
 const provider = new firebase.auth.GoogleAuthProvider();
 
-
-
 // ================================================================
-
 // СОСТОЯНИЕ
-
 // ================================================================
-
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
-
 let USER = null;
-
 let USER_UID = null;
-
 let SAVED_PROFILES = [];
 
-
-
 // ================================================================
-
-// МЕНЮ В ХЕДЕРЕ
-
+// МЕНЮ ТРИ ТОЧКИ
 // ================================================================
-
-function toggleHeaderMenu() {
-
-    const menu = document.getElementById('headerMenu');
-
-    const overlay = document.getElementById('headerMenuOverlay');
-
+function toggleProfileMenu() {
+    const menu = document.getElementById('profileMenu');
+    const overlay = document.getElementById('menuOverlay');
     const isOpen = menu.classList.contains('open');
-
     
-
     if (isOpen) {
-
-        closeHeaderMenu();
-
+        closeProfileMenu();
     } else {
-
         menu.classList.add('open');
-
         overlay.classList.add('active');
-
     }
-
 }
 
-
-
-function closeHeaderMenu() {
-
-    document.getElementById('headerMenu').classList.remove('open');
-
-    document.getElementById('headerMenuOverlay').classList.remove('active');
-
+function closeProfileMenu() {
+    document.getElementById('profileMenu').classList.remove('open');
+    document.getElementById('menuOverlay').classList.remove('active');
 }
-
-
 
 // Закрываем при клике вне меню
-
 document.addEventListener('click', function(e) {
-
-    const menu = document.getElementById('headerMenu');
-
-    const btn = document.getElementById('settingsBtn');
-
-    const avatar = document.getElementById('headerAvatar');
-
+    const menu = document.getElementById('profileMenu');
+    const btn = document.getElementById('menuToggle');
     if (menu && menu.classList.contains('open')) {
-
-        if (!menu.contains(e.target) && !btn.contains(e.target) && !avatar.contains(e.target)) {
-
-            closeHeaderMenu();
-
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            closeProfileMenu();
         }
-
     }
-
 });
 
-
-
 // ================================================================
-
 // ЗАГРУЗКА СОХРАНЕННЫХ ПРОФИЛЕЙ
-
 // ================================================================
-
 function loadSavedProfiles() {
-
     try {
-
         const saved = localStorage.getItem('dc_profiles_' + SITE);
-
         SAVED_PROFILES = saved ? JSON.parse(saved) : [];
-
     } catch(e) {
-
         SAVED_PROFILES = [];
-
     }
-
     renderSavedProfiles();
-
 }
-
-
 
 function saveProfileToList(uid, name, email, avatarUrl) {
-
     const existing = SAVED_PROFILES.find(p => p.uid === uid);
-
     if (!existing) {
-
         SAVED_PROFILES.push({
-
             uid: uid,
-
             name: name,
-
             email: email || 'anon',
-
             avatarUrl: avatarUrl || null,
-
             lastUsed: Date.now()
-
         });
-
     } else {
-
         existing.name = name;
-
         existing.email = email || 'anon';
-
         existing.avatarUrl = avatarUrl || null;
-
         existing.lastUsed = Date.now();
-
     }
-
     localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-
     renderSavedProfiles();
-
 }
-
-
 
 function renderSavedProfiles() {
-
     const container = document.getElementById('profileSelector');
-
     if (!container) return;
-
     
-
     if (SAVED_PROFILES.length === 0) {
-
         container.innerHTML = '<div style="color:#bbb;text-align:center;padding:10px;font-size:14px;">Нет сохраненных профилей</div>';
-
         return;
-
     }
-
     
-
     const sorted = [...SAVED_PROFILES].sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
-
     
-
     container.innerHTML = sorted.map(p => {
-
         const letter = (p.name || '?').charAt(0).toUpperCase();
-
         const avatarHtml = p.avatarUrl ? 
-
             `<img src="${p.avatarUrl}">` :
-
             `<span>${letter}</span>`;
-
         
-
         return `
-
             <div class="profile-option" onclick="loginWithSavedProfile('${p.uid}')">
-
                 <div class="avatar">${avatarHtml}</div>
-
                 <div class="info">
-
                     <div class="name">${p.name || 'Аноним'}</div>
-
                     <div class="email">${p.email || ''}</div>
-
                 </div>
-
                 <button class="remove-btn" onclick="event.stopPropagation();removeSavedProfile('${p.uid}')">✕</button>
-
             </div>
-
         `;
-
     }).join('');
-
 }
-
-
 
 window.removeSavedProfile = function(uid) {
-
     if (!confirm('Удалить сохраненный профиль?')) return;
-
     SAVED_PROFILES = SAVED_PROFILES.filter(p => p.uid !== uid);
-
     localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-
     renderSavedProfiles();
-
 };
-
-
 
 window.loginWithSavedProfile = function(uid) {
-
     const profile = SAVED_PROFILES.find(p => p.uid === uid);
-
     if (!profile) return;
-
     
-
     auth.signInAnonymously().then(() => {
-
         USER = profile.name;
-
         USER_UID = uid;
-
         localStorage.setItem('dc_u_' + SITE, USER);
-
         
-
         const data = {
-
             name: profile.name,
-
             email: profile.email || 'anon',
-
             uid: uid,
-
             lastLogin: Date.now(),
-
             avatarUrl: profile.avatarUrl || null
-
         };
-
         
-
         db.ref('sites/' + SITE + '/users/' + uid).update(data);
-
         db.ref('sites/' + SITE + '/all_users/' + uid).set(data);
-
         
-
         profile.lastUsed = Date.now();
-
         localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-
         
-
         document.getElementById('loginModal').classList.remove('open');
-
         updateUI();
-
         loadData();
-
     }).catch(e => alert('Ошибка входа: ' + e.message));
-
 };
 
-
-
 // ================================================================
-
 // AUTH
-
 // ================================================================
-
 auth.onAuthStateChanged(user => {
-
     if (user) {
-
         if (!USER_UID) {
-
             USER_UID = user.uid;
-
             USER = user.displayName || user.email || user.uid.slice(0, 8);
-
             localStorage.setItem('dc_u_' + SITE, USER);
-
             
-
             saveProfileToList(USER_UID, USER, user.email, user.photoURL);
-
             
-
             const data = {
-
                 name: USER,
-
                 email: user.email || 'anon',
-
                 uid: USER_UID,
-
                 lastLogin: Date.now(),
-
                 avatarUrl: user.photoURL || null
-
             };
-
             
-
             db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
-
             db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
-
         }
-
         
-
         document.getElementById('loginModal').classList.remove('open');
-
         updateUI();
-
         loadData();
-
     } else {
-
         USER = null;
-
         USER_UID = null;
-
         document.getElementById('loginModal').classList.add('open');
-
         updateUI();
-
         loadSavedProfiles();
-
     }
-
 });
-
-
 
 document.getElementById('googleBtn').addEventListener('click', () => {
-
     auth.signInWithPopup(provider).catch(err => {
-
         if (err.code === 'auth/popup-blocked') {
-
             auth.signInWithRedirect(provider);
-
         } else {
-
             alert('Ошибка: ' + err.message);
-
         }
-
     });
-
 });
 
-
-
 window.loginName = function() {
-
     const name = document.getElementById('nameInput').value.trim();
-
     if (!name) { alert('Введите имя'); return; }
-
     
-
     auth.signInAnonymously().then(() => {
-
         USER = name;
-
         USER_UID = 'anon_' + Date.now();
-
         localStorage.setItem('dc_u_' + SITE, USER);
-
         
-
         const data = {
-
             name: USER,
-
             email: 'anon_' + Date.now() + '@anon.com',
-
             uid: USER_UID,
-
             lastLogin: Date.now()
-
         };
-
         
-
         db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
-
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
-
         saveProfileToList(USER_UID, USER, data.email);
-
         
-
         document.getElementById('loginModal').classList.remove('open');
-
         updateUI();
-
         loadData();
-
     }).catch(e => alert('Ошибка: ' + e.message));
-
 };
-
-
 
 window.logout = function() {
-
     if (!confirm('Выйти из профиля?')) return;
-
-    closeHeaderMenu();
-
+    closeProfileMenu();
     auth.signOut().then(() => {
-
         localStorage.removeItem('dc_u_' + SITE);
-
         USER = null;
-
         USER_UID = null;
-
         document.getElementById('loginModal').classList.add('open');
-
         updateUI();
-
         loadSavedProfiles();
-
     }).catch(e => alert('Ошибка выхода: ' + e.message));
-
 };
 
-
-
 // ================================================================
-
-// UI (ОБНОВЛЕНО - БЕЗ ИМЕНИ В ХЕДЕРЕ)
-
+// UI
 // ================================================================
-
 function updateUI() {
-
     const headerAvatar = document.getElementById('headerAvatar');
-
+    const headerName = document.getElementById('headerName');
     
-
     if (USER) {
-
+        headerName.textContent = USER;
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', snap => {
-
             const url = snap.val();
-
             if (url) {
-
                 headerAvatar.innerHTML = `<img src="${url}">`;
-
             } else {
-
                 headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
-
             }
-
         });
-
     } else {
-
+        headerName.textContent = 'Гость';
         headerAvatar.innerHTML = '<span>?</span>';
-
     }
-
 }
 
-
-
 // ================================================================
-
 // ЗАГРУЗКА ДАННЫХ
-
 // ================================================================
-
 function loadData() {
-
     if (!USER_UID) return;
-
     loadProfile();
-
     loadPeople();
-
     loadRooms();
-
 }
 
-
-
 // ================================================================
-
 // ПРОФИЛЬ
-
 // ================================================================
-
 function loadProfile() {
-
     if (!USER_UID) return;
-
     
-
     db.ref('sites/' + SITE + '/users/' + USER_UID).once('value', snap => {
-
         const u = snap.val() || {};
-
         const name = u.name || USER || 'Гость';
-
         const email = u.email || '';
-
         const bio = u.bio || 'Привет! 👋';
-
         const avatar = document.getElementById('profileAvatar');
-
         const letter = document.getElementById('avatarLetter');
-
         
-
         document.getElementById('profileName').textContent = name;
-
         document.getElementById('profileEmail').textContent = email;
-
         document.getElementById('profileBio').textContent = bio;
-
         
-
         if (u.avatarUrl) {
-
             avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">📷 Сменить</span>`;
-
         } else {
-
             letter.textContent = name.charAt(0).toUpperCase();
-
             avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span><span class="avatar-hint">📷 Сменить</span>`;
-
         }
-
     });
-
 }
 
-
-
 // ================================================================
-
 // ЛЮДИ
-
 // ================================================================
-
 function loadPeople() {
-
     if (!USER_UID) return;
-
     
-
     db.ref('sites/' + SITE + '/all_users').once('value', snap => {
-
         const users = snap.val() || {};
-
         const keys = Object.keys(users).filter(k => k !== USER_UID);
-
         const el = document.getElementById('peopleList');
-
         
-
         if (keys.length === 0) {
-
             el.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Нет пользователей</div>';
-
             return;
-
         }
-
         
-
         let html = '';
-
         keys.forEach(k => {
-
             const u = users[k];
-
             const name = u.name || 'Аноним';
-
             const letter = name.charAt(0).toUpperCase();
-
             const avatarHtml = u.avatarUrl ? 
-
                 `<img src="${u.avatarUrl}">` : 
-
                 `<span>${letter}</span>`;
-
             
-
             html += `
-
                 <div class="user-item">
-
                     <div class="avatar">${avatarHtml}</div>
-
                     <div class="info">
-
                         <div class="name">${name}</div>
-
                         <div class="email">${u.email || ''}</div>
-
                     </div>
-
                 </div>
-
             `;
-
         });
-
         el.innerHTML = html;
-
     });
-
 }
 
-
-
 // ================================================================
-
-// ГРУППЫ (БЫВШИЕ КОМНАТЫ)
-
+// КОМНАТЫ
 // ================================================================
-
 function loadRooms() {
-
     if (!USER_UID) return;
-
     
-
     db.ref('sites/' + SITE + '/rooms').once('value', snap => {
-
         const rooms = snap.val() || {};
-
         const el = document.getElementById('roomsList');
-
         
-
         if (Object.keys(rooms).length === 0) {
-
             createDefaultRooms();
-
             return;
-
         }
-
         
-
         let html = '';
-
         Object.keys(rooms).forEach(roomId => {
-
             const room = rooms[roomId];
-
             db.ref('sites/' + SITE + '/room_users/' + roomId).once('value', snap => {
+                const users = snap.val() || {};
+                const count = Object.keys(users).length;
+                const countEl = document.querySelector(`#room-${roomId} .count`);
+                if (countEl) countEl.textContent = count;
+            });
+            
+            html += `
+                <div class="room-card" id="room-${roomId}" onclick="joinRoom('${roomId}')">
+                    <div class="icon">${room.icon || '🏠'}</div>
+                    <div class="name">${room.name}</div>
+                    <div class="count">👥 <span class="count">0</span></div>
+                </div>
+            `;
+        });
+        el.innerHTML = html;
+    });
+}
 
-                const users =
+function createDefaultRooms() {
+    for (let i = 1; i <= 10; i++) {
+        db.ref('sites/' + SITE + '/rooms/room' + i).set({
+            name: 'Комната ' + i,
+            icon: '🏠',
+            createdBy: 'system',
+            createdAt: Date.now()
+        });
+    }
+}
+
+window.joinRoom = function(roomId) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    db.ref('sites/' + SITE + '/room_users/' + roomId + '/' + USER_UID).set({
+        name: USER,
+        joinedAt: Date.now()
+    });
+    alert('✅ Вы вошли в комнату!');
+    loadRooms();
+};
+
+// ================================================================
+// АВАТАРКА
+// ================================================================
+window.uploadAvatar = function() {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    closeProfileMenu();
+    
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
+        
+        const ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
+        ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
+            db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
+            
+            const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
+            if (profile) {
+                profile.avatarUrl = url;
+                localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+            }
+            
+            loadProfile();
+            updateUI();
+            alert('✅ Аватарка обновлена!');
+        });
+    };
+    input.click();
+};
+
+// ================================================================
+// РЕДАКТИРОВАНИЕ
+// ================================================================
+window.editProfile = function() {
+    closeProfileMenu();
+    document.getElementById('editProfileModal').classList.add('open');
+    document.getElementById('editName').value = USER || '';
+    document.getElementById('editBio').value = '';
+};
+
+window.closeEditProfile = function() {
+    document.getElementById('editProfileModal').classList.remove('open');
+};
+
+window.saveProfile = function() {
+    const name = document.getElementById('editName').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    if (!name) { alert('Введите имя'); return; }
+    
+    USER = name;
+    localStorage.setItem('dc_u_' + SITE, USER);
+    
+    const updates = { name: USER, bio: bio };
+    db.ref('sites/' + SITE + '/users/' + USER_UID).update(updates);
+    db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(updates);
+    
+    const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
+    if (profile) {
+        profile.name = USER;
+        localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+    }
+    
+    closeEditProfile();
+    loadProfile();
+    updateUI();
+    loadPeople();
+};
+
+// ================================================================
+// ВКЛАДКИ
+// ================================================================
+window.showTab = function(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-bar .tab').forEach(t => {
+        const text = t.textContent.trim();
+        if ((tab === 'profile' && text.includes('Профиль')) ||
+            (tab === 'people' && text.includes('Люди')) ||
+            (tab === 'rooms' && text.includes('Комнаты'))) {
+            t.classList.add('active');
+        }
+    });
+    
+    document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
+    document.getElementById('peopleTab').classList.toggle('hidden', tab !== 'people');
+    document.getElementById('roomsTab').classList.toggle('hidden', tab !== 'rooms');
+    
+    if (tab === 'profile') loadProfile();
+    if (tab === 'people') loadPeople();
+    if (tab === 'rooms') loadRooms();
+};
+
+// ================================================================
+// ЗАПУСК
+// ================================================================
+loadSavedProfiles();
+showTab('profile');
+
+console.log('✅ METAIMPERIYA - Минималистичный профиль с меню');
+console.log('📱 Три точки в правом верхнем углу');
+console.log('🎯 Все действия спрятаны в меню');
+</script>
+</body>
+</html>
