@@ -25,13 +25,14 @@
         .header {
             background: #1877f2;
             color: white;
-            padding: 15px 20px;
+            padding: 12px 20px;
             border-radius: 16px;
             margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+            position: relative;
         }
         
         .header h2 {
@@ -39,10 +40,10 @@
             font-weight: 700;
         }
         
-        .header .user-info {
+        .header .right-group {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
         
         .header .avatar-small {
@@ -57,6 +58,14 @@
             font-size: 16px;
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .header .avatar-small:hover {
+            transform: scale(1.05);
+            border-color: white;
         }
         
         .header .avatar-small img {
@@ -65,147 +74,55 @@
             object-fit: cover;
         }
         
-        .header .user-name {
-            font-weight: 600;
-            font-size: 15px;
-        }
-        
-        /* ===== ПРОФИЛЬ ===== */
-        .profile-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px 20px 25px;
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        /* ===== АВАТАРКА ===== */
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: #1877f2;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 42px;
-            font-weight: 700;
-            color: white;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .profile-avatar:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 16px rgba(24, 119, 242, 0.3);
-        }
-        
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-avatar .avatar-hint {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            font-size: 11px;
-            padding: 4px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .profile-avatar:hover .avatar-hint {
-            opacity: 1;
-        }
-        
-        /* ===== ИМЯ И БИО ===== */
-        .profile-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 4px;
-        }
-        
-        .profile-email {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 8px;
-        }
-        
-        .profile-bio {
-            font-size: 15px;
-            color: #555;
-            line-height: 1.5;
-            max-width: 80%;
-            margin: 0 auto;
-        }
-        
-        /* ===== КНОПКА ТРИ ТОЧКИ ===== */
-        .profile-menu-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
+        .header .settings-btn {
+            background: rgba(255,255,255,0.15);
             border: none;
-            font-size: 24px;
-            color: #888;
+            color: white;
+            font-size: 20px;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
             transition: all 0.2s;
-            line-height: 1;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 1;
         }
         
-        .profile-menu-btn:hover {
-            background: #f0f2f5;
-            color: #1877f2;
+        .header .settings-btn:hover {
+            background: rgba(255,255,255,0.25);
         }
         
-        .profile-menu-btn:active {
+        .header .settings-btn:active {
             transform: scale(0.9);
         }
         
         /* ===== ВЫПАДАЮЩЕЕ МЕНЮ ===== */
-        .profile-menu-dropdown {
+        .header-menu-dropdown {
             position: absolute;
-            top: 60px;
-            right: 16px;
+            top: 58px;
+            right: 0;
             background: white;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.15);
             padding: 8px 0;
             min-width: 200px;
             opacity: 0;
-            transform: translateY(-10px) scale(0.95);
+            transform: translateY(-10px);
             pointer-events: none;
-            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: all 0.2s ease;
             z-index: 100;
             border: 1px solid rgba(0,0,0,0.05);
-            transform-origin: top right;
         }
         
-        .profile-menu-dropdown.open {
+        .header-menu-dropdown.open {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
             pointer-events: auto;
         }
         
-        /* Пункты меню */
         .menu-item {
             display: flex;
             align-items: center;
@@ -225,10 +142,6 @@
         
         .menu-item:hover {
             background: #f5f7fa;
-        }
-        
-        .menu-item:active {
-            background: #e8ecf1;
         }
         
         .menu-item .icon {
@@ -252,7 +165,6 @@
             margin: 4px 16px;
         }
         
-        /* ===== ОВЕРЛЕЙ ДЛЯ ЗАКРЫТИЯ ===== */
         .menu-overlay {
             position: fixed;
             top: 0;
@@ -299,6 +211,83 @@
             color: white;
         }
         
+        /* ===== ПРОФИЛЬ ===== */
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px 25px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #1877f2;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 700;
+            color: white;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .profile-avatar:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(24, 119, 242, 0.3);
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-avatar .avatar-hint {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 11px;
+            padding: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .profile-avatar:hover .avatar-hint {
+            opacity: 1;
+        }
+        
+        .profile-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .profile-email {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .profile-bio {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.5;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+        
         /* ===== КАРТОЧКИ ===== */
         .card {
             background: white;
@@ -314,7 +303,7 @@
             margin-bottom: 12px;
         }
         
-        /* ===== СПИСОК ЛЮДЕЙ ===== */
+        /* ===== ЛЮДИ ===== */
         .user-item {
             display: flex;
             align-items: center;
@@ -356,7 +345,7 @@
             color: #888;
         }
         
-        /* ===== КОМНАТЫ ===== */
+        /* ===== ГРУППЫ ===== */
         .room-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -396,13 +385,6 @@
         
         .btn:hover { background: #4a9eff; }
         .btn:active { transform: scale(0.96); }
-        
-        .btn-secondary {
-            background: #e8ecf1;
-            color: #333;
-        }
-        
-        .btn-secondary:hover { background: #d5d9df; }
         
         .hidden { display: none; }
         
@@ -572,8 +554,8 @@
             .profile-avatar { width: 80px; height: 80px; font-size: 32px; }
             .profile-name { font-size: 19px; }
             .room-grid { grid-template-columns: 1fr; }
-            .profile-menu-dropdown { min-width: 170px; right: 8px; top: 54px; }
-            .profile-menu-btn { top: 12px; right: 8px; }
+            .header-menu-dropdown { min-width: 170px; right: 0; top: 52px; }
+            .header h2 { font-size: 17px; }
         }
     </style>
 </head>
@@ -582,70 +564,65 @@
 <!-- ===== ХЕДЕР ===== -->
 <div class="header">
     <h2>🏠 METAIMPERIYA</h2>
-    <div class="user-info">
-        <div class="avatar-small" id="headerAvatar"><span>?</span></div>
-        <span class="user-name" id="headerName">Гость</span>
+    <div class="right-group">
+        <div class="avatar-small" id="headerAvatar" onclick="toggleHeaderMenu()">
+            <span>?</span>
+        </div>
+        <button class="settings-btn" id="settingsBtn" onclick="toggleHeaderMenu()">
+            ⚙️
+        </button>
+        
+        <div class="header-menu-dropdown" id="headerMenu">
+            <button class="menu-item" onclick="editProfile();closeHeaderMenu();">
+                <span class="icon">✏️</span> Редактировать
+            </button>
+            <button class="menu-item" onclick="uploadAvatar();closeHeaderMenu();">
+                <span class="icon">📷</span> Сменить аватар
+            </button>
+            <div class="menu-divider"></div>
+            <button class="menu-item danger" onclick="logout();closeHeaderMenu();">
+                <span class="icon">🚪</span> Выйти
+            </button>
+        </div>
+        
+        <div class="menu-overlay" id="headerMenuOverlay" onclick="closeHeaderMenu()"></div>
     </div>
 </div>
 
 <!-- ===== ВКЛАДКИ ===== -->
 <div class="tab-bar">
-    <button class="tab active" onclick="showTab('profile')">👤 Профиль</button>
-    <button class="tab" onclick="showTab('people')">👥 Люди</button>
-    <button class="tab" onclick="showTab('rooms')">🏠 Комнаты</button>
+    <button class="tab active" onclick="showTab('groups')">👥 Группы</button>
+    <button class="tab" onclick="showTab('people')">👤 Люди</button>
+    <button class="tab" onclick="showTab('profile')">👤 Профиль</button>
 </div>
 
-<!-- ===== ПРОФИЛЬ ===== -->
-<div id="profileTab">
-    <div class="profile-card">
-        <!-- Кнопка три точки -->
-        <button class="profile-menu-btn" id="menuToggle" onclick="toggleProfileMenu()">
-            ⋮
-        </button>
-        
-        <!-- Выпадающее меню -->
-        <div class="profile-menu-dropdown" id="profileMenu">
-            <button class="menu-item" onclick="editProfile();closeProfileMenu();">
-                <span class="icon">✏️</span> Редактировать
-            </button>
-            <button class="menu-item" onclick="uploadAvatar();closeProfileMenu();">
-                <span class="icon">📷</span> Сменить аватарку
-            </button>
-            <div class="menu-divider"></div>
-            <button class="menu-item danger" onclick="logout();closeProfileMenu();">
-                <span class="icon">🚪</span> Выйти
-            </button>
-        </div>
-        
-        <!-- Оверлей для закрытия меню -->
-        <div class="menu-overlay" id="menuOverlay" onclick="closeProfileMenu()"></div>
-        
-        <!-- Аватарка -->
-        <div class="profile-avatar" id="profileAvatar" onclick="uploadAvatar()">
-            <span id="avatarLetter">?</span>
-            <span class="avatar-hint">📷 Сменить</span>
-        </div>
-        
-        <!-- Имя и био -->
-        <div class="profile-name" id="profileName">Имя</div>
-        <div class="profile-email" id="profileEmail">email@example.com</div>
-        <div class="profile-bio" id="profileBio">Привет! 👋</div>
+<!-- ===== ГРУППЫ ===== -->
+<div id="groupsTab">
+    <div class="card">
+        <h3>👥 Группы</h3>
+        <div id="roomsList" class="room-grid"></div>
     </div>
 </div>
 
 <!-- ===== ЛЮДИ ===== -->
 <div id="peopleTab" class="hidden">
     <div class="card">
-        <h3>👥 Все пользователи</h3>
+        <h3>👤 Все пользователи</h3>
         <div id="peopleList"></div>
     </div>
 </div>
 
-<!-- ===== КОМНАТЫ ===== -->
-<div id="roomsTab" class="hidden">
-    <div class="card">
-        <h3>🏠 Комнаты</h3>
-        <div id="roomsList" class="room-grid"></div>
+<!-- ===== ПРОФИЛЬ ===== -->
+<div id="profileTab" class="hidden">
+    <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar" onclick="uploadAvatar()">
+            <span id="avatarLetter">?</span>
+            <span class="avatar-hint">📷 Сменить</span>
+        </div>
+        
+        <div class="profile-name" id="profileName">Имя</div>
+        <div class="profile-email" id="profileEmail">email@example.com</div>
+        <div class="profile-bio" id="profileBio">Привет! 👋</div>
     </div>
 </div>
 
@@ -711,33 +688,33 @@ let USER_UID = null;
 let SAVED_PROFILES = [];
 
 // ================================================================
-// МЕНЮ ТРИ ТОЧКИ
+// МЕНЮ В ХЕДЕРЕ
 // ================================================================
-function toggleProfileMenu() {
-    const menu = document.getElementById('profileMenu');
-    const overlay = document.getElementById('menuOverlay');
-    const isOpen = menu.classList.contains('open');
+function toggleHeaderMenu() {
+    const menu = document.getElementById('headerMenu');
+    const overlay = document.getElementById('headerMenuOverlay');
     
-    if (isOpen) {
-        closeProfileMenu();
+    if (menu.classList.contains('open')) {
+        menu.classList.remove('open');
+        overlay.classList.remove('active');
     } else {
         menu.classList.add('open');
         overlay.classList.add('active');
     }
 }
 
-function closeProfileMenu() {
-    document.getElementById('profileMenu').classList.remove('open');
-    document.getElementById('menuOverlay').classList.remove('active');
+function closeHeaderMenu() {
+    document.getElementById('headerMenu').classList.remove('open');
+    document.getElementById('headerMenuOverlay').classList.remove('active');
 }
 
-// Закрываем при клике вне меню
 document.addEventListener('click', function(e) {
-    const menu = document.getElementById('profileMenu');
-    const btn = document.getElementById('menuToggle');
+    const menu = document.getElementById('headerMenu');
+    const btn = document.getElementById('settingsBtn');
+    const avatar = document.getElementById('headerAvatar');
     if (menu && menu.classList.contains('open')) {
-        if (!menu.contains(e.target) && !btn.contains(e.target)) {
-            closeProfileMenu();
+        if (!menu.contains(e.target) && !btn.contains(e.target) && !avatar.contains(e.target)) {
+            closeHeaderMenu();
         }
     }
 });
@@ -915,7 +892,7 @@ window.loginName = function() {
 
 window.logout = function() {
     if (!confirm('Выйти из профиля?')) return;
-    closeProfileMenu();
+    closeHeaderMenu();
     auth.signOut().then(() => {
         localStorage.removeItem('dc_u_' + SITE);
         USER = null;
@@ -927,14 +904,12 @@ window.logout = function() {
 };
 
 // ================================================================
-// UI
+// UI (ОБНОВЛЕНО - ТОЛЬКО АВАТАРКА)
 // ================================================================
 function updateUI() {
     const headerAvatar = document.getElementById('headerAvatar');
-    const headerName = document.getElementById('headerName');
     
-    if (USER) {
-        headerName.textContent = USER;
+    if (USER && USER_UID) {
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', snap => {
             const url = snap.val();
             if (url) {
@@ -944,7 +919,6 @@ function updateUI() {
             }
         });
     } else {
-        headerName.textContent = 'Гость';
         headerAvatar.innerHTML = '<span>?</span>';
     }
 }
@@ -1026,7 +1000,7 @@ function loadPeople() {
 }
 
 // ================================================================
-// КОМНАТЫ
+// ГРУППЫ
 // ================================================================
 function loadRooms() {
     if (!USER_UID) return;
@@ -1052,7 +1026,7 @@ function loadRooms() {
             
             html += `
                 <div class="room-card" id="room-${roomId}" onclick="joinRoom('${roomId}')">
-                    <div class="icon">${room.icon || '🏠'}</div>
+                    <div class="icon">${room.icon || '👥'}</div>
                     <div class="name">${room.name}</div>
                     <div class="count">👥 <span class="count">0</span></div>
                 </div>
@@ -1065,8 +1039,8 @@ function loadRooms() {
 function createDefaultRooms() {
     for (let i = 1; i <= 10; i++) {
         db.ref('sites/' + SITE + '/rooms/room' + i).set({
-            name: 'Комната ' + i,
-            icon: '🏠',
+            name: 'Группа ' + i,
+            icon: '👥',
             createdBy: 'system',
             createdAt: Date.now()
         });
@@ -1079,7 +1053,7 @@ window.joinRoom = function(roomId) {
         name: USER,
         joinedAt: Date.now()
     });
-    alert('✅ Вы вошли в комнату!');
+    alert('✅ Вы вошли в группу!');
     loadRooms();
 };
 
@@ -1088,7 +1062,7 @@ window.joinRoom = function(roomId) {
 // ================================================================
 window.uploadAvatar = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
-    closeProfileMenu();
+    closeHeaderMenu();
     
     const input = document.createElement('input');
     input.type = 'file';
@@ -1121,7 +1095,7 @@ window.uploadAvatar = function() {
 // РЕДАКТИРОВАНИЕ
 // ================================================================
 window.editProfile = function() {
-    closeProfileMenu();
+    closeHeaderMenu();
     document.getElementById('editProfileModal').classList.add('open');
     document.getElementById('editName').value = USER || '';
     document.getElementById('editBio').value = '';
@@ -1162,31 +1136,32 @@ window.showTab = function(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-bar .tab').forEach(t => {
         const text = t.textContent.trim();
-        if ((tab === 'profile' && text.includes('Профиль')) ||
+        if ((tab === 'groups' && text.includes('Группы')) ||
             (tab === 'people' && text.includes('Люди')) ||
-            (tab === 'rooms' && text.includes('Комнаты'))) {
+            (tab === 'profile' && text.includes('Профиль'))) {
             t.classList.add('active');
         }
     });
     
-    document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
+    document.getElementById('groupsTab').classList.toggle('hidden', tab !== 'groups');
     document.getElementById('peopleTab').classList.toggle('hidden', tab !== 'people');
-    document.getElementById('roomsTab').classList.toggle('hidden', tab !== 'rooms');
+    document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
     
-    if (tab === 'profile') loadProfile();
+    if (tab === 'groups') loadRooms();
     if (tab === 'people') loadPeople();
-    if (tab === 'rooms') loadRooms();
+    if (tab === 'profile') loadProfile();
 };
 
 // ================================================================
 // ЗАПУСК
 // ================================================================
 loadSavedProfiles();
-showTab('profile');
+showTab('groups');
 
-console.log('✅ METAIMPERIYA - Минималистичный профиль с меню');
-console.log('📱 Три точки в правом верхнем углу');
-console.log('🎯 Все действия спрятаны в меню');
+console.log('✅ METAIMPERIYA - ВСЕ РАБОТАЕТ!');
+console.log('📱 В хедере аватарка и шестеренка');
+console.log('🎯 Меню открывается по клику');
+console.log('📋 Вкладки: Группы → Люди → Профиль');
 </script>
 </body>
 </html>
