@@ -428,6 +428,15 @@
             color: #65676b;
             margin-top: 2px;
         }
+        .profile-page .profile-username .username-copy {
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .profile-page .profile-username .username-copy:hover {
+            background: #e8f0fe;
+        }
         .profile-page .profile-email {
             font-size: 14px;
             color: #65676b;
@@ -873,16 +882,6 @@
         .page { display: none; }
         .page.active { display: block; }
         
-        .username-copy {
-            cursor: pointer;
-            padding: 2px 8px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        .username-copy:hover {
-            background: #e8f0fe;
-        }
-        
         @media (max-width: 480px) {
             body { padding: 12px; }
             .header { padding: 10px 16px; }
@@ -1059,328 +1058,34 @@ const ADMIN_UIDS = [
 let isAdmin = false;
 
 // ================================================================
-// ДИНАМИЧЕСКИЙ РОУТИНГ (PUBLIC PROFILES)
+// ОБРАБОТКА USERNAME ИЗ GITHUB PAGES
 // ================================================================
 
-function handleRouting() {
-    const path = window.location.pathname;
+function handleGitHubUsername() {
+    const username = localStorage.getItem('metaimperiya_username');
     
-    if (path === '/' || path === '/index.html' || path === '') {
-        if (USER_UID) {
-            navigateToFeed();
-        }
-        return;
-    }
-    
-    const username = path.substring(1).trim();
-    if (!username) {
-        navigateToFeed();
-        return;
-    }
-    
-    console.log(`🔍 Поиск профиля по username: ${username}`);
-    
-    db.ref('sites/' + SITE + '/users_by_name/' + username).once('value', snap => {
-        const uid = snap.val();
-        if (uid) {
-            console.log(`✅ Найден пользователь с UID: ${uid}`);
-            db.ref('sites/' + SITE + '/all_users/' + uid).once('value', userSnap => {
-                const user = userSnap.val();
-                if (user) {
-                    document.title = `${user.name || username} | METAIMPERIYA`;
-                    navigateToProfile(uid);
-                } else {
-                    document.title = 'Пользователь не найден | METAIMPERIYA';
-                    showNotFound(username);
-                }
-            });
-        } else {
-            console.log(`❌ Пользователь "${username}" не найден`);
-            document.title = 'Пользователь не найден | METAIMPERIYA';
-            showNotFound(username);
-        }
-    }).catch(err => {
-        console.error('❌ Ошибка поиска пользователя:', err);
-        showNotFound(username);
-    });
-}
-
-function showNotFound(username) {
-    const container = document.getElementById('profileContent');
-    if (!container) return;
-    
-    document.querySelectorAll('.page').forEach(p => {
-        p.classList.remove('active');
-        p.classList.add('hidden');
-    });
-    
-    document.getElementById('profilePage').classList.remove('hidden');
-    document.getElementById('profilePage').classList.add('active');
-    
-    container.innerHTML = `
-        <div class="profile-page" style="padding: 60px 20px;">
-            <div style="font-size: 80px; margin-bottom: 20px;">🔍</div>
-            <div style="font-size: 24px; font-weight: 700; color: #050505; margin-bottom: 8px;">
-                Пользователь не найден
-            </div>
-            <div style="color: #65676b; font-size: 16px; margin-bottom: 20px;">
-                Пользователь с ником <strong>@${esc(username)}</strong> не существует
-            </div>
-            <button class="btn-action" onclick="navigateToFeed()" style="background: #1877f2; color: white; padding: 10px 30px;">
-                🏠 На главную
-            </button>
-        </div>
-    `;
-}
-
-// ================================================================
-// ГЕНЕРАЦИЯ USERNAME
-// ================================================================
-
-function generateUsername(name) {
-    if (!name) return 'user_' + Date.now();
-    
-    const translitMap = {
-        'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e',
-        'ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m',
-        'н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u',
-        'ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch',
-        'ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya',
-        'А':'A','Б':'B','В':'V','Г':'G','Д':'D','Е':'E','Ё':'E',
-        'Ж':'Zh','З':'Z','И':'I','Й':'Y','К':'K','Л':'L','М':'M',
-        'Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U',
-        'Ф':'F','Х':'H','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch',
-        'Ъ':'','Ы':'Y','Ь':'','Э':'E','Ю':'Yu','Я':'Ya'
-    };
-    
-    let username = '';
-    for (let char of name.trim()) {
-        username += translitMap[char] || char;
-    }
-    
-    username = username.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
-    
-    if (username.length < 3) {
-        username = username + '_' + Math.random().toString(36).substring(2, 6);
-    }
-    
-    return new Promise((resolve) => {
-        checkUsernameUnique(username, resolve);
-    });
-}
-
-function checkUsernameUnique(baseUsername, callback) {
-    let username = baseUsername;
-    let counter = 1;
-    
-    const check = function(name, cb) {
-        db.ref('sites/' + SITE + '/users_by_name/' + name).once('value', snap => {
-            if (snap.val()) {
-                const newName = baseUsername + '_' + counter;
-                counter++;
-                check(newName, cb);
+    if (username && username.trim() !== '') {
+        console.log(`🔍 Найден username из URL: ${username}`);
+        
+        // Ищем пользователя по username
+        db.ref('sites/' + SITE + '/users_by_name/' + username).once('value', snap => {
+            const uid = snap.val();
+            
+            if (uid) {
+                console.log(`✅ Найден пользователь: ${uid}`);
+                localStorage.removeItem('metaimperiya_username');
+                navigateToProfile(uid);
+                history.pushState(null, '', '/' + username);
             } else {
-                cb(name);
+                console.log(`❌ Пользователь "${username}" не найден`);
+                localStorage.removeItem('metaimperiya_username');
+                showNotFound(username);
             }
-        });
-    };
-    
-    check(username, callback);
-}
-
-function saveUsername(uid, username) {
-    if (!uid || !username) return;
-    db.ref('sites/' + SITE + '/users_by_name/' + username).set(uid);
-    db.ref('sites/' + SITE + '/users/' + uid + '/username').set(username);
-    db.ref('sites/' + SITE + '/all_users/' + uid + '/username').set(username);
-    console.log(`✅ Username "${username}" привязан к пользователю ${uid}`);
-}
-
-function updateUrl(username) {
-    if (username && history.pushState) {
-        const newUrl = '/' + username;
-        if (window.location.pathname !== newUrl) {
-            history.pushState(null, '', newUrl);
-        }
-    }
-}
-
-function copyUsername(username) {
-    if (!username) return;
-    navigator.clipboard?.writeText(username).then(() => {
-        const el = document.querySelector('.username-copy');
-        if (el) {
-            const original = el.textContent;
-            el.textContent = '✅ Скопировано!';
-            setTimeout(() => { el.textContent = original; }, 1500);
-        }
-    }).catch(() => {});
-}
-
-// ================================================================
-// АДМИН-ФУНКЦИИ (С ПРОВЕРКОЙ)
-// ================================================================
-
-function checkAdminAccess(uid) {
-    const wasAdmin = isAdmin;
-    isAdmin = ADMIN_UIDS.includes(uid);
-    if (wasAdmin !== isAdmin) updateAdminUI();
-    console.log(`👑 Админ-режим: ${isAdmin ? 'ВКЛЮЧЕН' : 'ВЫКЛЮЧЕН'}`);
-    return isAdmin;
-}
-
-function updateAdminUI() {
-    const body = document.body;
-    if (isAdmin) {
-        body.classList.add('admin-mode');
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
-        document.querySelectorAll('.user-item').forEach(item => {
-            const uid = item.id?.replace('user-item-', '');
-            if (uid && uid !== USER_UID) {
-                const actions = item.querySelector('.actions');
-                if (actions && !item.querySelector('.admin-delete-btn')) {
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'btn-action admin-delete-btn';
-                    deleteBtn.style.cssText = 'background:#e74c3c;color:white;min-width:32px;padding:4px 8px;';
-                    deleteBtn.innerHTML = '🗑';
-                    deleteBtn.title = 'Удалить пользователя';
-                    deleteBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        if (confirm('Удалить пользователя?')) adminDeleteUser(uid);
-                    };
-                    actions.appendChild(deleteBtn);
-                }
-            }
-        });
-    } else {
-        body.classList.remove('admin-mode');
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.admin-delete-btn').forEach(el => el.remove());
-    }
-}
-
-function adminDeleteUser(uid) {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!uid || uid === USER_UID) { alert('Нельзя удалить себя'); return; }
-    if (!confirm('Удалить пользователя? Это необратимо!')) return;
-    
-    const updates = {};
-    updates['sites/' + SITE + '/users/' + uid] = null;
-    updates['sites/' + SITE + '/all_users/' + uid] = null;
-    updates['sites/' + SITE + '/friends/' + uid] = null;
-    updates['sites/' + SITE + '/followers/' + uid] = null;
-    updates['sites/' + SITE + '/notifications/' + uid] = null;
-    updates['sites/' + SITE + '/users_by_name/'] = null;
-    
-    db.ref().update(updates).then(() => {
-        alert('✅ Пользователь удален');
-        loadPeople();
-        loadRooms();
-    }).catch(err => {
-        console.error('❌ Ошибка:', err);
-        alert('Ошибка удаления');
-    });
-}
-
-function adminDeleteAllUsers() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!confirm('Удалить ВСЕХ пользователей, кроме админов?')) return;
-    if (!confirm('Вы уверены? Это НЕОБРАТИМО!')) return;
-    
-    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
-        const users = snap.val() || {};
-        const updates = {};
-        Object.keys(users).forEach(uid => {
-            if (!ADMIN_UIDS.includes(uid) && uid !== USER_UID) {
-                updates['sites/' + SITE + '/users/' + uid] = null;
-                updates['sites/' + SITE + '/all_users/' + uid] = null;
-                updates['sites/' + SITE + '/friends/' + uid] = null;
-                updates['sites/' + SITE + '/followers/' + uid] = null;
-                updates['sites/' + SITE + '/notifications/' + uid] = null;
-            }
-        });
-        updates['sites/' + SITE + '/room_users/'] = null;
-        updates['sites/' + SITE + '/users_by_name/'] = null;
-        db.ref().update(updates).then(() => {
-            alert('✅ Все пользователи удалены');
-            loadPeople();
-            loadRooms();
         }).catch(err => {
-            console.error('❌ Ошибка:', err);
-            alert('Ошибка удаления');
+            console.error('❌ Ошибка поиска:', err);
+            localStorage.removeItem('metaimperiya_username');
         });
-    });
-}
-
-function adminClearRooms() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!confirm('Очистить все комнаты?')) return;
-    db.ref('sites/' + SITE + '/rooms').remove().then(() => {
-        db.ref('sites/' + SITE + '/room_users/').remove();
-        alert('✅ Комнаты очищены');
-        loadRooms();
-    }).catch(err => {
-        console.error('❌ Ошибка:', err);
-        alert('Ошибка очистки');
-    });
-}
-
-function adminClearNotifications() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!confirm('Очистить все уведомления?')) return;
-    db.ref('sites/' + SITE + '/notifications/').remove().then(() => {
-        alert('✅ Уведомления очищены');
-    }).catch(err => {
-        console.error('❌ Ошибка:', err);
-        alert('Ошибка очистки');
-    });
-}
-
-function adminExportData() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    db.ref('sites/' + SITE).once('value', snap => {
-        const data = snap.val();
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], {type: 'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `metaimperiya_export_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-    });
-}
-
-function adminFixUsernames() {
-    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
-    if (!confirm('Починить username для всех пользователей?')) return;
-    
-    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
-        const users = snap.val() || {};
-        let count = 0;
-        const promises = [];
-        
-        Object.keys(users).forEach(uid => {
-            const user = users[uid];
-            if (user && user.name) {
-                promises.push(
-                    generateUsername(user.name).then(username => {
-                        saveUsername(uid, username);
-                        db.ref('sites/' + SITE + '/all_users/' + uid + '/username').set(username);
-                        count++;
-                    })
-                );
-            }
-        });
-        
-        Promise.all(promises).then(() => {
-            alert(`✅ Username обновлены для ${count} пользователей`);
-            loadPeople();
-        }).catch(err => {
-            console.error('❌ Ошибка:', err);
-            alert('Ошибка обновления');
-        });
-    });
+    }
 }
 
 // ================================================================
@@ -1571,6 +1276,256 @@ window.loginWithSavedProfile = function(uid) {
 };
 
 // ================================================================
+// ГЕНЕРАЦИЯ USERNAME
+// ================================================================
+
+function generateUsername(name) {
+    if (!name) return 'user_' + Date.now();
+    
+    const translitMap = {
+        'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e',
+        'ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m',
+        'н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u',
+        'ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch',
+        'ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya',
+        'А':'A','Б':'B','В':'V','Г':'G','Д':'D','Е':'E','Ё':'E',
+        'Ж':'Zh','З':'Z','И':'I','Й':'Y','К':'K','Л':'L','М':'M',
+        'Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U',
+        'Ф':'F','Х':'H','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch',
+        'Ъ':'','Ы':'Y','Ь':'','Э':'E','Ю':'Yu','Я':'Ya'
+    };
+    
+    let username = '';
+    for (let char of name.trim()) {
+        username += translitMap[char] || char;
+    }
+    
+    username = username.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
+    
+    if (username.length < 3) {
+        username = username + '_' + Math.random().toString(36).substring(2, 6);
+    }
+    
+    return new Promise((resolve) => {
+        checkUsernameUnique(username, resolve);
+    });
+}
+
+function checkUsernameUnique(baseUsername, callback) {
+    let username = baseUsername;
+    let counter = 1;
+    
+    const check = function(name, cb) {
+        db.ref('sites/' + SITE + '/users_by_name/' + name).once('value', snap => {
+            if (snap.val()) {
+                const newName = baseUsername + '_' + counter;
+                counter++;
+                check(newName, cb);
+            } else {
+                cb(name);
+            }
+        });
+    };
+    
+    check(username, callback);
+}
+
+function saveUsername(uid, username) {
+    if (!uid || !username) return;
+    db.ref('sites/' + SITE + '/users_by_name/' + username).set(uid);
+    db.ref('sites/' + SITE + '/users/' + uid + '/username').set(username);
+    db.ref('sites/' + SITE + '/all_users/' + uid + '/username').set(username);
+    console.log(`✅ Username "${username}" привязан к пользователю ${uid}`);
+}
+
+function updateUrl(username) {
+    if (username && history.pushState) {
+        const newUrl = '/' + username;
+        if (window.location.pathname !== newUrl) {
+            history.pushState(null, '', newUrl);
+        }
+    }
+}
+
+function copyUsername(username) {
+    if (!username) return;
+    navigator.clipboard?.writeText(username).then(() => {
+        const el = document.querySelector('.username-copy');
+        if (el) {
+            const original = el.textContent;
+            el.textContent = '✅ Скопировано!';
+            setTimeout(() => { el.textContent = original; }, 1500);
+        }
+    }).catch(() => {});
+}
+
+// ================================================================
+// АДМИН-ФУНКЦИИ
+// ================================================================
+
+function checkAdminAccess(uid) {
+    const wasAdmin = isAdmin;
+    isAdmin = ADMIN_UIDS.includes(uid);
+    if (wasAdmin !== isAdmin) updateAdminUI();
+    console.log(`👑 Админ-режим: ${isAdmin ? 'ВКЛЮЧЕН' : 'ВЫКЛЮЧЕН'}`);
+    return isAdmin;
+}
+
+function updateAdminUI() {
+    const body = document.body;
+    if (isAdmin) {
+        body.classList.add('admin-mode');
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
+        document.querySelectorAll('.user-item').forEach(item => {
+            const uid = item.id?.replace('user-item-', '');
+            if (uid && uid !== USER_UID) {
+                const actions = item.querySelector('.actions');
+                if (actions && !item.querySelector('.admin-delete-btn')) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-action admin-delete-btn';
+                    deleteBtn.style.cssText = 'background:#e74c3c;color:white;min-width:32px;padding:4px 8px;';
+                    deleteBtn.innerHTML = '🗑';
+                    deleteBtn.title = 'Удалить пользователя';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm('Удалить пользователя?')) adminDeleteUser(uid);
+                    };
+                    actions.appendChild(deleteBtn);
+                }
+            }
+        });
+    } else {
+        body.classList.remove('admin-mode');
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.admin-delete-btn').forEach(el => el.remove());
+    }
+}
+
+function adminDeleteUser(uid) {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!uid || uid === USER_UID) { alert('Нельзя удалить себя'); return; }
+    if (!confirm('Удалить пользователя? Это необратимо!')) return;
+    
+    const updates = {};
+    updates['sites/' + SITE + '/users/' + uid] = null;
+    updates['sites/' + SITE + '/all_users/' + uid] = null;
+    updates['sites/' + SITE + '/friends/' + uid] = null;
+    updates['sites/' + SITE + '/followers/' + uid] = null;
+    updates['sites/' + SITE + '/notifications/' + uid] = null;
+    updates['sites/' + SITE + '/users_by_name/'] = null;
+    
+    db.ref().update(updates).then(() => {
+        alert('✅ Пользователь удален');
+        loadPeople();
+        loadRooms();
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка удаления');
+    });
+}
+
+function adminDeleteAllUsers() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Удалить ВСЕХ пользователей, кроме админов?')) return;
+    if (!confirm('Вы уверены? Это НЕОБРАТИМО!')) return;
+    
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        const updates = {};
+        Object.keys(users).forEach(uid => {
+            if (!ADMIN_UIDS.includes(uid) && uid !== USER_UID) {
+                updates['sites/' + SITE + '/users/' + uid] = null;
+                updates['sites/' + SITE + '/all_users/' + uid] = null;
+                updates['sites/' + SITE + '/friends/' + uid] = null;
+                updates['sites/' + SITE + '/followers/' + uid] = null;
+                updates['sites/' + SITE + '/notifications/' + uid] = null;
+            }
+        });
+        updates['sites/' + SITE + '/room_users/'] = null;
+        updates['sites/' + SITE + '/users_by_name/'] = null;
+        db.ref().update(updates).then(() => {
+            alert('✅ Все пользователи удалены');
+            loadPeople();
+            loadRooms();
+        }).catch(err => {
+            console.error('❌ Ошибка:', err);
+            alert('Ошибка удаления');
+        });
+    });
+}
+
+function adminClearRooms() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Очистить все комнаты?')) return;
+    db.ref('sites/' + SITE + '/rooms').remove().then(() => {
+        db.ref('sites/' + SITE + '/room_users/').remove();
+        alert('✅ Комнаты очищены');
+        loadRooms();
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка очистки');
+    });
+}
+
+function adminClearNotifications() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Очистить все уведомления?')) return;
+    db.ref('sites/' + SITE + '/notifications/').remove().then(() => {
+        alert('✅ Уведомления очищены');
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка очистки');
+    });
+}
+
+function adminExportData() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    db.ref('sites/' + SITE).once('value', snap => {
+        const data = snap.val();
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `metaimperiya_export_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+}
+
+function adminFixUsernames() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Починить username для всех пользователей?')) return;
+    
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        let count = 0;
+        const promises = [];
+        
+        Object.keys(users).forEach(uid => {
+            const user = users[uid];
+            if (user && user.name) {
+                promises.push(
+                    generateUsername(user.name).then(username => {
+                        saveUsername(uid, username);
+                        db.ref('sites/' + SITE + '/all_users/' + uid + '/username').set(username);
+                        count++;
+                    })
+                );
+            }
+        });
+        
+        Promise.all(promises).then(() => {
+            alert(`✅ Username обновлены для ${count} пользователей`);
+            loadPeople();
+        }).catch(err => {
+            console.error('❌ Ошибка:', err);
+            alert('Ошибка обновления');
+        });
+    });
+}
+
+// ================================================================
 // AUTH (С АВТОМАТИЧЕСКОЙ ПРОВЕРКОЙ АДМИНА И USERNAME)
 // ================================================================
 
@@ -1593,7 +1548,6 @@ auth.onAuthStateChanged(user => {
                 isAdmin: isAdmin
             };
             
-            // Генерируем и сохраняем username
             generateUsername(USER).then(username => {
                 currentUsername = username;
                 data.username = username;
@@ -1610,8 +1564,8 @@ auth.onAuthStateChanged(user => {
                 loadData();
                 loadNotifications();
                 
-                // Проверяем роутинг после входа
-                setTimeout(handleRouting, 300);
+                // Проверяем GitHub Pages роутинг
+                setTimeout(handleGitHubUsername, 300);
             });
         } else {
             document.getElementById('loginModal').classList.remove('open');
@@ -1619,8 +1573,8 @@ auth.onAuthStateChanged(user => {
             loadData();
             loadNotifications();
             
-            // Проверяем роутинг после входа
-            setTimeout(handleRouting, 300);
+            // Проверяем GitHub Pages роутинг
+            setTimeout(handleGitHubUsername, 300);
         }
     } else {
         USER = null;
@@ -1675,7 +1629,7 @@ window.loginName = function() {
             updateUI();
             loadData();
             loadNotifications();
-            setTimeout(handleRouting, 300);
+            setTimeout(handleGitHubUsername, 300);
         });
     }).catch(e => alert('Ошибка: ' + e.message));
 };
@@ -1762,7 +1716,6 @@ function navigateToFeed() {
     });
     currentTab = 'groups';
     loadRooms();
-    // Обновляем URL
     if (window.location.pathname !== '/') {
         history.pushState(null, '', '/');
         document.title = 'METAIMPERIYA';
@@ -1851,7 +1804,6 @@ function renderProfile(uid) {
         const bio = user.bio || 'Привет! 👋';
         const avatarUrl = user.avatarUrl || null;
         
-        // Обновляем URL для публичного профиля
         if (username) {
             updateUrl(username);
             document.title = `${name} | METAIMPERIYA`;
@@ -1934,7 +1886,6 @@ function renderProfile(uid) {
         let actionsHtml = '';
         let statHtml = '';
         
-        // Кнопка копирования username
         const usernameHtml = username ? `
             <div class="profile-username">
                 @<span class="username-copy" onclick="copyUsername('${username}')" title="Нажмите чтобы скопировать">${username}</span>
@@ -2042,6 +1993,34 @@ function renderProfile(uid) {
             }
         }
     });
+}
+
+function showNotFound(username) {
+    const container = document.getElementById('profileContent');
+    if (!container) return;
+    
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.classList.add('hidden');
+    });
+    
+    document.getElementById('profilePage').classList.remove('hidden');
+    document.getElementById('profilePage').classList.add('active');
+    
+    container.innerHTML = `
+        <div class="profile-page" style="padding: 60px 20px;">
+            <div style="font-size: 80px; margin-bottom: 20px;">🔍</div>
+            <div style="font-size: 24px; font-weight: 700; color: #050505; margin-bottom: 8px;">
+                Пользователь не найден
+            </div>
+            <div style="color: #65676b; font-size: 16px; margin-bottom: 20px;">
+                Пользователь с ником <strong>@${esc(username)}</strong> не существует
+            </div>
+            <button class="btn-action" onclick="navigateToFeed()" style="background: #1877f2; color: white; padding: 10px 30px;">
+                🏠 На главную
+            </button>
+        </div>
+    `;
 }
 
 // ================================================================
@@ -2399,7 +2378,7 @@ function renderInlineUser(container, uid, userData) {
     itemDiv.id = 'user-item-' + uid;
     const avatarHtml = avatarUrl ? `<img src="${avatarUrl}" alt="${esc(name)}">` : `<span>${letter}</span>`;
     
-    // Ссылка на профиль
+    // Ссылка на профиль через username
     const profileLink = username ? `/${username}` : `#`;
     const clickHandler = username ? `window.location.href='${profileLink}'` : `navigateToProfile('${uid}')`;
     
@@ -2635,7 +2614,6 @@ function handleNotifClick(notifId, fromUid, type) {
         db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
     } else if (type === 'friend_request') {
         closeNotifications();
-        // Ищем username для перехода
         db.ref('sites/' + SITE + '/all_users/' + fromUid + '/username').once('value', snap => {
             const username = snap.val();
             if (username) {
@@ -2860,7 +2838,6 @@ window.saveProfile = function() {
         updateUI();
         loadPeople();
         
-        // Обновляем URL
         updateUrl(username);
         document.title = `${USER} | METAIMPERIYA`;
     });
@@ -2884,19 +2861,28 @@ function loadData() {
 // ================================================================
 
 window.addEventListener('popstate', function(e) {
-    handleRouting();
+    const username = localStorage.getItem('metaimperiya_username');
+    if (username) {
+        localStorage.removeItem('metaimperiya_username');
+        handleGitHubUsername();
+    } else {
+        handleRouting();
+    }
 });
 
-// ================================================================
-// ЗАПУСК РОУТИНГА
-// ================================================================
-
-if (document.readyState === 'complete') {
-    handleRouting();
-} else {
-    window.addEventListener('load', function() {
-        handleRouting();
-    });
+function handleRouting() {
+    const path = window.location.pathname;
+    if (path && path !== '/' && path !== '/index.html') {
+        let username = path.substring(1);
+        while (username.endsWith('/')) {
+            username = username.slice(0, -1);
+        }
+        if (username && username.trim() !== '') {
+            localStorage.setItem('metaimperiya_username', username.trim());
+            navigateToFeed();
+            setTimeout(handleGitHubUsername, 200);
+        }
+    }
 }
 
 // ================================================================
@@ -2906,7 +2892,12 @@ if (document.readyState === 'complete') {
 loadSavedProfiles();
 navigateToFeed();
 
-console.log('✅ METAIMPERIYA - ДИНАМИЧЕСКИЙ РОУТИНГ ГОТОВ!');
+// При загрузке страницы проверяем роутинг
+window.addEventListener('load', function() {
+    setTimeout(handleRouting, 100);
+});
+
+console.log('✅ METAIMPERIYA - ПОЛНАЯ ВЕРСИЯ ГОТОВА!');
 console.log('🔗 Публичные профили: metaimperiya.com/username');
 console.log('👑 Админ-режим: включен автоматически по UID');
 console.log('🔹 Списки в профиле закрыты по умолчанию');
@@ -2914,6 +2905,7 @@ console.log('🔹 Меню "три точки" в правом верхнем у
 console.log('🔹 Приватность: скрытие списков друзей');
 console.log('🔹 Друзья, подписки, подписчики');
 console.log('🔹 Личные сообщения с уведомлениями');
+console.log('📱 GitHub Pages: 404.html для обработки username');
 </script>
 </body>
 </html>
