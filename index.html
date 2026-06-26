@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>METAIMPERIYA - Inline UI</title>
+    <title>METAIMPERIYA</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -16,55 +16,55 @@
             background: #f0f2f5;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             padding: 20px;
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
             min-height: 100vh;
         }
         
+        /* ===== HEADER ===== */
         .header {
-            background: transparent;
-            padding: 8px 0 16px 0;
+            background: #1877f2;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
         }
         
         .header .left h2 {
-            font-size: 18px;
-            color: #1877f2;
+            font-size: 20px;
+            font-weight: 700;
         }
         
         .header .right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .header .notif-btn {
             position: relative;
-            background: none;
+            background: rgba(255,255,255,0.15);
             border: none;
-            font-size: 22px;
+            color: white;
+            font-size: 20px;
             cursor: pointer;
-            padding: 4px;
-            border-radius: 50%;
+            padding: 6px 10px;
+            border-radius: 8px;
             transition: all 0.2s;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         .header .notif-btn:hover {
-            background: rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.25);
         }
         
         .header .notif-btn .badge {
             position: absolute;
-            top: 0;
-            right: 0;
+            top: -4px;
+            right: -4px;
             background: #e74c3c;
             color: white;
             font-size: 10px;
@@ -76,26 +76,25 @@
         }
         
         .header .avatar-small {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: #1877f2;
+            background: rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             color: white;
             overflow: hidden;
             cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.3);
             transition: all 0.2s;
-            border: 2px solid #1877f2;
-            flex-shrink: 0;
         }
         
         .header .avatar-small:hover {
+            border-color: white;
             transform: scale(1.05);
-            box-shadow: 0 2px 12px rgba(24, 119, 242, 0.3);
         }
         
         .header .avatar-small img {
@@ -104,13 +103,14 @@
             object-fit: cover;
         }
         
+        /* ===== TABS ===== */
         .tab-bar {
             display: flex;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             background: white;
-            border-radius: 16px;
-            padding: 6px;
+            border-radius: 12px;
+            padding: 4px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
         
@@ -120,52 +120,235 @@
             text-align: center;
             border: none;
             background: none;
-            border-radius: 12px;
+            border-radius: 10px;
             font-weight: 600;
             font-size: 14px;
-            color: #666;
+            color: #65676b;
             cursor: pointer;
             transition: all 0.2s;
             font-family: inherit;
         }
         
-        .tab:hover { background: #f5f7fa; }
+        .tab:hover {
+            background: #f0f2f5;
+        }
+        
         .tab.active {
             background: #1877f2;
             color: white;
         }
         
-        .profile-card {
+        /* ===== CARD ===== */
+        .card {
             background: white;
-            border-radius: 20px;
-            padding: 40px 20px 30px;
-            text-align: center;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
         
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
+        .card h3 {
+            font-size: 17px;
+            color: #050505;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        /* ===== USER LIST - FACEBOOK STYLE ===== */
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            height: 60px;
+            border-bottom: 1px solid #e4e6eb;
+            transition: background 0.15s;
+            gap: 12px;
+            cursor: default;
+        }
+        
+        .user-item:hover {
+            background: #f0f2f5;
+            border-radius: 8px;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-item .avatar {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
             border-radius: 50%;
-            background: #1877f2;
-            margin: 0 auto 16px;
+            background: #e4e6eb;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #65676b;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        .user-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-item .info {
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+        
+        .user-item .info .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #050505;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-item .info .email {
+            display: none;
+        }
+        
+        .user-item .actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px 14px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            white-space: nowrap;
+            background: #e4e6eb;
+            color: #050505;
+        }
+        
+        .btn-action:hover {
+            background: #d8dadf;
+        }
+        
+        .btn-action:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-message {
+            background: #e4e6eb;
+            color: #050505;
+            min-width: 32px;
+            padding: 6px 12px;
+        }
+        
+        .btn-message:hover {
+            background: #d8dadf;
+        }
+        
+        .btn-message .icon {
+            font-size: 15px;
+            line-height: 1;
+        }
+        
+        .btn-friend {
+            min-width: 80px;
+            padding: 6px 14px;
+            background: #e4e6eb;
+            color: #050505;
+        }
+        
+        .btn-friend:hover {
+            background: #d8dadf;
+        }
+        
+        .btn-friend.add {
+            background: #e4e6eb;
+            color: #050505;
+        }
+        
+        .btn-friend.add:hover {
+            background: #d8dadf;
+        }
+        
+        .btn-friend.pending {
+            background: #e4e6eb;
+            color: #050505;
+            opacity: 0.7;
+            cursor: default;
+        }
+        
+        .btn-friend.pending:hover {
+            background: #e4e6eb;
+        }
+        
+        .btn-friend.friend {
+            background: #e4e6eb;
+            color: #050505;
+        }
+        
+        .btn-friend.friend:hover {
+            background: #d8dadf;
+        }
+        
+        .btn-friend .icon {
+            font-size: 14px;
+            line-height: 1;
+            margin-right: 4px;
+        }
+        
+        .btn-message .icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+        
+        /* ===== PROFILE ===== */
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 20px 24px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            margin-bottom: 12px;
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #e4e6eb;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
             font-weight: 700;
-            color: white;
+            color: #65676b;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.2s;
-            position: relative;
-            border: 3px solid #1877f2;
+            border: 3px solid #e4e6eb;
         }
         
         .profile-avatar:hover {
+            border-color: #1877f2;
             transform: scale(1.02);
-            box-shadow: 0 4px 20px rgba(24, 119, 242, 0.3);
         }
         
         .profile-avatar img {
@@ -175,43 +358,28 @@
         }
         
         .profile-avatar .avatar-hint {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            font-size: 12px;
-            padding: 6px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .profile-avatar:hover .avatar-hint {
-            opacity: 1;
+            display: none;
         }
         
         .profile-name {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 4px;
+            color: #050505;
         }
         
         .profile-email {
             font-size: 14px;
-            color: #888;
-            margin-bottom: 8px;
+            color: #65676b;
+            margin-top: 4px;
         }
         
         .profile-bio {
-            font-size: 15px;
-            color: #555;
-            line-height: 1.5;
-            max-width: 80%;
-            margin: 0 auto;
+            font-size: 14px;
+            color: #65676b;
+            margin-top: 8px;
         }
         
+        /* ===== STAT TABS ===== */
         .stat-tabs {
             display: flex;
             gap: 8px;
@@ -223,8 +391,8 @@
         .stat-tab {
             padding: 6px 14px;
             border: none;
-            background: #e8ecf1;
-            color: #555;
+            background: #e4e6eb;
+            color: #65676b;
             border-radius: 20px;
             font-weight: 600;
             cursor: pointer;
@@ -234,7 +402,7 @@
         }
         
         .stat-tab:hover {
-            background: #d5d9df;
+            background: #d8dadf;
         }
         
         .stat-tab.active {
@@ -260,319 +428,234 @@
         }
         
         .stat-empty {
-            color: #888;
+            color: #65676b;
             font-size: 14px;
             padding: 20px 0;
             text-align: center;
         }
         
-        .context-menu {
-            position: fixed;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            padding: 8px 0;
-            min-width: 200px;
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-            transition: all 0.2s ease;
-            z-index: 1000;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .context-menu.open {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
-        
-        .context-menu .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-            cursor: pointer;
-            transition: background 0.15s;
-            font-family: inherit;
-        }
-        
-        .context-menu .menu-item:hover {
-            background: #f5f7fa;
-        }
-        
-        .context-menu .menu-item .icon {
-            font-size: 18px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        
-        .context-menu .menu-item.danger {
-            color: #e74c3c;
-        }
-        
-        .context-menu .menu-item.danger:hover {
-            background: #fef0ef;
-        }
-        
-        .context-menu .menu-divider {
-            height: 1px;
-            background: #eee;
-            margin: 4px 16px;
-        }
-        
-        .context-overlay {
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 999;
-            display: none;
-        }
-        
-        .context-overlay.active {
-            display: block;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-        }
-        
-        .card h3 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 12px;
-        }
-        
-        /* ===== INLINE USER ITEM С КНОПКАМИ ===== */
-        .user-item {
-            display: flex;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
             align-items: center;
-            gap: 10px;
-            padding: 10px 8px;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.15s;
+            padding: 20px;
+        }
+        
+        .modal.open {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlide 0.2s ease;
+        }
+        
+        @keyframes modalSlide {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #050505;
+        }
+        
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e4e6eb;
             border-radius: 8px;
+            margin: 6px 0;
+            font-size: 15px;
+            font-family: inherit;
         }
         
-        .user-item:hover {
-            background: #f5f7fa;
+        .modal-content input:focus {
+            outline: none;
+            border-color: #1877f2;
         }
         
-        .user-item:last-child {
-            border-bottom: none;
+        .modal-content .btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
         }
         
-        .user-item .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .modal-content .btns button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        
+        .modal-content .btns .cancel {
+            background: #e4e6eb;
+            color: #050505;
+        }
+        
+        .modal-content .btns .cancel:hover {
+            background: #d8dadf;
+        }
+        
+        .modal-content .btns .save {
             background: #1877f2;
+            color: white;
+        }
+        
+        .modal-content .btns .save:hover {
+            background: #4a9eff;
+        }
+        
+        .google-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-            flex-shrink: 0;
-            overflow: hidden;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e4e6eb;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
         }
         
-        .user-item .avatar img {
+        .google-btn:hover {
+            background: #f0f2f5;
+        }
+        
+        .google-btn img {
+            width: 20px;
+        }
+        
+        .profile-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        
+        .profile-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #e4e6eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .profile-option:hover {
+            border-color: #1877f2;
+            background: #f0f7ff;
+        }
+        
+        .profile-option .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e4e6eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #65676b;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .profile-option .avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        .user-item .info {
-            flex: 1;
-            cursor: pointer;
-            min-width: 0;
-        }
-        
-        .user-item .info .name {
+        .profile-option .info .name {
             font-weight: 600;
             font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         
-        .user-item .info .email {
+        .profile-option .info .email {
             font-size: 12px;
-            color: #888;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: #65676b;
         }
         
-        .user-item .actions {
-            display: flex;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        
-        .btn-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
+        .profile-option .remove-btn {
+            margin-left: auto;
+            background: none;
             border: none;
-            background: #e8ecf1;
-            color: #555;
+            color: #ccc;
             cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            font-size: 18px;
+            padding: 4px 8px;
         }
         
-        .btn-icon:hover {
-            background: #d5d9df;
-            transform: scale(1.05);
+        .profile-option .remove-btn:hover {
+            color: #e74c3c;
         }
         
-        .btn-icon:active {
-            transform: scale(0.92);
-        }
-        
-        .btn-icon.primary {
-            background: #1877f2;
-            color: white;
-        }
-        
-        .btn-icon.primary:hover {
-            background: #4a9eff;
-        }
-        
-        .btn-icon.success {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .btn-icon.success:hover {
-            background: #219a52;
-        }
-        
-        .btn-icon.danger {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .btn-icon.danger:hover {
-            background: #c0392b;
-        }
-        
-        .btn-icon.pending {
-            background: #f39c12;
-            color: white;
-        }
-        
-        .btn-icon.pending:hover {
-            background: #d68910;
-        }
-        
-        .btn-icon.friend {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .btn-icon.friend:hover {
-            background: #219a52;
-        }
-        
-        .btn-icon .badge-icon {
-            font-size: 14px;
-        }
-        
-        .room-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .room-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .room-card:hover {
-            background: #f0f2f5;
-            transform: translateY(-2px);
-        }
-        
-        .room-card .icon { font-size: 28px; }
-        .room-card .name { font-weight: 600; margin: 4px 0; font-size: 14px; }
-        .room-card .count { font-size: 13px; color: #888; }
-        
-        .hidden { display: none; }
-        
-        /* ===== FIXED FLOATING CHAT WINDOW ===== */
-        .chat-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 9998;
-            display: none;
-            backdrop-filter: blur(2px);
-        }
-        
-        .chat-overlay.active {
-            display: block;
-        }
-        
+        /* ===== CHAT WINDOW ===== */
         .chat-window {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 450px;
-            height: 80%;
-            max-height: 600px;
+            bottom: 20px;
+            right: 20px;
+            width: 380px;
+            max-width: calc(100% - 40px);
+            height: 500px;
+            max-height: calc(100% - 100px);
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
             z-index: 9999;
             display: none;
             flex-direction: column;
             overflow: hidden;
-            animation: chatSlideIn 0.25s ease;
+            animation: chatSlideUp 0.25s ease;
         }
         
         .chat-window.active {
             display: flex;
         }
         
-        @keyframes chatSlideIn {
+        @keyframes chatSlideUp {
             from {
                 opacity: 0;
-                transform: translate(-50%, -50%) scale(0.92);
+                transform: translateY(20px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
+                transform: translateY(0) scale(1);
             }
         }
         
@@ -580,8 +663,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid #eee;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e4e6eb;
             background: #1877f2;
             color: white;
             flex-shrink: 0;
@@ -589,22 +672,22 @@
         
         .chat-window .chat-header .title {
             font-weight: 600;
-            font-size: 16px;
+            font-size: 15px;
         }
         
         .chat-window .chat-header .close-btn {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             border: none;
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
             padding: 4px 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.2s;
         }
         
         .chat-window .chat-header .close-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.25);
         }
         
         .chat-window .chat-messages {
@@ -654,7 +737,7 @@
             display: flex;
             gap: 8px;
             padding: 12px 16px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #e4e6eb;
             background: white;
             flex-shrink: 0;
         }
@@ -662,8 +745,8 @@
         .chat-window .chat-input-wrap input {
             flex: 1;
             padding: 10px 16px;
-            border: 1px solid #ddd;
-            border-radius: 24px;
+            border: 1px solid #e4e6eb;
+            border-radius: 20px;
             outline: none;
             font-size: 14px;
             font-family: inherit;
@@ -677,7 +760,7 @@
             background: #1877f2;
             color: white;
             border: none;
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 0 20px;
             font-weight: 600;
             cursor: pointer;
@@ -690,13 +773,88 @@
             background: #4a9eff;
         }
         
-        .chat-window .chat-input-wrap button:active {
+        /* ===== CONTEXT MENU ===== */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 200px;
+            opacity: 0;
             transform: scale(0.95);
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 1000;
+            border: 1px solid #e4e6eb;
         }
         
+        .context-menu.open {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        
+        .context-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: #050505;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+        
+        .context-menu .menu-item:hover {
+            background: #f0f2f5;
+        }
+        
+        .context-menu .menu-item .icon {
+            font-size: 16px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .context-menu .menu-item.danger {
+            color: #e74c3c;
+        }
+        
+        .context-menu .menu-item.danger:hover {
+            background: #fef0ef;
+        }
+        
+        .context-menu .menu-divider {
+            height: 1px;
+            background: #e4e6eb;
+            margin: 4px 16px;
+        }
+        
+        .context-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            display: none;
+        }
+        
+        .context-overlay.active {
+            display: block;
+        }
+        
+        /* ===== NOTIFICATIONS ===== */
         .notif-item {
             padding: 12px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #e4e6eb;
             cursor: pointer;
             border-radius: 8px;
             margin-bottom: 4px;
@@ -707,7 +865,7 @@
         }
         
         .notif-item:hover {
-            background: #f5f7fa;
+            background: #f0f2f5;
         }
         
         .notif-item.unread {
@@ -725,7 +883,7 @@
         }
         
         .notif-item .notif-time {
-            color: #888;
+            color: #65676b;
             font-size: 11px;
         }
         
@@ -737,186 +895,65 @@
             flex-shrink: 0;
         }
         
-        .modal {
+        .hidden {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
         }
         
-        .modal.open { display: flex; }
-        
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            animation: modalSlide 0.2s ease;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        @keyframes modalSlide {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .modal-content h3 {
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-        
-        .modal-content input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            margin: 6px 0;
-            font-size: 15px;
-            font-family: inherit;
-        }
-        
-        .modal-content input:focus {
-            outline: none;
-            border-color: #1877f2;
-        }
-        
-        .modal-content .btns {
-            display: flex;
+        .room-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: 12px;
         }
         
-        .modal-content .btns button {
-            flex: 1;
-            padding: 12px;
-            border: none;
+        .room-card {
+            background: #f0f2f5;
             border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .room-card:hover {
+            background: #e4e6eb;
+            transform: translateY(-2px);
+        }
+        
+        .room-card .icon {
+            font-size: 28px;
+        }
+        
+        .room-card .name {
             font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 15px;
-            transition: all 0.2s;
-        }
-        
-        .modal-content .btns .cancel {
-            background: #e8ecf1;
-            color: #333;
-        }
-        
-        .modal-content .btns .cancel:hover { background: #d5d9df; }
-        .modal-content .btns .save {
-            background: #1877f2;
-            color: white;
-        }
-        .modal-content .btns .save:hover { background: #4a9eff; }
-        
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 12px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 15px;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        
-        .google-btn:hover { background: #f5f5f5; }
-        .google-btn img { width: 20px; }
-        
-        .profile-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 12px 0;
-        }
-        
-        .profile-option {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .profile-option:hover {
-            border-color: #1877f2;
-            background: #f5f9ff;
-        }
-        
-        .profile-option .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #1877f2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
+            margin: 4px 0;
             font-size: 14px;
-            flex-shrink: 0;
-            overflow: hidden;
         }
         
-        .profile-option .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .room-card .count {
+            font-size: 13px;
+            color: #65676b;
         }
-        
-        .profile-option .info .name { font-weight: 600; font-size: 14px; }
-        .profile-option .info .email { font-size: 12px; color: #888; }
-        
-        .profile-option .remove-btn {
-            margin-left: auto;
-            background: none;
-            border: none;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 18px;
-            padding: 4px 8px;
-        }
-        
-        .profile-option .remove-btn:hover { color: #e74c3c; }
         
         @media (max-width: 480px) {
-            .profile-card { padding: 30px 16px 20px; }
-            .profile-avatar { width: 100px; height: 100px; font-size: 40px; }
-            .profile-name { font-size: 20px; }
+            body { padding: 12px; }
+            .header { padding: 10px 16px; }
+            .header .left h2 { font-size: 17px; }
+            .user-item { padding: 6px 8px; height: 54px; gap: 10px; }
+            .user-item .avatar { width: 34px; height: 34px; min-width: 34px; font-size: 14px; }
+            .user-item .info .name { font-size: 14px; }
+            .btn-action { padding: 4px 10px; height: 28px; font-size: 12px; }
+            .btn-friend { min-width: 60px; }
+            .user-item .actions { gap: 6px; }
             .room-grid { grid-template-columns: 1fr; }
-            .modal-content { padding: 16px; }
-            .header .left h2 { font-size: 15px; }
-            .stat-tabs { gap: 4px; }
-            .stat-tab { font-size: 12px; padding: 4px 10px; }
-            .user-item { padding: 8px 4px; gap: 6px; }
-            .user-item .info .name { font-size: 13px; }
-            .btn-icon { width: 30px; height: 30px; font-size: 14px; }
-            .chat-window { width: 95%; height: 85%; max-height: 500px; }
+            .profile-avatar { width: 80px; height: 80px; font-size: 32px; }
+            .profile-name { font-size: 19px; }
+            .chat-window { width: calc(100% - 20px); right: 10px; bottom: 10px; height: 400px; }
         }
     </style>
 </head>
 <body>
 
-<!-- ===== ХЕДЕР ===== -->
+<!-- ===== HEADER ===== -->
 <div class="header">
     <div class="left">
         <h2>🏠 METAIMPERIYA</h2>
@@ -932,13 +969,13 @@
     </div>
 </div>
 
-<!-- ===== ВКЛАДКИ ===== -->
+<!-- ===== TABS ===== -->
 <div class="tab-bar">
     <button class="tab active" onclick="showTab('groups')">👥 Группы</button>
     <button class="tab" onclick="showTab('people')">👤 Люди</button>
 </div>
 
-<!-- ===== ГРУППЫ ===== -->
+<!-- ===== GROUPS ===== -->
 <div id="groupsTab">
     <div class="card">
         <h3>👥 Группы</h3>
@@ -946,7 +983,7 @@
     </div>
 </div>
 
-<!-- ===== ЛЮДИ ===== -->
+<!-- ===== PEOPLE ===== -->
 <div id="peopleTab" class="hidden">
     <div class="card">
         <h3>👤 Все пользователи</h3>
@@ -954,12 +991,11 @@
     </div>
 </div>
 
-<!-- ===== ПРОФИЛЬ ===== -->
+<!-- ===== PROFILE ===== -->
 <div id="profileTab" class="hidden">
     <div class="profile-card">
-        <div class="profile-avatar" id="profileAvatar">
+        <div class="profile-avatar" id="profileAvatar" onclick="uploadAvatar()">
             <span id="avatarLetter">?</span>
-            <span class="avatar-hint">👆 Нажми для меню</span>
         </div>
         
         <div class="profile-name" id="profileName">Имя</div>
@@ -984,8 +1020,7 @@
     </div>
 </div>
 
-<!-- ===== FIXED FLOATING CHAT WINDOW ===== -->
-<div class="chat-overlay" id="chatOverlay" onclick="closeChat()"></div>
+<!-- ===== CHAT WINDOW ===== -->
 <div class="chat-window" id="chatWindow">
     <div class="chat-header">
         <span class="title" id="chatTitle">💬 Чат</span>
@@ -998,7 +1033,7 @@
     </div>
 </div>
 
-<!-- ===== КОНТЕКСТНОЕ МЕНЮ ===== -->
+<!-- ===== CONTEXT MENU ===== -->
 <div class="context-menu" id="contextMenu">
     <button class="menu-item" onclick="editProfile();closeContextMenu();">
         <span class="icon">✏️</span> Редактировать профиль
@@ -1014,7 +1049,7 @@
 
 <div class="context-overlay" id="contextOverlay"></div>
 
-<!-- ===== МОДАЛКА УВЕДОМЛЕНИЙ ===== -->
+<!-- ===== NOTIFICATIONS MODAL ===== -->
 <div class="modal" id="notificationsModal">
     <div class="modal-content">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -1025,7 +1060,7 @@
     </div>
 </div>
 
-<!-- ===== МОДАЛКА ВХОДА ===== -->
+<!-- ===== LOGIN MODAL ===== -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
         <h3>👤 Вход</h3>
@@ -1033,19 +1068,19 @@
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
             Войти через Google
         </button>
-        <div style="text-align:center;margin:10px 0;color:#bbb;">или</div>
+        <div style="text-align:center;margin:10px 0;color:#65676b;">или</div>
         <div style="display:flex;gap:10px;">
             <input type="text" id="nameInput" placeholder="Введите имя" style="flex:1;">
-            <button class="btn" onclick="loginName()" style="flex-shrink:0;">Войти</button>
+            <button class="btn-action" onclick="loginName()" style="flex-shrink:0;background:#1877f2;color:white;padding:10px 16px;border-radius:8px;border:none;font-weight:600;cursor:pointer;">Войти</button>
         </div>
-        <div id="savedProfiles" style="margin-top:16px;border-top:1px solid #eee;padding-top:16px;">
-            <p style="color:#888;font-size:14px;margin-bottom:10px;">📱 Сохраненные профили:</p>
+        <div id="savedProfiles" style="margin-top:16px;border-top:1px solid #e4e6eb;padding-top:16px;">
+            <p style="color:#65676b;font-size:14px;margin-bottom:10px;">📱 Сохраненные профили:</p>
             <div id="profileSelector" class="profile-selector"></div>
         </div>
     </div>
 </div>
 
-<!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ===== -->
+<!-- ===== EDIT PROFILE MODAL ===== -->
 <div class="modal" id="editProfileModal">
     <div class="modal-content">
         <h3>✏️ Редактировать профиль</h3>
@@ -1058,7 +1093,7 @@
     </div>
 </div>
 
-<!-- ===== МОДАЛКА ПРОСМОТРА ПРОФИЛЯ (ДЛЯ УВЕДОМЛЕНИЙ) ===== -->
+<!-- ===== VIEW PROFILE MODAL ===== -->
 <div class="modal" id="profileViewModal">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -1066,13 +1101,13 @@
             <button onclick="closeProfileView()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">✕</button>
         </div>
         
-        <div class="avatar" id="viewAvatar" style="width: 100px; height: 100px; border-radius: 50%; background: #1877f2; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: white; overflow: hidden;">
+        <div class="avatar" id="viewAvatar" style="width: 100px; height: 100px; border-radius: 50%; background: #e4e6eb; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: #65676b; overflow: hidden;">
             <span id="viewAvatarLetter">?</span>
         </div>
         
         <div style="font-size: 22px; font-weight: 700; margin-bottom: 4px;" id="viewName">Имя</div>
-        <div style="color: #888; font-size: 14px; margin-bottom: 8px;" id="viewEmail">email@example.com</div>
-        <div style="color: #555; font-size: 15px; margin-bottom: 16px;" id="viewBio">О себе</div>
+        <div style="color: #65676b; font-size: 14px; margin-bottom: 8px;" id="viewEmail">email@example.com</div>
+        <div style="color: #65676b; font-size: 15px; margin-bottom: 16px;" id="viewBio">О себе</div>
         
         <div id="viewActions" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <!-- Кнопки добавляются динамически -->
@@ -1101,7 +1136,7 @@ const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 // ================================================================
-// УПРАВЛЕНИЕ АКТИВНЫМИ ЗАПРОСАМИ
+// УПРАВЛЕНИЕ ЗАПРОСАМИ
 // ================================================================
 const activeRequests = new Map();
 
@@ -1146,7 +1181,6 @@ function safeFirebaseQuery(key, ref, callback) {
 }
 
 function cancelAllRequests() {
-    console.log(`🧹 Отменяем ${activeRequests.size} активных запросов`);
     for (const [key, cancelFn] of activeRequests) {
         if (typeof cancelFn === 'function') {
             cancelFn();
@@ -1260,7 +1294,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ================================================================
-// ЗАГРУЗКА СОХРАНЕННЫХ ПРОФИЛЕЙ
+// СОХРАНЕННЫЕ ПРОФИЛИ
 // ================================================================
 function loadSavedProfiles() {
     try {
@@ -1297,7 +1331,7 @@ function renderSavedProfiles() {
     if (!container) return;
     
     if (SAVED_PROFILES.length === 0) {
-        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:10px;font-size:14px;">Нет сохраненных профилей</div>';
+        container.innerHTML = '<div style="color:#65676b;text-align:center;padding:10px;font-size:14px;">Нет сохраненных профилей</div>';
         return;
     }
     
@@ -1562,27 +1596,18 @@ function loadProfile() {
             const emailEl = document.getElementById('profileEmail');
             const bioEl = document.getElementById('profileBio');
             const avatar = document.getElementById('profileAvatar');
+            const letter = document.getElementById('avatarLetter');
             
             if (nameEl) nameEl.textContent = name;
             if (emailEl) emailEl.textContent = email;
             if (bioEl) bioEl.textContent = bio;
             
             if (avatar) {
-                const wasOpen = document.getElementById('contextMenu')?.classList.contains('open');
-                
                 if (u.avatarUrl) {
-                    avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">👆 Нажми для меню</span>`;
+                    avatar.innerHTML = `<img src="${u.avatarUrl}">`;
                 } else {
-                    const letter = name.charAt(0).toUpperCase();
-                    avatar.innerHTML = `<span id="avatarLetter">${letter}</span><span class="avatar-hint">👆 Нажми для меню</span>`;
-                }
-                
-                if (wasOpen) {
-                    const menu = document.getElementById('contextMenu');
-                    const overlay = document.getElementById('contextOverlay');
-                    if (menu) menu.classList.add('open');
-                    if (overlay) overlay.classList.add('active');
-                    menuState.isOpen = true;
+                    letter.textContent = name.charAt(0).toUpperCase();
+                    avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span>`;
                 }
             }
             
@@ -1661,7 +1686,7 @@ window.joinRoom = function(roomId) {
 };
 
 // ================================================================
-// ЛЮДИ - INLINE КНОПКИ
+// ЛЮДИ - FACEBOOK STYLE
 // ================================================================
 function loadPeople() {
     if (!USER_UID) return;
@@ -1673,92 +1698,192 @@ function loadPeople() {
         db.ref('sites/' + SITE + '/all_users'),
         (snap) => {
             const users = snap.val() || {};
-            const keys = Object.keys(users).filter(k => k !== USER_UID);
+            
+            const keys = Object.keys(users).filter(k => {
+                if (k === USER_UID) return false;
+                const u = users[k];
+                if (!u || !u.name || u.name.trim() === '') return false;
+                return true;
+            });
             
             if (keys.length === 0) {
-                el.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Нет пользователей</div>';
+                el.innerHTML = '<div style="text-align:center;padding:30px;color:#65676b;">😕 Нет других пользователей</div>';
                 return;
             }
             
-            // Рендерим каждого юзера с inline кнопками
+            el.innerHTML = '';
+            
             keys.forEach(k => {
                 const u = users[k];
                 renderInlineUser(el, k, u);
+            });
+            
+            keys.forEach(k => {
+                getFriendStatus(k, (status) => {
+                    updateFriendButtonInline(k, status);
+                });
             });
         }
     );
 }
 
 function renderInlineUser(container, uid, userData) {
-    const name = userData.name || 'Аноним';
-    const email = userData.email || '';
+    if (!userData || !userData.name) {
+        console.warn('⚠️ Пустые данные пользователя:', uid);
+        return;
+    }
+    
+    const name = userData.name.trim() || 'Аноним';
     const letter = name.charAt(0).toUpperCase();
     const avatarUrl = userData.avatarUrl || null;
     
-    // Создаем элемент
     const itemDiv = document.createElement('div');
     itemDiv.className = 'user-item';
     itemDiv.id = 'user-item-' + uid;
     
-    // Аватарка
     const avatarHtml = avatarUrl ? 
-        `<img src="${avatarUrl}">` : 
+        `<img src="${avatarUrl}" alt="${esc(name)}">` : 
         `<span>${letter}</span>`;
     
     itemDiv.innerHTML = `
-        <div class="avatar" onclick="viewProfileInline('${uid}')">${avatarHtml}</div>
-        <div class="info" onclick="viewProfileInline('${uid}')">
-            <div class="name">${name}</div>
-            <div class="email">${email}</div>
+        <div class="avatar" onclick="viewProfileModal('${uid}')">${avatarHtml}</div>
+        <div class="info" onclick="viewProfileModal('${uid}')">
+            <div class="name">${esc(name)}</div>
         </div>
-        <div class="actions" id="actions-${uid}">
-            <button class="btn-icon primary" onclick="openPrivateChat('${uid}')" title="Сообщение">✉️</button>
-            <button class="btn-icon" id="friend-btn-${uid}" onclick="toggleFriendStatus('${uid}')" title="Друзья">➕</button>
+        <div class="actions">
+            <button class="btn-action btn-message" onclick="openPrivateChat('${uid}')" title="Сообщение">
+                <span class="icon">✉</span>
+            </button>
+            <button class="btn-action btn-friend add" id="friend-btn-${uid}" onclick="toggleFriendStatus('${uid}')">
+                <span class="icon">➕</span> Добавить
+            </button>
         </div>
     `;
     
     container.appendChild(itemDiv);
-    
-    // Загружаем статус дружбы и обновляем кнопку
-    getFriendStatus(uid, (status) => {
-        updateFriendButtonInline(uid, status);
-    });
 }
 
 function updateFriendButtonInline(uid, status) {
     const btn = document.getElementById('friend-btn-' + uid);
     if (!btn) return;
     
-    // Убираем все классы
-    btn.className = 'btn-icon';
+    btn.className = 'btn-action btn-friend';
     
     if (status === 'friend') {
-        btn.textContent = '✓';
+        btn.innerHTML = `<span class="icon">✓</span> В друзьях`;
         btn.classList.add('friend');
         btn.title = 'В друзьях';
+        btn.disabled = false;
     } else if (status === 'pending') {
-        btn.textContent = '⏳';
+        btn.innerHTML = `<span class="icon">⏳</span> Запрос`;
         btn.classList.add('pending');
         btn.title = 'Запрос отправлен';
+        btn.disabled = true;
     } else {
-        btn.textContent = '➕';
-        btn.classList.add('primary');
+        btn.innerHTML = `<span class="icon">➕</span> Добавить`;
+        btn.classList.add('add');
         btn.title = 'Добавить в друзья';
+        btn.disabled = false;
     }
 }
 
-function viewProfileInline(uid) {
-    // Для быстрого просмотра - просто открываем чат или показываем уведомление
-    // Можно добавить модалку, но по задаче мы убираем модалки
-    // Поэтому просто показываем профиль в консоли или открываем чат
-    console.log('👤 Профиль пользователя:', uid);
-    // Если нужно - можно открыть чат
-    // openPrivateChat(uid);
+function viewProfileModal(uid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (uid === USER_UID) { 
+        alert('Это ваш профиль'); 
+        goToProfile();
+        return; 
+    }
+    
+    const modal = document.getElementById('profileViewModal');
+    const avatar = document.getElementById('viewAvatar');
+    const avatarLetter = document.getElementById('viewAvatarLetter');
+    const nameEl = document.getElementById('viewName');
+    const emailEl = document.getElementById('viewEmail');
+    const bioEl = document.getElementById('viewBio');
+    const actions = document.getElementById('viewActions');
+    
+    modal.classList.add('open');
+    nameEl.textContent = 'Загрузка...';
+    bioEl.textContent = '';
+    emailEl.textContent = '';
+    avatarLetter.textContent = '?';
+    actions.innerHTML = '<span style="color:#65676b;">Загрузка...</span>';
+    
+    safeFirebaseQuery(
+        'viewProfile_' + uid,
+        db.ref('sites/' + SITE + '/all_users/' + uid),
+        (snap) => {
+            const user = snap.val();
+            if (!user) {
+                nameEl.textContent = 'Пользователь не найден';
+                actions.innerHTML = '<span style="color:#e74c3c;">❌ Пользователь удален</span>';
+                return;
+            }
+            
+            const name = user.name || 'Аноним';
+            const email = user.email || '';
+            const bio = user.bio || 'Привет! 👋';
+            const avatarUrl = user.avatarUrl || null;
+            
+            nameEl.textContent = name;
+            emailEl.textContent = email;
+            bioEl.textContent = bio;
+            
+            if (avatarUrl) {
+                avatar.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+            } else {
+                avatar.innerHTML = `<span id="viewAvatarLetter">${name.charAt(0).toUpperCase()}</span>`;
+            }
+            
+            getFriendStatus(uid, (status) => {
+                let btnHtml = '';
+                
+                if (status === 'friend') {
+                    btnHtml = `<button class="btn-action" onclick="removeFriend('${uid}')" style="background:#e74c3c;color:white;">❌ Удалить из друзей</button>`;
+                } else if (status === 'pending') {
+                    db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap => {
+                        const fromThem = snap.val() === 'pending';
+                        if (fromThem) {
+                            actions.innerHTML = `
+                                <button class="btn-action" onclick="handleFriendRequest('${uid}', 'accept')" style="background:#27ae60;color:white;">✅ Принять</button>
+                                <button class="btn-action" onclick="handleFriendRequest('${uid}', 'decline')" style="background:#e74c3c;color:white;">❌ Отклонить</button>
+                            `;
+                        } else {
+                            actions.innerHTML = `
+                                <button class="btn-action" style="cursor:default;opacity:0.7;">⏳ Запрос отправлен</button>
+                            `;
+                        }
+                    });
+                    return;
+                } else {
+                    btnHtml = `<button class="btn-action" onclick="toggleFriendStatus('${uid}')">➕ Добавить в друзья</button>`;
+                }
+                
+                actions.innerHTML = `
+                    <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
+                    ${btnHtml}
+                `;
+            });
+        }
+    );
+}
+
+function closeProfileView() {
+    document.getElementById('profileViewModal').classList.remove('open');
 }
 
 // ================================================================
-// ЛОГИКА ОДНОЙ КНОПКИ (TOGGLE FRIEND STATUS)
+// ЛОГИКА ДРУЖБЫ
 // ================================================================
+function getFriendStatus(targetUid, callback) {
+    if (!USER_UID) { callback('none'); return; }
+    
+    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
+        const status = snap.val();
+        callback(status || 'none');
+    });
+}
 
 function toggleFriendStatus(targetUid) {
     if (!USER_UID) { 
@@ -1815,246 +1940,16 @@ function toggleFriendStatus(targetUid) {
     });
 }
 
-// ================================================================
-// ПОЛУЧЕНИЕ СТАТУСА ДЛЯ КНОПКИ
-// ================================================================
-
-function getFriendStatus(targetUid, callback) {
-    if (!USER_UID) { callback('none'); return; }
-    
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
-        const status = snap.val();
-        callback(status || 'none');
-    });
-}
-
-// ================================================================
-// УВЕДОМЛЕНИЯ
-// ================================================================
-
-function sendNotification(targetUid, data) {
-    if (!USER_UID) return;
-    if (!targetUid || targetUid === USER_UID) {
-        console.warn('❌ Нельзя отправить уведомление себе');
-        return;
-    }
-    
-    const notifRef = db.ref('sites/' + SITE + '/notifications/' + targetUid).push();
-    notifRef.set({
-        ...data,
-        read: false,
-        fromName: USER,
-        fromUid: USER_UID
-    }).then(() => {
-        console.log(`✅ Уведомление отправлено пользователю ${targetUid}`);
-    }).catch(err => {
-        console.error('❌ Ошибка отправки уведомления:', err);
-    });
-}
-
-function loadNotifications() {
-    if (!USER_UID) return;
-    
-    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-    
-    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
-    notifUnsub = ref.on('value', snap => {
-        const notifications = snap.val() || {};
-        const keys = Object.keys(notifications).sort((a, b) => 
-            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
-        );
-        
-        const unread = keys.filter(k => !notifications[k].read);
-        const badge = document.getElementById('notifBadge');
-        if (badge) {
-            if (unread.length > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = unread.length;
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-        
-        if (document.getElementById('notificationsModal').classList.contains('open')) {
-            renderNotifications(notifications, keys);
-        }
-    });
-}
-
-function renderNotifications(notifications, keys) {
-    const container = document.getElementById('notificationsList');
-    if (!container) return;
-    
-    if (keys.length === 0) {
-        container.innerHTML = '<div style="color:#888;text-align:center;padding:20px;">Нет уведомлений</div>';
-        return;
-    }
-    
-    let html = '';
-    keys.slice(0, 20).forEach(k => {
-        const n = notifications[k];
-        const isUnread = !n.read;
-        const time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-        
-        let icon = '📩';
-        if (n.type === 'friend_request') icon = '🤝';
-        if (n.type === 'friend_accepted') icon = '✅';
-        if (n.type === 'message') icon = '💬';
-        
-        html += `
-            <div class="notif-item ${isUnread ? 'unread' : ''}" 
-                 onclick="handleNotifClick('${k}', '${n.fromUid || n.from}', '${n.type}')">
-                <span class="notif-icon">${icon}</span>
-                <div class="notif-text">
-                    <div style="font-weight:${isUnread ? '600' : '400'};font-size:14px;">${n.text || 'Уведомление'}</div>
-                    <div class="notif-time">${time}</div>
-                </div>
-                ${isUnread ? '<span class="notif-dot"></span>' : ''}
-            </div>
-        `;
-    });
-    container.innerHTML = html;
-}
-
-function handleNotifClick(notifId, fromUid, type) {
-    if (!USER_UID) return;
-    if (!fromUid) return;
-    
-    db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
-    
-    if (type === 'message') {
-        closeNotifications();
-        openPrivateChat(fromUid);
-        db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
-    } else if (type === 'friend_request') {
-        closeNotifications();
-        // Открываем профиль в модалке (для принятия/отклонения)
-        viewProfileModal(fromUid);
-    } else {
-        closeNotifications();
-        viewProfileModal(fromUid);
-    }
-}
-
-function openNotifications() {
-    document.getElementById('notificationsModal').classList.add('open');
-    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
-    ref.once('value', snap => {
-        const notifications = snap.val() || {};
-        const keys = Object.keys(notifications).sort((a, b) => 
-            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
-        );
-        renderNotifications(notifications, keys);
-    });
-}
-
-function closeNotifications() {
-    document.getElementById('notificationsModal').classList.remove('open');
-}
-
-// ================================================================
-// МОДАЛКА ПРОСМОТРА ПРОФИЛЯ (ДЛЯ УВЕДОМЛЕНИЙ)
-// ================================================================
-
-function viewProfileModal(uid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (uid === USER_UID) { 
-        alert('Это ваш профиль'); 
-        goToProfile();
-        return; 
-    }
-    
-    const modal = document.getElementById('profileViewModal');
-    const avatar = document.getElementById('viewAvatar');
-    const avatarLetter = document.getElementById('viewAvatarLetter');
-    const nameEl = document.getElementById('viewName');
-    const emailEl = document.getElementById('viewEmail');
-    const bioEl = document.getElementById('viewBio');
-    const actions = document.getElementById('viewActions');
-    
-    modal.classList.add('open');
-    nameEl.textContent = 'Загрузка...';
-    bioEl.textContent = '';
-    emailEl.textContent = '';
-    avatarLetter.textContent = '?';
-    actions.innerHTML = '<span style="color:#888;">Загрузка...</span>';
-    
-    safeFirebaseQuery(
-        'viewProfile_' + uid,
-        db.ref('sites/' + SITE + '/all_users/' + uid),
-        (snap) => {
-            const user = snap.val();
-            if (!user) {
-                nameEl.textContent = 'Пользователь не найден';
-                actions.innerHTML = '<span style="color:#e74c3c;">❌ Пользователь удален</span>';
-                return;
-            }
-            
-            const name = user.name || 'Аноним';
-            const email = user.email || '';
-            const bio = user.bio || 'Привет! 👋';
-            const avatarUrl = user.avatarUrl || null;
-            
-            nameEl.textContent = name;
-            emailEl.textContent = email;
-            bioEl.textContent = bio;
-            
-            if (avatarUrl) {
-                avatar.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
-            } else {
-                avatar.innerHTML = `<span id="viewAvatarLetter">${name.charAt(0).toUpperCase()}</span>`;
-            }
-            
-            getFriendStatus(uid, (status) => {
-                let btnHtml = '';
-                
-                if (status === 'friend') {
-                    btnHtml = `<button class="btn btn-danger" onclick="removeFriendModal('${uid}')">❌ Удалить из друзей</button>`;
-                } else if (status === 'pending') {
-                    db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap => {
-                        const fromThem = snap.val() === 'pending';
-                        if (fromThem) {
-                            actions.innerHTML = `
-                                <button class="btn btn-success" onclick="handleFriendRequestModal('${uid}', 'accept')">✅ Принять</button>
-                                <button class="btn btn-danger" onclick="handleFriendRequestModal('${uid}', 'decline')">❌ Отклонить</button>
-                            `;
-                        } else {
-                            actions.innerHTML = `
-                                <button class="btn btn-secondary" style="cursor:default;">⏳ Запрос отправлен</button>
-                            `;
-                        }
-                    });
-                    return;
-                } else {
-                    btnHtml = `<button class="btn" onclick="toggleFriendStatus('${uid}')">➕ Добавить в друзья</button>`;
-                }
-                
-                actions.innerHTML = btnHtml;
-            });
-        }
-    );
-}
-
-function closeProfileView() {
-    document.getElementById('profileViewModal').classList.remove('open');
-}
-
-function removeFriendModal(uid) {
-    if (!confirm('Удалить из друзей?')) return;
-    removeFriend(uid);
-    closeProfileView();
-}
-
-function handleFriendRequestModal(uid, action) {
+function handleFriendRequest(targetUid, action) {
     if (action === 'accept') {
         const updates = {};
-        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + uid] = 'friend';
-        updates['sites/' + SITE + '/friends/' + uid + '/' + USER_UID] = 'friend';
-        updates['sites/' + SITE + '/followers/' + uid + '/' + USER_UID] = true;
+        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'friend';
+        updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'friend';
+        updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
         
         db.ref().update(updates);
         
-        sendNotification(uid, {
+        sendNotification(targetUid, {
             type: 'friend_accepted',
             from: USER_UID,
             text: `${USER} принял(а) ваш запрос в друзья`,
@@ -2065,10 +1960,11 @@ function handleFriendRequestModal(uid, action) {
         closeProfileView();
         loadPeople();
         loadProfile();
+        
     } else if (action === 'decline') {
         const updates = {};
-        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + uid] = null;
-        updates['sites/' + SITE + '/friends/' + uid + '/' + USER_UID] = null;
+        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
+        updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
         
         db.ref().update(updates);
         
@@ -2078,10 +1974,6 @@ function handleFriendRequestModal(uid, action) {
         loadProfile();
     }
 }
-
-// ================================================================
-// ДРУЗЬЯ - ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ
-// ================================================================
 
 function removeFriend(uid) {
     if (!USER_UID) { alert('Войдите!'); return; }
@@ -2095,7 +1987,8 @@ function removeFriend(uid) {
     db.ref().update(updates);
     
     alert('❌ Пользователь удален из друзей');
-    renderFriendsList('friends');
+    closeProfileView();
+    loadPeople();
     loadProfile();
 }
 
@@ -2113,7 +2006,6 @@ function unfollow(uid) {
 // ================================================================
 // СПИСКИ ДРУЗЕЙ/ПОДПИСОК/ПОДПИСЧИКОВ
 // ================================================================
-
 function renderFriendsList(type) {
     const container = document.getElementById('friendsListContainer');
     if (!container) return;
@@ -2192,7 +2084,6 @@ function renderUserList(container, uids, type) {
         db.ref('sites/' + SITE + '/all_users/' + uid).once('value', snap => {
             const user = snap.val() || {};
             const name = user.name || 'Аноним';
-            const email = user.email || '';
             const letter = name.charAt(0).toUpperCase();
             const avatarHtml = user.avatarUrl ? 
                 `<img src="${user.avatarUrl}">` : 
@@ -2205,12 +2096,12 @@ function renderUserList(container, uids, type) {
             
             if (type === 'friends') {
                 actionsHtml = `
-                    <button class="btn-icon primary" onclick="openPrivateChat('${uid}')" title="Сообщение">✉️</button>
-                    <button class="btn-icon danger" onclick="removeFriend('${uid}')" title="Удалить">✕</button>
+                    <button class="btn-action btn-message" onclick="openPrivateChat('${uid}')" title="Сообщение">✉</button>
+                    <button class="btn-action" onclick="removeFriend('${uid}')" style="background:#e74c3c;color:white;">✕</button>
                 `;
             } else if (type === 'following') {
                 actionsHtml = `
-                    <button class="btn-icon danger" onclick="unfollow('${uid}')" title="Отписаться">📴</button>
+                    <button class="btn-action" onclick="unfollow('${uid}')" style="background:#e74c3c;color:white;">📴 Отписаться</button>
                 `;
             } else if (type === 'followers') {
                 db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
@@ -2218,26 +2109,28 @@ function renderUserList(container, uids, type) {
                     const actionBtn = itemDiv.querySelector('.follower-action');
                     if (actionBtn) {
                         if (status === 'friend') {
-                            actionBtn.innerHTML = '✓';
-                            actionBtn.className = 'btn-icon success';
+                            actionBtn.innerHTML = '✓ В друзьях';
+                            actionBtn.className = 'btn-action btn-friend friend';
                             actionBtn.disabled = true;
                         } else if (status === 'pending') {
                             db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap2 => {
                                 if (snap2.val() === 'pending') {
-                                    actionBtn.innerHTML = '⏳';
-                                    actionBtn.className = 'btn-icon pending';
+                                    actionBtn.innerHTML = '⏳ Запрос';
+                                    actionBtn.className = 'btn-action btn-friend pending';
                                     actionBtn.disabled = true;
                                 } else {
-                                    actionBtn.innerHTML = '✅';
-                                    actionBtn.className = 'btn-icon success';
+                                    actionBtn.innerHTML = '✅ Принять';
+                                    actionBtn.className = 'btn-action';
+                                    actionBtn.style.background = '#27ae60';
+                                    actionBtn.style.color = 'white';
                                     actionBtn.onclick = () => {
-                                        handleFriendRequestModal(uid, 'accept');
+                                        handleFriendRequest(uid, 'accept');
                                     };
                                 }
                             });
                         } else {
-                            actionBtn.innerHTML = '➕';
-                            actionBtn.className = 'btn-icon primary';
+                            actionBtn.innerHTML = '➕ Добавить';
+                            actionBtn.className = 'btn-action btn-friend add';
                             actionBtn.onclick = () => {
                                 toggleFriendStatus(uid);
                             };
@@ -2245,7 +2138,7 @@ function renderUserList(container, uids, type) {
                     }
                 });
                 actionsHtml = `
-                    <button class="btn-icon secondary follower-action" disabled>⏳</button>
+                    <button class="btn-action follower-action" disabled>⏳</button>
                 `;
             }
             
@@ -2253,7 +2146,6 @@ function renderUserList(container, uids, type) {
                 <div class="avatar" onclick="viewProfileModal('${uid}')">${avatarHtml}</div>
                 <div class="info" onclick="viewProfileModal('${uid}')">
                     <div class="name">${name}</div>
-                    <div class="email">${email}</div>
                 </div>
                 <div class="actions">
                     ${actionsHtml}
@@ -2269,7 +2161,6 @@ function renderUserList(container, uids, type) {
 // ================================================================
 // ОБНОВЛЕНИЕ СЧЕТЧИКОВ
 // ================================================================
-
 function updateCounters() {
     if (!USER_UID) return;
     
@@ -2299,7 +2190,6 @@ function updateCounters() {
 // ================================================================
 // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В ПРОФИЛЕ
 // ================================================================
-
 function switchFriendTab(tab) {
     currentFriendTab = tab;
     
@@ -2317,9 +2207,130 @@ function switchFriendTab(tab) {
 }
 
 // ================================================================
-// FIXED FLOATING CHAT WINDOW
+// УВЕДОМЛЕНИЯ
 // ================================================================
+function sendNotification(targetUid, data) {
+    if (!USER_UID) return;
+    if (!targetUid || targetUid === USER_UID) {
+        console.warn('❌ Нельзя отправить уведомление себе');
+        return;
+    }
+    
+    const notifRef = db.ref('sites/' + SITE + '/notifications/' + targetUid).push();
+    notifRef.set({
+        ...data,
+        read: false,
+        fromName: USER,
+        fromUid: USER_UID
+    }).then(() => {
+        console.log(`✅ Уведомление отправлено пользователю ${targetUid}`);
+    }).catch(err => {
+        console.error('❌ Ошибка отправки уведомления:', err);
+    });
+}
 
+function loadNotifications() {
+    if (!USER_UID) return;
+    
+    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
+    
+    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
+    notifUnsub = ref.on('value', snap => {
+        const notifications = snap.val() || {};
+        const keys = Object.keys(notifications).sort((a, b) => 
+            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
+        );
+        
+        const unread = keys.filter(k => !notifications[k].read);
+        const badge = document.getElementById('notifBadge');
+        if (badge) {
+            if (unread.length > 0) {
+                badge.style.display = 'inline';
+                badge.textContent = unread.length;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        if (document.getElementById('notificationsModal').classList.contains('open')) {
+            renderNotifications(notifications, keys);
+        }
+    });
+}
+
+function renderNotifications(notifications, keys) {
+    const container = document.getElementById('notificationsList');
+    if (!container) return;
+    
+    if (keys.length === 0) {
+        container.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">Нет уведомлений</div>';
+        return;
+    }
+    
+    let html = '';
+    keys.slice(0, 20).forEach(k => {
+        const n = notifications[k];
+        const isUnread = !n.read;
+        const time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        
+        let icon = '📩';
+        if (n.type === 'friend_request') icon = '🤝';
+        if (n.type === 'friend_accepted') icon = '✅';
+        if (n.type === 'message') icon = '💬';
+        
+        html += `
+            <div class="notif-item ${isUnread ? 'unread' : ''}" 
+                 onclick="handleNotifClick('${k}', '${n.fromUid || n.from}', '${n.type}')">
+                <span class="notif-icon">${icon}</span>
+                <div class="notif-text">
+                    <div style="font-weight:${isUnread ? '600' : '400'};font-size:14px;">${n.text || 'Уведомление'}</div>
+                    <div class="notif-time">${time}</div>
+                </div>
+                ${isUnread ? '<span class="notif-dot"></span>' : ''}
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function handleNotifClick(notifId, fromUid, type) {
+    if (!USER_UID) return;
+    if (!fromUid) return;
+    
+    db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
+    
+    if (type === 'message') {
+        closeNotifications();
+        openPrivateChat(fromUid);
+        db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
+    } else if (type === 'friend_request') {
+        closeNotifications();
+        viewProfileModal(fromUid);
+    } else {
+        closeNotifications();
+        viewProfileModal(fromUid);
+    }
+}
+
+function openNotifications() {
+    document.getElementById('notificationsModal').classList.add('open');
+    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
+    ref.once('value', snap => {
+        const notifications = snap.val() || {};
+        const keys = Object.keys(notifications).sort((a, b) => 
+            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
+        );
+        renderNotifications(notifications, keys);
+    });
+}
+
+function closeNotifications() {
+    document.getElementById('notificationsModal').classList.remove('open');
+}
+
+// ================================================================
+// ЧАТ
+// ================================================================
 function openPrivateChat(targetUid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
@@ -2332,11 +2343,8 @@ function openPrivateChat(targetUid) {
     
     CURRENT_ROOM = chatId;
     
-    // Показываем окно чата
     document.getElementById('chatWindow').classList.add('active');
-    document.getElementById('chatOverlay').classList.add('active');
     
-    // Загружаем имя собеседника
     db.ref('sites/' + SITE + '/all_users/' + targetUid).once('value', snap => {
         const user = snap.val() || {};
         const name = user.name || 'Собеседник';
@@ -2352,12 +2360,12 @@ function loadChat(path) {
         chatUnsub = null; 
     }
     const box = document.getElementById('chatMessages');
-    box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">⏳ Загрузка...</div>';
+    box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">⏳ Загрузка...</div>';
     chatUnsub = path;
     db.ref(path).orderByChild('timestamp').on('value', snap => {
         box.innerHTML = '';
         if (!snap.exists()) { 
-            box.innerHTML = '<div style="color:#bbb;text-align:center;padding:20px;">Сообщений нет</div>'; 
+            box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">Сообщений нет</div>'; 
             return; 
         }
         snap.forEach(s => {
@@ -2404,7 +2412,6 @@ window.sendChat = function() {
 
 window.closeChat = function() {
     document.getElementById('chatWindow').classList.remove('active');
-    document.getElementById('chatOverlay').classList.remove('active');
     if (chatUnsub) { 
         if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
         chatUnsub = null; 
@@ -2491,7 +2498,6 @@ const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&l
 
 function goToGroups() { showTab('groups'); }
 function goToPeople() { showTab('people'); }
-function closeSidebar() {}
 
 // ================================================================
 // ЗАПУСК
@@ -2499,9 +2505,9 @@ function closeSidebar() {}
 loadSavedProfiles();
 showTab('groups');
 
-console.log('✅ METAIMPERIYA - INLINE UI ГОТОВ!');
-console.log('👥 Кнопки прямо в списке пользователей');
-console.log('💬 Fixed floating chat window');
+console.log('✅ METAIMPERIYA - FACEBOOK STYLE UI ГОТОВ!');
+console.log('👥 Чистый список пользователей с кнопками');
+console.log('💬 Fixed chat window');
 console.log('🔔 Уведомления: message → чат, friend_request → профиль');
 </script>
 </body>
