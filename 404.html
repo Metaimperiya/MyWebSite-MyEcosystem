@@ -40,13 +40,13 @@
         (function() {
             const path = window.location.pathname;
             if (path && path !== '/' && path !== '/index.html') {
-                let username = path.substring(1);
-                while (username.endsWith('/')) {
-                    username = username.slice(0, -1);
+                let slug = path.substring(1);
+                while (slug.endsWith('/')) {
+                    slug = slug.slice(0, -1);
                 }
-                if (username && username.trim() !== '') {
+                if (slug && slug.trim() !== '') {
                     try {
-                        localStorage.setItem('metaimperiya_username', username.trim());
+                        localStorage.setItem('metaimperiya_seo_slug', slug.trim());
                     } catch(e) {}
                     window.location.href = '/';
                 } else {
