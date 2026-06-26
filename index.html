@@ -622,6 +622,68 @@ const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 // ================================================================
+// УПРАВЛЕНИЕ АКТИВНЫМИ ЗАПРОСАМИ
+// ================================================================
+const activeRequests = new Map();
+
+function cancelRequest(key) {
+    if (activeRequests.has(key)) {
+        const cancelFn = activeRequests.get(key);
+        if (typeof cancelFn === 'function') {
+            cancelFn();
+        }
+        activeRequests.delete(key);
+        return true;
+    }
+    return false;
+}
+
+function safeFirebaseQuery(key, ref, callback) {
+    // Отменяем старый запрос с таким же ключом
+    cancelRequest(key);
+    
+    let isCancelled = false;
+    const cancelFn = () => {
+        isCancelled = true;
+        activeRequests.delete(key);
+    };
+    
+    activeRequests.set(key, cancelFn);
+    
+    ref.once('value', snap => {
+        if (isCancelled) {
+            console.log(`🔄 Запрос "${key}" отменен`);
+            return;
+        }
+        activeRequests.delete(key);
+        callback(snap);
+    }).catch(err => {
+        if (!isCancelled) {
+            activeRequests.delete(key);
+            console.warn(`❌ Ошибка запроса "${key}":`, err);
+        }
+    });
+    
+    return cancelFn;
+}
+
+function cancelAllRequests() {
+    console.log(`🧹 Отменяем ${activeRequests.size} активных запросов`);
+    for (const [key, cancelFn] of activeRequests) {
+        if (typeof cancelFn === 'function') {
+            cancelFn();
+        }
+    }
+    activeRequests.clear();
+}
+
+// Очистка при закрытии страницы
+window.addEventListener('beforeunload', function() {
+    cancelAllRequests();
+    closeContextMenu();
+});
+
+// ================================================================
 // СОСТОЯНИЕ
 // ================================================================
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
@@ -629,33 +691,69 @@ let USER = null;
 let USER_UID = null;
 let SAVED_PROFILES = [];
 let currentTab = 'groups';
-let avatarCache = null; // Кеш для аватарки
+let avatarCache = null;
+let menuState = {
+    isOpen: false,
+    isAnimating: false
+};
 
 // ================================================================
 // КОНТЕКСТНОЕ МЕНЮ
 // ================================================================
 function openProfileMenu(event) {
+    if (menuState.isAnimating) return;
+    
     event.stopPropagation();
+    event.preventDefault();
+    
     const menu = document.getElementById('contextMenu');
     const overlay = document.getElementById('contextOverlay');
     const avatar = document.getElementById('profileAvatar');
     
-    if (!avatar) return;
+    if (!menu || !avatar) return;
     
+    if (menu.classList.contains('open')) {
+        closeContextMenu();
+        return;
+    }
+
     const rect = avatar.getBoundingClientRect();
-    menu.style.left = (rect.left + rect.width / 2 - 100) + 'px';
-    menu.style.top = (rect.bottom + 10) + 'px';
+    const menuWidth = 200;
+    const leftPos = Math.max(10, rect.left + rect.width / 2 - menuWidth / 2);
+    const topPos = Math.min(
+        rect.bottom + 10,
+        window.innerHeight - 250
+    );
     
+    menu.style.left = leftPos + 'px';
+    menu.style.top = topPos + 'px';
+    
+    menuState.isAnimating = true;
     menu.classList.add('open');
     overlay.classList.add('active');
+    
+    setTimeout(() => {
+        menuState.isAnimating = false;
+        menuState.isOpen = true;
+    }, 200);
 }
 
 function closeContextMenu() {
-    document.getElementById('contextMenu').classList.remove('open');
-    document.getElementById('contextOverlay').classList.remove('active');
+    if (menuState.isAnimating) return;
+    
+    const menu = document.getElementById('contextMenu');
+    const overlay = document.getElementById('contextOverlay');
+    
+    menuState.isAnimating = true;
+    if (menu) menu.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+    
+    setTimeout(() => {
+        menuState.isAnimating = false;
+        menuState.isOpen = false;
+    }, 200);
 }
 
-// Обработчик кликов для закрытия меню
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('contextMenu');
     const avatar = document.getElementById('profileAvatar');
@@ -663,19 +761,13 @@ document.addEventListener('click', function(e) {
     
     if (!menu || !menu.classList.contains('open')) return;
     
-    // Если клик по аватарке - открываем меню
-    if (avatar && avatar.contains(e.target)) {
-        e.stopPropagation();
-        return;
-    }
+    const isClickInsideMenu = menu.contains(e.target);
+    const isClickOnAvatar = avatar && (e.target === avatar || avatar.contains(e.target));
+    const isClickOnOverlay = overlay && (e.target === overlay || overlay.contains(e.target));
     
-    // Если клик по меню - не закрываем
-    if (menu.contains(e.target)) {
-        return;
+    if (!isClickInsideMenu && !isClickOnAvatar) {
+        closeContextMenu();
     }
-    
-    // Иначе закрываем
-    closeContextMenu();
 });
 
 // Клик по аватарке в профиле
@@ -818,6 +910,7 @@ auth.onAuthStateChanged(user => {
         USER = null;
         USER_UID = null;
         avatarCache = null;
+        cancelAllRequests();
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
@@ -864,6 +957,7 @@ window.loginName = function() {
 window.logout = function() {
     if (!confirm('Выйти из профиля?')) return;
     closeContextMenu();
+    cancelAllRequests();
     auth.signOut().then(() => {
         localStorage.removeItem('dc_u_' + SITE);
         USER = null;
@@ -884,7 +978,6 @@ function updateUI() {
     if (!headerAvatar) return;
     
     if (USER && USER_UID) {
-        // Используем кеш, если есть
         if (avatarCache) {
             if (avatarCache === 'default') {
                 headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
@@ -894,24 +987,26 @@ function updateUI() {
             return;
         }
         
-        // Загружаем и кешируем
-        db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', snap => {
-            const url = snap.val();
-            avatarCache = url || 'default';
-            
-            if (url) {
-                headerAvatar.innerHTML = `<img src="${url}">`;
-            } else {
-                headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
+        safeFirebaseQuery(
+            'updateUI_avatar',
+            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl'),
+            (snap) => {
+                const url = snap.val();
+                avatarCache = url || 'default';
+                
+                if (url) {
+                    headerAvatar.innerHTML = `<img src="${url}">`;
+                } else {
+                    headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
+                }
             }
-        });
+        );
     } else {
         avatarCache = null;
         headerAvatar.innerHTML = '<span>?</span>';
     }
 }
 
-// Сброс кеша при обновлении аватарки
 function refreshAvatarCache() {
     avatarCache = null;
     updateUI();
@@ -921,14 +1016,15 @@ function refreshAvatarCache() {
 // НАВИГАЦИЯ
 // ================================================================
 window.goToProfile = function() {
+    if (menuState.isOpen) closeContextMenu();
     currentTab = 'profile';
     showTab('profile');
 };
 
 window.showTab = function(tab) {
+    if (menuState.isOpen) closeContextMenu();
     currentTab = tab;
     
-    // Обновляем табы
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-bar .tab').forEach(t => {
         const text = t.textContent.trim();
@@ -938,7 +1034,6 @@ window.showTab = function(tab) {
         }
     });
     
-    // Показываем/скрываем блоки
     const groupsTab = document.getElementById('groupsTab');
     const peopleTab = document.getElementById('peopleTab');
     const profileTab = document.getElementById('profileTab');
@@ -947,7 +1042,6 @@ window.showTab = function(tab) {
     if (peopleTab) peopleTab.classList.toggle('hidden', tab !== 'people');
     if (profileTab) profileTab.classList.toggle('hidden', tab !== 'profile');
     
-    // Загружаем данные только если нужно
     if (tab === 'groups') loadRooms();
     if (tab === 'people') loadPeople();
     if (tab === 'profile') loadProfile();
@@ -964,114 +1058,140 @@ function loadData() {
 }
 
 // ================================================================
-// ПРОФИЛЬ
+// ПРОФИЛЬ (С ОТМЕНОЙ ЗАПРОСОВ)
 // ================================================================
 function loadProfile() {
     if (!USER_UID) return;
     
-    db.ref('sites/' + SITE + '/users/' + USER_UID).once('value', snap => {
-        const u = snap.val() || {};
-        const name = u.name || USER || 'Гость';
-        const email = u.email || '';
-        const bio = u.bio || 'Привет! 👋';
-        const avatar = document.getElementById('profileAvatar');
-        const letter = document.getElementById('avatarLetter');
-        
-        const nameEl = document.getElementById('profileName');
-        const emailEl = document.getElementById('profileEmail');
-        const bioEl = document.getElementById('profileBio');
-        
-        if (nameEl) nameEl.textContent = name;
-        if (emailEl) emailEl.textContent = email;
-        if (bioEl) bioEl.textContent = bio;
-        
-        if (avatar) {
-            if (u.avatarUrl) {
-                avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">👆 Нажми для меню</span>`;
-            } else if (letter) {
-                letter.textContent = name.charAt(0).toUpperCase();
-                avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span><span class="avatar-hint">👆 Нажми для меню</span>`;
+    safeFirebaseQuery(
+        'loadProfile_' + USER_UID,
+        db.ref('sites/' + SITE + '/users/' + USER_UID),
+        (snap) => {
+            const u = snap.val() || {};
+            const name = u.name || USER || 'Гость';
+            const email = u.email || '';
+            const bio = u.bio || 'Привет! 👋';
+            
+            const nameEl = document.getElementById('profileName');
+            const emailEl = document.getElementById('profileEmail');
+            const bioEl = document.getElementById('profileBio');
+            const avatar = document.getElementById('profileAvatar');
+            
+            if (nameEl) nameEl.textContent = name;
+            if (emailEl) emailEl.textContent = email;
+            if (bioEl) bioEl.textContent = bio;
+            
+            if (avatar) {
+                const wasOpen = document.getElementById('contextMenu')?.classList.contains('open');
+                
+                if (u.avatarUrl) {
+                    avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">👆 Нажми для меню</span>`;
+                } else {
+                    const letter = name.charAt(0).toUpperCase();
+                    avatar.innerHTML = `<span id="avatarLetter">${letter}</span><span class="avatar-hint">👆 Нажми для меню</span>`;
+                }
+                
+                if (wasOpen) {
+                    const menu = document.getElementById('contextMenu');
+                    const overlay = document.getElementById('contextOverlay');
+                    if (menu) menu.classList.add('open');
+                    if (overlay) overlay.classList.add('active');
+                    menuState.isOpen = true;
+                }
             }
         }
-    });
+    );
 }
 
 // ================================================================
-// ЛЮДИ
+// ЛЮДИ (С ОТМЕНОЙ ЗАПРОСОВ)
 // ================================================================
 function loadPeople() {
     if (!USER_UID) return;
+    const el = document.getElementById('peopleList');
+    if (!el) return;
     
-    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
-        const users = snap.val() || {};
-        const keys = Object.keys(users).filter(k => k !== USER_UID);
-        const el = document.getElementById('peopleList');
-        if (!el) return;
-        
-        if (keys.length === 0) {
-            el.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Нет пользователей</div>';
-            return;
-        }
-        
-        let html = '';
-        keys.forEach(k => {
-            const u = users[k];
-            const name = u.name || 'Аноним';
-            const letter = name.charAt(0).toUpperCase();
-            const avatarHtml = u.avatarUrl ? 
-                `<img src="${u.avatarUrl}">` : 
-                `<span>${letter}</span>`;
+    safeFirebaseQuery(
+        'loadPeople',
+        db.ref('sites/' + SITE + '/all_users'),
+        (snap) => {
+            const users = snap.val() || {};
+            const keys = Object.keys(users).filter(k => k !== USER_UID);
             
-            html += `
-                <div class="user-item">
-                    <div class="avatar">${avatarHtml}</div>
-                    <div class="info">
-                        <div class="name">${name}</div>
-                        <div class="email">${u.email || ''}</div>
+            if (keys.length === 0) {
+                el.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Нет пользователей</div>';
+                return;
+            }
+            
+            let html = '';
+            keys.forEach(k => {
+                const u = users[k];
+                const name = u.name || 'Аноним';
+                const letter = name.charAt(0).toUpperCase();
+                const avatarHtml = u.avatarUrl ? 
+                    `<img src="${u.avatarUrl}">` : 
+                    `<span>${letter}</span>`;
+                
+                html += `
+                    <div class="user-item">
+                        <div class="avatar">${avatarHtml}</div>
+                        <div class="info">
+                            <div class="name">${name}</div>
+                            <div class="email">${u.email || ''}</div>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
-        el.innerHTML = html;
-    });
+                `;
+            });
+            el.innerHTML = html;
+        }
+    );
 }
 
 // ================================================================
-// ГРУППЫ
+// ГРУППЫ (С ОТМЕНОЙ ЗАПРОСОВ)
 // ================================================================
 function loadRooms() {
     if (!USER_UID) return;
+    const el = document.getElementById('roomsList');
+    if (!el) return;
     
-    db.ref('sites/' + SITE + '/rooms').once('value', snap => {
-        const rooms = snap.val() || {};
-        const el = document.getElementById('roomsList');
-        if (!el) return;
-        
-        if (Object.keys(rooms).length === 0) {
-            createDefaultRooms();
-            return;
-        }
-        
-        let html = '';
-        Object.keys(rooms).forEach(roomId => {
-            const room = rooms[roomId];
-            db.ref('sites/' + SITE + '/room_users/' + roomId).once('value', snap => {
-                const users = snap.val() || {};
-                const count = Object.keys(users).length;
-                const countEl = document.querySelector(`#room-${roomId} .count`);
-                if (countEl) countEl.textContent = count;
-            });
+    safeFirebaseQuery(
+        'loadRooms',
+        db.ref('sites/' + SITE + '/rooms'),
+        (snap) => {
+            const rooms = snap.val() || {};
             
-            html += `
-                <div class="room-card" id="room-${roomId}" onclick="joinRoom('${roomId}')">
-                    <div class="icon">${room.icon || '👥'}</div>
-                    <div class="name">${room.name}</div>
-                    <div class="count">👥 <span class="count">0</span></div>
-                </div>
-            `;
-        });
-        el.innerHTML = html;
-    });
+            if (Object.keys(rooms).length === 0) {
+                createDefaultRooms();
+                return;
+            }
+            
+            let html = '';
+            Object.keys(rooms).forEach(roomId => {
+                const room = rooms[roomId];
+                
+                safeFirebaseQuery(
+                    'roomUsers_' + roomId,
+                    db.ref('sites/' + SITE + '/room_users/' + roomId),
+                    (snap) => {
+                        const users = snap.val() || {};
+                        const count = Object.keys(users).length;
+                        const countEl = document.querySelector(`#room-${roomId} .count`);
+                        if (countEl) countEl.textContent = count;
+                    }
+                );
+                
+                html += `
+                    <div class="room-card" id="room-${roomId}" onclick="joinRoom('${roomId}')">
+                        <div class="icon">${room.icon || '👥'}</div>
+                        <div class="name">${room.name}</div>
+                        <div class="count">👥 <span class="count">0</span></div>
+                    </div>
+                `;
+            });
+            el.innerHTML = html;
+        }
+    );
 }
 
 function createDefaultRooms() {
@@ -1173,10 +1293,11 @@ window.saveProfile = function() {
 loadSavedProfiles();
 showTab('groups');
 
-console.log('✅ METAIMPERIYA - САНАЦИЯ ПРОВЕДЕНА');
-console.log('📱 Кеширование аватарок');
-console.log('🎯 Исправлены конфликты событий');
-console.log('📋 Чистые функции без лишних запросов');
+console.log('✅ METAIMPERIYA - ОПТИМИЗИРОВАННЫЙ КОД');
+console.log(`📊 Управление запросами: activeRequests Map`);
+console.log('🎯 Отмена запросов при переключении табов');
+console.log('🧹 Очистка beforeunload');
+console.log('📋 Чистые функции без конфликтов');
 </script>
 </body>
 </html>
