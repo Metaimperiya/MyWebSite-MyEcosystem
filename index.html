@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAIMPERIYA - Профили</title>
+    <title>METAIMPERIYA - Вход/Выход</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -26,7 +26,17 @@
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 20px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .btn {
@@ -37,8 +47,8 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            width: 100%;
             margin: 5px 0;
+            transition: all 0.2s;
         }
         
         .btn:hover { background: #4a9eff; }
@@ -46,6 +56,8 @@
         .btn-danger:hover { background: #c0392b; }
         .btn-success { background: #27ae60; }
         .btn-success:hover { background: #219a52; }
+        .btn-outline { background: transparent; border: 2px solid white; }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); }
         
         .card {
             background: white;
@@ -55,20 +67,9 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
         
-        .user-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-        
-        .user-item:hover { background: #f5f5f5; }
-        
         .avatar {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: #1877f2;
             display: flex;
@@ -76,7 +77,7 @@
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 20px;
+            font-size: 18px;
         }
         
         .avatar img {
@@ -86,62 +87,7 @@
             object-fit: cover;
         }
         
-        .name { font-weight: 600; }
-        .status { color: #888; font-size: 14px; }
-        
-        .profile-header {
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .profile-header .avatar {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 15px;
-            font-size: 40px;
-            cursor: pointer;
-        }
-        
-        .friends-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 10px 0;
-        }
-        
-        .friend-tag {
-            background: #e8f0fe;
-            color: #1877f2;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
         .hidden { display: none; }
-        
-        .tab-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .tab.active {
-            background: #1877f2;
-            color: white;
-            border-color: #1877f2;
-        }
         
         .modal {
             display: none;
@@ -201,68 +147,159 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.2s;
         }
         
         .google-btn:hover { background: #f5f5f5; }
         .google-btn img { width: 20px; }
+        
+        .profile-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .profile-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .profile-option:hover {
+            border-color: #1877f2;
+            background: #f0f7ff;
+        }
+        
+        .profile-option .avatar {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+        
+        .profile-option .info {
+            flex: 1;
+        }
+        
+        .profile-option .info .name {
+            font-weight: 600;
+        }
+        
+        .profile-option .info .email {
+            font-size: 14px;
+            color: #888;
+        }
+        
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .tab.active {
+            background: #1877f2;
+            color: white;
+            border-color: #1877f2;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <h2>👥 METAIMPERIYA</h2>
-    <div id="userInfo" style="margin-top:10px;font-size:14px;">
+    <h2>🏠 METAIMPERIYA</h2>
+    <div class="user-info">
+        <div class="avatar" id="headerAvatar"><span>?</span></div>
         <span id="userName">Не авторизован</span>
+        <button class="btn btn-outline" id="logoutBtn" onclick="logout()" style="display:none;">🚪 Выйти</button>
     </div>
 </div>
 
 <!-- Вкладки -->
 <div class="tab-bar">
-    <div class="tab active" onclick="showTab('people')">👤 Люди</div>
-    <div class="tab" onclick="showTab('profile')">👤 Мой профиль</div>
-    <div class="tab" onclick="showTab('friends')">🤝 Друзья</div>
+    <div class="tab active" onclick="showTab('profile')">👤 Профиль</div>
+    <div class="tab" onclick="showTab('people')">👥 Люди</div>
+    <div class="tab" onclick="showTab('rooms')">🏠 Комнаты</div>
+</div>
+
+<!-- Профиль -->
+<div id="profileTab">
+    <div class="card" style="text-align:center;padding:30px;">
+        <div class="avatar" id="profileAvatar" onclick="uploadAvatar()" style="width:100px;height:100px;font-size:40px;margin:0 auto 15px;cursor:pointer;">
+            <span>?</span>
+        </div>
+        <div style="font-size:24px;font-weight:700;" id="profileName">Имя</div>
+        <div style="color:#888;" id="profileEmail">email@example.com</div>
+        <div style="color:#888;margin:10px 0;" id="profileBio">О себе</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <button class="btn" onclick="editProfile()">✏️ Редактировать</button>
+            <button class="btn" onclick="uploadAvatar()">📷 Аватарка</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 Выйти</button>
+        </div>
+    </div>
 </div>
 
 <!-- Список людей -->
-<div id="peopleTab">
+<div id="peopleTab" class="hidden">
     <div class="card">
-        <h3>👤 Все пользователи</h3>
+        <h3>👥 Все пользователи</h3>
         <div id="peopleList"></div>
     </div>
 </div>
 
-<!-- Профиль -->
-<div id="profileTab" class="hidden">
-    <div class="card profile-header">
-        <div class="avatar" id="profileAvatar" onclick="uploadAvatar()">
-            <span>?</span>
-        </div>
-        <div class="name" id="profileName">Имя</div>
-        <div class="status" id="profileBio">О себе</div>
-        <button class="btn" onclick="editProfile()">✏️ Редактировать</button>
-    </div>
-</div>
-
-<!-- Друзья -->
-<div id="friendsTab" class="hidden">
+<!-- Комнаты -->
+<div id="roomsTab" class="hidden">
     <div class="card">
-        <h3>🤝 Мои друзья</h3>
-        <div id="friendsList"></div>
+        <h3>🏠 Комнаты</h3>
+        <div id="roomsList"></div>
     </div>
 </div>
 
 <!-- Модалка входа -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
-        <h3>👤 Вход</h3>
+        <h3>👤 Вход в METAIMPERIYA</h3>
+        <p style="color:#888;font-size:14px;margin:10px 0;">Выберите способ входа:</p>
+        
         <button class="google-btn" id="googleBtn">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
             Войти через Google
         </button>
-        <div style="text-align:center;margin:10px 0;">или</div>
-        <input type="text" id="nameInput" placeholder="Введите имя">
-        <div class="btns">
-            <button class="btn-success" onclick="loginName()">Войти</button>
+        
+        <div style="text-align:center;margin:10px 0;color:#bbb;">или</div>
+        
+        <div style="display:flex;gap:10px;">
+            <input type="text" id="nameInput" placeholder="Введите имя" style="flex:1;">
+            <button class="btn btn-success" onclick="loginName()" style="flex-shrink:0;">Войти</button>
+        </div>
+        
+        <!-- Список сохраненных профилей -->
+        <div id="savedProfiles" style="margin-top:15px;border-top:1px solid #eee;padding-top:15px;">
+            <p style="color:#888;font-size:14px;margin-bottom:10px;">📱 Сохраненные профили:</p>
+            <div id="profileSelector" class="profile-selector"></div>
         </div>
     </div>
 </div>
@@ -270,7 +307,7 @@
 <!-- Модалка редактирования профиля -->
 <div class="modal" id="editProfileModal">
     <div class="modal-content">
-        <h3>✏️ Редактировать</h3>
+        <h3>✏️ Редактировать профиль</h3>
         <input type="text" id="editName" placeholder="Имя">
         <input type="text" id="editBio" placeholder="О себе">
         <div class="btns">
@@ -306,41 +343,158 @@ const provider = new firebase.auth.GoogleAuthProvider();
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
 let USER = null;
 let USER_UID = null;
-let VIEWING_USER = null;
+let SAVED_PROFILES = [];
 
 // ================================================================
-// AUTH - ВХОД
+// ЗАГРУЗКА СОХРАНЕННЫХ ПРОФИЛЕЙ
+// ================================================================
+function loadSavedProfiles() {
+    try {
+        const saved = localStorage.getItem('dc_profiles_' + SITE);
+        SAVED_PROFILES = saved ? JSON.parse(saved) : [];
+    } catch(e) {
+        SAVED_PROFILES = [];
+    }
+    renderSavedProfiles();
+}
+
+function saveProfileToList(uid, name, email, avatarUrl) {
+    // Проверяем, есть ли уже такой профиль
+    const existing = SAVED_PROFILES.find(p => p.uid === uid);
+    if (!existing) {
+        SAVED_PROFILES.push({
+            uid: uid,
+            name: name,
+            email: email || 'anon',
+            avatarUrl: avatarUrl || null,
+            lastUsed: Date.now()
+        });
+    } else {
+        existing.name = name;
+        existing.email = email || 'anon';
+        existing.avatarUrl = avatarUrl || null;
+        existing.lastUsed = Date.now();
+    }
+    
+    // Сохраняем в localStorage
+    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+    renderSavedProfiles();
+}
+
+function renderSavedProfiles() {
+    const container = document.getElementById('profileSelector');
+    if (!container) return;
+    
+    if (SAVED_PROFILES.length === 0) {
+        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:10px;">Нет сохраненных профилей</div>';
+        return;
+    }
+    
+    // Сортируем по времени последнего использования
+    const sorted = [...SAVED_PROFILES].sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
+    
+    container.innerHTML = sorted.map(p => {
+        const letter = (p.name || '?').charAt(0).toUpperCase();
+        const avatarHtml = p.avatarUrl ? 
+            `<img src="${p.avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` :
+            `<span>${letter}</span>`;
+        
+        return `
+            <div class="profile-option" onclick="loginWithSavedProfile('${p.uid}')">
+                <div class="avatar">${avatarHtml}</div>
+                <div class="info">
+                    <div class="name">${p.name || 'Аноним'}</div>
+                    <div class="email">${p.email || ''}</div>
+                </div>
+                <button class="btn btn-danger" onclick="event.stopPropagation();removeSavedProfile('${p.uid}')" style="padding:5px 10px;font-size:12px;">
+                    ✕
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Удаление сохраненного профиля
+window.removeSavedProfile = function(uid) {
+    if (!confirm('Удалить сохраненный профиль?')) return;
+    SAVED_PROFILES = SAVED_PROFILES.filter(p => p.uid !== uid);
+    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+    renderSavedProfiles();
+};
+
+// Вход по сохраненному профилю
+window.loginWithSavedProfile = function(uid) {
+    // Находим профиль
+    const profile = SAVED_PROFILES.find(p => p.uid === uid);
+    if (!profile) return;
+    
+    // Входим анонимно с именем из профиля
+    auth.signInAnonymously().then(() => {
+        USER = profile.name;
+        USER_UID = uid;
+        localStorage.setItem('dc_u_' + SITE, USER);
+        
+        // Обновляем данные в Firebase
+        const data = {
+            name: profile.name,
+            email: profile.email || 'anon',
+            uid: uid,
+            lastLogin: Date.now(),
+            avatarUrl: profile.avatarUrl || null
+        };
+        
+        db.ref('sites/' + SITE + '/users/' + uid).update(data);
+        db.ref('sites/' + SITE + '/all_users/' + uid).set(data);
+        
+        // Обновляем время использования
+        profile.lastUsed = Date.now();
+        localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+        
+        document.getElementById('loginModal').classList.remove('open');
+        updateUI();
+        loadData();
+    }).catch(e => alert('Ошибка входа: ' + e.message));
+};
+
+// ================================================================
+// AUTH - ВХОД/ВЫХОД
 // ================================================================
 auth.onAuthStateChanged(user => {
     if (user) {
-        USER_UID = user.uid;
-        USER = user.displayName || user.email || user.uid.slice(0, 8);
-        localStorage.setItem('dc_u_' + SITE, USER);
+        // Если уже есть UID - используем его
+        if (!USER_UID) {
+            USER_UID = user.uid;
+            USER = user.displayName || user.email || user.uid.slice(0, 8);
+            localStorage.setItem('dc_u_' + SITE, USER);
+            
+            // Сохраняем профиль в список
+            saveProfileToList(USER_UID, USER, user.email, user.photoURL);
+            
+            // Сохраняем в Firebase
+            const data = {
+                name: USER,
+                email: user.email || 'anon',
+                uid: USER_UID,
+                lastLogin: Date.now(),
+                avatarUrl: user.photoURL || null
+            };
+            
+            db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
+            db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
+        }
         
-        // СОХРАНЯЕМ ЮЗЕРА
-        const data = {
-            name: USER,
-            email: user.email || 'anon',
-            uid: USER_UID,
-            lastLogin: Date.now(),
-            avatarUrl: user.photoURL || null
-        };
-        
-        db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
-        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
-        
-        document.getElementById('userName').textContent = '👋 ' + USER;
         document.getElementById('loginModal').classList.remove('open');
-        
-        loadPeople();
-        loadProfile();
-        loadFriends();
+        updateUI();
+        loadData();
         
     } else {
         USER = null;
         USER_UID = null;
         document.getElementById('loginModal').classList.add('open');
-        document.getElementById('userName').textContent = '❌ Не авторизован';
+        updateUI();
+        
+        // Загружаем сохраненные профили
+        loadSavedProfiles();
     }
 });
 
@@ -362,6 +516,7 @@ window.loginName = function() {
     
     auth.signInAnonymously().then(() => {
         USER = name;
+        USER_UID = 'anon_' + Date.now();
         localStorage.setItem('dc_u_' + SITE, USER);
         
         const data = {
@@ -374,17 +529,94 @@ window.loginName = function() {
         db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
         
-        document.getElementById('userName').textContent = '👋 ' + USER;
-        document.getElementById('loginModal').classList.remove('open');
+        // Сохраняем профиль
+        saveProfileToList(USER_UID, USER, data.email);
         
-        loadPeople();
-        loadProfile();
-        loadFriends();
+        document.getElementById('loginModal').classList.remove('open');
+        updateUI();
+        loadData();
     }).catch(e => alert('Ошибка: ' + e.message));
 };
 
+// Выход
+window.logout = function() {
+    if (!confirm('Выйти из профиля?')) return;
+    
+    auth.signOut().then(() => {
+        localStorage.removeItem('dc_u_' + SITE);
+        USER = null;
+        USER_UID = null;
+        document.getElementById('loginModal').classList.add('open');
+        updateUI();
+        loadSavedProfiles();
+    }).catch(e => alert('Ошибка выхода: ' + e.message));
+};
+
 // ================================================================
-// ЗАГРУЗКА ЛЮДЕЙ
+// UI
+// ================================================================
+function updateUI() {
+    const headerAvatar = document.getElementById('headerAvatar');
+    const userName = document.getElementById('userName');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (USER) {
+        userName.textContent = '👋 ' + USER;
+        logoutBtn.style.display = 'inline-block';
+        
+        // Загружаем аватарку
+        db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', snap => {
+            const url = snap.val();
+            if (url) {
+                headerAvatar.innerHTML = `<img src="${url}">`;
+            } else {
+                headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
+            }
+        });
+    } else {
+        userName.textContent = '❌ Не авторизован';
+        logoutBtn.style.display = 'none';
+        headerAvatar.innerHTML = '<span>?</span>';
+    }
+}
+
+// ================================================================
+// ЗАГРУЗКА ДАННЫХ
+// ================================================================
+function loadData() {
+    if (!USER_UID) return;
+    loadProfile();
+    loadPeople();
+    loadRooms();
+}
+
+// ================================================================
+// ПРОФИЛЬ
+// ================================================================
+function loadProfile() {
+    if (!USER_UID) return;
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID).once('value', snap => {
+        const u = snap.val() || {};
+        const name = u.name || USER || 'Гость';
+        const email = u.email || '';
+        const bio = u.bio || 'Привет!';
+        const avatar = document.getElementById('profileAvatar');
+        
+        document.getElementById('profileName').textContent = name;
+        document.getElementById('profileEmail').textContent = email;
+        document.getElementById('profileBio').textContent = bio;
+        
+        if (u.avatarUrl) {
+            avatar.innerHTML = `<img src="${u.avatarUrl}">`;
+        } else {
+            avatar.innerHTML = `<span>${name.charAt(0).toUpperCase()}</span>`;
+        }
+    });
+}
+
+// ================================================================
+// ЛЮДИ
 // ================================================================
 function loadPeople() {
     if (!USER_UID) return;
@@ -405,15 +637,15 @@ function loadPeople() {
             const name = u.name || 'Аноним';
             const letter = name.charAt(0).toUpperCase();
             const avatarHtml = u.avatarUrl ? 
-                `<img src="${u.avatarUrl}">` : 
+                `<img src="${u.avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : 
                 `<span>${letter}</span>`;
             
             html += `
-                <div class="user-item" onclick="viewUser('${k}')">
+                <div class="user-item">
                     <div class="avatar">${avatarHtml}</div>
                     <div>
-                        <div class="name">${name}</div>
-                        <div class="status">Нажми для просмотра</div>
+                        <div style="font-weight:600;">${name}</div>
+                        <div style="color:#888;font-size:14px;">${u.email || ''}</div>
                     </div>
                 </div>
             `;
@@ -423,109 +655,84 @@ function loadPeople() {
 }
 
 // ================================================================
-// ЗАГРУЗКА ПРОФИЛЯ
+// КОМНАТЫ
 // ================================================================
-function loadProfile() {
-    const uid = VIEWING_USER || USER_UID;
-    if (!uid) return;
-    
-    db.ref('sites/' + SITE + '/users/' + uid).once('value', snap => {
-        const u = snap.val() || {};
-        const name = u.name || 'Гость';
-        const bio = u.bio || 'Привет!';
-        const avatar = document.getElementById('profileAvatar');
-        
-        document.getElementById('profileName').textContent = name;
-        document.getElementById('profileBio').textContent = bio;
-        
-        if (u.avatarUrl) {
-            avatar.innerHTML = `<img src="${u.avatarUrl}">`;
-        } else {
-            avatar.innerHTML = `<span>${name.charAt(0).toUpperCase()}</span>`;
-        }
-    });
-}
-
-// ================================================================
-// ЗАГРУЗКА ДРУЗЕЙ
-// ================================================================
-function loadFriends() {
+function loadRooms() {
     if (!USER_UID) return;
     
-    db.ref('sites/' + SITE + '/friends/' + USER_UID).on('value', snap => {
-        const data = snap.val() || {};
-        const keys = Object.keys(data);
-        const el = document.getElementById('friendsList');
+    db.ref('sites/' + SITE + '/rooms').once('value', snap => {
+        const rooms = snap.val() || {};
+        const el = document.getElementById('roomsList');
         
-        if (keys.length === 0) {
-            el.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Нет друзей</div>';
+        if (Object.keys(rooms).length === 0) {
+            createDefaultRooms();
             return;
         }
         
-        let html = '<div class="friends-list">';
-        keys.forEach(k => {
-            db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
-                const u = usnap.val() || {};
-                const name = u.name || 'Аноним';
-                html += `<span class="friend-tag" onclick="viewUser('${k}')">${name}</span>`;
-                document.querySelector('#friendsList .friends-list').innerHTML = html + '</div>';
+        let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+        Object.keys(rooms).forEach(roomId => {
+            const room = rooms[roomId];
+            
+            // Считаем юзеров в комнате
+            db.ref('sites/' + SITE + '/room_users/' + roomId).once('value', snap => {
+                const users = snap.val() || {};
+                const count = Object.keys(users).length;
+                const countEl = document.querySelector(`#room-${roomId} .count`);
+                if (countEl) countEl.textContent = count;
             });
+            
+            html += `
+                <div class="card" id="room-${roomId}" style="text-align:center;">
+                    <div style="font-size:32px;">${room.icon || '🏠'}</div>
+                    <div style="font-weight:600;">${room.name}</div>
+                    <div style="color:#888;font-size:14px;">👥 <span class="count">0</span> участников</div>
+                    <button class="btn" onclick="joinRoom('${roomId}')" style="margin-top:10px;width:100%;">➕ Войти</button>
+                </div>
+            `;
+        });
+        html += '</div>';
+        el.innerHTML = html;
+    });
+}
+
+// Создаем 10 комнат
+function createDefaultRooms() {
+    const rooms = [];
+    for (let i = 1; i <= 10; i++) {
+        rooms.push({
+            id: 'room' + i,
+            name: 'Комната ' + i,
+            icon: '🏠',
+            createdBy: 'system',
+            createdAt: Date.now()
+        });
+    }
+    
+    rooms.forEach(room => {
+        db.ref('sites/' + SITE + '/rooms/' + room.id).set({
+            name: room.name,
+            icon: room.icon,
+            createdBy: room.createdBy,
+            createdAt: room.createdAt
         });
     });
 }
 
-// ================================================================
-// ДОБАВЛЕНИЕ В ДРУЗЬЯ
-// ================================================================
-function addFriend(uid) {
-    if (!USER_UID || uid === USER_UID) return;
+// Вход в комнату
+window.joinRoom = function(roomId) {
+    if (!USER_UID) { alert('Войдите!'); return; }
     
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
-    db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
-    
-    alert('✅ Пользователь добавлен в друзья!');
-    loadFriends();
-}
-
-function removeFriend(uid) {
-    if (!confirm('Удалить из друзей?')) return;
-    
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).remove();
-    db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).remove();
-    
-    alert('❌ Пользователь удален из друзей');
-    loadFriends();
-}
-
-// ================================================================
-// ПРОСМОТР ПОЛЬЗОВАТЕЛЯ
-// ================================================================
-window.viewUser = function(uid) {
-    if (uid === USER_UID) {
-        VIEWING_USER = null;
-        showTab('profile');
-        loadProfile();
-        return;
-    }
-    
-    VIEWING_USER = uid;
-    showTab('profile');
-    loadProfile();
-    
-    // Проверяем, есть ли в друзьях
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
-        const isFriend = snap.val() === true;
-        const actions = document.getElementById('profileActions');
-        if (actions) {
-            actions.innerHTML = isFriend ?
-                `<button class="btn btn-danger" onclick="removeFriend('${uid}')">❌ Удалить из друзей</button>` :
-                `<button class="btn btn-success" onclick="addFriend('${uid}')">➕ Добавить в друзья</button>`;
-        }
+    db.ref('sites/' + SITE + '/room_users/' + roomId + '/' + USER_UID).set({
+        name: USER,
+        joinedAt: Date.now()
     });
+    
+    alert('✅ Вы вошли в комнату!');
+    loadRooms();
 };
 
 // ================================================================
-// ЗАГРУЗКА АВАТАРКИ
+// АВАТАРКА
 // ================================================================
 window.uploadAvatar = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
@@ -542,8 +749,16 @@ window.uploadAvatar = function() {
         ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
             db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
+            
+            // Обновляем в сохраненных профилях
+            const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
+            if (profile) {
+                profile.avatarUrl = url;
+                localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+            }
+            
             loadProfile();
-            loadPeople();
+            updateUI();
             alert('✅ Аватарка обновлена!');
         });
     };
@@ -575,9 +790,16 @@ window.saveProfile = function() {
     db.ref('sites/' + SITE + '/users/' + USER_UID).update(updates);
     db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(updates);
     
-    document.getElementById('userName').textContent = '👋 ' + USER;
+    // Обновляем в сохраненных профилях
+    const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
+    if (profile) {
+        profile.name = USER;
+        localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+    }
+    
     closeEditProfile();
     loadProfile();
+    updateUI();
     loadPeople();
 };
 
@@ -587,37 +809,30 @@ window.saveProfile = function() {
 window.showTab = function(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-bar .tab').forEach(t => {
-        if (t.textContent.includes(tab === 'people' ? 'Люди' : tab === 'profile' ? 'Мой профиль' : 'Друзья')) {
+        if (t.textContent.includes(tab === 'profile' ? 'Профиль' : tab === 'people' ? 'Люди' : 'Комнаты')) {
             t.classList.add('active');
         }
     });
     
-    document.getElementById('peopleTab').classList.toggle('hidden', tab !== 'people');
     document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
-    document.getElementById('friendsTab').classList.toggle('hidden', tab !== 'friends');
+    document.getElementById('peopleTab').classList.toggle('hidden', tab !== 'people');
+    document.getElementById('roomsTab').classList.toggle('hidden', tab !== 'rooms');
     
-    if (tab === 'people') loadPeople();
     if (tab === 'profile') loadProfile();
-    if (tab === 'friends') loadFriends();
+    if (tab === 'people') loadPeople();
+    if (tab === 'rooms') loadRooms();
 };
 
 // ================================================================
 // ЗАПУСК
 // ================================================================
-document.getElementById('profileTab').innerHTML += `
-    <div class="card" id="profileActions">
-        <button class="btn" onclick="editProfile()">✏️ Редактировать профиль</button>
-        <button class="btn" onclick="uploadAvatar()">📷 Загрузить аватарку</button>
-    </div>
-`;
+loadSavedProfiles();
+showTab('profile');
 
-// Показываем людей по умолчанию
-showTab('people');
-
-console.log('✅ METAIMPERIYA - Профили и люди работают!');
-console.log('👥 Все пользователи сохраняются в all_users');
-console.log('🤝 Друзья работают через Firebase');
+console.log('✅ METAIMPERIYA - Вход/Выход работает!');
+console.log('📱 Сохраненные профили хранятся в localStorage');
+console.log('🚪 Кнопка выхода - в хедере и профиле');
+console.log('👥 При входе профиль сохраняется в список');
 </script>
-
 </body>
 </html>
