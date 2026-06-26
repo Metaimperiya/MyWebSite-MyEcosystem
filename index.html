@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <style>
+        /* Твой CSS без изменений */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #f0f2f5;
@@ -19,7 +20,6 @@
             min-height: 100vh;
         }
 
-        /* ===== ТОПБАР С ПЛЕЕРОМ ===== */
         .topbar {
             background: #fff; padding: 8px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: space-between; align-items: center;
@@ -35,7 +35,6 @@
             font-size: 1.1rem; font-weight: 700; color: #1877f2; cursor: pointer;
         }
 
-        /* ===== ПЛЕЕР ===== */
         .player {
             background: #0a0a12; color: #0f0; border: 2px solid #0f0;
             padding: 4px 14px; border-radius: 30px; font-family: monospace;
@@ -84,7 +83,6 @@
             max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* ===== ГОРИЗОНТАЛЬНОЕ МЕНЮ ===== */
         .hor-menu {
             background: #fff; padding: 6px 14px; border-bottom: 1px solid #ddd;
             display: flex; justify-content: center; gap: 8px;
@@ -99,7 +97,6 @@
         .hor-menu button:hover { background: #f0f0f0; }
         .hor-menu button.active { color: #1877f2; background: #e8f0fe; }
 
-        /* ===== САЙДБАР ===== */
         .sidebar {
             position: fixed; top: 0; left: -280px; width: 260px; height: 100vh;
             background: #fff; border-right: 1px solid #ddd;
@@ -144,7 +141,6 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* ===== ПОСТЫ ===== */
         .post-form {
             background: #fff; border-radius: 12px; padding: 12px 14px;
             margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
@@ -251,7 +247,6 @@
         .comments .input-wrap input:focus { border-color: #1877f2; }
         .comments .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 20px; padding: 4px 14px; cursor: pointer; font-weight: 600; font-size: 0.65rem; }
 
-        /* ===== ПРОФИЛЬ ===== */
         .profile-header {
             background: #fff; border-radius: 12px; padding: 16px; text-align: center;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8; margin-bottom: 10px;
@@ -291,7 +286,6 @@
         .friend-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.45rem; font-weight: 700; }
 
-        /* ===== ГРУППЫ ===== */
         .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .groups-page .group-card {
             background: #fff; border-radius: 12px; padding: 14px;
@@ -303,7 +297,6 @@
         .groups-page .group-card .name { font-weight: 600; font-size: 0.8rem; margin-top: 4px; }
         .groups-page .group-card .count { color: #888; font-size: 0.65rem; }
 
-        /* ===== ЛЮДИ ===== */
         .people-page .people-list { display: flex; flex-direction: column; gap: 6px; }
         .people-page .people-item {
             background: #fff; border-radius: 12px; padding: 10px 14px;
@@ -318,7 +311,6 @@
         .people-page .people-item .info .name { font-weight: 600; font-size: 0.8rem; }
         .people-page .people-item .info .status { color: #888; font-size: 0.65rem; }
 
-        /* ===== ЧАТ ===== */
         .chat-view {
             display: none; background: #fff; border-radius: 12px; padding: 12px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8;
@@ -335,7 +327,6 @@
         .chat-view .input-wrap input:focus { border-color: #1877f2; }
         .chat-view .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 20px; padding: 0 18px; font-weight: 600; cursor: pointer; font-size: 0.75rem; }
 
-        /* ===== МОДАЛКИ ===== */
         .modal {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;
@@ -701,19 +692,15 @@
                 name: USER,
                 email: user.email || 'anon',
                 uid: USER_UID,
-                lastLogin: Date.now()
+                lastLogin: Date.now(),
+                avatarUrl: user.photoURL || null
             };
             
-            // Сохраняем профиль
+            // Сохраняем в профиль пользователя
             db.ref('sites/' + SITE + '/users/' + USER_UID).update(userData);
             
             // ===== ДОБАВЛЯЕМ В ОБЩИЙ СПИСОК ВСЕХ ЮЗЕРОВ =====
             db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(userData);
-            
-            // Сохраняем подписки
-            if (user.email) {
-                db.ref('sites/' + SITE + '/users/' + USER_UID + '/email').set(user.email);
-            }
             
             updateUI();
             loadFeed();
@@ -755,7 +742,6 @@
             const ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
             ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
                 db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
-                // Обновляем в общем списке
                 db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
                 updateUI();
                 loadProfile();
@@ -820,7 +806,6 @@
             USER = n.slice(0, 24);
             localStorage.setItem('dc_u_' + SITE, USER);
             
-            // Сохраняем анонимного юзера
             const userData = {
                 name: USER,
                 email: 'anon_' + Date.now() + '@anon.com',
@@ -1502,7 +1487,6 @@
         USER = name;
         localStorage.setItem('dc_u_' + SITE, USER);
         
-        // Обновляем в обоих местах
         const updates = { name: USER, bio: bio };
         db.ref('sites/' + SITE + '/users/' + USER_UID).update(updates);
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(updates);
@@ -1514,12 +1498,11 @@
     };
 
     // ================================================================
-    // ГРУППЫ - ЗАГРУЗКА ИЗ FIREBASE
+    // ГРУППЫ - ЗАГРУЗКА ИЗ FIREBASE (УБИРАЕМ ДУБЛИРОВАНИЕ)
     // ================================================================
     function loadGroups() {
         const el = document.getElementById('groupList');
         
-        // Подписываемся на изменения списка групп
         db.ref('sites/' + SITE + '/groups').on('value', snap => {
             const groupsData = snap.val() || {};
             const groups = Object.keys(groupsData).map(key => ({
@@ -1529,25 +1512,31 @@
             }));
             
             if (groups.length === 0) {
-                // Создаем дефолтные группы при первом запуске
                 createDefaultGroups();
                 return;
             }
             
-            // Обновляем счетчики сообщений для каждой группы
-            el.innerHTML = groups.map(g => {
-                // Подписываемся на счетчик сообщений
+            el.innerHTML = '';
+            
+            groups.forEach(g => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+                card.dataset.id = g.id;
+                card.onclick = function() { openGroup(g.id); };
+                
                 db.ref('rooms/' + SITE + '_' + g.id + '/messages').on('value', snap => {
-                    const countEl = document.querySelector(`#groupList .group-card[data-id="${g.id}"] .count span`);
-                    if (countEl) countEl.textContent = snap.numChildren();
+                    const countSpan = card.querySelector('.count span');
+                    if (countSpan) countSpan.textContent = snap.numChildren();
                 });
                 
-                return `<div class="group-card" data-id="${g.id}" onclick="openGroup('${g.id}')">
+                card.innerHTML = `
                     <div class="icon">${g.icon}</div>
                     <div class="name">${esc(g.name)}</div>
                     <div class="count">💬 <span class="count">0</span></div>
-                </div>`;
-            }).join('');
+                `;
+                
+                el.appendChild(card);
+            });
         });
     }
 
@@ -1589,7 +1578,6 @@
         if (!name || name.length < 2) { alert('Минимум 2 символа'); return; }
         
         const id = 'g_' + Date.now();
-        // Сохраняем в Firebase
         db.ref('sites/' + SITE + '/groups/' + id).set({
             name: name,
             icon: '📁',
@@ -1602,7 +1590,7 @@
     };
 
     // ================================================================
-    // ЛЮДИ - ЗАГРУЗКА ИЗ ОБЩЕГО СПИСКА
+    // ЛЮДИ - ЗАГРУЗКА ИЗ ОБЩЕГО СПИСКА (ИСПРАВЛЕНО!)
     // ================================================================
     function loadPeople() {
         if (!USER_UID) {
@@ -1610,7 +1598,7 @@
             return;
         }
         
-        db.ref('sites/' + SITE + '/all_users').on('value', snap => {
+        db.ref('sites/' + SITE + '/all_users').once('value', snap => {
             const users = snap.val() || {};
             const keys = Object.keys(users).filter(k => k !== USER_UID);
             const el = document.getElementById('peopleList');
@@ -1620,7 +1608,6 @@
                 return;
             }
             
-            // Сортируем по времени последнего входа
             const sortedKeys = keys.sort((a, b) => (users[b].lastLogin || 0) - (users[a].lastLogin || 0));
             
             el.innerHTML = sortedKeys.map(k => {
@@ -1628,20 +1615,16 @@
                 const name = u.name || 'Аноним';
                 const letter = name.charAt(0).toUpperCase();
                 const isOnline = u.lastLogin && (Date.now() - u.lastLogin < 5 * 60 * 1000);
+                const avatarHtml = u.avatarUrl ? `<img src="${u.avatarUrl}" style="width:100%;height:100%;object-fit:cover;">` : `<span class="letter">${letter}</span>`;
+                
                 return `<div class="people-item" onclick="viewUser('${k}')">
-                    <span class="avatar-wrap" id="pava-${k}"><span class="letter">${letter}</span></span>
+                    <span class="avatar-wrap" id="pava-${k}">${avatarHtml}</span>
                     <div class="info">
                         <div class="name">${esc(name)} ${isOnline ? '🟢' : ''}</div>
                         <div class="status">${isOnline ? 'В сети' : 'Был(а) недавно'}</div>
                     </div>
                 </div>`;
             }).join('');
-            
-            // Загружаем аватарки
-            sortedKeys.forEach(k => {
-                const el2 = document.getElementById('pava-' + k);
-                if (el2) renderAvatar(k, el2, '?');
-            });
         });
     }
 
@@ -1756,11 +1739,10 @@
     loadPeople();
     setActivePage('feedPage');
 
-    console.log('🏛️ METAIMPERIYA С GOOGLE-ВХОДОМ, ПЛЕЕРОМ И ИСПРАВЛЕННЫМИ ЮЗЕРАМИ!');
-    console.log('🎵 Плеер: ONE IN BILLION');
-    console.log('✅ Пользователи теперь сохраняются в общий список all_users');
-    console.log('✅ Группы хранятся в Firebase и синхронизируются');
-    console.log('🏴‍☠️ Админ-пароль: 12345');
+    console.log('🏛️ METAIMPERIYA - ВСЕ ИСПРАВЛЕНО!');
+    console.log('✅ Пользователи сохраняются в all_users');
+    console.log('✅ Группы в Firebase');
+    console.log('✅ Нет дублирования шапок');
 
 })();
 </script>
