@@ -21,7 +21,6 @@
             min-height: 100vh;
         }
         
-        /* ===== HEADER ===== */
         .header {
             background: #1877f2;
             color: white;
@@ -34,10 +33,7 @@
             box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
         }
         
-        .header .left h2 {
-            font-size: 20px;
-            font-weight: 700;
-        }
+        .header .left h2 { font-size: 20px; font-weight: 700; }
         
         .header .right {
             display: flex;
@@ -57,9 +53,7 @@
             transition: all 0.2s;
         }
         
-        .header .notif-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
+        .header .notif-btn:hover { background: rgba(255,255,255,0.25); }
         
         .header .notif-btn .badge {
             position: absolute;
@@ -92,18 +86,9 @@
             transition: all 0.2s;
         }
         
-        .header .avatar-small:hover {
-            border-color: white;
-            transform: scale(1.05);
-        }
+        .header .avatar-small:hover { border-color: white; transform: scale(1.05); }
+        .header .avatar-small img { width: 100%; height: 100%; object-fit: cover; }
         
-        .header .avatar-small img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        /* ===== TABS ===== */
         .tab-bar {
             display: flex;
             gap: 8px;
@@ -129,16 +114,9 @@
             font-family: inherit;
         }
         
-        .tab:hover {
-            background: #f0f2f5;
-        }
+        .tab:hover { background: #f0f2f5; }
+        .tab.active { background: #1877f2; color: white; }
         
-        .tab.active {
-            background: #1877f2;
-            color: white;
-        }
-        
-        /* ===== CARD ===== */
         .card {
             background: white;
             border-radius: 12px;
@@ -154,7 +132,6 @@
             font-weight: 600;
         }
         
-        /* ===== USER LIST - FACEBOOK STYLE ===== */
         .user-item {
             display: flex;
             align-items: center;
@@ -166,14 +143,8 @@
             cursor: default;
         }
         
-        .user-item:hover {
-            background: #f0f2f5;
-            border-radius: 8px;
-        }
-        
-        .user-item:last-child {
-            border-bottom: none;
-        }
+        .user-item:hover { background: #f0f2f5; border-radius: 8px; }
+        .user-item:last-child { border-bottom: none; }
         
         .user-item .avatar {
             width: 40px;
@@ -192,11 +163,7 @@
             cursor: pointer;
         }
         
-        .user-item .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .user-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
         
         .user-item .info {
             flex: 1;
@@ -213,9 +180,7 @@
             text-overflow: ellipsis;
         }
         
-        .user-item .info .email {
-            display: none;
-        }
+        .user-item .info .email { display: none; }
         
         .user-item .actions {
             display: flex;
@@ -243,13 +208,8 @@
             color: #050505;
         }
         
-        .btn-action:hover {
-            background: #d8dadf;
-        }
-        
-        .btn-action:active {
-            transform: scale(0.95);
-        }
+        .btn-action:hover { background: #d8dadf; }
+        .btn-action:active { transform: scale(0.95); }
         
         .btn-message {
             background: #e4e6eb;
@@ -258,14 +218,8 @@
             padding: 6px 12px;
         }
         
-        .btn-message:hover {
-            background: #d8dadf;
-        }
-        
-        .btn-message .icon {
-            font-size: 15px;
-            line-height: 1;
-        }
+        .btn-message:hover { background: #d8dadf; }
+        .btn-message .icon { font-size: 15px; line-height: 1; }
         
         .btn-friend {
             min-width: 80px;
@@ -274,51 +228,28 @@
             color: #050505;
         }
         
-        .btn-friend:hover {
-            background: #d8dadf;
-        }
-        
-        .btn-friend.add {
-            background: #e4e6eb;
-            color: #050505;
-        }
-        
-        .btn-friend.add:hover {
-            background: #d8dadf;
-        }
+        .btn-friend:hover { background: #d8dadf; }
+        .btn-friend.add { background: #e4e6eb; color: #050505; }
+        .btn-friend.add:hover { background: #d8dadf; }
         
         .btn-friend.pending {
             background: #e4e6eb;
             color: #050505;
             opacity: 0.7;
-            cursor: default;
+            cursor: pointer;
         }
         
-        .btn-friend.pending:hover {
-            background: #e4e6eb;
-        }
+        .btn-friend.pending:hover { background: #d8dadf; opacity: 0.9; }
         
         .btn-friend.friend {
             background: #e4e6eb;
             color: #050505;
         }
         
-        .btn-friend.friend:hover {
-            background: #d8dadf;
-        }
+        .btn-friend.friend:hover { background: #d8dadf; }
+        .btn-friend .icon { font-size: 14px; line-height: 1; margin-right: 4px; }
+        .btn-message .icon { font-size: 14px; line-height: 1; }
         
-        .btn-friend .icon {
-            font-size: 14px;
-            line-height: 1;
-            margin-right: 4px;
-        }
-        
-        .btn-message .icon {
-            font-size: 14px;
-            line-height: 1;
-        }
-        
-        /* ===== PROFILE ===== */
         .profile-card {
             background: white;
             border-radius: 12px;
@@ -346,20 +277,8 @@
             border: 3px solid #e4e6eb;
         }
         
-        .profile-avatar:hover {
-            border-color: #1877f2;
-            transform: scale(1.02);
-        }
-        
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-avatar .avatar-hint {
-            display: none;
-        }
+        .profile-avatar:hover { border-color: #1877f2; transform: scale(1.02); }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         
         .profile-name {
             font-size: 22px;
@@ -379,7 +298,6 @@
             margin-top: 8px;
         }
         
-        /* ===== STAT TABS ===== */
         .stat-tabs {
             display: flex;
             gap: 8px;
@@ -401,15 +319,8 @@
             transition: all 0.2s;
         }
         
-        .stat-tab:hover {
-            background: #d8dadf;
-        }
-        
-        .stat-tab.active {
-            background: #1877f2;
-            color: white;
-        }
-        
+        .stat-tab:hover { background: #d8dadf; }
+        .stat-tab.active { background: #1877f2; color: white; }
         .stat-tab .count {
             background: rgba(0,0,0,0.05);
             padding: 0 8px;
@@ -417,10 +328,7 @@
             font-size: 12px;
             margin-left: 4px;
         }
-        
-        .stat-tab.active .count {
-            background: rgba(255,255,255,0.2);
-        }
+        .stat-tab.active .count { background: rgba(255,255,255,0.2); }
         
         .stat-container {
             padding: 8px 0;
@@ -434,7 +342,180 @@
             text-align: center;
         }
         
-        /* ===== MODAL ===== */
+        .chat-window {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 380px;
+            max-width: calc(100% - 40px);
+            height: 500px;
+            max-height: calc(100% - 100px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: chatSlideUp 0.25s ease;
+        }
+        
+        .chat-window.active { display: flex; }
+        
+        @keyframes chatSlideUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .chat-window .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e4e6eb;
+            background: #1877f2;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .chat-window .chat-header .title { font-weight: 600; font-size: 15px; }
+        
+        .chat-window .chat-header .close-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .chat-window .chat-header .close-btn:hover { background: rgba(255,255,255,0.25); }
+        
+        .chat-window .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            background: #f8f9fa;
+        }
+        
+        .chat-window .chat-messages .msg {
+            padding: 8px 14px;
+            margin-bottom: 6px;
+            background: white;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            max-width: 85%;
+        }
+        
+        .chat-window .chat-messages .msg.self {
+            margin-left: auto;
+            background: #1877f2;
+            color: white;
+        }
+        
+        .chat-window .chat-messages .msg .author {
+            font-weight: 600;
+            font-size: 12px;
+            color: #1877f2;
+        }
+        
+        .chat-window .chat-messages .msg.self .author { color: rgba(255,255,255,0.7); }
+        .chat-window .chat-messages .msg .time { color: #999; font-size: 10px; margin-left: 6px; }
+        .chat-window .chat-messages .msg.self .time { color: rgba(255,255,255,0.6); }
+        
+        .chat-window .chat-input-wrap {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid #e4e6eb;
+            background: white;
+            flex-shrink: 0;
+        }
+        
+        .chat-window .chat-input-wrap input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #e4e6eb;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .chat-window .chat-input-wrap input:focus { border-color: #1877f2; }
+        
+        .chat-window .chat-input-wrap button {
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .chat-window .chat-input-wrap button:hover { background: #4a9eff; }
+        
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 200px;
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 1000;
+            border: 1px solid #e4e6eb;
+        }
+        
+        .context-menu.open {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        
+        .context-menu .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 18px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 500;
+            color: #050505;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+        
+        .context-menu .menu-item:hover { background: #f0f2f5; }
+        .context-menu .menu-item .icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+        .context-menu .menu-item.danger { color: #e74c3c; }
+        .context-menu .menu-item.danger:hover { background: #fef0ef; }
+        .context-menu .menu-divider { height: 1px; background: #e4e6eb; margin: 4px 16px; }
+        .context-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+            display: none;
+        }
+        .context-overlay.active { display: block; }
+        
         .modal {
             display: none;
             position: fixed;
@@ -449,9 +530,7 @@
             padding: 20px;
         }
         
-        .modal.open {
-            display: flex;
-        }
+        .modal.open { display: flex; }
         
         .modal-content {
             background: white;
@@ -465,14 +544,8 @@
         }
         
         @keyframes modalSlide {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
         .modal-content h3 {
@@ -519,17 +592,36 @@
             color: #050505;
         }
         
-        .modal-content .btns .cancel:hover {
-            background: #d8dadf;
-        }
-        
+        .modal-content .btns .cancel:hover { background: #d8dadf; }
         .modal-content .btns .save {
             background: #1877f2;
             color: white;
         }
+        .modal-content .btns .save:hover { background: #4a9eff; }
         
-        .modal-content .btns .save:hover {
-            background: #4a9eff;
+        .notif-item {
+            padding: 12px;
+            border-bottom: 1px solid #e4e6eb;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: background 0.15s;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .notif-item:hover { background: #f0f2f5; }
+        .notif-item.unread { background: #f0f7ff; }
+        .notif-item .notif-icon { font-size: 20px; flex-shrink: 0; }
+        .notif-item .notif-text { flex: 1; font-size: 14px; }
+        .notif-item .notif-time { color: #65676b; font-size: 11px; }
+        .notif-item .notif-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1877f2;
+            flex-shrink: 0;
         }
         
         .google-btn {
@@ -549,13 +641,8 @@
             transition: all 0.2s;
         }
         
-        .google-btn:hover {
-            background: #f0f2f5;
-        }
-        
-        .google-btn img {
-            width: 20px;
-        }
+        .google-btn:hover { background: #f0f2f5; }
+        .google-btn img { width: 20px; }
         
         .profile-selector {
             display: flex;
@@ -595,22 +682,9 @@
             overflow: hidden;
         }
         
-        .profile-option .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-option .info .name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .profile-option .info .email {
-            font-size: 12px;
-            color: #65676b;
-        }
-        
+        .profile-option .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-option .info .name { font-weight: 600; font-size: 14px; }
+        .profile-option .info .email { font-size: 12px; color: #65676b; }
         .profile-option .remove-btn {
             margin-left: auto;
             background: none;
@@ -620,284 +694,7 @@
             font-size: 18px;
             padding: 4px 8px;
         }
-        
-        .profile-option .remove-btn:hover {
-            color: #e74c3c;
-        }
-        
-        /* ===== CHAT WINDOW ===== */
-        .chat-window {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 380px;
-            max-width: calc(100% - 40px);
-            height: 500px;
-            max-height: calc(100% - 100px);
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-            z-index: 9999;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            animation: chatSlideUp 0.25s ease;
-        }
-        
-        .chat-window.active {
-            display: flex;
-        }
-        
-        @keyframes chatSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        
-        .chat-window .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 16px;
-            border-bottom: 1px solid #e4e6eb;
-            background: #1877f2;
-            color: white;
-            flex-shrink: 0;
-        }
-        
-        .chat-window .chat-header .title {
-            font-weight: 600;
-            font-size: 15px;
-        }
-        
-        .chat-window .chat-header .close-btn {
-            background: rgba(255,255,255,0.15);
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-        
-        .chat-window .chat-header .close-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-        
-        .chat-window .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 16px;
-            background: #f8f9fa;
-        }
-        
-        .chat-window .chat-messages .msg {
-            padding: 8px 14px;
-            margin-bottom: 6px;
-            background: white;
-            border-radius: 12px;
-            font-size: 14px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            max-width: 85%;
-        }
-        
-        .chat-window .chat-messages .msg.self {
-            margin-left: auto;
-            background: #1877f2;
-            color: white;
-        }
-        
-        .chat-window .chat-messages .msg .author {
-            font-weight: 600;
-            font-size: 12px;
-            color: #1877f2;
-        }
-        
-        .chat-window .chat-messages .msg.self .author {
-            color: rgba(255,255,255,0.7);
-        }
-        
-        .chat-window .chat-messages .msg .time {
-            color: #999;
-            font-size: 10px;
-            margin-left: 6px;
-        }
-        
-        .chat-window .chat-messages .msg.self .time {
-            color: rgba(255,255,255,0.6);
-        }
-        
-        .chat-window .chat-input-wrap {
-            display: flex;
-            gap: 8px;
-            padding: 12px 16px;
-            border-top: 1px solid #e4e6eb;
-            background: white;
-            flex-shrink: 0;
-        }
-        
-        .chat-window .chat-input-wrap input {
-            flex: 1;
-            padding: 10px 16px;
-            border: 1px solid #e4e6eb;
-            border-radius: 20px;
-            outline: none;
-            font-size: 14px;
-            font-family: inherit;
-        }
-        
-        .chat-window .chat-input-wrap input:focus {
-            border-color: #1877f2;
-        }
-        
-        .chat-window .chat-input-wrap button {
-            background: #1877f2;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 0 20px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        
-        .chat-window .chat-input-wrap button:hover {
-            background: #4a9eff;
-        }
-        
-        /* ===== CONTEXT MENU ===== */
-        .context-menu {
-            position: fixed;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            padding: 8px 0;
-            min-width: 200px;
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-            transition: all 0.2s ease;
-            z-index: 1000;
-            border: 1px solid #e4e6eb;
-        }
-        
-        .context-menu.open {
-            opacity: 1;
-            transform: scale(1);
-            pointer-events: auto;
-        }
-        
-        .context-menu .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 18px;
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 500;
-            color: #050505;
-            cursor: pointer;
-            transition: background 0.15s;
-            font-family: inherit;
-        }
-        
-        .context-menu .menu-item:hover {
-            background: #f0f2f5;
-        }
-        
-        .context-menu .menu-item .icon {
-            font-size: 16px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        
-        .context-menu .menu-item.danger {
-            color: #e74c3c;
-        }
-        
-        .context-menu .menu-item.danger:hover {
-            background: #fef0ef;
-        }
-        
-        .context-menu .menu-divider {
-            height: 1px;
-            background: #e4e6eb;
-            margin: 4px 16px;
-        }
-        
-        .context-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 999;
-            display: none;
-        }
-        
-        .context-overlay.active {
-            display: block;
-        }
-        
-        /* ===== NOTIFICATIONS ===== */
-        .notif-item {
-            padding: 12px;
-            border-bottom: 1px solid #e4e6eb;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-bottom: 4px;
-            transition: background 0.15s;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .notif-item:hover {
-            background: #f0f2f5;
-        }
-        
-        .notif-item.unread {
-            background: #f0f7ff;
-        }
-        
-        .notif-item .notif-icon {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        .notif-item .notif-text {
-            flex: 1;
-            font-size: 14px;
-        }
-        
-        .notif-item .notif-time {
-            color: #65676b;
-            font-size: 11px;
-        }
-        
-        .notif-item .notif-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #1877f2;
-            flex-shrink: 0;
-        }
-        
-        .hidden {
-            display: none;
-        }
+        .profile-option .remove-btn:hover { color: #e74c3c; }
         
         .room-grid {
             display: grid;
@@ -914,25 +711,12 @@
             transition: all 0.2s;
         }
         
-        .room-card:hover {
-            background: #e4e6eb;
-            transform: translateY(-2px);
-        }
+        .room-card:hover { background: #e4e6eb; transform: translateY(-2px); }
+        .room-card .icon { font-size: 28px; }
+        .room-card .name { font-weight: 600; margin: 4px 0; font-size: 14px; }
+        .room-card .count { font-size: 13px; color: #65676b; }
         
-        .room-card .icon {
-            font-size: 28px;
-        }
-        
-        .room-card .name {
-            font-weight: 600;
-            margin: 4px 0;
-            font-size: 14px;
-        }
-        
-        .room-card .count {
-            font-size: 13px;
-            color: #65676b;
-        }
+        .hidden { display: none; }
         
         @media (max-width: 480px) {
             body { padding: 12px; }
@@ -994,7 +778,7 @@
 <!-- ===== PROFILE ===== -->
 <div id="profileTab" class="hidden">
     <div class="profile-card">
-        <div class="profile-avatar" id="profileAvatar" onclick="uploadAvatar()">
+        <div class="profile-avatar" id="profileAvatar">
             <span id="avatarLetter">?</span>
         </div>
         
@@ -1036,7 +820,7 @@
 <!-- ===== CONTEXT MENU ===== -->
 <div class="context-menu" id="contextMenu">
     <button class="menu-item" onclick="editProfile();closeContextMenu();">
-        <span class="icon">✏️</span> Редактировать профиль
+        <span class="icon">✏️</span> Редактировать
     </button>
     <button class="menu-item" onclick="uploadAvatar();closeContextMenu();">
         <span class="icon">📷</span> Сменить аватар
@@ -1083,7 +867,7 @@
 <!-- ===== EDIT PROFILE MODAL ===== -->
 <div class="modal" id="editProfileModal">
     <div class="modal-content">
-        <h3>✏️ Редактировать профиль</h3>
+        <h3>✏️ Редактировать</h3>
         <input type="text" id="editName" placeholder="Имя">
         <input type="text" id="editBio" placeholder="О себе">
         <div class="btns">
@@ -1109,9 +893,7 @@
         <div style="color: #65676b; font-size: 14px; margin-bottom: 8px;" id="viewEmail">email@example.com</div>
         <div style="color: #65676b; font-size: 15px; margin-bottom: 16px;" id="viewBio">О себе</div>
         
-        <div id="viewActions" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <!-- Кнопки добавляются динамически -->
-        </div>
+        <div id="viewActions" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;"></div>
     </div>
 </div>
 
@@ -1154,13 +936,11 @@ function cancelRequest(key) {
 
 function safeFirebaseQuery(key, ref, callback) {
     cancelRequest(key);
-    
     let isCancelled = false;
     const cancelFn = () => {
         isCancelled = true;
         activeRequests.delete(key);
     };
-    
     activeRequests.set(key, cancelFn);
     
     ref.once('value', snap => {
@@ -1176,7 +956,6 @@ function safeFirebaseQuery(key, ref, callback) {
             console.warn(`❌ Ошибка запроса "${key}":`, err);
         }
     });
-    
     return cancelFn;
 }
 
@@ -1192,6 +971,13 @@ function cancelAllRequests() {
 window.addEventListener('beforeunload', function() {
     cancelAllRequests();
     closeContextMenu();
+    // Отписываемся от слушателей
+    if (window.friendListeners) {
+        Object.values(window.friendListeners).forEach(unsubscribe => {
+            if (typeof unsubscribe === 'function') unsubscribe();
+        });
+        window.friendListeners = {};
+    }
 });
 
 // ================================================================
@@ -1207,47 +993,35 @@ let CURRENT_ROOM = null;
 let chatUnsub = null;
 let notifUnsub = null;
 let currentFriendTab = 'friends';
+window.friendListeners = {};
 
-let menuState = {
-    isOpen: false,
-    isAnimating: false
-};
+let menuState = { isOpen: false, isAnimating: false };
 
 // ================================================================
 // КОНТЕКСТНОЕ МЕНЮ
 // ================================================================
 function openProfileMenu(event) {
     if (menuState.isAnimating) return;
-    
     event.stopPropagation();
     event.preventDefault();
     
     const menu = document.getElementById('contextMenu');
     const overlay = document.getElementById('contextOverlay');
     const avatar = document.getElementById('profileAvatar');
-    
     if (!menu || !avatar) return;
-    
     if (menu.classList.contains('open')) {
         closeContextMenu();
         return;
     }
-
     const rect = avatar.getBoundingClientRect();
     const menuWidth = 200;
     const leftPos = Math.max(10, rect.left + rect.width / 2 - menuWidth / 2);
-    const topPos = Math.min(
-        rect.bottom + 10,
-        window.innerHeight - 250
-    );
-    
+    const topPos = Math.min(rect.bottom + 10, window.innerHeight - 250);
     menu.style.left = leftPos + 'px';
     menu.style.top = topPos + 'px';
-    
     menuState.isAnimating = true;
     menu.classList.add('open');
     overlay.classList.add('active');
-    
     setTimeout(() => {
         menuState.isAnimating = false;
         menuState.isOpen = true;
@@ -1256,14 +1030,11 @@ function openProfileMenu(event) {
 
 function closeContextMenu() {
     if (menuState.isAnimating) return;
-    
     const menu = document.getElementById('contextMenu');
     const overlay = document.getElementById('contextOverlay');
-    
     menuState.isAnimating = true;
     if (menu) menu.classList.remove('open');
     if (overlay) overlay.classList.remove('active');
-    
     setTimeout(() => {
         menuState.isAnimating = false;
         menuState.isOpen = false;
@@ -1273,14 +1044,9 @@ function closeContextMenu() {
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('contextMenu');
     const avatar = document.getElementById('profileAvatar');
-    const overlay = document.getElementById('contextOverlay');
-    
     if (!menu || !menu.classList.contains('open')) return;
-    
     const isClickInsideMenu = menu.contains(e.target);
     const isClickOnAvatar = avatar && (e.target === avatar || avatar.contains(e.target));
-    const isClickOnOverlay = overlay && (e.target === overlay || overlay.contains(e.target));
-    
     if (!isClickInsideMenu && !isClickOnAvatar) {
         closeContextMenu();
     }
@@ -1329,20 +1095,14 @@ function saveProfileToList(uid, name, email, avatarUrl) {
 function renderSavedProfiles() {
     const container = document.getElementById('profileSelector');
     if (!container) return;
-    
     if (SAVED_PROFILES.length === 0) {
         container.innerHTML = '<div style="color:#65676b;text-align:center;padding:10px;font-size:14px;">Нет сохраненных профилей</div>';
         return;
     }
-    
     const sorted = [...SAVED_PROFILES].sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
-    
     container.innerHTML = sorted.map(p => {
         const letter = (p.name || '?').charAt(0).toUpperCase();
-        const avatarHtml = p.avatarUrl ? 
-            `<img src="${p.avatarUrl}">` :
-            `<span>${letter}</span>`;
-        
+        const avatarHtml = p.avatarUrl ? `<img src="${p.avatarUrl}">` : `<span>${letter}</span>`;
         return `
             <div class="profile-option" onclick="loginWithSavedProfile('${p.uid}')">
                 <div class="avatar">${avatarHtml}</div>
@@ -1366,12 +1126,10 @@ window.removeSavedProfile = function(uid) {
 window.loginWithSavedProfile = function(uid) {
     const profile = SAVED_PROFILES.find(p => p.uid === uid);
     if (!profile) return;
-    
     auth.signInAnonymously().then(() => {
         USER = profile.name;
         USER_UID = uid;
         localStorage.setItem('dc_u_' + SITE, USER);
-        
         const data = {
             name: profile.name,
             email: profile.email || 'anon',
@@ -1379,13 +1137,10 @@ window.loginWithSavedProfile = function(uid) {
             lastLogin: Date.now(),
             avatarUrl: profile.avatarUrl || null
         };
-        
         db.ref('sites/' + SITE + '/users/' + uid).update(data);
         db.ref('sites/' + SITE + '/all_users/' + uid).set(data);
-        
         profile.lastUsed = Date.now();
         localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-        
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadData();
@@ -1402,9 +1157,7 @@ auth.onAuthStateChanged(user => {
             USER_UID = user.uid;
             USER = user.displayName || user.email || user.uid.slice(0, 8);
             localStorage.setItem('dc_u_' + SITE, USER);
-            
             saveProfileToList(USER_UID, USER, user.email, user.photoURL);
-            
             const data = {
                 name: USER,
                 email: user.email || 'anon',
@@ -1412,11 +1165,9 @@ auth.onAuthStateChanged(user => {
                 lastLogin: Date.now(),
                 avatarUrl: user.photoURL || null
             };
-            
             db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
             db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
         }
-        
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadData();
@@ -1428,6 +1179,12 @@ auth.onAuthStateChanged(user => {
         avatarCache = null;
         cancelAllRequests();
         if (notifUnsub) { notifUnsub(); notifUnsub = null; }
+        if (window.friendListeners) {
+            Object.values(window.friendListeners).forEach(unsubscribe => {
+                if (typeof unsubscribe === 'function') unsubscribe();
+            });
+            window.friendListeners = {};
+        }
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
@@ -1447,23 +1204,19 @@ document.getElementById('googleBtn').addEventListener('click', () => {
 window.loginName = function() {
     const name = document.getElementById('nameInput').value.trim();
     if (!name) { alert('Введите имя'); return; }
-    
     auth.signInAnonymously().then(() => {
         USER = name;
         USER_UID = 'anon_' + Date.now();
         localStorage.setItem('dc_u_' + SITE, USER);
-        
         const data = {
             name: USER,
             email: 'anon_' + Date.now() + '@anon.com',
             uid: USER_UID,
             lastLogin: Date.now()
         };
-        
         db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
         saveProfileToList(USER_UID, USER, data.email);
-        
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadData();
@@ -1477,6 +1230,12 @@ window.logout = function() {
     closeContextMenu();
     cancelAllRequests();
     if (notifUnsub) { notifUnsub(); notifUnsub = null; }
+    if (window.friendListeners) {
+        Object.values(window.friendListeners).forEach(unsubscribe => {
+            if (typeof unsubscribe === 'function') unsubscribe();
+        });
+        window.friendListeners = {};
+    }
     auth.signOut().then(() => {
         localStorage.removeItem('dc_u_' + SITE);
         USER = null;
@@ -1495,7 +1254,6 @@ window.logout = function() {
 function updateUI() {
     const headerAvatar = document.getElementById('headerAvatar');
     if (!headerAvatar) return;
-    
     if (USER && USER_UID) {
         if (avatarCache) {
             if (avatarCache === 'default') {
@@ -1505,14 +1263,12 @@ function updateUI() {
             }
             return;
         }
-        
         safeFirebaseQuery(
             'updateUI_avatar',
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl'),
             (snap) => {
                 const url = snap.val();
                 avatarCache = url || 'default';
-                
                 if (url) {
                     headerAvatar.innerHTML = `<img src="${url}">`;
                 } else {
@@ -1543,7 +1299,6 @@ window.goToProfile = function() {
 window.showTab = function(tab) {
     if (menuState.isOpen) closeContextMenu();
     currentTab = tab;
-    
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-bar .tab').forEach(t => {
         const text = t.textContent.trim();
@@ -1552,15 +1307,12 @@ window.showTab = function(tab) {
             t.classList.add('active');
         }
     });
-    
     const groupsTab = document.getElementById('groupsTab');
     const peopleTab = document.getElementById('peopleTab');
     const profileTab = document.getElementById('profileTab');
-    
     if (groupsTab) groupsTab.classList.toggle('hidden', tab !== 'groups');
     if (peopleTab) peopleTab.classList.toggle('hidden', tab !== 'people');
     if (profileTab) profileTab.classList.toggle('hidden', tab !== 'profile');
-    
     if (tab === 'groups') loadRooms();
     if (tab === 'people') loadPeople();
     if (tab === 'profile') loadProfile();
@@ -1582,7 +1334,6 @@ function loadData() {
 // ================================================================
 function loadProfile() {
     if (!USER_UID) return;
-    
     safeFirebaseQuery(
         'loadProfile_' + USER_UID,
         db.ref('sites/' + SITE + '/users/' + USER_UID),
@@ -1591,17 +1342,14 @@ function loadProfile() {
             const name = u.name || USER || 'Гость';
             const email = u.email || '';
             const bio = u.bio || 'Привет! 👋';
-            
             const nameEl = document.getElementById('profileName');
             const emailEl = document.getElementById('profileEmail');
             const bioEl = document.getElementById('profileBio');
             const avatar = document.getElementById('profileAvatar');
             const letter = document.getElementById('avatarLetter');
-            
             if (nameEl) nameEl.textContent = name;
             if (emailEl) emailEl.textContent = email;
             if (bioEl) bioEl.textContent = bio;
-            
             if (avatar) {
                 if (u.avatarUrl) {
                     avatar.innerHTML = `<img src="${u.avatarUrl}">`;
@@ -1610,7 +1358,6 @@ function loadProfile() {
                     avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span>`;
                 }
             }
-            
             updateCounters();
             renderFriendsList(currentFriendTab);
         }
@@ -1624,44 +1371,31 @@ function loadRooms() {
     if (!USER_UID) return;
     const el = document.getElementById('roomsList');
     if (!el) return;
-    
-    safeFirebaseQuery(
-        'loadRooms',
-        db.ref('sites/' + SITE + '/rooms'),
-        (snap) => {
-            const rooms = snap.val() || {};
-            
-            if (Object.keys(rooms).length === 0) {
-                createDefaultRooms();
-                return;
-            }
-            
-            let html = '';
-            Object.keys(rooms).forEach(roomId => {
-                const room = rooms[roomId];
-                
-                safeFirebaseQuery(
-                    'roomUsers_' + roomId,
-                    db.ref('sites/' + SITE + '/room_users/' + roomId),
-                    (snap) => {
-                        const users = snap.val() || {};
-                        const count = Object.keys(users).length;
-                        const countEl = document.querySelector(`#room-${roomId} .count`);
-                        if (countEl) countEl.textContent = count;
-                    }
-                );
-                
-                html += `
-                    <div class="room-card" id="room-${roomId}" onclick="joinRoom('${roomId}')">
-                        <div class="icon">${room.icon || '👥'}</div>
-                        <div class="name">${room.name}</div>
-                        <div class="count">👥 <span class="count">0</span></div>
-                    </div>
-                `;
-            });
-            el.innerHTML = html;
+    safeFirebaseQuery('loadRooms', db.ref('sites/' + SITE + '/rooms'), (snap) => {
+        const rooms = snap.val() || {};
+        if (Object.keys(rooms).length === 0) {
+            createDefaultRooms();
+            return;
         }
-    );
+        let html = '';
+        Object.keys(rooms).forEach(roomId => {
+            const room = rooms[roomId];
+            safeFirebaseQuery('roomUsers_' + roomId, db.ref('sites/' + SITE + '/room_users/' + roomId), (snap) => {
+                const users = snap.val() || {};
+                const count = Object.keys(users).length;
+                const countEl = document.querySelector(`#room-${roomId} .count`);
+                if (countEl) countEl.textContent = count;
+            });
+            html += `
+                <div class="room-card" id="room-${roomId}" onclick="joinRoom('${roomId}')">
+                    <div class="icon">${room.icon || '👥'}</div>
+                    <div class="name">${room.name}</div>
+                    <div class="count">👥 <span class="count">0</span></div>
+                </div>
+            `;
+        });
+        el.innerHTML = html;
+    });
 }
 
 function createDefaultRooms() {
@@ -1686,45 +1420,35 @@ window.joinRoom = function(roomId) {
 };
 
 // ================================================================
-// ЛЮДИ - FACEBOOK STYLE
+// ЛЮДИ - С СИНХРОНИЗАЦИЕЙ
 // ================================================================
 function loadPeople() {
     if (!USER_UID) return;
     const el = document.getElementById('peopleList');
     if (!el) return;
     
-    safeFirebaseQuery(
-        'loadPeople',
-        db.ref('sites/' + SITE + '/all_users'),
-        (snap) => {
-            const users = snap.val() || {};
-            
-            const keys = Object.keys(users).filter(k => {
-                if (k === USER_UID) return false;
-                const u = users[k];
-                if (!u || !u.name || u.name.trim() === '') return false;
-                return true;
-            });
-            
-            if (keys.length === 0) {
-                el.innerHTML = '<div style="text-align:center;padding:30px;color:#65676b;">😕 Нет других пользователей</div>';
-                return;
-            }
-            
-            el.innerHTML = '';
-            
-            keys.forEach(k => {
-                const u = users[k];
-                renderInlineUser(el, k, u);
-            });
-            
-            keys.forEach(k => {
-                getFriendStatus(k, (status) => {
-                    updateFriendButtonInline(k, status);
-                });
-            });
+    safeFirebaseQuery('loadPeople', db.ref('sites/' + SITE + '/all_users'), (snap) => {
+        const users = snap.val() || {};
+        const keys = Object.keys(users).filter(k => {
+            if (k === USER_UID) return false;
+            const u = users[k];
+            if (!u || !u.name || u.name.trim() === '') return false;
+            return true;
+        });
+        if (keys.length === 0) {
+            el.innerHTML = '<div style="text-align:center;padding:30px;color:#65676b;">😕 Нет других пользователей</div>';
+            return;
         }
-    );
+        el.innerHTML = '';
+        keys.forEach(k => {
+            const u = users[k];
+            renderInlineUser(el, k, u);
+        });
+        // Запускаем слушатели для каждого пользователя
+        keys.forEach(k => {
+            listenFriendStatus(k);
+        });
+    });
 }
 
 function renderInlineUser(container, uid, userData) {
@@ -1732,19 +1456,13 @@ function renderInlineUser(container, uid, userData) {
         console.warn('⚠️ Пустые данные пользователя:', uid);
         return;
     }
-    
     const name = userData.name.trim() || 'Аноним';
     const letter = name.charAt(0).toUpperCase();
     const avatarUrl = userData.avatarUrl || null;
-    
     const itemDiv = document.createElement('div');
     itemDiv.className = 'user-item';
     itemDiv.id = 'user-item-' + uid;
-    
-    const avatarHtml = avatarUrl ? 
-        `<img src="${avatarUrl}" alt="${esc(name)}">` : 
-        `<span>${letter}</span>`;
-    
+    const avatarHtml = avatarUrl ? `<img src="${avatarUrl}" alt="${esc(name)}">` : `<span>${letter}</span>`;
     itemDiv.innerHTML = `
         <div class="avatar" onclick="viewProfileModal('${uid}')">${avatarHtml}</div>
         <div class="info" onclick="viewProfileModal('${uid}')">
@@ -1759,215 +1477,122 @@ function renderInlineUser(container, uid, userData) {
             </button>
         </div>
     `;
-    
     container.appendChild(itemDiv);
 }
 
+// ================================================================
+// СЛУШАТЕЛЬ ДЛЯ ОБНОВЛЕНИЯ КНОПОК В РЕАЛЬНОМ ВРЕМЕНИ
+// ================================================================
+function listenFriendStatus(targetUid) {
+    if (!USER_UID || !targetUid) return;
+    if (window.friendListeners && window.friendListeners[targetUid]) {
+        window.friendListeners[targetUid]();
+        delete window.friendListeners[targetUid];
+    }
+    if (!window.friendListeners) {
+        window.friendListeners = {};
+    }
+    const ref = db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid);
+    const onValue = snap => {
+        const status = snap.val();
+        updateFriendButtonInline(targetUid, status || 'none');
+    };
+    ref.on('value', onValue);
+    window.friendListeners[targetUid] = () => {
+        ref.off('value', onValue);
+        delete window.friendListeners[targetUid];
+    };
+    return window.friendListeners[targetUid];
+}
+
+// ================================================================
+// ОБНОВЛЕНИЕ КНОПКИ В СПИСКЕ
+// ================================================================
 function updateFriendButtonInline(uid, status) {
     const btn = document.getElementById('friend-btn-' + uid);
     if (!btn) return;
-    
     btn.className = 'btn-action btn-friend';
-    
+    btn.disabled = false;
     if (status === 'friend') {
         btn.innerHTML = `<span class="icon">✓</span> В друзьях`;
         btn.classList.add('friend');
-        btn.title = 'В друзьях';
-        btn.disabled = false;
+        btn.title = 'В друзьях (нажмите чтобы удалить)';
     } else if (status === 'pending') {
         btn.innerHTML = `<span class="icon">⏳</span> Запрос`;
         btn.classList.add('pending');
-        btn.title = 'Запрос отправлен';
-        btn.disabled = true;
+        btn.title = 'Запрос отправлен (нажмите чтобы отменить)';
     } else {
         btn.innerHTML = `<span class="icon">➕</span> Добавить`;
         btn.classList.add('add');
         btn.title = 'Добавить в друзья';
-        btn.disabled = false;
     }
 }
 
-function viewProfileModal(uid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (uid === USER_UID) { 
-        alert('Это ваш профиль'); 
-        goToProfile();
-        return; 
-    }
-    
-    const modal = document.getElementById('profileViewModal');
-    const avatar = document.getElementById('viewAvatar');
-    const avatarLetter = document.getElementById('viewAvatarLetter');
-    const nameEl = document.getElementById('viewName');
-    const emailEl = document.getElementById('viewEmail');
-    const bioEl = document.getElementById('viewBio');
-    const actions = document.getElementById('viewActions');
-    
-    modal.classList.add('open');
-    nameEl.textContent = 'Загрузка...';
-    bioEl.textContent = '';
-    emailEl.textContent = '';
-    avatarLetter.textContent = '?';
-    actions.innerHTML = '<span style="color:#65676b;">Загрузка...</span>';
-    
-    safeFirebaseQuery(
-        'viewProfile_' + uid,
-        db.ref('sites/' + SITE + '/all_users/' + uid),
-        (snap) => {
-            const user = snap.val();
-            if (!user) {
-                nameEl.textContent = 'Пользователь не найден';
-                actions.innerHTML = '<span style="color:#e74c3c;">❌ Пользователь удален</span>';
-                return;
-            }
-            
-            const name = user.name || 'Аноним';
-            const email = user.email || '';
-            const bio = user.bio || 'Привет! 👋';
-            const avatarUrl = user.avatarUrl || null;
-            
-            nameEl.textContent = name;
-            emailEl.textContent = email;
-            bioEl.textContent = bio;
-            
-            if (avatarUrl) {
-                avatar.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
-            } else {
-                avatar.innerHTML = `<span id="viewAvatarLetter">${name.charAt(0).toUpperCase()}</span>`;
-            }
-            
-            getFriendStatus(uid, (status) => {
-                let btnHtml = '';
-                
-                if (status === 'friend') {
-                    btnHtml = `<button class="btn-action" onclick="removeFriend('${uid}')" style="background:#e74c3c;color:white;">❌ Удалить из друзей</button>`;
-                } else if (status === 'pending') {
-                    db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap => {
-                        const fromThem = snap.val() === 'pending';
-                        if (fromThem) {
-                            actions.innerHTML = `
-                                <button class="btn-action" onclick="handleFriendRequest('${uid}', 'accept')" style="background:#27ae60;color:white;">✅ Принять</button>
-                                <button class="btn-action" onclick="handleFriendRequest('${uid}', 'decline')" style="background:#e74c3c;color:white;">❌ Отклонить</button>
-                            `;
-                        } else {
-                            actions.innerHTML = `
-                                <button class="btn-action" style="cursor:default;opacity:0.7;">⏳ Запрос отправлен</button>
-                            `;
-                        }
-                    });
-                    return;
-                } else {
-                    btnHtml = `<button class="btn-action" onclick="toggleFriendStatus('${uid}')">➕ Добавить в друзья</button>`;
-                }
-                
-                actions.innerHTML = `
-                    <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
-                    ${btnHtml}
-                `;
-            });
-        }
-    );
-}
-
-function closeProfileView() {
-    document.getElementById('profileViewModal').classList.remove('open');
-}
-
 // ================================================================
-// ЛОГИКА ДРУЖБЫ
+// УНИВЕРСАЛЬНЫЙ TOGGLE ДЛЯ ДРУЖБЫ
 // ================================================================
-function getFriendStatus(targetUid, callback) {
-    if (!USER_UID) { callback('none'); return; }
-    
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
-        const status = snap.val();
-        callback(status || 'none');
-    });
-}
-
 function toggleFriendStatus(targetUid) {
-    if (!USER_UID) { 
-        alert('Войдите!');
-        return; 
-    }
-    
-    if (targetUid === USER_UID) { 
-        alert('Нельзя добавить себя');
-        return; 
-    }
-    
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (targetUid === USER_UID) { alert('Нельзя добавить себя'); return; }
     db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
         const status = snap.val();
-        
         if (status === 'friend') {
             const updates = {};
             updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
             updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
             updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
-            
             db.ref().update(updates);
-            updateFriendButtonInline(targetUid, 'none');
             updateCounters();
-            
         } else if (status === 'pending') {
             const updates = {};
             updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
             updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
             updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
-            
             db.ref().update(updates);
-            updateFriendButtonInline(targetUid, 'none');
             updateCounters();
-            
         } else {
             const updates = {};
             updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'pending';
             updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'pending';
             updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
-            
             db.ref().update(updates);
-            
             sendNotification(targetUid, {
                 type: 'friend_request',
                 from: USER_UID,
                 text: `${USER} отправил(а) запрос в друзья`,
                 timestamp: Date.now()
             });
-            
-            updateFriendButtonInline(targetUid, 'pending');
             updateCounters();
         }
     });
 }
 
+// ================================================================
+// ОБРАБОТЧИК ЗАПРОСА ДРУЖБЫ
+// ================================================================
 function handleFriendRequest(targetUid, action) {
+    if (!USER_UID) { alert('Войдите!'); return; }
     if (action === 'accept') {
         const updates = {};
         updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'friend';
         updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'friend';
         updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
-        
         db.ref().update(updates);
-        
         sendNotification(targetUid, {
             type: 'friend_accepted',
             from: USER_UID,
             text: `${USER} принял(а) ваш запрос в друзья`,
             timestamp: Date.now()
         });
-        
         alert('✅ Дружба подтверждена!');
         closeProfileView();
         loadPeople();
         loadProfile();
-        
     } else if (action === 'decline') {
         const updates = {};
         updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
         updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-        
         db.ref().update(updates);
-        
         alert('❌ Запрос отклонен');
         closeProfileView();
         loadPeople();
@@ -1975,33 +1600,280 @@ function handleFriendRequest(targetUid, action) {
     }
 }
 
-function removeFriend(uid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (!confirm('Удалить из друзей?')) return;
-    
-    const updates = {};
-    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + uid] = null;
-    updates['sites/' + SITE + '/friends/' + uid + '/' + USER_UID] = null;
-    updates['sites/' + SITE + '/followers/' + uid + '/' + USER_UID] = null;
-    
-    db.ref().update(updates);
-    
-    alert('❌ Пользователь удален из друзей');
-    closeProfileView();
-    loadPeople();
-    loadProfile();
+// ================================================================
+// УВЕДОМЛЕНИЯ (РАЗДЕЛЕННАЯ ЛОГИКА)
+// ================================================================
+function sendNotification(targetUid, data) {
+    if (!USER_UID) return;
+    if (!targetUid || targetUid === USER_UID) {
+        console.warn('❌ Нельзя отправить уведомление себе');
+        return;
+    }
+    const notifRef = db.ref('sites/' + SITE + '/notifications/' + targetUid).push();
+    notifRef.set({
+        ...data,
+        read: false,
+        fromName: USER,
+        fromUid: USER_UID
+    }).then(() => {
+        console.log(`✅ Уведомление отправлено пользователю ${targetUid}`);
+    }).catch(err => {
+        console.error('❌ Ошибка отправки уведомления:', err);
+    });
 }
 
-function unfollow(uid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (!confirm(`Отписаться от пользователя?`)) return;
-    
-    db.ref('sites/' + SITE + '/followers/' + uid + '/' + USER_UID).remove();
-    
-    alert('✅ Вы отписались');
-    renderFriendsList('following');
-    loadProfile();
+function loadNotifications() {
+    if (!USER_UID) return;
+    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
+    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
+    notifUnsub = ref.on('value', snap => {
+        const notifications = snap.val() || {};
+        const keys = Object.keys(notifications).sort((a, b) => 
+            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
+        );
+        const unread = keys.filter(k => !notifications[k].read);
+        const badge = document.getElementById('notifBadge');
+        if (badge) {
+            if (unread.length > 0) {
+                badge.style.display = 'inline';
+                badge.textContent = unread.length;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        if (document.getElementById('notificationsModal').classList.contains('open')) {
+            renderNotifications(notifications, keys);
+        }
+    });
 }
+
+function renderNotifications(notifications, keys) {
+    const container = document.getElementById('notificationsList');
+    if (!container) return;
+    if (keys.length === 0) {
+        container.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">Нет уведомлений</div>';
+        return;
+    }
+    let html = '';
+    keys.slice(0, 20).forEach(k => {
+        const n = notifications[k];
+        const isUnread = !n.read;
+        const time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+        let icon = '📩';
+        if (n.type === 'friend_request') icon = '🤝';
+        if (n.type === 'friend_accepted') icon = '✅';
+        if (n.type === 'message') icon = '💬';
+        html += `
+            <div class="notif-item ${isUnread ? 'unread' : ''}" 
+                 onclick="handleNotifClick('${k}', '${n.fromUid || n.from}', '${n.type}')"
+                 data-type="${n.type}"
+                 data-from="${n.fromUid || n.from}"
+                 data-id="${k}">
+                <span class="notif-icon">${icon}</span>
+                <div class="notif-text">
+                    <div style="font-weight:${isUnread ? '600' : '400'};font-size:14px;">${n.text || 'Уведомление'}</div>
+                    <div class="notif-time">${time}</div>
+                </div>
+                ${isUnread ? '<span class="notif-dot"></span>' : ''}
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function handleNotifClick(notifId, fromUid, type) {
+    if (!USER_UID) return;
+    if (!fromUid) return;
+    db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
+    
+    if (type === 'message') {
+        closeNotifications();
+        openPrivateChat(fromUid);
+        db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
+    } else if (type === 'friend_request') {
+        closeNotifications();
+        viewProfileModal(fromUid);
+    } else if (type === 'friend_accepted') {
+        closeNotifications();
+        viewProfileModal(fromUid);
+    }
+}
+
+function openNotifications() {
+    document.getElementById('notificationsModal').classList.add('open');
+    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
+    ref.once('value', snap => {
+        const notifications = snap.val() || {};
+        const keys = Object.keys(notifications).sort((a, b) => 
+            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
+        );
+        renderNotifications(notifications, keys);
+    });
+}
+
+function closeNotifications() {
+    document.getElementById('notificationsModal').classList.remove('open');
+}
+
+// ================================================================
+// viewProfileModal
+// ================================================================
+function viewProfileModal(uid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (uid === USER_UID) { 
+        alert('Это ваш профиль'); 
+        goToProfile();
+        return; 
+    }
+    const modal = document.getElementById('profileViewModal');
+    const avatar = document.getElementById('viewAvatar');
+    const avatarLetter = document.getElementById('viewAvatarLetter');
+    const nameEl = document.getElementById('viewName');
+    const emailEl = document.getElementById('viewEmail');
+    const bioEl = document.getElementById('viewBio');
+    const actions = document.getElementById('viewActions');
+    modal.classList.add('open');
+    nameEl.textContent = 'Загрузка...';
+    bioEl.textContent = '';
+    emailEl.textContent = '';
+    avatarLetter.textContent = '?';
+    actions.innerHTML = '<span style="color:#65676b;">Загрузка...</span>';
+    
+    safeFirebaseQuery('viewProfile_' + uid, db.ref('sites/' + SITE + '/all_users/' + uid), (snap) => {
+        const user = snap.val();
+        if (!user) {
+            nameEl.textContent = 'Пользователь не найден';
+            actions.innerHTML = '<span style="color:#e74c3c;">❌ Пользователь удален</span>';
+            return;
+        }
+        const name = user.name || 'Аноним';
+        const email = user.email || '';
+        const bio = user.bio || 'Привет! 👋';
+        const avatarUrl = user.avatarUrl || null;
+        nameEl.textContent = name;
+        emailEl.textContent = email;
+        bioEl.textContent = bio;
+        if (avatarUrl) {
+            avatar.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+            avatar.innerHTML = `<span id="viewAvatarLetter">${name.charAt(0).toUpperCase()}</span>`;
+        }
+        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
+            const status = snap.val();
+            let btnHtml = '';
+            if (status === 'friend') {
+                btnHtml = `<button class="btn-action" onclick="toggleFriendStatus('${uid}')" style="background:#e74c3c;color:white;">❌ Удалить из друзей</button>`;
+            } else if (status === 'pending') {
+                db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap2 => {
+                    const fromThem = snap2.val() === 'pending';
+                    if (fromThem) {
+                        actions.innerHTML = `
+                            <button class="btn-action" onclick="handleFriendRequest('${uid}', 'accept')" style="background:#27ae60;color:white;">✅ Принять</button>
+                            <button class="btn-action" onclick="handleFriendRequest('${uid}', 'decline')" style="background:#e74c3c;color:white;">❌ Отклонить</button>
+                        `;
+                    } else {
+                        actions.innerHTML = `
+                            <button class="btn-action" style="cursor:default;opacity:0.7;">⏳ Запрос отправлен</button>
+                        `;
+                    }
+                });
+                return;
+            } else {
+                btnHtml = `<button class="btn-action" onclick="toggleFriendStatus('${uid}')">➕ Добавить в друзья</button>`;
+            }
+            actions.innerHTML = `
+                <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
+                ${btnHtml}
+            `;
+        });
+    });
+}
+
+function closeProfileView() {
+    document.getElementById('profileViewModal').classList.remove('open');
+}
+
+// ================================================================
+// ЧАТ
+// ================================================================
+function openPrivateChat(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
+    const chatId = [USER_UID, targetUid].sort().join('_');
+    const path = 'dms/' + SITE + '/' + chatId + '/messages';
+    closeNotifications();
+    closeProfileView();
+    closeContextMenu();
+    CURRENT_ROOM = chatId;
+    document.getElementById('chatWindow').classList.add('active');
+    db.ref('sites/' + SITE + '/all_users/' + targetUid).once('value', snap => {
+        const user = snap.val() || {};
+        const name = user.name || 'Собеседник';
+        document.getElementById('chatTitle').textContent = '💬 ' + name;
+    });
+    loadChat(path);
+}
+
+function loadChat(path) {
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">⏳ Загрузка...</div>';
+    chatUnsub = path;
+    db.ref(path).orderByChild('timestamp').on('value', snap => {
+        box.innerHTML = '';
+        if (!snap.exists()) { 
+            box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">Сообщений нет</div>'; 
+            return; 
+        }
+        snap.forEach(s => {
+            const m = s.val();
+            const isSelf = m.nick === USER;
+            const div = document.createElement('div');
+            div.className = 'msg' + (isSelf ? ' self' : '');
+            div.innerHTML = `
+                <span class="author">${esc(m.nick||'?')}</span>
+                <span class="time">${m.time||''}</span>
+                <div>${esc(m.text||'')}</div>
+            `;
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    });
+}
+
+window.sendChat = function() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text || !CURRENT_ROOM) return;
+    const path = 'dms/' + SITE + '/' + CURRENT_ROOM + '/messages';
+    const parts = CURRENT_ROOM.split('_');
+    const targetUid = parts[0] === USER_UID ? parts[1] : parts[0];
+    db.ref(path).push({
+        nick: USER,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+    });
+    sendNotification(targetUid, {
+        type: 'message',
+        from: USER_UID,
+        text: `${USER}: ${text}`,
+        timestamp: Date.now()
+    });
+    input.value = '';
+};
+
+window.closeChat = function() {
+    document.getElementById('chatWindow').classList.remove('active');
+    if (chatUnsub) { 
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null; 
+    }
+    CURRENT_ROOM = null;
+};
 
 // ================================================================
 // СПИСКИ ДРУЗЕЙ/ПОДПИСОК/ПОДПИСЧИКОВ
@@ -2009,16 +1881,12 @@ function unfollow(uid) {
 function renderFriendsList(type) {
     const container = document.getElementById('friendsListContainer');
     if (!container) return;
-    
     container.innerHTML = '';
-    
     if (!USER_UID) {
         container.innerHTML = '<div class="stat-empty">Войдите, чтобы увидеть список</div>';
         return;
     }
-    
     let queryRef;
-    
     if (type === 'friends') {
         queryRef = db.ref('sites/' + SITE + '/friends/' + USER_UID);
     } else if (type === 'followers') {
@@ -2029,43 +1897,35 @@ function renderFriendsList(type) {
         container.innerHTML = '<div class="stat-empty">Неизвестный тип списка</div>';
         return;
     }
-    
     container.innerHTML = '<div class="stat-empty">⏳ Загрузка...</div>';
-    
     if (type === 'following') {
         queryRef.once('value', snap => {
             const allFollowers = snap.val() || {};
             const followingList = [];
-            
             for (const [targetUid, followers] of Object.entries(allFollowers)) {
                 if (followers && followers[USER_UID] === true) {
                     followingList.push(targetUid);
                 }
             }
-            
             if (followingList.length === 0) {
                 container.innerHTML = '<div class="stat-empty">Вы ни на кого не подписаны</div>';
                 return;
             }
-            
             renderUserList(container, followingList, 'following');
         });
     } else {
         queryRef.once('value', snap => {
             const data = snap.val() || {};
             let uids = Object.keys(data);
-            
             if (type === 'friends') {
                 uids = uids.filter(uid => data[uid] === 'friend');
             }
-            
             if (uids.length === 0) {
                 const emptyText = type === 'friends' ? 'Нет друзей' : 
                                  type === 'followers' ? 'Нет подписчиков' : 'Список пуст';
                 container.innerHTML = `<div class="stat-empty">${emptyText}</div>`;
                 return;
             }
-            
             renderUserList(container, uids, type);
         });
     }
@@ -2076,24 +1936,17 @@ function renderUserList(container, uids, type) {
         container.innerHTML = '<div class="stat-empty">Список пуст</div>';
         return;
     }
-    
     let loaded = 0;
     container.innerHTML = '';
-    
     uids.forEach(uid => {
         db.ref('sites/' + SITE + '/all_users/' + uid).once('value', snap => {
             const user = snap.val() || {};
             const name = user.name || 'Аноним';
             const letter = name.charAt(0).toUpperCase();
-            const avatarHtml = user.avatarUrl ? 
-                `<img src="${user.avatarUrl}">` : 
-                `<span>${letter}</span>`;
-            
+            const avatarHtml = user.avatarUrl ? `<img src="${user.avatarUrl}">` : `<span>${letter}</span>`;
             const itemDiv = document.createElement('div');
             itemDiv.className = 'user-item';
-            
             let actionsHtml = '';
-            
             if (type === 'friends') {
                 actionsHtml = `
                     <button class="btn-action btn-message" onclick="openPrivateChat('${uid}')" title="Сообщение">✉</button>
@@ -2137,25 +1990,41 @@ function renderUserList(container, uids, type) {
                         }
                     }
                 });
-                actionsHtml = `
-                    <button class="btn-action follower-action" disabled>⏳</button>
-                `;
+                actionsHtml = `<button class="btn-action follower-action" disabled>⏳</button>`;
             }
-            
             itemDiv.innerHTML = `
                 <div class="avatar" onclick="viewProfileModal('${uid}')">${avatarHtml}</div>
                 <div class="info" onclick="viewProfileModal('${uid}')">
                     <div class="name">${name}</div>
                 </div>
-                <div class="actions">
-                    ${actionsHtml}
-                </div>
+                <div class="actions">${actionsHtml}</div>
             `;
-            
             container.appendChild(itemDiv);
             loaded++;
         });
     });
+}
+
+function removeFriend(uid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (!confirm('Удалить из друзей?')) return;
+    const updates = {};
+    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + uid] = null;
+    updates['sites/' + SITE + '/friends/' + uid + '/' + USER_UID] = null;
+    updates['sites/' + SITE + '/followers/' + uid + '/' + USER_UID] = null;
+    db.ref().update(updates);
+    alert('❌ Пользователь удален из друзей');
+    renderFriendsList('friends');
+    loadProfile();
+}
+
+function unfollow(uid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (!confirm(`Отписаться от пользователя?`)) return;
+    db.ref('sites/' + SITE + '/followers/' + uid + '/' + USER_UID).remove();
+    alert('✅ Вы отписались');
+    renderFriendsList('following');
+    loadProfile();
 }
 
 // ================================================================
@@ -2163,18 +2032,15 @@ function renderUserList(container, uids, type) {
 // ================================================================
 function updateCounters() {
     if (!USER_UID) return;
-    
     db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', snap => {
         const data = snap.val() || {};
         const friends = Object.keys(data).filter(k => data[k] === 'friend');
         document.getElementById('friendsCount').textContent = friends.length;
     });
-    
     db.ref('sites/' + SITE + '/followers/' + USER_UID).once('value', snap => {
         const data = snap.val() || {};
         document.getElementById('followersCount').textContent = Object.keys(data).length;
     });
-    
     db.ref('sites/' + SITE + '/followers').once('value', snap => {
         const allFollowers = snap.val() || {};
         let count = 0;
@@ -2187,12 +2053,8 @@ function updateCounters() {
     });
 }
 
-// ================================================================
-// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В ПРОФИЛЕ
-// ================================================================
 function switchFriendTab(tab) {
     currentFriendTab = tab;
-    
     document.querySelectorAll('.stat-tab').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.stat-tab').forEach(btn => {
         const text = btn.textContent.trim();
@@ -2202,222 +2064,8 @@ function switchFriendTab(tab) {
             btn.classList.add('active');
         }
     });
-    
     renderFriendsList(tab);
 }
-
-// ================================================================
-// УВЕДОМЛЕНИЯ
-// ================================================================
-function sendNotification(targetUid, data) {
-    if (!USER_UID) return;
-    if (!targetUid || targetUid === USER_UID) {
-        console.warn('❌ Нельзя отправить уведомление себе');
-        return;
-    }
-    
-    const notifRef = db.ref('sites/' + SITE + '/notifications/' + targetUid).push();
-    notifRef.set({
-        ...data,
-        read: false,
-        fromName: USER,
-        fromUid: USER_UID
-    }).then(() => {
-        console.log(`✅ Уведомление отправлено пользователю ${targetUid}`);
-    }).catch(err => {
-        console.error('❌ Ошибка отправки уведомления:', err);
-    });
-}
-
-function loadNotifications() {
-    if (!USER_UID) return;
-    
-    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-    
-    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
-    notifUnsub = ref.on('value', snap => {
-        const notifications = snap.val() || {};
-        const keys = Object.keys(notifications).sort((a, b) => 
-            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
-        );
-        
-        const unread = keys.filter(k => !notifications[k].read);
-        const badge = document.getElementById('notifBadge');
-        if (badge) {
-            if (unread.length > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = unread.length;
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-        
-        if (document.getElementById('notificationsModal').classList.contains('open')) {
-            renderNotifications(notifications, keys);
-        }
-    });
-}
-
-function renderNotifications(notifications, keys) {
-    const container = document.getElementById('notificationsList');
-    if (!container) return;
-    
-    if (keys.length === 0) {
-        container.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">Нет уведомлений</div>';
-        return;
-    }
-    
-    let html = '';
-    keys.slice(0, 20).forEach(k => {
-        const n = notifications[k];
-        const isUnread = !n.read;
-        const time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-        
-        let icon = '📩';
-        if (n.type === 'friend_request') icon = '🤝';
-        if (n.type === 'friend_accepted') icon = '✅';
-        if (n.type === 'message') icon = '💬';
-        
-        html += `
-            <div class="notif-item ${isUnread ? 'unread' : ''}" 
-                 onclick="handleNotifClick('${k}', '${n.fromUid || n.from}', '${n.type}')">
-                <span class="notif-icon">${icon}</span>
-                <div class="notif-text">
-                    <div style="font-weight:${isUnread ? '600' : '400'};font-size:14px;">${n.text || 'Уведомление'}</div>
-                    <div class="notif-time">${time}</div>
-                </div>
-                ${isUnread ? '<span class="notif-dot"></span>' : ''}
-            </div>
-        `;
-    });
-    container.innerHTML = html;
-}
-
-function handleNotifClick(notifId, fromUid, type) {
-    if (!USER_UID) return;
-    if (!fromUid) return;
-    
-    db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
-    
-    if (type === 'message') {
-        closeNotifications();
-        openPrivateChat(fromUid);
-        db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
-    } else if (type === 'friend_request') {
-        closeNotifications();
-        viewProfileModal(fromUid);
-    } else {
-        closeNotifications();
-        viewProfileModal(fromUid);
-    }
-}
-
-function openNotifications() {
-    document.getElementById('notificationsModal').classList.add('open');
-    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
-    ref.once('value', snap => {
-        const notifications = snap.val() || {};
-        const keys = Object.keys(notifications).sort((a, b) => 
-            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
-        );
-        renderNotifications(notifications, keys);
-    });
-}
-
-function closeNotifications() {
-    document.getElementById('notificationsModal').classList.remove('open');
-}
-
-// ================================================================
-// ЧАТ
-// ================================================================
-function openPrivateChat(targetUid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
-    
-    const chatId = [USER_UID, targetUid].sort().join('_');
-    const path = 'dms/' + SITE + '/' + chatId + '/messages';
-    
-    closeNotifications();
-    closeProfileView();
-    
-    CURRENT_ROOM = chatId;
-    
-    document.getElementById('chatWindow').classList.add('active');
-    
-    db.ref('sites/' + SITE + '/all_users/' + targetUid).once('value', snap => {
-        const user = snap.val() || {};
-        const name = user.name || 'Собеседник';
-        document.getElementById('chatTitle').textContent = '💬 ' + name;
-    });
-    
-    loadChat(path);
-}
-
-function loadChat(path) {
-    if (chatUnsub) { 
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null; 
-    }
-    const box = document.getElementById('chatMessages');
-    box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">⏳ Загрузка...</div>';
-    chatUnsub = path;
-    db.ref(path).orderByChild('timestamp').on('value', snap => {
-        box.innerHTML = '';
-        if (!snap.exists()) { 
-            box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">Сообщений нет</div>'; 
-            return; 
-        }
-        snap.forEach(s => {
-            const m = s.val();
-            const isSelf = m.nick === USER;
-            const div = document.createElement('div');
-            div.className = 'msg' + (isSelf ? ' self' : '');
-            div.innerHTML = `
-                <span class="author">${esc(m.nick||'?')}</span>
-                <span class="time">${m.time||''}</span>
-                <div>${esc(m.text||'')}</div>
-            `;
-            box.appendChild(div);
-        });
-        box.scrollTop = box.scrollHeight;
-    });
-}
-
-window.sendChat = function() {
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text || !CURRENT_ROOM) return;
-    
-    const path = 'dms/' + SITE + '/' + CURRENT_ROOM + '/messages';
-    const parts = CURRENT_ROOM.split('_');
-    const targetUid = parts[0] === USER_UID ? parts[1] : parts[0];
-    
-    db.ref(path).push({
-        nick: USER,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-    });
-    
-    sendNotification(targetUid, {
-        type: 'message',
-        from: USER_UID,
-        text: `${USER}: ${text}`,
-        timestamp: Date.now()
-    });
-    
-    input.value = '';
-};
-
-window.closeChat = function() {
-    document.getElementById('chatWindow').classList.remove('active');
-    if (chatUnsub) { 
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null; 
-    }
-    CURRENT_ROOM = null;
-};
 
 // ================================================================
 // АВАТАРКА
@@ -2425,7 +2073,6 @@ window.closeChat = function() {
 window.uploadAvatar = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
     closeContextMenu();
-    
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -2433,18 +2080,15 @@ window.uploadAvatar = function() {
         const file = e.target.files[0];
         if (!file) return;
         if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
-        
         const ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
         ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
             db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
-            
             const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
             if (profile) {
                 profile.avatarUrl = url;
                 localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
             }
-            
             refreshAvatarCache();
             loadProfile();
             alert('✅ Аватарка обновлена!');
@@ -2471,20 +2115,16 @@ window.saveProfile = function() {
     const name = document.getElementById('editName').value.trim();
     const bio = document.getElementById('editBio').value.trim();
     if (!name) { alert('Введите имя'); return; }
-    
     USER = name;
     localStorage.setItem('dc_u_' + SITE, USER);
-    
     const updates = { name: USER, bio: bio };
     db.ref('sites/' + SITE + '/users/' + USER_UID).update(updates);
     db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(updates);
-    
     const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
     if (profile) {
         profile.name = USER;
         localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
     }
-    
     closeEditProfile();
     loadProfile();
     updateUI();
@@ -2505,10 +2145,10 @@ function goToPeople() { showTab('people'); }
 loadSavedProfiles();
 showTab('groups');
 
-console.log('✅ METAIMPERIYA - FACEBOOK STYLE UI ГОТОВ!');
-console.log('👥 Чистый список пользователей с кнопками');
-console.log('💬 Fixed chat window');
-console.log('🔔 Уведомления: message → чат, friend_request → профиль');
+console.log('✅ METAIMPERIYA - СИНХРОНИЗАЦИЯ КНОПОК ГОТОВА');
+console.log('🔹 Кнопки обновляются через слушатели on("value")');
+console.log('🔹 Уведомления разделены: message → чат, friend_request → профиль');
+console.log('🔹 Синхронизация статусов в реальном времени');
 </script>
 </body>
 </html>
