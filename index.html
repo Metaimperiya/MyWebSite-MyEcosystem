@@ -29,26 +29,11 @@
             border: 1px solid #1877f2;
             margin-bottom: 12px;
         }
-        
-        .admin-mode .admin-panel {
-            display: block !important;
-        }
-        
-        .admin-mode .admin-only {
-            display: flex !important;
-        }
-        
-        .admin-only {
-            display: none !important;
-        }
-        
-        .admin-delete-btn {
-            display: none !important;
-        }
-        
-        .admin-mode .admin-delete-btn {
-            display: flex !important;
-        }
+        .admin-mode .admin-panel { display: block !important; }
+        .admin-mode .admin-only { display: flex !important; }
+        .admin-only { display: none !important; }
+        .admin-delete-btn { display: none !important; }
+        .admin-mode .admin-delete-btn { display: flex !important; }
         
         .header {
             background: #1877f2;
@@ -61,16 +46,13 @@
             align-items: center;
             box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
         }
-        
         .header .left h2 { font-size: 20px; font-weight: 700; cursor: pointer; }
         .header .left h2:hover { opacity: 0.8; }
-        
         .header .right {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
         .header .notif-btn {
             position: relative;
             background: rgba(255,255,255,0.15);
@@ -82,9 +64,7 @@
             border-radius: 8px;
             transition: all 0.2s;
         }
-        
         .header .notif-btn:hover { background: rgba(255,255,255,0.25); }
-        
         .header .notif-btn .badge {
             position: absolute;
             top: -4px;
@@ -98,7 +78,6 @@
             min-width: 18px;
             text-align: center;
         }
-        
         .header .avatar-small {
             width: 36px;
             height: 36px;
@@ -115,7 +94,6 @@
             border: 2px solid rgba(255,255,255,0.3);
             transition: all 0.2s;
         }
-        
         .header .avatar-small:hover { border-color: white; transform: scale(1.05); }
         .header .avatar-small img { width: 100%; height: 100%; object-fit: cover; }
         
@@ -128,7 +106,6 @@
             padding: 4px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
-        
         .tab {
             flex: 1;
             padding: 10px;
@@ -143,7 +120,6 @@
             transition: all 0.2s;
             font-family: inherit;
         }
-        
         .tab:hover { background: #f0f2f5; }
         .tab.active { background: #1877f2; color: white; }
         
@@ -154,7 +130,6 @@
             margin-bottom: 12px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
-        
         .card h3 {
             font-size: 17px;
             color: #050505;
@@ -172,10 +147,8 @@
             gap: 12px;
             cursor: pointer;
         }
-        
         .user-item:hover { background: #f0f2f5; border-radius: 8px; }
         .user-item:last-child { border-bottom: none; }
-        
         .user-item .avatar {
             width: 40px;
             height: 40px;
@@ -191,14 +164,11 @@
             overflow: hidden;
             flex-shrink: 0;
         }
-        
         .user-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        
         .user-item .info {
             flex: 1;
             min-width: 0;
         }
-        
         .user-item .info .name {
             font-size: 15px;
             font-weight: 600;
@@ -207,17 +177,17 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        
+        .user-item .info .username {
+            font-size: 12px;
+            color: #65676b;
+        }
         .user-item .actions {
             display: flex;
             align-items: center;
             gap: 8px;
             flex-shrink: 0;
         }
-        
-        .user-item .actions .btn-action {
-            pointer-events: auto;
-        }
+        .user-item .actions .btn-action { pointer-events: auto; }
         
         .btn-action {
             display: flex;
@@ -238,27 +208,22 @@
             color: #050505;
             pointer-events: auto;
         }
-        
         .btn-action:hover { background: #d8dadf; }
         .btn-action:active { transform: scale(0.95); }
-        
         .btn-message {
             background: #e4e6eb;
             color: #050505;
             min-width: 32px;
             padding: 6px 12px;
         }
-        
         .btn-message:hover { background: #d8dadf; }
         .btn-message .icon { font-size: 15px; line-height: 1; }
-        
         .btn-friend {
             min-width: 80px;
             padding: 6px 14px;
             background: #e4e6eb;
             color: #050505;
         }
-        
         .btn-friend:hover { background: #d8dadf; }
         .btn-friend.add { background: #e4e6eb; color: #050505; }
         .btn-friend.add:hover { background: #d8dadf; }
@@ -285,7 +250,6 @@
             margin-bottom: 12px;
             position: relative;
         }
-        
         .profile-page .back-btn {
             display: inline-flex;
             align-items: center;
@@ -302,7 +266,6 @@
             font-family: inherit;
             margin-bottom: 8px;
         }
-        
         .profile-page .back-btn:hover { background: #f0f7ff; }
         
         .profile-more-btn {
@@ -319,12 +282,10 @@
             transition: all 0.2s;
             line-height: 1;
         }
-        
         .profile-more-btn:hover {
             background: #f0f2f5;
             color: #1877f2;
         }
-        
         .profile-more-btn:active { transform: scale(0.9); }
         
         .profile-dropdown {
@@ -343,13 +304,11 @@
             z-index: 100;
             border: 1px solid #e4e6eb;
         }
-        
         .profile-dropdown.open {
             opacity: 1;
             transform: translateY(0) scale(1);
             pointer-events: auto;
         }
-        
         .profile-dropdown .dropdown-item {
             display: flex;
             align-items: center;
@@ -366,13 +325,11 @@
             transition: background 0.15s;
             font-family: inherit;
         }
-        
         .profile-dropdown .dropdown-item:hover { background: #f0f2f5; }
         .profile-dropdown .dropdown-item .icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
         .profile-dropdown .dropdown-item.danger { color: #e74c3c; }
         .profile-dropdown .dropdown-item.danger:hover { background: #fef0ef; }
         .profile-dropdown .dropdown-divider { height: 1px; background: #e4e6eb; margin: 4px 16px; }
-        
         .profile-dropdown .toggle-wrap {
             display: flex;
             align-items: center;
@@ -383,15 +340,12 @@
             color: #050505;
             cursor: default;
         }
-        
         .profile-dropdown .toggle-wrap .toggle-label {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        
         .profile-dropdown .toggle-wrap .toggle-label .icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
-        
         .toggle-switch {
             position: relative;
             width: 40px;
@@ -402,7 +356,6 @@
             transition: all 0.2s;
             flex-shrink: 0;
         }
-        
         .toggle-switch.active { background: #1877f2; }
         .toggle-switch .toggle-slider {
             position: absolute;
@@ -446,14 +399,11 @@
             transition: all 0.2s;
             position: relative;
         }
-        
         .profile-page .profile-avatar:hover {
             border-color: #1877f2;
             transform: scale(1.02);
         }
-        
         .profile-page .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        
         .profile-page .profile-avatar .avatar-hint {
             position: absolute;
             bottom: 0;
@@ -466,7 +416,6 @@
             opacity: 0;
             transition: opacity 0.2s;
         }
-        
         .profile-page .profile-avatar:hover .avatar-hint { opacity: 1; }
         
         .profile-page .profile-name {
@@ -474,19 +423,21 @@
             font-weight: 700;
             color: #050505;
         }
-        
+        .profile-page .profile-username {
+            font-size: 14px;
+            color: #65676b;
+            margin-top: 2px;
+        }
         .profile-page .profile-email {
             font-size: 14px;
             color: #65676b;
             margin-top: 4px;
         }
-        
         .profile-page .profile-bio {
             font-size: 14px;
             color: #65676b;
             margin-top: 8px;
         }
-        
         .profile-page .profile-actions {
             display: flex;
             gap: 10px;
@@ -502,7 +453,6 @@
             justify-content: center;
             flex-wrap: wrap;
         }
-        
         .stat-toggle {
             padding: 6px 14px;
             border: none;
@@ -515,13 +465,11 @@
             font-size: 13px;
             transition: all 0.2s;
         }
-        
         .stat-toggle:hover { background: #d8dadf; }
         .stat-toggle.active {
             background: #1877f2;
             color: white;
         }
-        
         .stat-toggle .count {
             background: rgba(0,0,0,0.05);
             padding: 0 8px;
@@ -529,7 +477,6 @@
             font-size: 12px;
             margin-left: 4px;
         }
-        
         .stat-toggle.active .count { background: rgba(255,255,255,0.2); }
         
         .stat-container {
@@ -537,23 +484,19 @@
             min-height: 60px;
             display: none;
         }
-        
         .stat-container.open { display: block; }
-        
         .stat-empty {
             color: #65676b;
             font-size: 14px;
             padding: 20px 0;
             text-align: center;
         }
-        
         .stat-list {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             padding: 4px 0;
         }
-        
         .stat-list .stat-item {
             background: #f0f2f5;
             padding: 4px 12px;
@@ -565,9 +508,7 @@
             gap: 6px;
             transition: all 0.2s;
         }
-        
         .stat-list .stat-item:hover { background: #e4e6eb; }
-        
         .stat-list .stat-item .mini-avatar {
             width: 20px;
             height: 20px;
@@ -582,13 +523,11 @@
             overflow: hidden;
             flex-shrink: 0;
         }
-        
         .stat-list .stat-item .mini-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
         .stat-private {
             color: #65676b;
             font-size: 14px;
@@ -613,14 +552,11 @@
             overflow: hidden;
             animation: chatSlideUp 0.25s ease;
         }
-        
         .chat-window.active { display: flex; }
-        
         @keyframes chatSlideUp {
             from { opacity: 0; transform: translateY(20px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        
         .chat-window .chat-header {
             display: flex;
             justify-content: space-between;
@@ -631,7 +567,6 @@
             color: white;
             flex-shrink: 0;
         }
-        
         .chat-window .chat-header .title { font-weight: 600; font-size: 15px; }
         .chat-window .chat-header .close-btn {
             background: rgba(255,255,255,0.15);
@@ -644,14 +579,12 @@
             transition: all 0.2s;
         }
         .chat-window .chat-header .close-btn:hover { background: rgba(255,255,255,0.25); }
-        
         .chat-window .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 12px 16px;
             background: #f8f9fa;
         }
-        
         .chat-window .chat-messages .msg {
             padding: 8px 14px;
             margin-bottom: 6px;
@@ -661,13 +594,11 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             max-width: 85%;
         }
-        
         .chat-window .chat-messages .msg.self {
             margin-left: auto;
             background: #1877f2;
             color: white;
         }
-        
         .chat-window .chat-messages .msg .author {
             font-weight: 600;
             font-size: 12px;
@@ -676,7 +607,6 @@
         .chat-window .chat-messages .msg.self .author { color: rgba(255,255,255,0.7); }
         .chat-window .chat-messages .msg .time { color: #999; font-size: 10px; margin-left: 6px; }
         .chat-window .chat-messages .msg.self .time { color: rgba(255,255,255,0.6); }
-        
         .chat-window .chat-input-wrap {
             display: flex;
             gap: 8px;
@@ -685,7 +615,6 @@
             background: white;
             flex-shrink: 0;
         }
-        
         .chat-window .chat-input-wrap input {
             flex: 1;
             padding: 10px 16px;
@@ -696,7 +625,6 @@
             font-family: inherit;
         }
         .chat-window .chat-input-wrap input:focus { border-color: #1877f2; }
-        
         .chat-window .chat-input-wrap button {
             background: #1877f2;
             color: white;
@@ -725,13 +653,11 @@
             z-index: 1000;
             border: 1px solid #e4e6eb;
         }
-        
         .context-menu.open {
             opacity: 1;
             transform: scale(1);
             pointer-events: auto;
         }
-        
         .context-menu .menu-item {
             display: flex;
             align-items: center;
@@ -778,7 +704,6 @@
             padding: 20px;
         }
         .modal.open { display: flex; }
-        
         .modal-content {
             background: white;
             border-radius: 12px;
@@ -789,12 +714,10 @@
             overflow-y: auto;
             animation: modalSlide 0.2s ease;
         }
-        
         @keyframes modalSlide {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
         .modal-content h3 {
             font-size: 18px;
             margin-bottom: 12px;
@@ -950,6 +873,16 @@
         .page { display: none; }
         .page.active { display: block; }
         
+        .username-copy {
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .username-copy:hover {
+            background: #e8f0fe;
+        }
+        
         @media (max-width: 480px) {
             body { padding: 12px; }
             .header { padding: 10px 16px; }
@@ -986,7 +919,7 @@
     </div>
 </div>
 
-<!-- ===== ADMIN PANEL (АВТОМАТИЧЕСКИ ПОЯВЛЯЕТСЯ ДЛЯ АДМИНОВ) ===== -->
+<!-- ===== ADMIN PANEL ===== -->
 <div class="admin-panel" id="adminPanel">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <span style="font-weight:600;color:#1877f2;font-size:13px;">👑 Админ-панель</span>
@@ -994,6 +927,7 @@
         <button class="btn-action admin-only" onclick="adminClearRooms()" style="background:#e74c3c;color:white;">🧹 Очистить комнаты</button>
         <button class="btn-action admin-only" onclick="adminClearNotifications()" style="background:#e74c3c;color:white;">🔔 Очистить уведомления</button>
         <button class="btn-action admin-only" onclick="adminExportData()" style="background:#27ae60;color:white;">📤 Экспорт</button>
+        <button class="btn-action admin-only" onclick="adminFixUsernames()" style="background:#f39c12;color:white;">🔧 Починить username</button>
     </div>
 </div>
 
@@ -1053,9 +987,9 @@
 <!-- ===== NOTIFICATIONS MODAL ===== -->
 <div class="modal" id="notificationsModal">
     <div class="modal-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0;">🔔 Уведомления</h3>
-            <button onclick="closeNotifications()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">✕</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;">🔔 Уведомления</h3>
+            <button onclick="closeNotifications()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#999;">✕</button>
         </div>
         <div id="notificationsList"></div>
     </div>
@@ -1117,41 +1051,189 @@ const provider = new firebase.auth.GoogleAuthProvider();
 // ================================================================
 // АДМИН - ХАРДКОД UID
 // ================================================================
-
 const ADMIN_UIDS = [
-    "ayXehcol9FgAQU6tZuup7aSaRoV2",  // Все Работники
-    "pWB0nGVvVXc4je6466ss7IwBm9G2",  // Джобс Москва
-    "ANR62p3qcjOe2ALsdVvJHUNCCV42"   // Плеер Лайки
+    "ayXehcol9FgAQU6tZuup7aSaRoV2",
+    "pWB0nGVvVXc4je6466ss7IwBm9G2",
+    "ANR62p3qcjOe2ALsdVvJHUNCCV42"
 ];
-
 let isAdmin = false;
 
 // ================================================================
-// ПРОВЕРКА АДМИН-ДОСТУПА
+// ДИНАМИЧЕСКИЙ РОУТИНГ (PUBLIC PROFILES)
+// ================================================================
+
+function handleRouting() {
+    const path = window.location.pathname;
+    
+    if (path === '/' || path === '/index.html' || path === '') {
+        if (USER_UID) {
+            navigateToFeed();
+        }
+        return;
+    }
+    
+    const username = path.substring(1).trim();
+    if (!username) {
+        navigateToFeed();
+        return;
+    }
+    
+    console.log(`🔍 Поиск профиля по username: ${username}`);
+    
+    db.ref('sites/' + SITE + '/users_by_name/' + username).once('value', snap => {
+        const uid = snap.val();
+        if (uid) {
+            console.log(`✅ Найден пользователь с UID: ${uid}`);
+            db.ref('sites/' + SITE + '/all_users/' + uid).once('value', userSnap => {
+                const user = userSnap.val();
+                if (user) {
+                    document.title = `${user.name || username} | METAIMPERIYA`;
+                    navigateToProfile(uid);
+                } else {
+                    document.title = 'Пользователь не найден | METAIMPERIYA';
+                    showNotFound(username);
+                }
+            });
+        } else {
+            console.log(`❌ Пользователь "${username}" не найден`);
+            document.title = 'Пользователь не найден | METAIMPERIYA';
+            showNotFound(username);
+        }
+    }).catch(err => {
+        console.error('❌ Ошибка поиска пользователя:', err);
+        showNotFound(username);
+    });
+}
+
+function showNotFound(username) {
+    const container = document.getElementById('profileContent');
+    if (!container) return;
+    
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.classList.add('hidden');
+    });
+    
+    document.getElementById('profilePage').classList.remove('hidden');
+    document.getElementById('profilePage').classList.add('active');
+    
+    container.innerHTML = `
+        <div class="profile-page" style="padding: 60px 20px;">
+            <div style="font-size: 80px; margin-bottom: 20px;">🔍</div>
+            <div style="font-size: 24px; font-weight: 700; color: #050505; margin-bottom: 8px;">
+                Пользователь не найден
+            </div>
+            <div style="color: #65676b; font-size: 16px; margin-bottom: 20px;">
+                Пользователь с ником <strong>@${esc(username)}</strong> не существует
+            </div>
+            <button class="btn-action" onclick="navigateToFeed()" style="background: #1877f2; color: white; padding: 10px 30px;">
+                🏠 На главную
+            </button>
+        </div>
+    `;
+}
+
+// ================================================================
+// ГЕНЕРАЦИЯ USERNAME
+// ================================================================
+
+function generateUsername(name) {
+    if (!name) return 'user_' + Date.now();
+    
+    const translitMap = {
+        'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e',
+        'ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m',
+        'н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u',
+        'ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch',
+        'ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya',
+        'А':'A','Б':'B','В':'V','Г':'G','Д':'D','Е':'E','Ё':'E',
+        'Ж':'Zh','З':'Z','И':'I','Й':'Y','К':'K','Л':'L','М':'M',
+        'Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U',
+        'Ф':'F','Х':'H','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch',
+        'Ъ':'','Ы':'Y','Ь':'','Э':'E','Ю':'Yu','Я':'Ya'
+    };
+    
+    let username = '';
+    for (let char of name.trim()) {
+        username += translitMap[char] || char;
+    }
+    
+    username = username.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
+    
+    if (username.length < 3) {
+        username = username + '_' + Math.random().toString(36).substring(2, 6);
+    }
+    
+    return new Promise((resolve) => {
+        checkUsernameUnique(username, resolve);
+    });
+}
+
+function checkUsernameUnique(baseUsername, callback) {
+    let username = baseUsername;
+    let counter = 1;
+    
+    const check = function(name, cb) {
+        db.ref('sites/' + SITE + '/users_by_name/' + name).once('value', snap => {
+            if (snap.val()) {
+                const newName = baseUsername + '_' + counter;
+                counter++;
+                check(newName, cb);
+            } else {
+                cb(name);
+            }
+        });
+    };
+    
+    check(username, callback);
+}
+
+function saveUsername(uid, username) {
+    if (!uid || !username) return;
+    db.ref('sites/' + SITE + '/users_by_name/' + username).set(uid);
+    db.ref('sites/' + SITE + '/users/' + uid + '/username').set(username);
+    db.ref('sites/' + SITE + '/all_users/' + uid + '/username').set(username);
+    console.log(`✅ Username "${username}" привязан к пользователю ${uid}`);
+}
+
+function updateUrl(username) {
+    if (username && history.pushState) {
+        const newUrl = '/' + username;
+        if (window.location.pathname !== newUrl) {
+            history.pushState(null, '', newUrl);
+        }
+    }
+}
+
+function copyUsername(username) {
+    if (!username) return;
+    navigator.clipboard?.writeText(username).then(() => {
+        const el = document.querySelector('.username-copy');
+        if (el) {
+            const original = el.textContent;
+            el.textContent = '✅ Скопировано!';
+            setTimeout(() => { el.textContent = original; }, 1500);
+        }
+    }).catch(() => {});
+}
+
+// ================================================================
+// АДМИН-ФУНКЦИИ (С ПРОВЕРКОЙ)
 // ================================================================
 
 function checkAdminAccess(uid) {
     const wasAdmin = isAdmin;
     isAdmin = ADMIN_UIDS.includes(uid);
-    if (wasAdmin !== isAdmin) {
-        updateAdminUI();
-    }
+    if (wasAdmin !== isAdmin) updateAdminUI();
     console.log(`👑 Админ-режим: ${isAdmin ? 'ВКЛЮЧЕН' : 'ВЫКЛЮЧЕН'}`);
     return isAdmin;
 }
-
-// ================================================================
-// ОБНОВЛЕНИЕ UI ПРИ ИЗМЕНЕНИИ СТАТУСА АДМИНА
-// ================================================================
 
 function updateAdminUI() {
     const body = document.body;
     if (isAdmin) {
         body.classList.add('admin-mode');
-        document.querySelectorAll('.admin-only').forEach(el => {
-            el.style.display = 'flex';
-        });
-        // Добавляем кнопки удаления в список пользователей
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
         document.querySelectorAll('.user-item').forEach(item => {
             const uid = item.id?.replace('user-item-', '');
             if (uid && uid !== USER_UID) {
@@ -1159,17 +1241,12 @@ function updateAdminUI() {
                 if (actions && !item.querySelector('.admin-delete-btn')) {
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'btn-action admin-delete-btn';
-                    deleteBtn.style.background = '#e74c3c';
-                    deleteBtn.style.color = 'white';
-                    deleteBtn.style.minWidth = '32px';
-                    deleteBtn.style.padding = '4px 8px';
+                    deleteBtn.style.cssText = 'background:#e74c3c;color:white;min-width:32px;padding:4px 8px;';
                     deleteBtn.innerHTML = '🗑';
                     deleteBtn.title = 'Удалить пользователя';
                     deleteBtn.onclick = (e) => {
                         e.stopPropagation();
-                        if (confirm(`Удалить пользователя?`)) {
-                            adminDeleteUser(uid);
-                        }
+                        if (confirm('Удалить пользователя?')) adminDeleteUser(uid);
                     };
                     actions.appendChild(deleteBtn);
                 }
@@ -1177,23 +1254,15 @@ function updateAdminUI() {
         });
     } else {
         body.classList.remove('admin-mode');
-        document.querySelectorAll('.admin-only').forEach(el => {
-            el.style.display = 'none';
-        });
-        document.querySelectorAll('.admin-delete-btn').forEach(el => {
-            el.remove();
-        });
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.admin-delete-btn').forEach(el => el.remove());
     }
 }
-
-// ================================================================
-// АДМИН-ФУНКЦИИ
-// ================================================================
 
 function adminDeleteUser(uid) {
     if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
     if (!uid || uid === USER_UID) { alert('Нельзя удалить себя'); return; }
-    if (!confirm(`Удалить пользователя? Это необратимо!`)) return;
+    if (!confirm('Удалить пользователя? Это необратимо!')) return;
     
     const updates = {};
     updates['sites/' + SITE + '/users/' + uid] = null;
@@ -1201,6 +1270,7 @@ function adminDeleteUser(uid) {
     updates['sites/' + SITE + '/friends/' + uid] = null;
     updates['sites/' + SITE + '/followers/' + uid] = null;
     updates['sites/' + SITE + '/notifications/' + uid] = null;
+    updates['sites/' + SITE + '/users_by_name/'] = null;
     
     db.ref().update(updates).then(() => {
         alert('✅ Пользователь удален');
@@ -1230,6 +1300,7 @@ function adminDeleteAllUsers() {
             }
         });
         updates['sites/' + SITE + '/room_users/'] = null;
+        updates['sites/' + SITE + '/users_by_name/'] = null;
         db.ref().update(updates).then(() => {
             alert('✅ Все пользователи удалены');
             loadPeople();
@@ -1280,6 +1351,38 @@ function adminExportData() {
     });
 }
 
+function adminFixUsernames() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Починить username для всех пользователей?')) return;
+    
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        let count = 0;
+        const promises = [];
+        
+        Object.keys(users).forEach(uid => {
+            const user = users[uid];
+            if (user && user.name) {
+                promises.push(
+                    generateUsername(user.name).then(username => {
+                        saveUsername(uid, username);
+                        db.ref('sites/' + SITE + '/all_users/' + uid + '/username').set(username);
+                        count++;
+                    })
+                );
+            }
+        });
+        
+        Promise.all(promises).then(() => {
+            alert(`✅ Username обновлены для ${count} пользователей`);
+            loadPeople();
+        }).catch(err => {
+            console.error('❌ Ошибка:', err);
+            alert('Ошибка обновления');
+        });
+    });
+}
+
 // ================================================================
 // УПРАВЛЕНИЕ ЗАПРОСАМИ
 // ================================================================
@@ -1288,9 +1391,7 @@ const activeRequests = new Map();
 function cancelRequest(key) {
     if (activeRequests.has(key)) {
         const cancelFn = activeRequests.get(key);
-        if (typeof cancelFn === 'function') {
-            cancelFn();
-        }
+        if (typeof cancelFn === 'function') { cancelFn(); }
         activeRequests.delete(key);
         return true;
     }
@@ -1307,10 +1408,7 @@ function safeFirebaseQuery(key, ref, callback) {
     activeRequests.set(key, cancelFn);
     
     ref.once('value', snap => {
-        if (isCancelled) {
-            console.log(`🔄 Запрос "${key}" отменен`);
-            return;
-        }
+        if (isCancelled) { console.log(`🔄 Запрос "${key}" отменен`); return; }
         activeRequests.delete(key);
         callback(snap);
     }).catch(err => {
@@ -1324,9 +1422,7 @@ function safeFirebaseQuery(key, ref, callback) {
 
 function cancelAllRequests() {
     for (const [key, cancelFn] of activeRequests) {
-        if (typeof cancelFn === 'function') {
-            cancelFn();
-        }
+        if (typeof cancelFn === 'function') { cancelFn(); }
     }
     activeRequests.clear();
 }
@@ -1359,6 +1455,7 @@ let currentFriendTab = 'friends';
 let viewingProfileUid = null;
 let activeStatToggle = null;
 let profilePrivacy = { hideFriends: false };
+let currentUsername = null;
 window.friendListeners = {};
 
 let menuState = { isOpen: false, isAnimating: false };
@@ -1372,7 +1469,6 @@ function toggleProfileDropdown() {
     const dropdown = document.getElementById('profileDropdown');
     const overlay = document.getElementById('profileDropdownOverlay');
     if (!dropdown) return;
-    
     if (dropdown.classList.contains('open')) {
         closeProfileDropdown();
     } else {
@@ -1406,22 +1502,14 @@ function loadSavedProfiles() {
     try {
         const saved = localStorage.getItem('dc_profiles_' + SITE);
         SAVED_PROFILES = saved ? JSON.parse(saved) : [];
-    } catch(e) {
-        SAVED_PROFILES = [];
-    }
+    } catch(e) { SAVED_PROFILES = []; }
     renderSavedProfiles();
 }
 
 function saveProfileToList(uid, name, email, avatarUrl) {
     const existing = SAVED_PROFILES.find(p => p.uid === uid);
     if (!existing) {
-        SAVED_PROFILES.push({
-            uid: uid,
-            name: name,
-            email: email || 'anon',
-            avatarUrl: avatarUrl || null,
-            lastUsed: Date.now()
-        });
+        SAVED_PROFILES.push({ uid, name, email: email || 'anon', avatarUrl: avatarUrl || null, lastUsed: Date.now() });
     } else {
         existing.name = name;
         existing.email = email || 'anon';
@@ -1470,13 +1558,7 @@ window.loginWithSavedProfile = function(uid) {
         USER = profile.name;
         USER_UID = uid;
         localStorage.setItem('dc_u_' + SITE, USER);
-        const data = {
-            name: profile.name,
-            email: profile.email || 'anon',
-            uid: uid,
-            lastLogin: Date.now(),
-            avatarUrl: profile.avatarUrl || null
-        };
+        const data = { name: profile.name, email: profile.email || 'anon', uid, lastLogin: Date.now(), avatarUrl: profile.avatarUrl || null };
         db.ref('sites/' + SITE + '/users/' + uid).update(data);
         db.ref('sites/' + SITE + '/all_users/' + uid).set(data);
         profile.lastUsed = Date.now();
@@ -1489,7 +1571,7 @@ window.loginWithSavedProfile = function(uid) {
 };
 
 // ================================================================
-// AUTH (С АВТОМАТИЧЕСКОЙ ПРОВЕРКОЙ АДМИНА)
+// AUTH (С АВТОМАТИЧЕСКОЙ ПРОВЕРКОЙ АДМИНА И USERNAME)
 // ================================================================
 
 auth.onAuthStateChanged(user => {
@@ -1499,7 +1581,6 @@ auth.onAuthStateChanged(user => {
             USER = user.displayName || user.email || user.uid.slice(0, 8);
             localStorage.setItem('dc_u_' + SITE, USER);
             
-            // ===== АВТОМАТИЧЕСКАЯ ПРОВЕРКА АДМИНА =====
             checkAdminAccess(USER_UID);
             
             saveProfileToList(USER_UID, USER, user.email, user.photoURL);
@@ -1511,24 +1592,42 @@ auth.onAuthStateChanged(user => {
                 avatarUrl: user.photoURL || null,
                 isAdmin: isAdmin
             };
-            db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
-            db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
             
-            if (isAdmin) {
-                db.ref('sites/' + SITE + '/users/' + USER_UID + '/isAdmin').set(true);
-            }
+            // Генерируем и сохраняем username
+            generateUsername(USER).then(username => {
+                currentUsername = username;
+                data.username = username;
+                db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
+                db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
+                saveUsername(USER_UID, username);
+                
+                if (isAdmin) {
+                    db.ref('sites/' + SITE + '/users/' + USER_UID + '/isAdmin').set(true);
+                }
+                
+                document.getElementById('loginModal').classList.remove('open');
+                updateUI();
+                loadData();
+                loadNotifications();
+                
+                // Проверяем роутинг после входа
+                setTimeout(handleRouting, 300);
+            });
+        } else {
+            document.getElementById('loginModal').classList.remove('open');
+            updateUI();
+            loadData();
+            loadNotifications();
+            
+            // Проверяем роутинг после входа
+            setTimeout(handleRouting, 300);
         }
-        
-        document.getElementById('loginModal').classList.remove('open');
-        updateUI();
-        loadData();
-        navigateToFeed();
-        loadNotifications();
     } else {
         USER = null;
         USER_UID = null;
         avatarCache = null;
         isAdmin = false;
+        currentUsername = null;
         updateAdminUI();
         
         cancelAllRequests();
@@ -1562,20 +1661,22 @@ window.loginName = function() {
         USER = name;
         USER_UID = 'anon_' + Date.now();
         localStorage.setItem('dc_u_' + SITE, USER);
-        const data = {
-            name: USER,
-            email: 'anon_' + Date.now() + '@anon.com',
-            uid: USER_UID,
-            lastLogin: Date.now()
-        };
+        const data = { name: USER, email: 'anon_' + Date.now() + '@anon.com', uid: USER_UID, lastLogin: Date.now() };
         db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
         saveProfileToList(USER_UID, USER, data.email);
-        document.getElementById('loginModal').classList.remove('open');
-        updateUI();
-        loadData();
-        navigateToFeed();
-        loadNotifications();
+        
+        generateUsername(USER).then(username => {
+            currentUsername = username;
+            saveUsername(USER_UID, username);
+            db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/username').set(username);
+            
+            document.getElementById('loginModal').classList.remove('open');
+            updateUI();
+            loadData();
+            loadNotifications();
+            setTimeout(handleRouting, 300);
+        });
     }).catch(e => alert('Ошибка: ' + e.message));
 };
 
@@ -1597,6 +1698,7 @@ window.logout = function() {
         USER_UID = null;
         avatarCache = null;
         isAdmin = false;
+        currentUsername = null;
         updateAdminUI();
         document.getElementById('loginModal').classList.add('open');
         updateUI();
@@ -1620,19 +1722,15 @@ function updateUI() {
             }
             return;
         }
-        safeFirebaseQuery(
-            'updateUI_avatar',
-            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl'),
-            (snap) => {
-                const url = snap.val();
-                avatarCache = url || 'default';
-                if (url) {
-                    headerAvatar.innerHTML = `<img src="${url}">`;
-                } else {
-                    headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
-                }
+        safeFirebaseQuery('updateUI_avatar', db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl'), (snap) => {
+            const url = snap.val();
+            avatarCache = url || 'default';
+            if (url) {
+                headerAvatar.innerHTML = `<img src="${url}">`;
+            } else {
+                headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
             }
-        );
+        });
     } else {
         avatarCache = null;
         headerAvatar.innerHTML = '<span>?</span>';
@@ -1664,14 +1762,17 @@ function navigateToFeed() {
     });
     currentTab = 'groups';
     loadRooms();
+    // Обновляем URL
+    if (window.location.pathname !== '/') {
+        history.pushState(null, '', '/');
+        document.title = 'METAIMPERIYA';
+    }
 }
 
 function showTab(tab) {
     if (viewingProfileUid) {
         navigateToFeed();
-        setTimeout(() => {
-            showTabInternal(tab);
-        }, 100);
+        setTimeout(() => showTabInternal(tab), 100);
         return;
     }
     showTabInternal(tab);
@@ -1745,9 +1846,16 @@ function renderProfile(uid) {
         
         const isOwnProfile = (uid === USER_UID);
         const name = user.name || 'Аноним';
+        const username = user.username || '';
         const email = user.email || '';
         const bio = user.bio || 'Привет! 👋';
         const avatarUrl = user.avatarUrl || null;
+        
+        // Обновляем URL для публичного профиля
+        if (username) {
+            updateUrl(username);
+            document.title = `${name} | METAIMPERIYA`;
+        }
         
         if (isOwnProfile) {
             db.ref('sites/' + SITE + '/users/' + uid + '/settings/hideFriends').once('value', snap => {
@@ -1825,6 +1933,13 @@ function renderProfile(uid) {
         
         let actionsHtml = '';
         let statHtml = '';
+        
+        // Кнопка копирования username
+        const usernameHtml = username ? `
+            <div class="profile-username">
+                @<span class="username-copy" onclick="copyUsername('${username}')" title="Нажмите чтобы скопировать">${username}</span>
+            </div>
+        ` : '';
         
         if (isOwnProfile) {
             actionsHtml = `
@@ -1907,6 +2022,7 @@ function renderProfile(uid) {
                 </div>
                 
                 <div class="profile-name">${name}</div>
+                ${usernameHtml}
                 <div class="profile-email">${email}</div>
                 <div class="profile-bio">${bio}</div>
                 
@@ -2263,7 +2379,6 @@ function loadPeople() {
             listenFriendStatus(k);
         });
         
-        // Обновляем админ-кнопки после загрузки списка
         if (isAdmin) {
             setTimeout(() => updateAdminUI(), 100);
         }
@@ -2276,6 +2391,7 @@ function renderInlineUser(container, uid, userData) {
         return;
     }
     const name = userData.name.trim() || 'Аноним';
+    const username = userData.username || '';
     const letter = name.charAt(0).toUpperCase();
     const avatarUrl = userData.avatarUrl || null;
     const itemDiv = document.createElement('div');
@@ -2283,10 +2399,15 @@ function renderInlineUser(container, uid, userData) {
     itemDiv.id = 'user-item-' + uid;
     const avatarHtml = avatarUrl ? `<img src="${avatarUrl}" alt="${esc(name)}">` : `<span>${letter}</span>`;
     
+    // Ссылка на профиль
+    const profileLink = username ? `/${username}` : `#`;
+    const clickHandler = username ? `window.location.href='${profileLink}'` : `navigateToProfile('${uid}')`;
+    
     itemDiv.innerHTML = `
-        <div class="avatar">${avatarHtml}</div>
-        <div class="info">
+        <div class="avatar" onclick="${clickHandler}">${avatarHtml}</div>
+        <div class="info" onclick="${clickHandler}">
             <div class="name">${esc(name)}</div>
+            ${username ? `<div class="username">@${esc(username)}</div>` : ''}
         </div>
         <div class="actions" onclick="event.stopPropagation();">
             <button class="btn-action btn-message" onclick="event.stopPropagation();openPrivateChat('${uid}')" title="Сообщение">
@@ -2300,7 +2421,11 @@ function renderInlineUser(container, uid, userData) {
     
     itemDiv.addEventListener('click', function(e) {
         if (!e.target.closest('.btn-action')) {
-            navigateToProfile(uid);
+            if (username) {
+                window.location.href = '/' + username;
+            } else {
+                navigateToProfile(uid);
+            }
         }
     });
     
@@ -2510,10 +2635,25 @@ function handleNotifClick(notifId, fromUid, type) {
         db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
     } else if (type === 'friend_request') {
         closeNotifications();
-        navigateToProfile(fromUid);
+        // Ищем username для перехода
+        db.ref('sites/' + SITE + '/all_users/' + fromUid + '/username').once('value', snap => {
+            const username = snap.val();
+            if (username) {
+                window.location.href = '/' + username;
+            } else {
+                navigateToProfile(fromUid);
+            }
+        });
     } else if (type === 'friend_accepted') {
         closeNotifications();
-        navigateToProfile(fromUid);
+        db.ref('sites/' + SITE + '/all_users/' + fromUid + '/username').once('value', snap => {
+            const username = snap.val();
+            if (username) {
+                window.location.href = '/' + username;
+            } else {
+                navigateToProfile(fromUid);
+            }
+        });
     }
 }
 
@@ -2679,7 +2819,7 @@ window.uploadAvatar = function() {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ
+// РЕДАКТИРОВАНИЕ (С СОХРАНЕНИЕМ USERNAME)
 // ================================================================
 
 window.editProfile = function() {
@@ -2698,20 +2838,32 @@ window.saveProfile = function() {
     const name = document.getElementById('editName').value.trim();
     const bio = document.getElementById('editBio').value.trim();
     if (!name) { alert('Введите имя'); return; }
+    
     USER = name;
     localStorage.setItem('dc_u_' + SITE, USER);
-    const updates = { name: USER, bio: bio };
-    db.ref('sites/' + SITE + '/users/' + USER_UID).update(updates);
-    db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(updates);
-    const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
-    if (profile) {
-        profile.name = USER;
-        localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-    }
-    closeEditProfile();
-    if (viewingProfileUid) renderProfile(viewingProfileUid);
-    updateUI();
-    loadPeople();
+    
+    generateUsername(name).then(username => {
+        const updates = { name: USER, bio: bio, username: username };
+        
+        db.ref('sites/' + SITE + '/users/' + USER_UID).update(updates);
+        db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(updates);
+        saveUsername(USER_UID, username);
+        
+        const profile = SAVED_PROFILES.find(p => p.uid === USER_UID);
+        if (profile) {
+            profile.name = USER;
+            localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+        }
+        
+        closeEditProfile();
+        if (viewingProfileUid) renderProfile(viewingProfileUid);
+        updateUI();
+        loadPeople();
+        
+        // Обновляем URL
+        updateUrl(username);
+        document.title = `${USER} | METAIMPERIYA`;
+    });
 };
 
 // ================================================================
@@ -2728,15 +2880,35 @@ function loadData() {
 }
 
 // ================================================================
+// ПЕРЕХВАТ НАВИГАЦИИ НАЗАД/ВПЕРЕД
+// ================================================================
+
+window.addEventListener('popstate', function(e) {
+    handleRouting();
+});
+
+// ================================================================
+// ЗАПУСК РОУТИНГА
+// ================================================================
+
+if (document.readyState === 'complete') {
+    handleRouting();
+} else {
+    window.addEventListener('load', function() {
+        handleRouting();
+    });
+}
+
+// ================================================================
 // ЗАПУСК
 // ================================================================
 
 loadSavedProfiles();
 navigateToFeed();
 
-console.log('✅ METAIMPERIYA - ПОЛНАЯ СОЦИАЛЬНАЯ СЕТЬ ГОТОВА!');
+console.log('✅ METAIMPERIYA - ДИНАМИЧЕСКИЙ РОУТИНГ ГОТОВ!');
+console.log('🔗 Публичные профили: metaimperiya.com/username');
 console.log('👑 Админ-режим: включен автоматически по UID');
-console.log('📋 UID админов:', ADMIN_UIDS);
 console.log('🔹 Списки в профиле закрыты по умолчанию');
 console.log('🔹 Меню "три точки" в правом верхнем углу');
 console.log('🔹 Приватность: скрытие списков друзей');
