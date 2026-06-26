@@ -30,12 +30,6 @@
             margin-bottom: 4px;
         }
         
-        .header .left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
         .header .left h2 {
             font-size: 18px;
             color: #1877f2;
@@ -220,14 +214,14 @@
         
         .stat-tabs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin: 16px 0 8px;
             justify-content: center;
             flex-wrap: wrap;
         }
         
         .stat-tab {
-            padding: 6px 16px;
+            padding: 6px 14px;
             border: none;
             background: #e8ecf1;
             color: #555;
@@ -265,55 +259,10 @@
             min-height: 60px;
         }
         
-        .stat-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 4px 0;
-        }
-        
-        .stat-item {
-            background: #f0f2f5;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 13px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        
-        .stat-item:hover {
-            background: #e4e6eb;
-            transform: scale(1.02);
-        }
-        
-        .stat-item .mini-avatar {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #1877f2;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 10px;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        
-        .stat-item .mini-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
         .stat-empty {
             color: #888;
             font-size: 14px;
-            padding: 12px 0;
+            padding: 20px 0;
             text-align: center;
         }
         
@@ -412,17 +361,18 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 0;
+            padding: 10px 8px;
             border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
             transition: background 0.15s;
+            border-radius: 8px;
         }
         
         .user-item:hover {
             background: #f5f7fa;
-            border-radius: 8px;
-            padding-left: 8px;
-            padding-right: 8px;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
         }
         
         .user-item .avatar {
@@ -438,6 +388,7 @@
             font-size: 16px;
             flex-shrink: 0;
             overflow: hidden;
+            cursor: pointer;
         }
         
         .user-item .avatar img {
@@ -446,14 +397,70 @@
             object-fit: cover;
         }
         
+        .user-item .info {
+            flex: 1;
+            cursor: pointer;
+            min-width: 0;
+        }
+        
         .user-item .info .name {
             font-weight: 600;
             font-size: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .user-item .info .email {
             font-size: 13px;
             color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .user-item .actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .btn:hover { background: #4a9eff; }
+        .btn:active { transform: scale(0.96); }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-success { background: #27ae60; }
+        .btn-success:hover { background: #219a52; }
+        .btn-secondary { background: #e8ecf1; color: #333; }
+        .btn-secondary:hover { background: #d5d9df; }
+        
+        .btn-small {
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 8px;
+            min-width: 32px;
+        }
+        
+        .btn-small:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+        
+        .btn-small:hover:not(:disabled) {
+            transform: scale(1.05);
         }
         
         .room-grid {
@@ -479,28 +486,6 @@
         .room-card .icon { font-size: 28px; }
         .room-card .name { font-weight: 600; margin: 4px 0; font-size: 14px; }
         .room-card .count { font-size: 13px; color: #888; }
-        
-        .btn {
-            background: #1877f2;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        
-        .btn:hover { background: #4a9eff; }
-        .btn:active { transform: scale(0.96); }
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
-        .btn-secondary { background: #e8ecf1; color: #333; }
-        .btn-secondary:hover { background: #d5d9df; }
-        .btn-success { background: #27ae60; }
-        .btn-success:hover { background: #219a52; }
         
         .hidden { display: none; }
         
@@ -771,6 +756,9 @@
             border-radius: 8px;
             margin-bottom: 4px;
             transition: background 0.15s;
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
         
         .notif-item:hover {
@@ -815,8 +803,11 @@
             .room-grid { grid-template-columns: 1fr; }
             .modal-content { padding: 16px; }
             .header .left h2 { font-size: 15px; }
-            .stat-tabs { gap: 6px; }
-            .stat-tab { font-size: 12px; padding: 4px 12px; }
+            .stat-tabs { gap: 4px; }
+            .stat-tab { font-size: 12px; padding: 4px 10px; }
+            .user-item { padding: 8px 4px; }
+            .user-item .info .name { font-size: 13px; }
+            .btn-small { font-size: 11px; padding: 3px 8px; }
         }
     </style>
 </head>
@@ -872,22 +863,22 @@
         <div class="profile-email" id="profileEmail">email@example.com</div>
         <div class="profile-bio" id="profileBio">Привет! 👋</div>
         
+        <!-- Вкладки друзей/подписок/подписчиков -->
         <div class="stat-tabs">
-            <button class="stat-tab active" onclick="showStatTab('friends')">
+            <button class="stat-tab active" onclick="switchFriendTab('friends')">
                 🤝 Друзья <span class="count" id="friendsCount">0</span>
             </button>
-            <button class="stat-tab" onclick="showStatTab('subscriptions')">
+            <button class="stat-tab" onclick="switchFriendTab('following')">
                 📌 Подписки <span class="count" id="subscriptionsCount">0</span>
             </button>
-            <button class="stat-tab" onclick="showStatTab('followers')">
+            <button class="stat-tab" onclick="switchFriendTab('followers')">
                 👀 Подписчики <span class="count" id="followersCount">0</span>
             </button>
         </div>
         
-        <div class="stat-container">
-            <div id="friendsList" class="stat-list"></div>
-            <div id="subscriptionsList" class="stat-list" style="display:none;"></div>
-            <div id="followersList" class="stat-list" style="display:none;"></div>
+        <!-- Контейнер для списков -->
+        <div id="friendsListContainer" class="stat-container">
+            <div class="stat-empty">Загрузка...</div>
         </div>
     </div>
 </div>
@@ -1079,6 +1070,7 @@ let avatarCache = null;
 let CURRENT_ROOM = null;
 let chatUnsub = null;
 let notifUnsub = null;
+let currentFriendTab = 'friends';
 
 let menuState = {
     isOpen: false,
@@ -1492,10 +1484,9 @@ function loadProfile() {
                 }
             }
             
-            // Загружаем списки
-            loadFriendsList();
-            loadFollowersList();
-            loadSubscriptionsList();
+            // Обновляем счетчики и рендерим список
+            updateCounters();
+            renderFriendsList(currentFriendTab);
         }
     );
 }
@@ -1674,7 +1665,6 @@ function viewProfile(uid) {
                 if (status === 'friend') {
                     buttonsHtml += `<button class="btn btn-danger" onclick="removeFriend('${uid}')">❌ Удалить из друзей</button>`;
                 } else if (status === 'pending') {
-                    // Проверяем, кто отправил запрос
                     db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap => {
                         const fromThem = snap.val() === 'pending';
                         if (fromThem) {
@@ -1794,125 +1784,239 @@ function handleFriendRequest(targetUid, action) {
     }
 }
 
-function removeFriend(targetUid) {
+function removeFriend(uid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (!confirm('Удалить из друзей?')) return;
     
     const updates = {};
-    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
-    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-    updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
+    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + uid] = null;
+    updates['sites/' + SITE + '/friends/' + uid + '/' + USER_UID] = null;
+    updates['sites/' + SITE + '/followers/' + uid + '/' + USER_UID] = null;
     
     db.ref().update(updates);
     
     alert('❌ Пользователь удален из друзей');
-    closeProfileView();
-    loadPeople();
+    renderFriendsList('friends');
     loadProfile();
 }
 
-// ----- СПИСКИ ДРУЗЕЙ/ПОДПИСЧИКОВ/ПОДПИСОК -----
-function loadFriendsList() {
-    if (!USER_UID) return;
+function unfollow(uid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (!confirm(`Отписаться от пользователя?`)) return;
     
-    safeFirebaseQuery(
-        'loadFriends_' + USER_UID,
-        db.ref('sites/' + SITE + '/friends/' + USER_UID),
-        (snap) => {
-            const data = snap.val() || {};
-            const friends = Object.keys(data).filter(k => data[k] === 'friend');
-            document.getElementById('friendsCount').textContent = friends.length;
-            renderList('friendsList', friends, 'Друзья');
-        }
-    );
+    db.ref('sites/' + SITE + '/followers/' + uid + '/' + USER_UID).remove();
+    
+    alert('✅ Вы отписались');
+    renderFriendsList('following');
+    loadProfile();
 }
 
-function loadFollowersList() {
-    if (!USER_UID) return;
-    
-    safeFirebaseQuery(
-        'loadFollowers_' + USER_UID,
-        db.ref('sites/' + SITE + '/followers/' + USER_UID),
-        (snap) => {
-            const data = snap.val() || {};
-            const followers = Object.keys(data);
-            document.getElementById('followersCount').textContent = followers.length;
-            renderList('followersList', followers, 'Подписчики');
-        }
-    );
-}
+// ================================================================
+// СПИСКИ ДРУЗЕЙ/ПОДПИСОК/ПОДПИСЧИКОВ
+// ================================================================
 
-function loadSubscriptionsList() {
-    if (!USER_UID) return;
-    
-    safeFirebaseQuery(
-        'loadSubscriptions_' + USER_UID,
-        db.ref('sites/' + SITE + '/followers'),
-        (snap) => {
-            const allFollowers = snap.val() || {};
-            const subscriptions = [];
-            for (const [targetUid, followers] of Object.entries(allFollowers)) {
-                if (followers && followers[USER_UID] === true) {
-                    subscriptions.push(targetUid);
-                }
-            }
-            document.getElementById('subscriptionsCount').textContent = subscriptions.length;
-            renderList('subscriptionsList', subscriptions, 'Подписки');
-        }
-    );
-}
-
-function renderList(containerId, uids, title) {
-    const container = document.getElementById(containerId);
+function renderFriendsList(type) {
+    const container = document.getElementById('friendsListContainer');
     if (!container) return;
     
-    if (uids.length === 0) {
-        container.innerHTML = `<div class="stat-empty">Нет ${title.toLowerCase()}</div>`;
+    container.innerHTML = '';
+    
+    if (!USER_UID) {
+        container.innerHTML = '<div class="stat-empty">Войдите, чтобы увидеть список</div>';
         return;
     }
     
-    // Очищаем контейнер
+    let queryRef;
+    
+    if (type === 'friends') {
+        queryRef = db.ref('sites/' + SITE + '/friends/' + USER_UID);
+    } else if (type === 'followers') {
+        queryRef = db.ref('sites/' + SITE + '/followers/' + USER_UID);
+    } else if (type === 'following') {
+        queryRef = db.ref('sites/' + SITE + '/followers');
+    } else {
+        container.innerHTML = '<div class="stat-empty">Неизвестный тип списка</div>';
+        return;
+    }
+    
+    container.innerHTML = '<div class="stat-empty">⏳ Загрузка...</div>';
+    
+    if (type === 'following') {
+        queryRef.once('value', snap => {
+            const allFollowers = snap.val() || {};
+            const followingList = [];
+            
+            for (const [targetUid, followers] of Object.entries(allFollowers)) {
+                if (followers && followers[USER_UID] === true) {
+                    followingList.push(targetUid);
+                }
+            }
+            
+            if (followingList.length === 0) {
+                container.innerHTML = '<div class="stat-empty">Вы ни на кого не подписаны</div>';
+                return;
+            }
+            
+            renderUserList(container, followingList, 'following');
+        });
+    } else {
+        queryRef.once('value', snap => {
+            const data = snap.val() || {};
+            let uids = Object.keys(data);
+            
+            if (type === 'friends') {
+                uids = uids.filter(uid => data[uid] === 'friend');
+            }
+            
+            if (uids.length === 0) {
+                const emptyText = type === 'friends' ? 'Нет друзей' : 
+                                 type === 'followers' ? 'Нет подписчиков' : 'Список пуст';
+                container.innerHTML = `<div class="stat-empty">${emptyText}</div>`;
+                return;
+            }
+            
+            renderUserList(container, uids, type);
+        });
+    }
+}
+
+function renderUserList(container, uids, type) {
+    if (!uids || uids.length === 0) {
+        container.innerHTML = '<div class="stat-empty">Список пуст</div>';
+        return;
+    }
+    
+    let loaded = 0;
     container.innerHTML = '';
     
     uids.forEach(uid => {
         db.ref('sites/' + SITE + '/all_users/' + uid).once('value', snap => {
             const user = snap.val() || {};
             const name = user.name || 'Аноним';
+            const email = user.email || '';
             const letter = name.charAt(0).toUpperCase();
             const avatarHtml = user.avatarUrl ? 
                 `<img src="${user.avatarUrl}">` : 
-                letter;
+                `<span>${letter}</span>`;
             
-            const item = document.createElement('span');
-            item.className = 'stat-item';
-            item.onclick = () => viewProfile(uid);
-            item.innerHTML = `
-                <span class="mini-avatar">${avatarHtml}</span>
-                ${name}
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'user-item';
+            
+            let actionsHtml = '';
+            
+            if (type === 'friends') {
+                actionsHtml = `
+                    <button class="btn btn-small" onclick="openPrivateChat('${uid}')" title="Сообщение">✉️</button>
+                    <button class="btn btn-danger btn-small" onclick="removeFriend('${uid}')" title="Удалить">❌</button>
+                `;
+            } else if (type === 'following') {
+                actionsHtml = `
+                    <button class="btn btn-danger btn-small" onclick="unfollow('${uid}')">📴 Отписаться</button>
+                `;
+            } else if (type === 'followers') {
+                db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
+                    const status = snap.val();
+                    const actionBtn = itemDiv.querySelector('.follower-action');
+                    if (actionBtn) {
+                        if (status === 'friend') {
+                            actionBtn.innerHTML = '✅ В друзьях';
+                            actionBtn.className = 'btn btn-small btn-secondary';
+                            actionBtn.disabled = true;
+                        } else if (status === 'pending') {
+                            db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap2 => {
+                                if (snap2.val() === 'pending') {
+                                    actionBtn.innerHTML = '⏳ Запрос отправлен';
+                                    actionBtn.className = 'btn btn-small btn-secondary';
+                                    actionBtn.disabled = true;
+                                } else {
+                                    actionBtn.innerHTML = '✅ Принять';
+                                    actionBtn.className = 'btn btn-small btn-success';
+                                    actionBtn.onclick = () => handleFriendRequest(uid, 'accept');
+                                }
+                            });
+                        } else {
+                            actionBtn.innerHTML = '➕ Добавить';
+                            actionBtn.className = 'btn btn-small';
+                            actionBtn.onclick = () => sendFriendRequest(uid);
+                        }
+                    }
+                });
+                actionsHtml = `
+                    <button class="btn btn-small btn-secondary follower-action" disabled>⏳ Проверка...</button>
+                `;
+            }
+            
+            itemDiv.innerHTML = `
+                <div class="avatar" onclick="viewProfile('${uid}')">${avatarHtml}</div>
+                <div class="info" onclick="viewProfile('${uid}')">
+                    <div class="name">${name}</div>
+                    <div class="email">${email}</div>
+                </div>
+                <div class="actions">
+                    ${actionsHtml}
+                </div>
             `;
-            container.appendChild(item);
+            
+            container.appendChild(itemDiv);
+            loaded++;
         });
     });
 }
 
-// ----- ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В ПРОФИЛЕ -----
-function showStatTab(tab) {
+// ================================================================
+// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК В ПРОФИЛЕ
+// ================================================================
+
+function switchFriendTab(tab) {
+    currentFriendTab = tab;
+    
     document.querySelectorAll('.stat-tab').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.stat-tab').forEach(btn => {
-        if (btn.textContent.includes(
-            tab === 'friends' ? 'Друзья' : 
-            tab === 'subscriptions' ? 'Подписки' : 'Подписчики'
-        )) {
+        const text = btn.textContent.trim();
+        if ((tab === 'friends' && text.includes('Друзья')) ||
+            (tab === 'following' && text.includes('Подписки')) ||
+            (tab === 'followers' && text.includes('Подписчики'))) {
             btn.classList.add('active');
         }
     });
     
-    document.getElementById('friendsList').style.display = tab === 'friends' ? 'flex' : 'none';
-    document.getElementById('subscriptionsList').style.display = tab === 'subscriptions' ? 'flex' : 'none';
-    document.getElementById('followersList').style.display = tab === 'followers' ? 'flex' : 'none';
+    renderFriendsList(tab);
 }
 
-// ----- УВЕДОМЛЕНИЯ -----
+// ================================================================
+// ОБНОВЛЕНИЕ СЧЕТЧИКОВ
+// ================================================================
+
+function updateCounters() {
+    if (!USER_UID) return;
+    
+    db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', snap => {
+        const data = snap.val() || {};
+        const friends = Object.keys(data).filter(k => data[k] === 'friend');
+        document.getElementById('friendsCount').textContent = friends.length;
+    });
+    
+    db.ref('sites/' + SITE + '/followers/' + USER_UID).once('value', snap => {
+        const data = snap.val() || {};
+        document.getElementById('followersCount').textContent = Object.keys(data).length;
+    });
+    
+    db.ref('sites/' + SITE + '/followers').once('value', snap => {
+        const allFollowers = snap.val() || {};
+        let count = 0;
+        for (const [targetUid, followers] of Object.entries(allFollowers)) {
+            if (followers && followers[USER_UID] === true) {
+                count++;
+            }
+        }
+        document.getElementById('subscriptionsCount').textContent = count;
+    });
+}
+
+// ================================================================
+// УВЕДОМЛЕНИЯ
+// ================================================================
+
 function sendNotification(targetUid, data) {
     if (!USER_UID) return;
     
@@ -1947,7 +2051,6 @@ function loadNotifications() {
             }
         }
         
-        // Обновляем список в модалке, если она открыта
         if (document.getElementById('notificationsModal').classList.contains('open')) {
             renderNotifications(notifications, keys);
         }
@@ -1976,14 +2079,12 @@ function renderNotifications(notifications, keys) {
         
         html += `
             <div class="notif-item ${isUnread ? 'unread' : ''}" onclick="handleNotifClick('${k}', '${n.from}')">
-                <div style="display:flex;gap:10px;align-items:center;">
-                    <span class="notif-icon">${icon}</span>
-                    <div class="notif-text">
-                        <div style="font-weight:${isUnread ? '600' : '400'};font-size:14px;">${n.text || 'Уведомление'}</div>
-                        <div class="notif-time">${time}</div>
-                    </div>
-                    ${isUnread ? '<span class="notif-dot"></span>' : ''}
+                <span class="notif-icon">${icon}</span>
+                <div class="notif-text">
+                    <div style="font-weight:${isUnread ? '600' : '400'};font-size:14px;">${n.text || 'Уведомление'}</div>
+                    <div class="notif-time">${time}</div>
                 </div>
+                ${isUnread ? '<span class="notif-dot"></span>' : ''}
             </div>
         `;
     });
@@ -2005,7 +2106,6 @@ function handleNotifClick(notifId, fromUid) {
 
 function openNotifications() {
     document.getElementById('notificationsModal').classList.add('open');
-    // Перезагружаем список
     const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
     ref.once('value', snap => {
         const notifications = snap.val() || {};
@@ -2020,7 +2120,10 @@ function closeNotifications() {
     document.getElementById('notificationsModal').classList.remove('open');
 }
 
-// ----- ЛИЧКА (ЧАТ) -----
+// ================================================================
+// ЛИЧКА (ЧАТ)
+// ================================================================
+
 function openPrivateChat(targetUid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
@@ -2046,9 +2149,6 @@ function openPrivateChat(targetUid) {
     });
 }
 
-// ================================================================
-// ЧАТ
-// ================================================================
 function loadChat(path) {
     if (chatUnsub) { 
         if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
@@ -2090,7 +2190,6 @@ window.sendChat = function() {
         timestamp: Date.now()
     });
     
-    // Отправляем уведомление собеседнику
     sendNotification(targetUid, {
         type: 'message',
         from: USER_UID,
@@ -2188,25 +2287,13 @@ window.saveProfile = function() {
 };
 
 // ================================================================
-// САЙДБАР
-// ================================================================
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-}
-
-function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
-}
-
-function goToGroups() { showTab('groups'); }
-function goToPeople() { showTab('people'); }
-
-// ================================================================
 // УТИЛИТЫ
 // ================================================================
 const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
+
+function goToGroups() { showTab('groups'); }
+function goToPeople() { showTab('people'); }
+function closeSidebar() {}
 
 // ================================================================
 // ЗАПУСК
@@ -2215,12 +2302,10 @@ loadSavedProfiles();
 showTab('groups');
 
 console.log('✅ METAIMPERIYA - ПОЛНАЯ СОЦИАЛЬНАЯ СЕТЬ ГОТОВА');
+console.log('👥 Друзья, Подписки, Подписчики');
+console.log('🔔 Уведомления: friend_request, friend_accepted, message');
+console.log('💬 Личные сообщения с уведомлениями');
 console.log('📊 Управление запросами: activeRequests Map');
-console.log('👥 viewProfile - просмотр профилей');
-console.log('🤝 sendFriendRequest/handleFriendRequest - система друзей');
-console.log('👀 Подписчики/Подписки');
-console.log('🔔 Уведомления - friend_request, friend_accepted, message');
-console.log('💬 openPrivateChat - личные сообщения с уведомлениями');
 </script>
 </body>
 </html>
