@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель | METAIMPERIYA</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .admin-container { max-width: 600px; margin: 0 auto; }
+        .admin-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .admin-card h3 { margin-bottom: 12px; }
+        .admin-card .btn { display: inline-block; padding: 8px 16px; background: #1877f2; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; margin: 4px; }
+        .admin-card .btn:hover { background: #4a9eff; }
+        .admin-card .btn-danger { background: #e74c3c; }
+        .admin-card .btn-danger:hover { background: #c0392b; }
+        .admin-card .btn-success { background: #27ae60; }
+        .admin-card .btn-success:hover { background: #219a52; }
+        .admin-card .btn-warning { background: #f39c12; }
+        .admin-card .btn-warning:hover { background: #d68910; }
+        .admin-card input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin: 6px 0; font-size: 14px; }
+        .admin-card .row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .admin-card .row .btn { flex: 1; text-align: center; }
+        .admin-card .status { color: #65676b; font-size: 13px; margin-top: 8px; }
+        .admin-card .status.success { color: #27ae60; }
+        .admin-card .status.error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">🏠 METAIMPERIYA</a>
+            <div class="header-right">
+                <a href="/" class="admin-link">← На главную</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <div class="admin-card">
+            <h3>👑 Админ-панель</h3>
+            <p style="color:#65676b;font-size:14px;">Управление статическими страницами</p>
+        </div>
+
+        <div class="admin-card">
+            <h3>📁 Создать страницу</h3>
+            <input type="text" id="pagePath" placeholder="Путь (например: user/playerlikee или group/general)">
+            <div class="row">
+                <button class="btn btn-success" onclick="createPage()">➕ Создать</button>
+                <button class="btn btn-danger" onclick="deletePage()">🗑 Удалить</button>
+            </div>
+            <div id="pageStatus" class="status"></div>
+        </div>
+
+        <div class="admin-card">
+            <h3>📋 Быстрые действия</h3>
+            <div class="row">
+                <button class="btn" onclick="window.open('/user/playerlikee/', '_blank')">👤 PLAYER Likee</button>
+                <button class="btn" onclick="window.open('/user/jobsmoscowru/', '_blank')">👤 Jobs Moscow</button>
+                <button class="btn" onclick="window.open('/user/allrabotniki/', '_blank')">👤 Все Работники</button>
+            </div>
+            <div class="row" style="margin-top:8px;">
+                <button class="btn" onclick="window.open('/group/general/', '_blank')">🌍 Общий</button>
+                <button class="btn" onclick="window.open('/group/sport/', '_blank')">⚽ Спорт</button>
+                <button class="btn" onclick="window.open('/group/games/', '_blank')">🎮 Игры</button>
+                <button class="btn" onclick="window.open('/group/music/', '_blank')">🎵 Музыка</button>
+            </div>
+        </div>
+
+        <div class="admin-card">
+            <h3>📄 Инструкция</h3>
+            <ul style="color:#65676b;font-size:14px;line-height:1.8;padding-left:20px;">
+                <li>Каждая страница — это отдельная папка с <code>index.html</code></li>
+                <li>Структура: <code>/user/username/index.html</code> или <code>/group/groupname/index.html</code></li>
+                <li>Для создания страницы просто скопируй шаблон и отредактируй</li>
+                <li>Все изменения делаются вручную через GitHub</li>
+                <li>Firebase используется только для счётчиков и интерактива</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        function createPage() {
+            const path = document.getElementById('pagePath').value.trim();
+            const status = document.getElementById('pageStatus');
+            if (!path) {
+                status.textContent = '❌ Введите путь';
+                status.className = 'status error';
+                return;
+            }
+            
+            status.textContent = '📝 Инструкция: создайте папку /' + path + '/ и файл index.html в репозитории';
+            status.className = 'status';
+            
+            // Открываем шаблон в новой вкладке
+            const template = `
+        <!DOCTYPE html>
+        <html lang="ru">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>${path.split('/').pop()} | METAIMPERIYA</title>
+            <meta name="description" content="Страница ${path.split('/').pop()} в METAIMPERIYA">
+            <link rel="stylesheet" href="/style.css">
+        </head>
+        <body>
+            <header class="header">
+                <div class="header-inner">
+                    <a href="/" class="logo">🏠 METAIMPERIYA</a>
+                    <div class="header-right">
+                        <a href="/admin/" class="admin-link">⚙️ Админ</a>
+                        <div class="avatar-small">?</div>
+                    </div>
+                </div>
+            </header>
+            <nav class="tab-bar">
+                <a href="/" class="tab">👥 Группы</a>
+                <a href="/people.html" class="tab">👤 Люди</a>
+            </nav>
+            <main class="container">
+                <div class="profile-page" style="text-align:center;padding:60px 20px;">
+                    <div style="font-size:80px;margin-bottom:20px;">📄</div>
+                    <div style="font-size:24px;font-weight:700;color:#050505;">${path.split('/').pop()}</div>
+                    <div style="color:#65676b;font-size:16px;">Страница создана. Отредактируйте этот файл в репозитории.</div>
+                    <a href="/" class="btn-action" style="margin-top:20px;background:#1877f2;color:white;padding:10px 30px;text-decoration:none;">🏠 На главную</a>
+                </div>
+            </main>
+            <script src="/script.js"></script>
+        </body>
+        </html>
+            `;
+            
+            status.textContent = '✅ Скопируйте шаблон в /' + path + '/index.html';
+            status.className = 'status success';
+            
+            // Копируем в буфер обмена
+            navigator.clipboard?.writeText(template).then(() => {
+                status.textContent = '✅ Шаблон скопирован в буфер обмена! Создайте файл в репозитории.';
+            }).catch(() => {
+                status.textContent = '✅ Шаблон:\n' + template;
+            });
+        }
+        
+        function deletePage() {
+            const path = document.getElementById('pagePath').value.trim();
+            const status = document.getElementById('pageStatus');
+            if (!path) {
+                status.textContent = '❌ Введите путь';
+                status.className = 'status error';
+                return;
+            }
+            
+            status.textContent = '🗑 Чтобы удалить страницу, удалите папку /' + path + '/ в репозитории GitHub';
+            status.className = 'status';
+        }
+    </script>
+</body>
+</html>
