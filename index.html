@@ -971,7 +971,6 @@ function cancelAllRequests() {
 window.addEventListener('beforeunload', function() {
     cancelAllRequests();
     closeContextMenu();
-    // Отписываемся от слушателей
     if (window.friendListeners) {
         Object.values(window.friendListeners).forEach(unsubscribe => {
             if (typeof unsubscribe === 'function') unsubscribe();
@@ -1472,7 +1471,7 @@ function renderInlineUser(container, uid, userData) {
             <button class="btn-action btn-message" onclick="openPrivateChat('${uid}')" title="Сообщение">
                 <span class="icon">✉</span>
             </button>
-            <button class="btn-action btn-friend add" id="friend-btn-${uid}" onclick="toggleFriendStatus('${uid}')">
+            <button class="btn-action btn-friend add" id="friend-btn-${uid}" onclick="sendFriendRequest('${uid}')">
                 <span class="icon">➕</span> Добавить
             </button>
         </div>
@@ -1517,87 +1516,188 @@ function updateFriendButtonInline(uid, status) {
         btn.innerHTML = `<span class="icon">✓</span> В друзьях`;
         btn.classList.add('friend');
         btn.title = 'В друзьях (нажмите чтобы удалить)';
+        btn.onclick = () => removeFriend(uid);
     } else if (status === 'pending') {
         btn.innerHTML = `<span class="icon">⏳</span> Запрос`;
         btn.classList.add('pending');
         btn.title = 'Запрос отправлен (нажмите чтобы отменить)';
+        btn.onclick = () => sendFriendRequest(uid);
     } else {
         btn.innerHTML = `<span class="icon">➕</span> Добавить`;
         btn.classList.add('add');
         btn.title = 'Добавить в друзья';
+        btn.onclick = () => sendFriendRequest(uid);
     }
 }
 
 // ================================================================
-// УНИВЕРСАЛЬНЫЙ TOGGLE ДЛЯ ДРУЖБЫ
+// АТОМАРНЫЕ ОПЕРАЦИИ С ДРУЗЬЯМИ
 // ================================================================
-function toggleFriendStatus(targetUid) {
+
+// ----- 1. ОТПРАВКА/ОТМЕНА ЗАПРОСА -----
+function sendFriendRequest(targetUid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (targetUid === USER_UID) { alert('Нельзя добавить себя'); return; }
+    
     db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
         const status = snap.val();
+        
         if (status === 'friend') {
-            const updates = {};
-            updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
-            updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-            updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
-            db.ref().update(updates);
-            updateCounters();
-        } else if (status === 'pending') {
-            const updates = {};
-            updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
-            updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-            updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
-            db.ref().update(updates);
-            updateCounters();
-        } else {
-            const updates = {};
-            updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'pending';
-            updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'pending';
-            updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
-            db.ref().update(updates);
-            sendNotification(targetUid, {
-                type: 'friend_request',
-                from: USER_UID,
-                text: `${USER} отправил(а) запрос в друзья`,
-                timestamp: Date.now()
-            });
-            updateCounters();
+            alert('✅ Уже в друзьях');
+            return;
         }
+        
+        if (status === 'pending') {
+            // Отменяем запрос - атомарное удаление
+            const updates = {};
+            updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
+            updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
+            updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
+            db.ref().update(updates);
+            return;
+        }
+        
+        // Отправляем запрос - атомарное создание
+        const updates = {};
+        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'pending';
+        updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'pending';
+        updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
+        db.ref().update(updates);
+        
+        sendNotification(targetUid, {
+            type: 'friend_request',
+            from: USER_UID,
+            text: `${USER} отправил(а) запрос в друзья`,
+            timestamp: Date.now()
+        });
     });
 }
 
-// ================================================================
-// ОБРАБОТЧИК ЗАПРОСА ДРУЖБЫ
-// ================================================================
-function handleFriendRequest(targetUid, action) {
+// ----- 2. ПРИНЯТИЕ ЗАПРОСА (АТОМАРНО) -----
+function acceptFriendRequest(targetUid) {
     if (!USER_UID) { alert('Войдите!'); return; }
-    if (action === 'accept') {
-        const updates = {};
-        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'friend';
-        updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'friend';
-        updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
-        db.ref().update(updates);
-        sendNotification(targetUid, {
-            type: 'friend_accepted',
-            from: USER_UID,
-            text: `${USER} принял(а) ваш запрос в друзья`,
-            timestamp: Date.now()
-        });
-        alert('✅ Дружба подтверждена!');
-        closeProfileView();
-        loadPeople();
-        loadProfile();
-    } else if (action === 'decline') {
-        const updates = {};
-        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
-        updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-        db.ref().update(updates);
-        alert('❌ Запрос отклонен');
-        closeProfileView();
-        loadPeople();
-        loadProfile();
+    
+    const updates = {};
+    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'friend';
+    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'friend';
+    updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
+    db.ref().update(updates);
+    
+    sendNotification(targetUid, {
+        type: 'friend_accepted',
+        from: USER_UID,
+        text: `${USER} принял(а) ваш запрос в друзья`,
+        timestamp: Date.now()
+    });
+    
+    alert('✅ Дружба подтверждена!');
+    closeProfileView();
+}
+
+// ----- 3. УДАЛЕНИЕ ИЗ ДРУЗЕЙ (АТОМАРНО) -----
+function removeFriend(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (!confirm('Удалить из друзей?')) return;
+    
+    const updates = {};
+    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
+    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
+    updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
+    db.ref().update(updates);
+    
+    alert('❌ Пользователь удален из друзей');
+    closeProfileView();
+}
+
+// ----- 4. ОТКЛОНЕНИЕ ЗАПРОСА -----
+function declineFriendRequest(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    
+    const updates = {};
+    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
+    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
+    db.ref().update(updates);
+    
+    alert('❌ Запрос отклонен');
+    closeProfileView();
+}
+
+// ================================================================
+// viewProfileModal
+// ================================================================
+function viewProfileModal(uid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (uid === USER_UID) { 
+        alert('Это ваш профиль'); 
+        goToProfile();
+        return; 
     }
+    const modal = document.getElementById('profileViewModal');
+    const avatar = document.getElementById('viewAvatar');
+    const avatarLetter = document.getElementById('viewAvatarLetter');
+    const nameEl = document.getElementById('viewName');
+    const emailEl = document.getElementById('viewEmail');
+    const bioEl = document.getElementById('viewBio');
+    const actions = document.getElementById('viewActions');
+    modal.classList.add('open');
+    nameEl.textContent = 'Загрузка...';
+    bioEl.textContent = '';
+    emailEl.textContent = '';
+    avatarLetter.textContent = '?';
+    actions.innerHTML = '<span style="color:#65676b;">Загрузка...</span>';
+    
+    safeFirebaseQuery('viewProfile_' + uid, db.ref('sites/' + SITE + '/all_users/' + uid), (snap) => {
+        const user = snap.val();
+        if (!user) {
+            nameEl.textContent = 'Пользователь не найден';
+            actions.innerHTML = '<span style="color:#e74c3c;">❌ Пользователь удален</span>';
+            return;
+        }
+        const name = user.name || 'Аноним';
+        const email = user.email || '';
+        const bio = user.bio || 'Привет! 👋';
+        const avatarUrl = user.avatarUrl || null;
+        nameEl.textContent = name;
+        emailEl.textContent = email;
+        bioEl.textContent = bio;
+        if (avatarUrl) {
+            avatar.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+            avatar.innerHTML = `<span id="viewAvatarLetter">${name.charAt(0).toUpperCase()}</span>`;
+        }
+        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
+            const status = snap.val();
+            let btnHtml = '';
+            if (status === 'friend') {
+                btnHtml = `<button class="btn-action" onclick="removeFriend('${uid}')" style="background:#e74c3c;color:white;">❌ Удалить из друзей</button>`;
+            } else if (status === 'pending') {
+                db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap2 => {
+                    const fromThem = snap2.val() === 'pending';
+                    if (fromThem) {
+                        actions.innerHTML = `
+                            <button class="btn-action" onclick="acceptFriendRequest('${uid}')" style="background:#27ae60;color:white;">✅ Принять</button>
+                            <button class="btn-action" onclick="declineFriendRequest('${uid}')" style="background:#e74c3c;color:white;">❌ Отклонить</button>
+                        `;
+                    } else {
+                        actions.innerHTML = `
+                            <button class="btn-action" style="cursor:default;opacity:0.7;">⏳ Запрос отправлен</button>
+                        `;
+                    }
+                });
+                return;
+            } else {
+                btnHtml = `<button class="btn-action" onclick="sendFriendRequest('${uid}')">➕ Добавить в друзья</button>`;
+            }
+            actions.innerHTML = `
+                <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
+                ${btnHtml}
+            `;
+        });
+    });
+}
+
+function closeProfileView() {
+    document.getElementById('profileViewModal').classList.remove('open');
 }
 
 // ================================================================
@@ -1713,84 +1813,6 @@ function openNotifications() {
 
 function closeNotifications() {
     document.getElementById('notificationsModal').classList.remove('open');
-}
-
-// ================================================================
-// viewProfileModal
-// ================================================================
-function viewProfileModal(uid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (uid === USER_UID) { 
-        alert('Это ваш профиль'); 
-        goToProfile();
-        return; 
-    }
-    const modal = document.getElementById('profileViewModal');
-    const avatar = document.getElementById('viewAvatar');
-    const avatarLetter = document.getElementById('viewAvatarLetter');
-    const nameEl = document.getElementById('viewName');
-    const emailEl = document.getElementById('viewEmail');
-    const bioEl = document.getElementById('viewBio');
-    const actions = document.getElementById('viewActions');
-    modal.classList.add('open');
-    nameEl.textContent = 'Загрузка...';
-    bioEl.textContent = '';
-    emailEl.textContent = '';
-    avatarLetter.textContent = '?';
-    actions.innerHTML = '<span style="color:#65676b;">Загрузка...</span>';
-    
-    safeFirebaseQuery('viewProfile_' + uid, db.ref('sites/' + SITE + '/all_users/' + uid), (snap) => {
-        const user = snap.val();
-        if (!user) {
-            nameEl.textContent = 'Пользователь не найден';
-            actions.innerHTML = '<span style="color:#e74c3c;">❌ Пользователь удален</span>';
-            return;
-        }
-        const name = user.name || 'Аноним';
-        const email = user.email || '';
-        const bio = user.bio || 'Привет! 👋';
-        const avatarUrl = user.avatarUrl || null;
-        nameEl.textContent = name;
-        emailEl.textContent = email;
-        bioEl.textContent = bio;
-        if (avatarUrl) {
-            avatar.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
-        } else {
-            avatar.innerHTML = `<span id="viewAvatarLetter">${name.charAt(0).toUpperCase()}</span>`;
-        }
-        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
-            const status = snap.val();
-            let btnHtml = '';
-            if (status === 'friend') {
-                btnHtml = `<button class="btn-action" onclick="toggleFriendStatus('${uid}')" style="background:#e74c3c;color:white;">❌ Удалить из друзей</button>`;
-            } else if (status === 'pending') {
-                db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).once('value', snap2 => {
-                    const fromThem = snap2.val() === 'pending';
-                    if (fromThem) {
-                        actions.innerHTML = `
-                            <button class="btn-action" onclick="handleFriendRequest('${uid}', 'accept')" style="background:#27ae60;color:white;">✅ Принять</button>
-                            <button class="btn-action" onclick="handleFriendRequest('${uid}', 'decline')" style="background:#e74c3c;color:white;">❌ Отклонить</button>
-                        `;
-                    } else {
-                        actions.innerHTML = `
-                            <button class="btn-action" style="cursor:default;opacity:0.7;">⏳ Запрос отправлен</button>
-                        `;
-                    }
-                });
-                return;
-            } else {
-                btnHtml = `<button class="btn-action" onclick="toggleFriendStatus('${uid}')">➕ Добавить в друзья</button>`;
-            }
-            actions.innerHTML = `
-                <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
-                ${btnHtml}
-            `;
-        });
-    });
-}
-
-function closeProfileView() {
-    document.getElementById('profileViewModal').classList.remove('open');
 }
 
 // ================================================================
@@ -1976,17 +1998,13 @@ function renderUserList(container, uids, type) {
                                     actionBtn.className = 'btn-action';
                                     actionBtn.style.background = '#27ae60';
                                     actionBtn.style.color = 'white';
-                                    actionBtn.onclick = () => {
-                                        handleFriendRequest(uid, 'accept');
-                                    };
+                                    actionBtn.onclick = () => acceptFriendRequest(uid);
                                 }
                             });
                         } else {
                             actionBtn.innerHTML = '➕ Добавить';
                             actionBtn.className = 'btn-action btn-friend add';
-                            actionBtn.onclick = () => {
-                                toggleFriendStatus(uid);
-                            };
+                            actionBtn.onclick = () => sendFriendRequest(uid);
                         }
                     }
                 });
@@ -2003,19 +2021,6 @@ function renderUserList(container, uids, type) {
             loaded++;
         });
     });
-}
-
-function removeFriend(uid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (!confirm('Удалить из друзей?')) return;
-    const updates = {};
-    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + uid] = null;
-    updates['sites/' + SITE + '/friends/' + uid + '/' + USER_UID] = null;
-    updates['sites/' + SITE + '/followers/' + uid + '/' + USER_UID] = null;
-    db.ref().update(updates);
-    alert('❌ Пользователь удален из друзей');
-    renderFriendsList('friends');
-    loadProfile();
 }
 
 function unfollow(uid) {
@@ -2145,10 +2150,10 @@ function goToPeople() { showTab('people'); }
 loadSavedProfiles();
 showTab('groups');
 
-console.log('✅ METAIMPERIYA - СИНХРОНИЗАЦИЯ КНОПОК ГОТОВА');
-console.log('🔹 Кнопки обновляются через слушатели on("value")');
+console.log('✅ METAIMPERIYA - АТОМАРНЫЕ ОБНОВЛЕНИЯ ГОТОВЫ!');
+console.log('🔹 Статусы синхронизируются у обоих пользователей');
+console.log('🔹 Кнопки обновляются через on("value")');
 console.log('🔹 Уведомления разделены: message → чат, friend_request → профиль');
-console.log('🔹 Синхронизация статусов в реальном времени');
 </script>
 </body>
 </html>
