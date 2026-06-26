@@ -1419,8 +1419,109 @@ window.joinRoom = function(roomId) {
 };
 
 // ================================================================
-// ЛЮДИ - С СИНХРОНИЗАЦИЕЙ
+// АТОМАРНОЕ ОБНОВЛЕНИЕ СТАТУСА ДРУЖБЫ
 // ================================================================
+
+function updateFriendStatus(myUid, targetUid, status) {
+    if (!myUid || !targetUid) {
+        console.error('❌ Ошибка: отсутствуют UID');
+        return;
+    }
+    
+    const updates = {};
+    const path1 = 'sites/' + SITE + '/friends/' + myUid + '/' + targetUid;
+    const path2 = 'sites/' + SITE + '/friends/' + targetUid + '/' + myUid;
+    
+    if (status === 'friend') {
+        updates[path1] = 'friend';
+        updates[path2] = 'friend';
+        updates['sites/' + SITE + '/followers/' + targetUid + '/' + myUid] = true;
+    } else if (status === 'pending') {
+        updates[path1] = 'pending';
+        updates[path2] = 'pending';
+        updates['sites/' + SITE + '/followers/' + targetUid + '/' + myUid] = true;
+    } else if (status === null) {
+        updates[path1] = null;
+        updates[path2] = null;
+        updates['sites/' + SITE + '/followers/' + targetUid + '/' + myUid] = null;
+    }
+    
+    db.ref().update(updates)
+        .then(() => {
+            console.log(`✅ Статус "${status}" установлен для ${myUid} и ${targetUid}`);
+        })
+        .catch(err => {
+            console.error('❌ Ошибка обновления статуса:', err);
+        });
+}
+
+// ================================================================
+// ФУНКЦИИ УПРАВЛЕНИЯ ДРУЗЬЯМИ
+// ================================================================
+
+function sendFriendRequest(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (targetUid === USER_UID) { alert('Нельзя добавить себя'); return; }
+    
+    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
+        const status = snap.val();
+        
+        if (status === 'friend') {
+            alert('✅ Уже в друзьях');
+            return;
+        }
+        
+        if (status === 'pending') {
+            updateFriendStatus(USER_UID, targetUid, null);
+            return;
+        }
+        
+        updateFriendStatus(USER_UID, targetUid, 'pending');
+        
+        sendNotification(targetUid, {
+            type: 'friend_request',
+            from: USER_UID,
+            text: `${USER} отправил(а) запрос в друзья`,
+            timestamp: Date.now()
+        });
+    });
+}
+
+function acceptFriendRequest(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    updateFriendStatus(USER_UID, targetUid, 'friend');
+    sendNotification(targetUid, {
+        type: 'friend_accepted',
+        from: USER_UID,
+        text: `${USER} принял(а) ваш запрос в друзья`,
+        timestamp: Date.now()
+    });
+    alert('✅ Дружба подтверждена!');
+    closeProfileView();
+}
+
+function removeFriend(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (!confirm('Удалить из друзей?')) return;
+    updateFriendStatus(USER_UID, targetUid, null);
+    alert('❌ Пользователь удален из друзей');
+    closeProfileView();
+}
+
+function declineFriendRequest(targetUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    const updates = {};
+    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
+    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
+    db.ref().update(updates);
+    alert('❌ Запрос отклонен');
+    closeProfileView();
+}
+
+// ================================================================
+// ЛЮДИ - С СЛУШАТЕЛЯМИ В РЕАЛЬНОМ ВРЕМЕНИ
+// ================================================================
+
 function loadPeople() {
     if (!USER_UID) return;
     const el = document.getElementById('peopleList');
@@ -1442,10 +1543,6 @@ function loadPeople() {
         keys.forEach(k => {
             const u = users[k];
             renderInlineUser(el, k, u);
-        });
-        // Запускаем слушатели для каждого пользователя
-        keys.forEach(k => {
-            listenFriendStatus(k);
         });
     });
 }
@@ -1477,41 +1574,55 @@ function renderInlineUser(container, uid, userData) {
         </div>
     `;
     container.appendChild(itemDiv);
+    
+    // ЗАПУСКАЕМ СЛУШАТЕЛЬ ДЛЯ ОБНОВЛЕНИЯ В РЕАЛЬНОМ ВРЕМЕНИ
+    listenFriendStatus(uid);
 }
 
 // ================================================================
 // СЛУШАТЕЛЬ ДЛЯ ОБНОВЛЕНИЯ КНОПОК В РЕАЛЬНОМ ВРЕМЕНИ
 // ================================================================
+
 function listenFriendStatus(targetUid) {
     if (!USER_UID || !targetUid) return;
+    
     if (window.friendListeners && window.friendListeners[targetUid]) {
         window.friendListeners[targetUid]();
         delete window.friendListeners[targetUid];
     }
+    
     if (!window.friendListeners) {
         window.friendListeners = {};
     }
+    
     const ref = db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid);
     const onValue = snap => {
         const status = snap.val();
         updateFriendButtonInline(targetUid, status || 'none');
     };
+    
+    // ИСПОЛЬЗУЕМ on('value') ДЛЯ РЕАЛЬНОГО ВРЕМЕНИ
     ref.on('value', onValue);
+    
     window.friendListeners[targetUid] = () => {
         ref.off('value', onValue);
         delete window.friendListeners[targetUid];
     };
+    
     return window.friendListeners[targetUid];
 }
 
 // ================================================================
 // ОБНОВЛЕНИЕ КНОПКИ В СПИСКЕ
 // ================================================================
+
 function updateFriendButtonInline(uid, status) {
     const btn = document.getElementById('friend-btn-' + uid);
     if (!btn) return;
+    
     btn.className = 'btn-action btn-friend';
     btn.disabled = false;
+    
     if (status === 'friend') {
         btn.innerHTML = `<span class="icon">✓</span> В друзьях`;
         btn.classList.add('friend');
@@ -1531,100 +1642,9 @@ function updateFriendButtonInline(uid, status) {
 }
 
 // ================================================================
-// АТОМАРНЫЕ ОПЕРАЦИИ С ДРУЗЬЯМИ
-// ================================================================
-
-// ----- 1. ОТПРАВКА/ОТМЕНА ЗАПРОСА -----
-function sendFriendRequest(targetUid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (targetUid === USER_UID) { alert('Нельзя добавить себя'); return; }
-    
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
-        const status = snap.val();
-        
-        if (status === 'friend') {
-            alert('✅ Уже в друзьях');
-            return;
-        }
-        
-        if (status === 'pending') {
-            // Отменяем запрос - атомарное удаление
-            const updates = {};
-            updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
-            updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-            updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
-            db.ref().update(updates);
-            return;
-        }
-        
-        // Отправляем запрос - атомарное создание
-        const updates = {};
-        updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'pending';
-        updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'pending';
-        updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
-        db.ref().update(updates);
-        
-        sendNotification(targetUid, {
-            type: 'friend_request',
-            from: USER_UID,
-            text: `${USER} отправил(а) запрос в друзья`,
-            timestamp: Date.now()
-        });
-    });
-}
-
-// ----- 2. ПРИНЯТИЕ ЗАПРОСА (АТОМАРНО) -----
-function acceptFriendRequest(targetUid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    
-    const updates = {};
-    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = 'friend';
-    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = 'friend';
-    updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = true;
-    db.ref().update(updates);
-    
-    sendNotification(targetUid, {
-        type: 'friend_accepted',
-        from: USER_UID,
-        text: `${USER} принял(а) ваш запрос в друзья`,
-        timestamp: Date.now()
-    });
-    
-    alert('✅ Дружба подтверждена!');
-    closeProfileView();
-}
-
-// ----- 3. УДАЛЕНИЕ ИЗ ДРУЗЕЙ (АТОМАРНО) -----
-function removeFriend(targetUid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (!confirm('Удалить из друзей?')) return;
-    
-    const updates = {};
-    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
-    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-    updates['sites/' + SITE + '/followers/' + targetUid + '/' + USER_UID] = null;
-    db.ref().update(updates);
-    
-    alert('❌ Пользователь удален из друзей');
-    closeProfileView();
-}
-
-// ----- 4. ОТКЛОНЕНИЕ ЗАПРОСА -----
-function declineFriendRequest(targetUid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    
-    const updates = {};
-    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
-    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
-    db.ref().update(updates);
-    
-    alert('❌ Запрос отклонен');
-    closeProfileView();
-}
-
-// ================================================================
 // viewProfileModal
 // ================================================================
+
 function viewProfileModal(uid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (uid === USER_UID) { 
@@ -1701,8 +1721,9 @@ function closeProfileView() {
 }
 
 // ================================================================
-// УВЕДОМЛЕНИЯ (РАЗДЕЛЕННАЯ ЛОГИКА)
+// УВЕДОМЛЕНИЯ
 // ================================================================
+
 function sendNotification(targetUid, data) {
     if (!USER_UID) return;
     if (!targetUid || targetUid === USER_UID) {
@@ -1818,6 +1839,7 @@ function closeNotifications() {
 // ================================================================
 // ЧАТ
 // ================================================================
+
 function openPrivateChat(targetUid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
@@ -1900,6 +1922,7 @@ window.closeChat = function() {
 // ================================================================
 // СПИСКИ ДРУЗЕЙ/ПОДПИСОК/ПОДПИСЧИКОВ
 // ================================================================
+
 function renderFriendsList(type) {
     const container = document.getElementById('friendsListContainer');
     if (!container) return;
@@ -2035,6 +2058,7 @@ function unfollow(uid) {
 // ================================================================
 // ОБНОВЛЕНИЕ СЧЕТЧИКОВ
 // ================================================================
+
 function updateCounters() {
     if (!USER_UID) return;
     db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', snap => {
@@ -2075,6 +2099,7 @@ function switchFriendTab(tab) {
 // ================================================================
 // АВАТАРКА
 // ================================================================
+
 window.uploadAvatar = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
     closeContextMenu();
@@ -2105,6 +2130,7 @@ window.uploadAvatar = function() {
 // ================================================================
 // РЕДАКТИРОВАНИЕ
 // ================================================================
+
 window.editProfile = function() {
     closeContextMenu();
     document.getElementById('editProfileModal').classList.add('open');
@@ -2139,6 +2165,7 @@ window.saveProfile = function() {
 // ================================================================
 // УТИЛИТЫ
 // ================================================================
+
 const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
 
 function goToGroups() { showTab('groups'); }
@@ -2147,6 +2174,7 @@ function goToPeople() { showTab('people'); }
 // ================================================================
 // ЗАПУСК
 // ================================================================
+
 loadSavedProfiles();
 showTab('groups');
 
