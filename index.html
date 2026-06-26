@@ -179,8 +179,6 @@
             text-overflow: ellipsis;
         }
         
-        .user-item .info .email { display: none; }
-        
         .user-item .actions {
             display: flex;
             align-items: center;
@@ -248,9 +246,7 @@
         }
         .btn-friend.friend:hover { background: #d8dadf; }
         .btn-friend .icon { font-size: 14px; line-height: 1; margin-right: 4px; }
-        .btn-message .icon { font-size: 14px; line-height: 1; }
         
-        /* ===== PROFILE PAGE ===== */
         .profile-page {
             background: white;
             border-radius: 12px;
@@ -280,7 +276,6 @@
         
         .profile-page .back-btn:hover { background: #f0f7ff; }
         
-        /* ===== MORE VERT MENU ===== */
         .profile-more-btn {
             position: absolute;
             top: 16px;
@@ -301,9 +296,7 @@
             color: #1877f2;
         }
         
-        .profile-more-btn:active {
-            transform: scale(0.9);
-        }
+        .profile-more-btn:active { transform: scale(0.9); }
         
         .profile-dropdown {
             position: absolute;
@@ -345,30 +338,11 @@
             font-family: inherit;
         }
         
-        .profile-dropdown .dropdown-item:hover {
-            background: #f0f2f5;
-        }
-        
-        .profile-dropdown .dropdown-item .icon {
-            font-size: 16px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        
-        .profile-dropdown .dropdown-item.danger {
-            color: #e74c3c;
-        }
-        
-        .profile-dropdown .dropdown-item.danger:hover {
-            background: #fef0ef;
-        }
-        
-        .profile-dropdown .dropdown-divider {
-            height: 1px;
-            background: #e4e6eb;
-            margin: 4px 16px;
-        }
+        .profile-dropdown .dropdown-item:hover { background: #f0f2f5; }
+        .profile-dropdown .dropdown-item .icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+        .profile-dropdown .dropdown-item.danger { color: #e74c3c; }
+        .profile-dropdown .dropdown-item.danger:hover { background: #fef0ef; }
+        .profile-dropdown .dropdown-divider { height: 1px; background: #e4e6eb; margin: 4px 16px; }
         
         .profile-dropdown .toggle-wrap {
             display: flex;
@@ -387,12 +361,7 @@
             gap: 12px;
         }
         
-        .profile-dropdown .toggle-wrap .toggle-label .icon {
-            font-size: 16px;
-            width: 24px;
-            text-align: center;
-            flex-shrink: 0;
-        }
+        .profile-dropdown .toggle-wrap .toggle-label .icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
         
         .toggle-switch {
             position: relative;
@@ -405,10 +374,7 @@
             flex-shrink: 0;
         }
         
-        .toggle-switch.active {
-            background: #1877f2;
-        }
-        
+        .toggle-switch.active { background: #1877f2; }
         .toggle-switch .toggle-slider {
             position: absolute;
             top: 2px;
@@ -420,10 +386,7 @@
             transition: all 0.2s;
             box-shadow: 0 1px 4px rgba(0,0,0,0.2);
         }
-        
-        .toggle-switch.active .toggle-slider {
-            left: 20px;
-        }
+        .toggle-switch.active .toggle-slider { left: 20px; }
         
         .profile-dropdown-overlay {
             position: fixed;
@@ -434,12 +397,8 @@
             z-index: 99;
             display: none;
         }
+        .profile-dropdown-overlay.active { display: block; }
         
-        .profile-dropdown-overlay.active {
-            display: block;
-        }
-        
-        /* ===== PROFILE AVATAR ===== */
         .profile-page .profile-avatar {
             width: 100px;
             height: 100px;
@@ -479,9 +438,7 @@
             transition: opacity 0.2s;
         }
         
-        .profile-page .profile-avatar:hover .avatar-hint {
-            opacity: 1;
-        }
+        .profile-page .profile-avatar:hover .avatar-hint { opacity: 1; }
         
         .profile-page .profile-name {
             font-size: 22px;
@@ -509,7 +466,6 @@
             margin-top: 16px;
         }
         
-        /* ===== STAT TOGGLES ===== */
         .stat-toggles {
             display: flex;
             gap: 8px;
@@ -553,9 +509,7 @@
             display: none;
         }
         
-        .stat-container.open {
-            display: block;
-        }
+        .stat-container.open { display: block; }
         
         .stat-empty {
             color: #65676b;
@@ -583,9 +537,7 @@
             transition: all 0.2s;
         }
         
-        .stat-list .stat-item:hover {
-            background: #e4e6eb;
-        }
+        .stat-list .stat-item:hover { background: #e4e6eb; }
         
         .stat-list .stat-item .mini-avatar {
             width: 20px;
@@ -1046,7 +998,8 @@
 <!-- ===== CONTEXT MENU ===== -->
 <div class="context-menu" id="contextMenu">
     <button class="menu-item" onclick="editProfile();closeContextMenu();">
-        <span class="icon">✏️</span> Редактировать    </button>
+        <span class="icon">✏️</span> Редактировать
+    </button>
     <button class="menu-item" onclick="uploadAvatar();closeContextMenu();">
         <span class="icon">📷</span> Сменить аватар
     </button>
@@ -1206,7 +1159,7 @@ let menuState = { isOpen: false, isAnimating: false };
 let dropdownState = { isOpen: false };
 
 // ================================================================
-// МЕНЮ "ТРИ ТОЧКИ" В ПРОФИЛЕ
+// МЕНЮ "ТРИ ТОЧКИ"
 // ================================================================
 
 function toggleProfileDropdown() {
@@ -1528,7 +1481,7 @@ function showTabInternal(tab) {
 }
 
 // ================================================================
-// НАВИГАЦИЯ В ПРОФИЛЬ (SPA)
+// НАВИГАЦИЯ В ПРОФИЛЬ
 // ================================================================
 
 function navigateToProfile(uid) {
@@ -1552,7 +1505,7 @@ function navigateToProfile(uid) {
 }
 
 // ================================================================
-// РЕНДЕР ПРОФИЛЯ
+// РЕНДЕР ПРОФИЛЯ (СПИСКИ ЗАКРЫТЫ ПО УМОЛЧАНИЮ)
 // ================================================================
 
 function renderProfile(uid) {
@@ -1651,7 +1604,7 @@ function renderProfile(uid) {
             });
         }
         
-        // Строим HTML профиля
+        // Строим HTML профиля - СПИСКИ ЗАКРЫТЫ ПО УМОЛЧАНИЮ
         let actionsHtml = '';
         let statHtml = '';
         
@@ -1661,7 +1614,7 @@ function renderProfile(uid) {
             `;
             statHtml = `
                 <div class="stat-toggles">
-                    <button class="stat-toggle active" onclick="toggleStatList('friends', this)">
+                    <button class="stat-toggle" onclick="toggleStatList('friends', this)">
                         🤝 Друзья <span class="count" id="friendsCount">0</span>
                     </button>
                     <button class="stat-toggle" onclick="toggleStatList('following', this)">
@@ -1671,7 +1624,7 @@ function renderProfile(uid) {
                         👀 Подписчики <span class="count" id="followersCount">0</span>
                     </button>
                 </div>
-                <div class="stat-container open" id="statContainer">
+                <div class="stat-container" id="statContainer">
                     <div id="statListContent"></div>
                 </div>
             `;
@@ -1690,16 +1643,14 @@ function renderProfile(uid) {
                 document.querySelector('#profileContent .profile-actions').innerHTML = mainBtn;
             });
             
-            // Показываем только кнопку "Сообщение", остальное в меню
             actionsHtml = `
                 <button class="btn-action" onclick="openPrivateChat('${uid}')">✉️ Сообщение</button>
             `;
             
-            // Проверяем приватность для отображения статистики
             if (!profilePrivacy.hideFriends) {
                 statHtml = `
                     <div class="stat-toggles">
-                        <button class="stat-toggle active" onclick="toggleStatList('friends', this)">
+                        <button class="stat-toggle" onclick="toggleStatList('friends', this)">
                             🤝 Друзья <span class="count" id="friendsCount">0</span>
                         </button>
                         <button class="stat-toggle" onclick="toggleStatList('following', this)">
@@ -1709,7 +1660,7 @@ function renderProfile(uid) {
                             👀 Подписчики <span class="count" id="followersCount">0</span>
                         </button>
                     </div>
-                    <div class="stat-container open" id="statContainer">
+                    <div class="stat-container" id="statContainer">
                         <div id="statListContent"></div>
                     </div>
                 `;
@@ -1750,22 +1701,19 @@ function renderProfile(uid) {
             </div>
         `;
         
-        // Если свой профиль - загружаем списки
+        // НЕ вызываем loadStatList() - списки закрыты по умолчанию
         if (isOwnProfile) {
             updateCounters();
-            loadStatList('friends');
         } else {
-            // Для чужого профиля обновляем действия в колбэке выше
             if (!profilePrivacy.hideFriends) {
                 updateCountersForUid(uid);
-                loadStatListForUid('friends', uid);
             }
         }
     });
 }
 
 // ================================================================
-// ПРИВАТНОСТЬ - Toggle
+// ПРИВАТНОСТЬ
 // ================================================================
 
 function togglePrivacy(event) {
@@ -1781,12 +1729,11 @@ function togglePrivacy(event) {
     
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/settings/hideFriends').set(newState);
     
-    // Перерисовываем профиль
     if (viewingProfileUid) renderProfile(viewingProfileUid);
 }
 
 // ================================================================
-// TOGGLE СПИСКОВ В ПРОФИЛЕ
+// TOGGLE СПИСКОВ
 // ================================================================
 
 function toggleStatList(type, btn) {
@@ -1911,39 +1858,8 @@ function updateCountersForUid(uid) {
     });
 }
 
-function loadStatListForUid(type, uid) {
-    const container = document.getElementById('statListContent');
-    if (!container) return;
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">⏳ Загрузка...</div>';
-    
-    if (type === 'friends') {
-        db.ref('sites/' + SITE + '/friends/' + uid).once('value', snap => {
-            const data = snap.val() || {};
-            const friends = Object.keys(data).filter(k => data[k] === 'friend');
-            renderStatList(container, friends, 'Друзья', 'friends');
-        });
-    } else if (type === 'followers') {
-        db.ref('sites/' + SITE + '/followers/' + uid).once('value', snap => {
-            const data = snap.val() || {};
-            const followers = Object.keys(data);
-            renderStatList(container, followers, 'Подписчики', 'followers');
-        });
-    } else if (type === 'following') {
-        db.ref('sites/' + SITE + '/followers').once('value', snap => {
-            const allFollowers = snap.val() || {};
-            const following = [];
-            for (const [targetUid, followers] of Object.entries(allFollowers)) {
-                if (followers && followers[uid] === true) {
-                    following.push(targetUid);
-                }
-            }
-            renderStatList(container, following, 'Подписки', 'following');
-        });
-    }
-}
-
 // ================================================================
-// КОНТЕКСТНОЕ МЕНЮ (для аватарки)
+// КОНТЕКСТНОЕ МЕНЮ
 // ================================================================
 
 function openProfileMenu(event) {
@@ -1999,7 +1915,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ================================================================
-// АТОМАРНОЕ ОБНОВЛЕНИЕ СТАТУСА ДРУЖБЫ
+// АТОМАРНОЕ ОБНОВЛЕНИЕ СТАТУСА
 // ================================================================
 
 function updateFriendStatus(myUid, targetUid, status) {
@@ -2036,7 +1952,7 @@ function updateFriendStatus(myUid, targetUid, status) {
 }
 
 // ================================================================
-// ФУНКЦИИ УПРАВЛЕНИЯ ДРУЗЬЯМИ
+// ФУНКЦИИ ДРУЗЕЙ
 // ================================================================
 
 function sendFriendRequest(targetUid) {
@@ -2480,7 +2396,7 @@ window.closeChat = function() {
 };
 
 // ================================================================
-// ОБНОВЛЕНИЕ СЧЕТЧИКОВ
+// СЧЕТЧИКИ
 // ================================================================
 
 function updateCounters() {
@@ -2597,10 +2513,13 @@ function loadData() {
 loadSavedProfiles();
 navigateToFeed();
 
-console.log('✅ METAIMPERIYA - ПРОФИЛЬ С МЕНЮ "ТРИ ТОЧКИ" ГОТОВ!');
+console.log('✅ METAIMPERIYA - ГОТОВАЯ СОЦИАЛЬНАЯ СЕТЬ!');
+console.log('🔹 Списки в профиле закрыты по умолчанию');
 console.log('🔹 Меню "три точки" в правом верхнем углу');
 console.log('🔹 Приватность: скрытие списков друзей');
-console.log('🔹 Чистый профиль с одной главной кнопкой');
+console.log('🔹 Друзья, подписки, подписчики');
+console.log('🔹 Личные сообщения с уведомлениями');
+console.log('🔹 Вход через Google и анонимно');
 </script>
 </body>
 </html>
