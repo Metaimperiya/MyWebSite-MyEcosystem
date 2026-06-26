@@ -21,7 +21,6 @@
             min-height: 100vh;
         }
         
-        /* ===== ХЕДЕР - ТОЛЬКО АВАТАРКА ===== */
         .header {
             background: transparent;
             padding: 8px 0 16px 0;
@@ -60,7 +59,6 @@
             object-fit: cover;
         }
         
-        /* ===== ВКЛАДКИ ===== */
         .tab-bar {
             display: flex;
             gap: 8px;
@@ -92,7 +90,6 @@
             color: white;
         }
         
-        /* ===== ПРОФИЛЬ ===== */
         .profile-card {
             background: white;
             border-radius: 20px;
@@ -170,7 +167,6 @@
             margin: 0 auto;
         }
         
-        /* ===== КОНТЕКСТНОЕ МЕНЮ ===== */
         .context-menu {
             position: fixed;
             background: white;
@@ -248,7 +244,6 @@
             display: block;
         }
         
-        /* ===== КАРТОЧКИ ===== */
         .card {
             background: white;
             border-radius: 16px;
@@ -263,7 +258,6 @@
             margin-bottom: 12px;
         }
         
-        /* ===== ЛЮДИ ===== */
         .user-item {
             display: flex;
             align-items: center;
@@ -305,7 +299,6 @@
             color: #888;
         }
         
-        /* ===== ГРУППЫ ===== */
         .room-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -348,7 +341,6 @@
         
         .hidden { display: none; }
         
-        /* ===== МОДАЛКИ ===== */
         .modal {
             display: none;
             position: fixed;
@@ -508,7 +500,6 @@
         
         .profile-option .remove-btn:hover { color: #e74c3c; }
         
-        /* ===== АДАПТИВ ===== */
         @media (max-width: 480px) {
             .profile-card { padding: 30px 16px 20px; }
             .profile-avatar { width: 100px; height: 100px; font-size: 40px; }
@@ -519,14 +510,14 @@
 </head>
 <body>
 
-<!-- ===== ХЕДЕР - ТОЛЬКО АВАТАРКА ===== -->
+<!-- ===== ХЕДЕР ===== -->
 <div class="header">
     <div class="avatar-small" id="headerAvatar" onclick="goToProfile()">
         <span>?</span>
     </div>
 </div>
 
-<!-- ===== ВКЛАДКИ (ТОЛЬКО ГРУППЫ И ЛЮДИ) ===== -->
+<!-- ===== ВКЛАДКИ ===== -->
 <div class="tab-bar">
     <button class="tab active" onclick="showTab('groups')">👥 Группы</button>
     <button class="tab" onclick="showTab('people')">👤 Люди</button>
@@ -551,7 +542,7 @@
 <!-- ===== ПРОФИЛЬ ===== -->
 <div id="profileTab" class="hidden">
     <div class="profile-card">
-        <div class="profile-avatar" id="profileAvatar" onclick="openProfileMenu(event)">
+        <div class="profile-avatar" id="profileAvatar">
             <span id="avatarLetter">?</span>
             <span class="avatar-hint">👆 Нажми для меню</span>
         </div>
@@ -562,7 +553,7 @@
     </div>
 </div>
 
-<!-- ===== КОНТЕКСТНОЕ МЕНЮ (ПОЯВЛЯЕТСЯ ПРИ КЛИКЕ НА БОЛЬШУЮ АВАТАРКУ) ===== -->
+<!-- ===== КОНТЕКСТНОЕ МЕНЮ ===== -->
 <div class="context-menu" id="contextMenu">
     <button class="menu-item" onclick="editProfile();closeContextMenu();">
         <span class="icon">✏️</span> Редактировать профиль
@@ -576,9 +567,9 @@
     </button>
 </div>
 
-<div class="context-overlay" id="contextOverlay" onclick="closeContextMenu()"></div>
+<div class="context-overlay" id="contextOverlay"></div>
 
-<!-- ===== МОДАЛКА ВХОДА ===== -->
+<!-- ===== МОДАЛКИ ===== -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
         <h3>👤 Вход</h3>
@@ -598,7 +589,6 @@
     </div>
 </div>
 
-<!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ===== -->
 <div class="modal" id="editProfileModal">
     <div class="modal-content">
         <h3>✏️ Редактировать профиль</h3>
@@ -639,19 +629,20 @@ let USER = null;
 let USER_UID = null;
 let SAVED_PROFILES = [];
 let currentTab = 'groups';
+let avatarCache = null; // Кеш для аватарки
 
 // ================================================================
-// КОНТЕКСТНОЕ МЕНЮ (ПРИ КЛИКЕ НА БОЛЬШУЮ АВАТАРКУ)
+// КОНТЕКСТНОЕ МЕНЮ
 // ================================================================
 function openProfileMenu(event) {
     event.stopPropagation();
     const menu = document.getElementById('contextMenu');
     const overlay = document.getElementById('contextOverlay');
-    
-    // Позиционируем меню под аватаркой
     const avatar = document.getElementById('profileAvatar');
-    const rect = avatar.getBoundingClientRect();
     
+    if (!avatar) return;
+    
+    const rect = avatar.getBoundingClientRect();
     menu.style.left = (rect.left + rect.width / 2 - 100) + 'px';
     menu.style.top = (rect.bottom + 10) + 'px';
     
@@ -664,14 +655,34 @@ function closeContextMenu() {
     document.getElementById('contextOverlay').classList.remove('active');
 }
 
-// Закрываем при клике вне меню
+// Обработчик кликов для закрытия меню
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('contextMenu');
     const avatar = document.getElementById('profileAvatar');
-    if (menu && menu.classList.contains('open')) {
-        if (!menu.contains(e.target) && !avatar.contains(e.target)) {
-            closeContextMenu();
-        }
+    const overlay = document.getElementById('contextOverlay');
+    
+    if (!menu || !menu.classList.contains('open')) return;
+    
+    // Если клик по аватарке - открываем меню
+    if (avatar && avatar.contains(e.target)) {
+        e.stopPropagation();
+        return;
+    }
+    
+    // Если клик по меню - не закрываем
+    if (menu.contains(e.target)) {
+        return;
+    }
+    
+    // Иначе закрываем
+    closeContextMenu();
+});
+
+// Клик по аватарке в профиле
+document.addEventListener('DOMContentLoaded', function() {
+    const profileAvatar = document.getElementById('profileAvatar');
+    if (profileAvatar) {
+        profileAvatar.addEventListener('click', openProfileMenu);
     }
 });
 
@@ -806,6 +817,7 @@ auth.onAuthStateChanged(user => {
     } else {
         USER = null;
         USER_UID = null;
+        avatarCache = null;
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
@@ -856,6 +868,7 @@ window.logout = function() {
         localStorage.removeItem('dc_u_' + SITE);
         USER = null;
         USER_UID = null;
+        avatarCache = null;
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
@@ -864,14 +877,28 @@ window.logout = function() {
 };
 
 // ================================================================
-// UI (ОБНОВЛЕНО)
+// UI (С КЕШИРОВАНИЕМ)
 // ================================================================
 function updateUI() {
     const headerAvatar = document.getElementById('headerAvatar');
+    if (!headerAvatar) return;
     
     if (USER && USER_UID) {
+        // Используем кеш, если есть
+        if (avatarCache) {
+            if (avatarCache === 'default') {
+                headerAvatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
+            } else {
+                headerAvatar.innerHTML = `<img src="${avatarCache}">`;
+            }
+            return;
+        }
+        
+        // Загружаем и кешируем
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', snap => {
             const url = snap.val();
+            avatarCache = url || 'default';
+            
             if (url) {
                 headerAvatar.innerHTML = `<img src="${url}">`;
             } else {
@@ -879,8 +906,15 @@ function updateUI() {
             }
         });
     } else {
+        avatarCache = null;
         headerAvatar.innerHTML = '<span>?</span>';
     }
+}
+
+// Сброс кеша при обновлении аватарки
+function refreshAvatarCache() {
+    avatarCache = null;
+    updateUI();
 }
 
 // ================================================================
@@ -894,6 +928,7 @@ window.goToProfile = function() {
 window.showTab = function(tab) {
     currentTab = tab;
     
+    // Обновляем табы
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-bar .tab').forEach(t => {
         const text = t.textContent.trim();
@@ -903,10 +938,16 @@ window.showTab = function(tab) {
         }
     });
     
-    document.getElementById('groupsTab').classList.toggle('hidden', tab !== 'groups');
-    document.getElementById('peopleTab').classList.toggle('hidden', tab !== 'people');
-    document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
+    // Показываем/скрываем блоки
+    const groupsTab = document.getElementById('groupsTab');
+    const peopleTab = document.getElementById('peopleTab');
+    const profileTab = document.getElementById('profileTab');
     
+    if (groupsTab) groupsTab.classList.toggle('hidden', tab !== 'groups');
+    if (peopleTab) peopleTab.classList.toggle('hidden', tab !== 'people');
+    if (profileTab) profileTab.classList.toggle('hidden', tab !== 'profile');
+    
+    // Загружаем данные только если нужно
     if (tab === 'groups') loadRooms();
     if (tab === 'people') loadPeople();
     if (tab === 'profile') loadProfile();
@@ -936,15 +977,21 @@ function loadProfile() {
         const avatar = document.getElementById('profileAvatar');
         const letter = document.getElementById('avatarLetter');
         
-        document.getElementById('profileName').textContent = name;
-        document.getElementById('profileEmail').textContent = email;
-        document.getElementById('profileBio').textContent = bio;
+        const nameEl = document.getElementById('profileName');
+        const emailEl = document.getElementById('profileEmail');
+        const bioEl = document.getElementById('profileBio');
         
-        if (u.avatarUrl) {
-            avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">👆 Нажми для меню</span>`;
-        } else {
-            letter.textContent = name.charAt(0).toUpperCase();
-            avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span><span class="avatar-hint">👆 Нажми для меню</span>`;
+        if (nameEl) nameEl.textContent = name;
+        if (emailEl) emailEl.textContent = email;
+        if (bioEl) bioEl.textContent = bio;
+        
+        if (avatar) {
+            if (u.avatarUrl) {
+                avatar.innerHTML = `<img src="${u.avatarUrl}"><span class="avatar-hint">👆 Нажми для меню</span>`;
+            } else if (letter) {
+                letter.textContent = name.charAt(0).toUpperCase();
+                avatar.innerHTML = `<span id="avatarLetter">${name.charAt(0).toUpperCase()}</span><span class="avatar-hint">👆 Нажми для меню</span>`;
+            }
         }
     });
 }
@@ -959,6 +1006,7 @@ function loadPeople() {
         const users = snap.val() || {};
         const keys = Object.keys(users).filter(k => k !== USER_UID);
         const el = document.getElementById('peopleList');
+        if (!el) return;
         
         if (keys.length === 0) {
             el.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Нет пользователей</div>';
@@ -997,6 +1045,7 @@ function loadRooms() {
     db.ref('sites/' + SITE + '/rooms').once('value', snap => {
         const rooms = snap.val() || {};
         const el = document.getElementById('roomsList');
+        if (!el) return;
         
         if (Object.keys(rooms).length === 0) {
             createDefaultRooms();
@@ -1072,8 +1121,8 @@ window.uploadAvatar = function() {
                 localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
             }
             
+            refreshAvatarCache();
             loadProfile();
-            updateUI();
             alert('✅ Аватарка обновлена!');
         });
     };
@@ -1124,11 +1173,10 @@ window.saveProfile = function() {
 loadSavedProfiles();
 showTab('groups');
 
-console.log('✅ METAIMPERIYA - МАКСИМАЛЬНО УПРОЩЕН!');
-console.log('📱 В хедере только аватарка');
-console.log('🎯 Клик по аватарке → переход в профиль');
-console.log('👆 Клик по большой аватарке → меню');
-console.log('📋 Вкладки: Группы → Люди');
+console.log('✅ METAIMPERIYA - САНАЦИЯ ПРОВЕДЕНА');
+console.log('📱 Кеширование аватарок');
+console.log('🎯 Исправлены конфликты событий');
+console.log('📋 Чистые функции без лишних запросов');
 </script>
 </body>
 </html>
