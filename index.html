@@ -21,6 +21,35 @@
             min-height: 100vh;
         }
         
+        .admin-panel {
+            display: none;
+            background: #e8f0fe;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #1877f2;
+            margin-bottom: 12px;
+        }
+        
+        .admin-mode .admin-panel {
+            display: block !important;
+        }
+        
+        .admin-mode .admin-only {
+            display: flex !important;
+        }
+        
+        .admin-only {
+            display: none !important;
+        }
+        
+        .admin-delete-btn {
+            display: none !important;
+        }
+        
+        .admin-mode .admin-delete-btn {
+            display: flex !important;
+        }
+        
         .header {
             background: #1877f2;
             color: white;
@@ -957,6 +986,17 @@
     </div>
 </div>
 
+<!-- ===== ADMIN PANEL (АВТОМАТИЧЕСКИ ПОЯВЛЯЕТСЯ ДЛЯ АДМИНОВ) ===== -->
+<div class="admin-panel" id="adminPanel">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span style="font-weight:600;color:#1877f2;font-size:13px;">👑 Админ-панель</span>
+        <button class="btn-action admin-only" onclick="adminDeleteAllUsers()" style="background:#e74c3c;color:white;">🗑 Удалить всех</button>
+        <button class="btn-action admin-only" onclick="adminClearRooms()" style="background:#e74c3c;color:white;">🧹 Очистить комнаты</button>
+        <button class="btn-action admin-only" onclick="adminClearNotifications()" style="background:#e74c3c;color:white;">🔔 Очистить уведомления</button>
+        <button class="btn-action admin-only" onclick="adminExportData()" style="background:#27ae60;color:white;">📤 Экспорт</button>
+    </div>
+</div>
+
 <!-- ===== TABS ===== -->
 <div class="tab-bar">
     <button class="tab active" onclick="showTab('groups')">👥 Группы</button>
@@ -1073,6 +1113,172 @@ const db = firebase.database();
 const auth = firebase.auth();
 const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
+
+// ================================================================
+// АДМИН - ХАРДКОД UID
+// ================================================================
+
+const ADMIN_UIDS = [
+    "ayXehcol9FgAQU6tZuup7aSaRoV2",  // Все Работники
+    "pWB0nGVvVXc4je6466ss7IwBm9G2",  // Джобс Москва
+    "ANR62p3qcjOe2ALsdVvJHUNCCV42"   // Плеер Лайки
+];
+
+let isAdmin = false;
+
+// ================================================================
+// ПРОВЕРКА АДМИН-ДОСТУПА
+// ================================================================
+
+function checkAdminAccess(uid) {
+    const wasAdmin = isAdmin;
+    isAdmin = ADMIN_UIDS.includes(uid);
+    if (wasAdmin !== isAdmin) {
+        updateAdminUI();
+    }
+    console.log(`👑 Админ-режим: ${isAdmin ? 'ВКЛЮЧЕН' : 'ВЫКЛЮЧЕН'}`);
+    return isAdmin;
+}
+
+// ================================================================
+// ОБНОВЛЕНИЕ UI ПРИ ИЗМЕНЕНИИ СТАТУСА АДМИНА
+// ================================================================
+
+function updateAdminUI() {
+    const body = document.body;
+    if (isAdmin) {
+        body.classList.add('admin-mode');
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = 'flex';
+        });
+        // Добавляем кнопки удаления в список пользователей
+        document.querySelectorAll('.user-item').forEach(item => {
+            const uid = item.id?.replace('user-item-', '');
+            if (uid && uid !== USER_UID) {
+                const actions = item.querySelector('.actions');
+                if (actions && !item.querySelector('.admin-delete-btn')) {
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-action admin-delete-btn';
+                    deleteBtn.style.background = '#e74c3c';
+                    deleteBtn.style.color = 'white';
+                    deleteBtn.style.minWidth = '32px';
+                    deleteBtn.style.padding = '4px 8px';
+                    deleteBtn.innerHTML = '🗑';
+                    deleteBtn.title = 'Удалить пользователя';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (confirm(`Удалить пользователя?`)) {
+                            adminDeleteUser(uid);
+                        }
+                    };
+                    actions.appendChild(deleteBtn);
+                }
+            }
+        });
+    } else {
+        body.classList.remove('admin-mode');
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = 'none';
+        });
+        document.querySelectorAll('.admin-delete-btn').forEach(el => {
+            el.remove();
+        });
+    }
+}
+
+// ================================================================
+// АДМИН-ФУНКЦИИ
+// ================================================================
+
+function adminDeleteUser(uid) {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!uid || uid === USER_UID) { alert('Нельзя удалить себя'); return; }
+    if (!confirm(`Удалить пользователя? Это необратимо!`)) return;
+    
+    const updates = {};
+    updates['sites/' + SITE + '/users/' + uid] = null;
+    updates['sites/' + SITE + '/all_users/' + uid] = null;
+    updates['sites/' + SITE + '/friends/' + uid] = null;
+    updates['sites/' + SITE + '/followers/' + uid] = null;
+    updates['sites/' + SITE + '/notifications/' + uid] = null;
+    
+    db.ref().update(updates).then(() => {
+        alert('✅ Пользователь удален');
+        loadPeople();
+        loadRooms();
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка удаления');
+    });
+}
+
+function adminDeleteAllUsers() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Удалить ВСЕХ пользователей, кроме админов?')) return;
+    if (!confirm('Вы уверены? Это НЕОБРАТИМО!')) return;
+    
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        const updates = {};
+        Object.keys(users).forEach(uid => {
+            if (!ADMIN_UIDS.includes(uid) && uid !== USER_UID) {
+                updates['sites/' + SITE + '/users/' + uid] = null;
+                updates['sites/' + SITE + '/all_users/' + uid] = null;
+                updates['sites/' + SITE + '/friends/' + uid] = null;
+                updates['sites/' + SITE + '/followers/' + uid] = null;
+                updates['sites/' + SITE + '/notifications/' + uid] = null;
+            }
+        });
+        updates['sites/' + SITE + '/room_users/'] = null;
+        db.ref().update(updates).then(() => {
+            alert('✅ Все пользователи удалены');
+            loadPeople();
+            loadRooms();
+        }).catch(err => {
+            console.error('❌ Ошибка:', err);
+            alert('Ошибка удаления');
+        });
+    });
+}
+
+function adminClearRooms() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Очистить все комнаты?')) return;
+    db.ref('sites/' + SITE + '/rooms').remove().then(() => {
+        db.ref('sites/' + SITE + '/room_users/').remove();
+        alert('✅ Комнаты очищены');
+        loadRooms();
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка очистки');
+    });
+}
+
+function adminClearNotifications() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    if (!confirm('Очистить все уведомления?')) return;
+    db.ref('sites/' + SITE + '/notifications/').remove().then(() => {
+        alert('✅ Уведомления очищены');
+    }).catch(err => {
+        console.error('❌ Ошибка:', err);
+        alert('Ошибка очистки');
+    });
+}
+
+function adminExportData() {
+    if (!isAdmin) { console.warn('❌ Доступ запрещен'); return; }
+    db.ref('sites/' + SITE).once('value', snap => {
+        const data = snap.val();
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `metaimperiya_export_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+}
 
 // ================================================================
 // УПРАВЛЕНИЕ ЗАПРОСАМИ
@@ -1283,25 +1489,36 @@ window.loginWithSavedProfile = function(uid) {
 };
 
 // ================================================================
-// AUTH
+// AUTH (С АВТОМАТИЧЕСКОЙ ПРОВЕРКОЙ АДМИНА)
 // ================================================================
+
 auth.onAuthStateChanged(user => {
     if (user) {
         if (!USER_UID) {
             USER_UID = user.uid;
             USER = user.displayName || user.email || user.uid.slice(0, 8);
             localStorage.setItem('dc_u_' + SITE, USER);
+            
+            // ===== АВТОМАТИЧЕСКАЯ ПРОВЕРКА АДМИНА =====
+            checkAdminAccess(USER_UID);
+            
             saveProfileToList(USER_UID, USER, user.email, user.photoURL);
             const data = {
                 name: USER,
                 email: user.email || 'anon',
                 uid: USER_UID,
                 lastLogin: Date.now(),
-                avatarUrl: user.photoURL || null
+                avatarUrl: user.photoURL || null,
+                isAdmin: isAdmin
             };
             db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
             db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
+            
+            if (isAdmin) {
+                db.ref('sites/' + SITE + '/users/' + USER_UID + '/isAdmin').set(true);
+            }
         }
+        
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadData();
@@ -1311,6 +1528,9 @@ auth.onAuthStateChanged(user => {
         USER = null;
         USER_UID = null;
         avatarCache = null;
+        isAdmin = false;
+        updateAdminUI();
+        
         cancelAllRequests();
         if (notifUnsub) { notifUnsub(); notifUnsub = null; }
         if (window.friendListeners) {
@@ -1376,6 +1596,8 @@ window.logout = function() {
         USER = null;
         USER_UID = null;
         avatarCache = null;
+        isAdmin = false;
+        updateAdminUI();
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
@@ -1505,7 +1727,7 @@ function navigateToProfile(uid) {
 }
 
 // ================================================================
-// РЕНДЕР ПРОФИЛЯ (СПИСКИ ЗАКРЫТЫ ПО УМОЛЧАНИЮ)
+// РЕНДЕР ПРОФИЛЯ
 // ================================================================
 
 function renderProfile(uid) {
@@ -1527,7 +1749,6 @@ function renderProfile(uid) {
         const bio = user.bio || 'Привет! 👋';
         const avatarUrl = user.avatarUrl || null;
         
-        // Загружаем настройки приватности
         if (isOwnProfile) {
             db.ref('sites/' + SITE + '/users/' + uid + '/settings/hideFriends').once('value', snap => {
                 profilePrivacy.hideFriends = snap.val() === true;
@@ -1542,7 +1763,6 @@ function renderProfile(uid) {
             `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;">` : 
             `<span>${name.charAt(0).toUpperCase()}</span>`;
         
-        // Формируем меню "три точки"
         let dropdownItems = '';
         if (isOwnProfile) {
             dropdownItems = `
@@ -1567,7 +1787,6 @@ function renderProfile(uid) {
                 </button>
             `;
         } else {
-            // Проверяем статус дружбы для чужого профиля
             db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
                 const status = snap.val();
                 let friendBtn = '';
@@ -1604,7 +1823,6 @@ function renderProfile(uid) {
             });
         }
         
-        // Строим HTML профиля - СПИСКИ ЗАКРЫТЫ ПО УМОЛЧАНИЮ
         let actionsHtml = '';
         let statHtml = '';
         
@@ -1629,7 +1847,6 @@ function renderProfile(uid) {
                 </div>
             `;
         } else {
-            // Для чужого профиля - проверяем статус дружбы
             db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).once('value', snap => {
                 const status = snap.val();
                 let mainBtn = '';
@@ -1701,7 +1918,6 @@ function renderProfile(uid) {
             </div>
         `;
         
-        // НЕ вызываем loadStatList() - списки закрыты по умолчанию
         if (isOwnProfile) {
             updateCounters();
         } else {
@@ -2046,6 +2262,11 @@ function loadPeople() {
         keys.forEach(k => {
             listenFriendStatus(k);
         });
+        
+        // Обновляем админ-кнопки после загрузки списка
+        if (isAdmin) {
+            setTimeout(() => updateAdminUI(), 100);
+        }
     });
 }
 
@@ -2513,13 +2734,14 @@ function loadData() {
 loadSavedProfiles();
 navigateToFeed();
 
-console.log('✅ METAIMPERIYA - ГОТОВАЯ СОЦИАЛЬНАЯ СЕТЬ!');
+console.log('✅ METAIMPERIYA - ПОЛНАЯ СОЦИАЛЬНАЯ СЕТЬ ГОТОВА!');
+console.log('👑 Админ-режим: включен автоматически по UID');
+console.log('📋 UID админов:', ADMIN_UIDS);
 console.log('🔹 Списки в профиле закрыты по умолчанию');
 console.log('🔹 Меню "три точки" в правом верхнем углу');
 console.log('🔹 Приватность: скрытие списков друзей');
 console.log('🔹 Друзья, подписки, подписчики');
 console.log('🔹 Личные сообщения с уведомлениями');
-console.log('🔹 Вход через Google и анонимно');
 </script>
 </body>
 </html>
