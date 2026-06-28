@@ -326,13 +326,13 @@
         }
 
         /* ================================================================
-           САЙДБАР
+           САЙДБАР (НОВЫЙ, С КУЧЕЙ РАЗДЕЛОВ)
            ================================================================ */
         .sidebar {
             position: fixed;
             top: 0;
-            left: -280px;
-            width: 280px;
+            left: -300px;
+            width: 300px;
             height: 100%;
             background: #fff;
             z-index: 1000;
@@ -405,6 +405,11 @@
         .sidebar .user .name {
             font-weight: 600;
             font-size: 0.85rem;
+        }
+
+        .sidebar .user .online-status {
+            font-size: 0.6rem;
+            color: #888;
         }
 
         .sidebar .nav-item {
@@ -953,6 +958,7 @@
             
             .group-list { grid-template-columns: 1fr 1fr; }
             .playlist-dropdown { min-width: 130px; right: 0; }
+            .sidebar { width: 280px; left: -280px; }
         }
     </style>
 </head>
@@ -1031,18 +1037,123 @@
         <button class="tab" onclick="goToProfile()">👤 Профиль</button>
     </div>
 
-    <!-- ===== САЙДБАР ===== -->
+    <!-- ================================================================
+         НОВЫЙ САЙДБАР С КУЧЕЙ РАЗДЕЛОВ
+         ================================================================ -->
     <div class="sidebar" id="sidebar">
-        <div class="head"><h3>📱 Меню</h3><button class="close" onclick="closeSidebar()">✕</button></div>
+        <div class="head">
+            <h3>📱 Меню</h3>
+            <button class="close" onclick="closeSidebar()">✕</button>
+        </div>
+
+        <!-- ===== ЮЗЕР ===== -->
         <div class="user">
             <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
-            <div><div class="name" id="sName">Гость</div></div>
+            <div>
+                <div class="name" id="sName">Гость</div>
+                <div class="online-status">онлайн</div>
+            </div>
         </div>
-        <div class="nav-item active" onclick="goToFeed();closeSidebar();">📰 Лента</div>
-        <div class="nav-item" onclick="goToGroups();closeSidebar();">👥 Группы</div>
-        <div class="nav-item" onclick="goToPeople();closeSidebar();">👤 Люди</div>
+
+        <!-- ===== ГЛАВНЫЕ РАЗДЕЛЫ ===== -->
+        <div class="nav-item active" onclick="goToFeed();closeSidebar();">🏠 Главная</div>
         <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
-        <div class="footer"><button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button></div>
+        <div class="nav-item" onclick="goToPeople();closeSidebar();">👥 Люди</div>
+        <div class="nav-item" onclick="goToGroups();closeSidebar();">💬 Сообщества</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== МУЛЬТИМЕДИА ===== -->
+        <div class="sidebar-title">🎵 Мультимедиа</div>
+        <div class="nav-item" onclick="closeSidebar();">📸 Фото</div>
+        <div class="nav-item" onclick="closeSidebar();">🎥 Видео</div>
+        <div class="nav-item" onclick="closeSidebar();">🎵 Музыка</div>
+        <div class="nav-item" onclick="closeSidebar();">📚 Книги</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== ТЕХНОЛОГИИ ===== -->
+        <div class="sidebar-title">💻 Технологии</div>
+        <div class="nav-item" onclick="closeSidebar();">💻 Программирование</div>
+        <div class="nav-item" onclick="closeSidebar();">🌐 Сайты</div>
+        <div class="nav-item" onclick="closeSidebar();">🤖 AI / ChatGPT</div>
+        <div class="nav-item" onclick="closeSidebar();">🕶️ VR / AR</div>
+        <div class="nav-item" onclick="closeSidebar();">🔐 Безопасность</div>
+        <div class="nav-item" onclick="closeSidebar();">☁️ Cloud</div>
+        <div class="nav-item" onclick="closeSidebar();">🌐 Open Source</div>
+        <div class="nav-item" onclick="closeSidebar();">🧩 API / SDK</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== БИЗНЕС И ФИНАНСЫ ===== -->
+        <div class="sidebar-title">💰 Бизнес</div>
+        <div class="nav-item" onclick="closeSidebar();">💰 Бизнес</div>
+        <div class="nav-item" onclick="closeSidebar();">📈 Финансы</div>
+        <div class="nav-item" onclick="closeSidebar();">🪙 Криптовалюты</div>
+        <div class="nav-item" onclick="closeSidebar();">🛒 Маркетплейс</div>
+        <div class="nav-item" onclick="closeSidebar();">💼 Работа</div>
+        <div class="nav-item" onclick="closeSidebar();">📦 Проекты</div>
+        <div class="nav-item" onclick="closeSidebar();">🚀 Стартапы</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== ЖИЗНЬ И ХОББИ ===== -->
+        <div class="sidebar-title">🌍 Жизнь</div>
+        <div class="nav-item" onclick="closeSidebar();">✈️ Путешествия</div>
+        <div class="nav-item" onclick="closeSidebar();">🍔 Еда</div>
+        <div class="nav-item" onclick="closeSidebar();">🏠 Недвижимость</div>
+        <div class="nav-item" onclick="closeSidebar();">⚽ Спорт</div>
+        <div class="nav-item" onclick="closeSidebar();">🎮 Игры</div>
+        <div class="nav-item" onclick="closeSidebar();">🎭 Аниме</div>
+        <div class="nav-item" onclick="closeSidebar();">🎬 Кино</div>
+        <div class="nav-item" onclick="closeSidebar();">📺 Сериалы</div>
+        <div class="nav-item" onclick="closeSidebar();">🎤 Блогеры</div>
+        <div class="nav-item" onclick="closeSidebar();">🎭 Мемы</div>
+        <div class="nav-item" onclick="closeSidebar();">👗 Мода</div>
+        <div class="nav-item" onclick="closeSidebar();">🚗 Автомобили</div>
+        <div class="nav-item" onclick="closeSidebar();">❤️ Волонтёрство</div>
+        <div class="nav-item" onclick="closeSidebar();">🐾 Животные</div>
+        <div class="nav-item" onclick="closeSidebar();">🎯 Хобби</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== ОБЩЕНИЕ ===== -->
+        <div class="sidebar-title">💬 Общение</div>
+        <div class="nav-item" onclick="closeSidebar();">💖 Знакомства</div>
+        <div class="nav-item" onclick="closeSidebar();">🤝 Команда</div>
+        <div class="nav-item" onclick="closeSidebar();">🏳️‍🌈 LGBTQ+</div>
+        <div class="nav-item" onclick="closeSidebar();">🗣️ Языки</div>
+        <div class="nav-item" onclick="closeSidebar();">❓ Q&A</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== НОВОСТИ И МЕДИА ===== -->
+        <div class="sidebar-title">📰 Новости</div>
+        <div class="nav-item" onclick="closeSidebar();">📰 Новости</div>
+        <div class="nav-item" onclick="closeSidebar();">📡 Стримы</div>
+        <div class="nav-item" onclick="closeSidebar();">🎉 События</div>
+        <div class="nav-item" onclick="closeSidebar();">📻 Подкасты</div>
+        <div class="nav-item" onclick="closeSidebar();">🏆 Конкурсы</div>
+        <div class="nav-item" onclick="closeSidebar();">🎁 Акции и скидки</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== ОСТАЛЬНОЕ ===== -->
+        <div class="sidebar-title">🔧 Другое</div>
+        <div class="nav-item" onclick="closeSidebar();">📄 Страницы</div>
+        <div class="nav-item" onclick="closeSidebar();">📝 Блог</div>
+        <div class="nav-item" onclick="closeSidebar();">🛍️ Покупки</div>
+        <div class="nav-item" onclick="closeSidebar();">📞 Услуги</div>
+        <div class="nav-item" onclick="closeSidebar();">🧑‍💼 Фриланс</div>
+        <div class="nav-item" onclick="closeSidebar();">🏛️ Организации</div>
+        <div class="nav-item" onclick="closeSidebar();">🏴‍☠️ METAIMPERIYA</div>
+
+        <div class="sidebar-divider"></div>
+
+        <!-- ===== КНОПКА СОЗДАНИЯ ===== -->
+        <div class="footer">
+            <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
+        </div>
     </div>
 
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
