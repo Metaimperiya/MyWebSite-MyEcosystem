@@ -36,12 +36,12 @@
     <link rel="manifest" href="site.webmanifest" />
     
     <!-- ===== FAVICONS (ПРЯМЫЕ ССЫЛКИ) ===== -->
-<link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya.ico" />
-<link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-16x16.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-32x32.png" />
-<link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-192x192.png" />
-<link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-512x512.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-icon.png" />
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-32x32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-icon.png" />
 
     <!-- ===== FIREBASE ===== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -133,72 +133,9 @@
         .page { display: none; }
         .page.active { display: block; }
         
-        /* ===== НОВЫЙ ПЛЕЕР (ПРОСТОЙ, НАД ЛЕНТОЙ) ===== */
-        .player-wrap {
-            background: #fff;
-            border-radius: 12px;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-            border: 1px solid #e8e8e8;
-        }
-        .player-simple {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            justify-content: center;
-        }
-        .player-simple .play-btn-simple {
-            background: #1877f2;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            flex-shrink: 0;
-        }
-        .player-simple .play-btn-simple:hover {
-            background: #4a9eff;
-            transform: scale(1.05);
-        }
-        .player-simple .track-name-simple {
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: #222;
-            flex: 1;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .player-simple .player-controls {
-            display: flex;
-            gap: 4px;
-        }
-        .player-simple .player-controls button {
-            background: none;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-size: 11px;
-            color: #555;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .player-simple .player-controls button:hover {
-            background: #f0f2f5;
-            border-color: #1877f2;
-        }
+        /* ===== СТИЛИ ДЛЯ ПЛЕЕРА (УЖЕ ДОБАВЛЕНЫ В style.css) ===== */
+        /* player-wrap, player-simple, player-card, playlist-dropdown и т.д. */
+        /* Они уже есть в твоём style.css */
 
         /* ===== ОСТАЛЬНЫЕ СТИЛИ (ТВОИ) ===== */
         .post-form {
@@ -441,24 +378,6 @@
             .groups-page .group-list { grid-template-columns: 1fr 1fr; }
             .hor-menu button { font-size: 0.6rem; padding: 4px 10px; }
             .post .link-preview iframe { height: 180px; }
-            
-            /* Адаптив для нового плеера */
-            .player-simple {
-                gap: 6px;
-            }
-            .player-simple .play-btn-simple {
-                width: 30px;
-                height: 30px;
-                font-size: 11px;
-            }
-            .player-simple .track-name-simple {
-                font-size: 0.65rem;
-            }
-            .player-simple .player-controls button {
-                width: 22px;
-                height: 22px;
-                font-size: 9px;
-            }
         }
     </style>
 </head>
@@ -506,18 +425,6 @@
 <!-- ===== КОНТЕЙНЕР ===== -->
 <div class="container">
 
-    <!-- ===== ПЛЕЕР (НАД ЛЕНТОЙ) ===== -->
-    <div class="player-wrap">
-        <div class="player-simple">
-            <button class="play-btn-simple" id="playBtn" onclick="playMusic()">▶</button>
-            <span class="track-name-simple" id="trackName">Capitulation</span>
-            <div class="player-controls">
-                <button onclick="prevTrack()">⏮</button>
-                <button onclick="nextTrack()">⏭</button>
-            </div>
-        </div>
-    </div>
-
     <!-- ЛЕНТА -->
     <div class="page feed-page active" id="feedPage">
         <div class="post-form">
@@ -534,6 +441,71 @@
                 <button class="remove-pic" onclick="removeImage()">✕</button>
             </div>
         </div>
+
+        <!-- ===== ПЛЕЕР-КАРТОЧКА (ВНУТРИ ЛЕНТЫ) ===== -->
+        <div class="card player-card">
+            <div class="player-header">
+                <span class="player-title">🎵 Музыка</span>
+                <button class="player-toggle" onclick="togglePlaylist()">📋 Список</button>
+            </div>
+            <div class="player-main">
+                <button class="play-btn-big" id="playBtn" onclick="playMusic()">▶</button>
+                <div class="player-info">
+                    <div class="track-name-big" id="trackName">Capitulation</div>
+                    <div class="track-progress">
+                        <span id="currentTime">0:00</span>
+                        <div class="progress-bar" id="progressBar" onclick="seekAudio(event)">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                </div>
+                <div class="player-controls-big">
+                    <button onclick="prevTrack()">⏮</button>
+                    <button onclick="nextTrack()">⏭</button>
+                </div>
+            </div>
+            <!-- ВЫПАДАЮЩИЙ СПИСОК ТРЕКОВ -->
+            <div class="playlist-dropdown" id="playlistDropdown">
+                <div class="playlist-item active" onclick="playTrack(0)">
+                    <span class="playlist-num">01</span>
+                    <span class="playlist-name">Capitulation</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(1)">
+                    <span class="playlist-num">02</span>
+                    <span class="playlist-name">Clean Victory</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(2)">
+                    <span class="playlist-num">03</span>
+                    <span class="playlist-name">Covenant of Change</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(3)">
+                    <span class="playlist-num">04</span>
+                    <span class="playlist-name">Dreams in the Wind</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(4)">
+                    <span class="playlist-num">05</span>
+                    <span class="playlist-name">Memory Like Dust</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(5)">
+                    <span class="playlist-num">06</span>
+                    <span class="playlist-name">Nobody</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(6)">
+                    <span class="playlist-num">07</span>
+                    <span class="playlist-name">Touch of Choice</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(7)">
+                    <span class="playlist-num">08</span>
+                    <span class="playlist-name">You Are Not in the Game</span>
+                </div>
+                <div class="playlist-item" onclick="playTrack(8)">
+                    <span class="playlist-num">09</span>
+                    <span class="playlist-name">You Can't See Me</span>
+                </div>
+            </div>
+        </div>
+
         <div id="feed"></div>
     </div>
 
@@ -684,8 +656,9 @@ const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 // ================================================================
-// ПЛЕЕР (ПРЯМЫЕ ССЫЛКИ ИЗ ТВОЕГО РЕПОЗИТОРИЯ)
+// ПЛЕЕР (С ПРОГРЕССОМ И ПЛЕЙЛИСТОМ)
 // ================================================================
+
 const PLAYLIST = [
     { name: 'Capitulation', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/capitulation.mp3' },
     { name: 'Clean Victory', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/clean_victory.mp3' },
@@ -704,12 +677,74 @@ function initAudio() {
     if (!audio) {
         audio = new Audio(PLAYLIST[currentTrack].url);
         audio.crossOrigin = 'anonymous';
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('loadedmetadata', updateDuration);
         audio.addEventListener('ended', () => {
             isPlaying = false;
             document.getElementById('playBtn').textContent = '▶';
+            updateProgress();
         });
     }
     document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+}
+
+function updateProgress() {
+    if (!audio) return;
+    const progress = (audio.currentTime / audio.duration) * 100 || 0;
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+}
+
+function updateDuration() {
+    if (!audio) return;
+    document.getElementById('totalTime').textContent = formatTime(audio.duration);
+}
+
+function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function seekAudio(e) {
+    if (!audio || !audio.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = x * audio.duration;
+}
+
+function togglePlaylist() {
+    const dropdown = document.getElementById('playlistDropdown');
+    dropdown.classList.toggle('open');
+}
+
+function playTrack(index) {
+    if (index === currentTrack && isPlaying) {
+        playMusic();
+        return;
+    }
+    currentTrack = index;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (isPlaying) {
+            audio.play().catch(() => {});
+        } else {
+            playMusic();
+        }
+    } else {
+        initAudio();
+        playMusic();
+    }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+}
+
+function updatePlaylistActive() {
+    document.querySelectorAll('.playlist-item').forEach((el, i) => {
+        el.classList.toggle('active', i === currentTrack);
+    });
 }
 
 window.playMusic = function() {
@@ -730,12 +765,14 @@ window.prevTrack = function() {
     currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
     if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(() => {}); }
     document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
 };
 
 window.nextTrack = function() {
     currentTrack = (currentTrack + 1) % PLAYLIST.length;
     if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(() => {}); }
     document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
 };
 
 initAudio();
@@ -1736,7 +1773,7 @@ setActivePage('feedPage');
 
 console.log('🏛️ METAIMPERIYA - ПОЛНАЯ ВЕРСИЯ!');
 console.log('🔑 Вход: Google или анонимный');
-console.log('🎵 Плеер: музыка из папки music/');
+console.log('🎵 Плеер: с прогрессом и плейлистом');
 console.log('🏴‍☠️ Админ-пароль: 12345');
 console.log('👥 Группы, лента, люди, профиль, чаты — ВСЁ РАБОТАЕТ!');
 
