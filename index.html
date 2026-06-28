@@ -50,7 +50,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <style>
-        /* ===== БАЗА ===== */
+        /* ================================================================
+           БАЗА
+           ================================================================ */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #f0f2f5;
@@ -61,7 +63,6 @@
             justify-content: center;
         }
 
-        /* ===== ОСНОВНОЙ КОНТЕЙНЕР ===== */
         .app {
             max-width: 480px;
             width: 100%;
@@ -70,7 +71,9 @@
             position: relative;
         }
 
-        /* ===== ШАПКА ===== */
+        /* ================================================================
+           ШАПКА
+           ================================================================ */
         .topbar {
             background: #fff;
             padding: 8px 12px;
@@ -165,7 +168,9 @@
             padding: 0 2px;
         }
 
-        /* ===== МИНИ-ПЛЕЕР ===== */
+        /* ================================================================
+           МИНИ-ПЛЕЕР
+           ================================================================ */
         .player-mini {
             display: flex;
             align-items: center;
@@ -224,7 +229,9 @@
             color: #1877f2;
         }
 
-        /* ===== ВЫПАДАЮЩИЙ СПИСОК ===== */
+        /* ================================================================
+           ВЫПАДАЮЩИЙ СПИСОК
+           ================================================================ */
         .playlist-dropdown {
             display: none;
             position: absolute;
@@ -276,7 +283,9 @@
             flex: 1;
         }
 
-        /* ===== ТАБЫ ===== */
+        /* ================================================================
+           ТАБЫ
+           ================================================================ */
         .tab-bar {
             background: #fff;
             display: flex;
@@ -312,7 +321,9 @@
             background: #e8f0fe;
         }
 
-        /* ===== САЙДБАР ===== */
+        /* ================================================================
+           САЙДБАР
+           ================================================================ */
         .sidebar {
             position: fixed;
             top: 0;
@@ -456,7 +467,9 @@
             display: block;
         }
 
-        /* ===== КАРТОЧКИ ===== */
+        /* ================================================================
+           КАРТОЧКИ
+           ================================================================ */
         .card {
             background: #fff;
             border-radius: 12px;
@@ -472,7 +485,9 @@
             margin-bottom: 10px;
         }
 
-        /* ===== ПОСТЫ ===== */
+        /* ================================================================
+           ПОСТЫ
+           ================================================================ */
         .post-form {
             background: #fff;
             border-radius: 12px;
@@ -567,7 +582,9 @@
         .post .stats button:hover { background: #f0f2f5; color: #1877f2; }
         .post .stats button.liked { color: #1877f2; }
 
-        /* ===== КОММЕНТАРИИ ===== */
+        /* ================================================================
+           КОММЕНТАРИИ
+           ================================================================ */
         .comments { margin-top: 6px; border-top: 1px solid #eee; padding-top: 6px; }
         .comments .toggle { background: none; border: none; color: #1877f2; cursor: pointer; font-size: 0.65rem; }
         .comments .list { display: none; }
@@ -620,7 +637,9 @@
             font-weight: 600; font-size: 0.6rem;
         }
 
-        /* ===== ПРОФИЛЬ ===== */
+        /* ================================================================
+           ПРОФИЛЬ
+           ================================================================ */
         .profile-header {
             background: #fff; border-radius: 12px; padding: 14px; text-align: center;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8; margin-bottom: 8px;
@@ -656,7 +675,9 @@
         .friend-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
         .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.4rem; font-weight: 700; }
 
-        /* ===== ГРУППЫ ===== */
+        /* ================================================================
+           ГРУППЫ
+           ================================================================ */
         .groups-page .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .groups-page .group-card {
             background: #fff; border-radius: 12px; padding: 12px;
@@ -668,7 +689,9 @@
         .groups-page .group-card .name { font-weight: 600; font-size: 0.75rem; margin-top: 2px; }
         .groups-page .group-card .count { color: #888; font-size: 0.6rem; }
 
-        /* ===== ЛЮДИ ===== */
+        /* ================================================================
+           ЛЮДИ
+           ================================================================ */
         .people-page .people-list { display: flex; flex-direction: column; gap: 4px; }
         .people-page .people-item {
             background: #fff; border-radius: 10px; padding: 8px 12px;
@@ -682,7 +705,9 @@
         .people-page .people-item .info .name { font-weight: 600; font-size: 0.75rem; }
         .people-page .people-item .info .status { color: #888; font-size: 0.6rem; }
 
-        /* ===== ЧАТ ===== */
+        /* ================================================================
+           ЧАТ
+           ================================================================ */
         .chat-view {
             display: none; background: #fff; border-radius: 12px; padding: 10px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: 1px solid #e8e8e8;
@@ -699,7 +724,9 @@
         .chat-view .input-wrap input:focus { border-color: #1877f2; }
         .chat-view .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 16px; padding: 0 14px; font-weight: 600; cursor: pointer; font-size: 0.7rem; }
 
-        /* ===== МОДАЛКИ ===== */
+        /* ================================================================
+           МОДАЛКИ
+           ================================================================ */
         .modal {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;
@@ -750,15 +777,89 @@
         }
         .admin-dot.active { background: #e67e22; border-color: #e67e22; }
 
+        /* ================================================================
+           ТУМБЛЕР РАЗМЕРА ФРЕЙМА
+           ================================================================ */
+        .frame-size-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 6px 0 8px 0;
+            padding: 4px 0;
+        }
+
+        .frame-size-toggle .label {
+            color: #888;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .frame-size-toggle .btn-group {
+            display: flex;
+            gap: 4px;
+            background: #f0f2f5;
+            border-radius: 20px;
+            padding: 3px;
+        }
+
+        .frame-size-btn {
+            padding: 4px 14px;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            font-weight: 600;
+            background: transparent;
+            color: #888;
+            transition: all 0.2s ease;
+        }
+
+        .frame-size-btn:hover {
+            background: #e8f0fe;
+            color: #1877f2;
+        }
+
+        .frame-size-btn.active {
+            background: #1877f2;
+            color: #fff;
+        }
+
+        .post .link-preview iframe {
+            border: none;
+            display: block;
+            transition: height 0.3s ease;
+            width: 100%;
+        }
+
+        .post .link-preview iframe.small {
+            height: 250px;
+        }
+
+        .post .link-preview iframe.large {
+            height: 450px;
+        }
+
+        /* ================================================================
+           АДАПТИВ
+           ================================================================ */
         @media (max-width: 480px) {
+            .topbar { padding: 6px 8px; }
+            .topbar .left .logo { font-size: 0.75rem; }
+            .topbar .left .menu-btn { font-size: 1rem; }
             .topbar .right .name { display: none; }
-            .groups-page .group-list { grid-template-columns: 1fr 1fr; }
-            .tab-bar .tab { font-size: 0.55rem; padding: 4px 8px; }
-            .post .link-preview iframe { height: 180px; }
+            .topbar .right .avatar-wrap { width: 24px; height: 24px; }
+            
             .player-mini { max-width: 150px; padding: 2px 6px; }
             .player-mini .track-name-mini { max-width: 40px; font-size: 0.5rem; }
             .player-mini .play-btn-mini { width: 18px; height: 18px; font-size: 7px; }
             .player-mini .track-time { font-size: 0.4rem; }
+            
+            .tab-bar .tab { font-size: 0.55rem; padding: 4px 8px; }
+            .container { padding: 6px 8px 50px; }
+            .post .link-preview iframe { height: 180px; }
+            
+            .group-list { grid-template-columns: 1fr 1fr; }
             .playlist-dropdown { min-width: 130px; right: 0; }
         }
     </style>
@@ -953,7 +1054,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛКА РЕДАКТИРОВАНИЯ -->
+    <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ С ТУМБЛЕРОМ ===== -->
     <div class="modal" id="editModal">
         <div class="box">
             <h3>✏️ Редактировать пост</h3>
@@ -961,6 +1062,20 @@
             <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
             <textarea id="editText" placeholder="📝 Текст поста"></textarea>
             <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
+            
+            <!-- ===== ТУМБЛЕР РАЗМЕРА ФРЕЙМА ===== -->
+            <div class="frame-size-toggle">
+                <span class="label">📐 Размер фрейма:</span>
+                <div class="btn-group">
+                    <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">
+                        📱 Обычный
+                    </button>
+                    <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">
+                        🖥️ Широкий
+                    </button>
+                </div>
+            </div>
+            
             <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
             <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
             <div id="editButtonsContainer"></div>
@@ -1053,7 +1168,6 @@ function initAudio() {
         audio = new Audio(PLAYLIST[currentTrack].url);
         audio.crossOrigin = 'anonymous';
         audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('loadedmetadata', updateDuration);
         audio.addEventListener('ended', () => {
             currentTrack = (currentTrack + 1) % PLAYLIST.length;
             audio.src = PLAYLIST[currentTrack].url;
@@ -1070,10 +1184,6 @@ function initAudio() {
 function updateProgress() {
     if (!audio) return;
     document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
-}
-
-function updateDuration() {
-    if (!audio) return;
 }
 
 function formatTime(seconds) {
@@ -1310,6 +1420,29 @@ window.goToProfile = function() {
     loadProfile();
 };
 
+// ===== РАЗМЕР ФРЕЙМА =====
+let currentFrameSize = localStorage.getItem('frameSize_' + SITE) || 'small';
+
+function setFrameSize(size) {
+    currentFrameSize = size;
+    localStorage.setItem('frameSize_' + SITE, size);
+    
+    document.querySelectorAll('.frame-size-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (size === 'small') {
+        const btn = document.getElementById('frameSizeSmall');
+        if (btn) btn.classList.add('active');
+    } else {
+        const btn = document.getElementById('frameSizeLarge');
+        if (btn) btn.classList.add('active');
+    }
+    
+    document.querySelectorAll('.post .link-preview iframe').forEach(iframe => {
+        iframe.className = size;
+    });
+}
+
 // ===== ЛЕНТА =====
 function loadFeed() {
     if (!USER_UID) {
@@ -1363,8 +1496,11 @@ function renderPost(p, type) {
         buttonsHtml += '</div>';
     }
 
+    // ===== ФРЕЙМ С РАЗМЕРОМ =====
     let previewHtml = '';
-    if (p.link) { previewHtml = `<div class="link-preview"><iframe src="${p.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`; }
+    if (p.link) {
+        previewHtml = `<div class="link-preview"><iframe src="${p.link}" class="${currentFrameSize}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
+    }
 
     let hashtagsHtml = '';
     if (p.hashtags && p.hashtags.length > 0) {
@@ -1643,6 +1779,10 @@ window.openEdit = function(id, type) {
         document.getElementById('editText').value = p.text || '';
         document.getElementById('editLink').value = p.link || '';
         document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
+
+        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА =====
+        const size = localStorage.getItem('frameSize_' + SITE) || 'small';
+        setFrameSize(size);
 
         const container = document.getElementById('editButtonsContainer');
         container.innerHTML = '';
@@ -2176,6 +2316,7 @@ console.log('🏛️ METAIMPERIYA - ПОЛНАЯ ВЕРСИЯ!');
 console.log('🔑 Вход: Google или анонимный');
 console.log('🎵 Плеер с плейлистом');
 console.log('✏️ Редактирование постов и комментариев');
+console.log('📐 Тумблер размера фрейма в редакторе');
 console.log('🏴‍☠️ Админ-пароль: 12345');
 
 </script>
