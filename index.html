@@ -1120,41 +1120,15 @@
         </div>
     </div>
 
-   <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ (ОДНА, С ТУМБЛЕРОМ) ===== -->
-<div class="modal" id="editModal">
-    <div class="box">
-        <h3>✏️ Редактировать пост</h3>
-        <div class="sub">Измените содержимое поста</div>
-        
-        <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
-        <textarea id="editText" placeholder="📝 Текст поста"></textarea>
-        <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
-        
-        <!-- ===== ТУМБЛЕР РАЗМЕРА ФРЕЙМА ===== -->
-        <div class="frame-size-toggle">
-            <span class="label">📐 Размер фрейма:</span>
-            <div class="btn-group">
-                <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">
-                    📱 Обычный
-                </button>
-                <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">
-                    🖥️ Широкий
-                </button>
-            </div>
-        </div>
-        
-        <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
-        <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
-        <div id="editButtonsContainer"></div>
-        <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
-        
-        <div class="btns" style="margin-top:6px;">
-            <button class="save" onclick="saveEdit()">💾 Сохранить</button>
-            <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
-        </div>
-        <button onclick="deleteEditPost()" style="width:100%;padding:3px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
-    </div>
-</div>
+    <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ (ОДНА, С ТУМБЛЕРОМ) ===== -->
+    <div class="modal" id="editModal">
+        <div class="box">
+            <h3>✏️ Редактировать пост</h3>
+            <div class="sub">Измените содержимое поста</div>
+            
+            <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
+            <textarea id="editText" placeholder="📝 Текст поста"></textarea>
+            <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
             
             <!-- ===== ТУМБЛЕР РАЗМЕРА ФРЕЙМА ===== -->
             <div class="frame-size-toggle">
@@ -1514,13 +1488,11 @@ window.goToProfile = function() {
     loadProfile();
 };
 
-// ===== РАЗМЕР ФРЕЙМА =====
-let currentFrameSize = localStorage.getItem('frameSize_' + SITE) || 'small';
+// ===== РАЗМЕР ФРЕЙМА (ДЛЯ РЕДАКТИРОВАНИЯ) =====
+let currentFrameSize = 'small';
 
 function setFrameSize(size) {
     currentFrameSize = size;
-    localStorage.setItem('frameSize_' + SITE, size);
-    
     document.querySelectorAll('.frame-size-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -1531,10 +1503,6 @@ function setFrameSize(size) {
         const btn = document.getElementById('frameSizeLarge');
         if (btn) btn.classList.add('active');
     }
-    
-    document.querySelectorAll('.post .link-preview iframe').forEach(iframe => {
-        iframe.className = size;
-    });
 }
 
 // ===== ЛЕНТА =====
@@ -1585,15 +1553,18 @@ function renderPost(p, type) {
     if (p.buttons && p.buttons.length > 0) {
         buttonsHtml = '<div class="buttons-wrap">';
         p.buttons.forEach(btn => {
-            if (btn.url) { buttonsHtml += `<a href="${esc(btn.url)}" target="_blank" class="btn-item">${esc(btn.label || '🔗 Перейти')}</a>`; }
+            if (btn.url) {
+                buttonsHtml += `<a href="${esc(btn.url)}" target="_blank" class="btn-item">${esc(btn.label || '🔗 Перейти')}</a>`;
+            }
         });
         buttonsHtml += '</div>';
     }
 
-    // ===== ФРЕЙМ С РАЗМЕРОМ =====
+    // ===== ФРЕЙМ С РАЗМЕРОМ ИЗ ПОСТА =====
     let previewHtml = '';
     if (p.link) {
-        previewHtml = `<div class="link-preview"><iframe src="${p.link}" class="${currentFrameSize}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
+        const frameSize = p.frameSize || 'small';
+        previewHtml = `<div class="link-preview"><iframe src="${p.link}" class="${frameSize}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
     }
 
     let hashtagsHtml = '';
@@ -1630,6 +1601,9 @@ function renderPost(p, type) {
 
     let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
+            <button class="toggle" onclick="toggleComments('${p.id}', '${type}')" id="commentsToggle_${p.id}">
+                💬 Показать
+            </button>
             <div class="list" id="commentsList_${p.id}">
                 <div id="commentsContainer_${p.id}"></div>
             </div>
@@ -1667,7 +1641,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// КОММЕНТАРИИ (С РЕДАКТИРОВАНИЕМ)
+// КОММЕНТАРИИ
 // ================================================================
 
 function loadComments(postId, type) {
@@ -1743,7 +1717,13 @@ document.addEventListener('click', function(e) {
 
 window.toggleComments = function(postId, type) {
     const list = document.getElementById('commentsList_' + postId);
-    if (list) { list.classList.toggle('open'); }
+    const toggle = document.getElementById('commentsToggle_' + postId);
+    if (list) {
+        list.classList.toggle('open');
+        if (toggle) {
+            toggle.textContent = list.classList.contains('open') ? '▲ Скрыть' : '💬 Показать';
+        }
+    }
 };
 
 window.submitComment = function(postId, type) {
@@ -1761,8 +1741,15 @@ window.submitComment = function(postId, type) {
         timestamp: Date.now()
     });
     input.value = '';
+    
     const list = document.getElementById('commentsList_' + postId);
-    if (list) { list.classList.add('open'); }
+    const toggle = document.getElementById('commentsToggle_' + postId);
+    if (list) {
+        list.classList.add('open');
+        if (toggle) {
+            toggle.textContent = '▲ Скрыть';
+        }
+    }
 };
 
 window.deleteComment = function(postId, commentId, type) {
@@ -1773,7 +1760,10 @@ window.deleteComment = function(postId, commentId, type) {
     if (menu) menu.classList.remove('open');
 };
 
-// ===== РЕДАКТИРОВАНИЕ КОММЕНТАРИЯ =====
+// ================================================================
+// РЕДАКТИРОВАНИЕ КОММЕНТАРИЕВ
+// ================================================================
+
 function editComment(postId, commentId, type) {
     const path = getPostPath(type);
     const textEl = document.getElementById('comment-text-' + commentId);
@@ -1874,9 +1864,9 @@ window.openEdit = function(id, type) {
         document.getElementById('editLink').value = p.link || '';
         document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
 
-        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА =====
-        const size = localStorage.getItem('frameSize_' + SITE) || 'small';
-        setFrameSize(size);
+        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА ИЗ ПОСТА =====
+        const frameSize = p.frameSize || 'small';
+        setFrameSize(frameSize);
 
         const container = document.getElementById('editButtonsContainer');
         container.innerHTML = '';
@@ -1932,6 +1922,7 @@ window.saveEdit = function() {
         link: link || null,
         hashtags: hashtags,
         buttons: buttons,
+        frameSize: currentFrameSize,
         edited: true,
         editedAt: Date.now()
     };
@@ -2005,6 +1996,7 @@ window.submitPost = function() {
         marquee: null,
         link: null,
         buttons: [],
+        frameSize: 'small',
         edited: false
     };
 
