@@ -255,3 +255,46 @@ body {
     color: #1877f2;
     border-color: #1877f2;
 }
+
+/* ================================================================
+   НОВОЕ МЕНЮ
+   ================================================================ */
+.sidebar-title {
+    color: #888;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 4px 4px;
+    font-weight: 600;
+}
+
+.sidebar-divider {
+    height: 1px;
+    background: #eee;
+    margin: 6px 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #555;
+    font-size: 0.8rem;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+}
+
+.nav-item:hover {
+    background: #f0f0f0;
+    border-color: #e0e0e0;
+    color: #222;
+}
+
+.nav-item.active {
+    background: #e8f0fe;
+    color: #1877f2;
+    border-color: #1877f2;
+}
