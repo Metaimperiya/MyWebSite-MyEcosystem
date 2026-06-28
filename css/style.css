@@ -553,3 +553,100 @@ body.dark .card h3 { color:#e4e6eb; }
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:#ccc; border-radius:4px; }
+/* ================================================================
+   НОВЫЙ ПЛЕЕР (ПРОСТОЙ, НАД ЛЕНТОЙ)
+   ================================================================ */
+.player-wrap {
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+}
+
+.player-simple {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.player-simple .play-btn-simple {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.player-simple .play-btn-simple:hover {
+    background: #4a9eff;
+    transform: scale(1.05);
+}
+
+.player-simple .track-name-simple {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #222;
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-simple .player-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.player-simple .player-controls button {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #555;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-simple .player-controls button:hover {
+    background: #f0f2f5;
+    border-color: #1877f2;
+}
+
+/* ================================================================
+   АДАПТИВ ДЛЯ ПЛЕЕРА
+   ================================================================ */
+@media (max-width: 480px) {
+    .player-simple {
+        gap: 8px;
+    }
+    .player-simple .play-btn-simple {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    .player-simple .track-name-simple {
+        font-size: 0.7rem;
+    }
+    .player-simple .player-controls button {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+    }
+}
