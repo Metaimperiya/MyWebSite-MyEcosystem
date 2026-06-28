@@ -1,6 +1,4 @@
-/* ===== ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ КОМПОНЕНТОВ ===== */
-
-/* Бегущая строка */
+/* Дополнительные стили для компонентов */
 .marquee-wrap {
     background: #f5f5f5;
     padding: 4px 10px;
@@ -17,7 +15,6 @@
     padding-left: 100%;
 }
 
-/* Кнопки в посте */
 .btn-link {
     display: inline-block;
     background: #e67e22;
@@ -30,7 +27,6 @@
     margin: 2px 4px 2px 0;
 }
 
-/* Теги/хештеги */
 .tag {
     color: #1877f2;
     font-size: 11px;
@@ -42,97 +38,14 @@
     margin: 2px;
 }
 
-/* Статистика в профиле */
-.stat-toggles {
-    display: flex;
-    gap: 6px;
-    margin: 14px 0 6px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-.stat-toggle {
-    padding: 5px 12px;
-    border: none;
-    background: #e4e6eb;
-    color: #65676b;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 12px;
-}
-.stat-toggle.active {
-    background: #1877f2;
-    color: white;
-}
-.stat-toggle .count {
-    background: rgba(0,0,0,0.05);
-    padding: 0 6px;
-    border-radius: 10px;
-    font-size: 11px;
-    margin-left: 3px;
-}
-.stat-toggle.active .count {
-    background: rgba(255,255,255,0.2);
-}
-
-.stat-container {
-    padding: 6px 0;
-    min-height: 50px;
-    display: none;
-}
-.stat-container.open { display: block; }
-.stat-empty {
-    color: #65676b;
-    font-size: 14px;
-    padding: 16px 0;
-    text-align: center;
-}
-.stat-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 4px 0;
-}
-.stat-list .stat-item {
-    background: #f0f2f5;
-    padding: 4px 10px;
-    border-radius: 16px;
-    font-size: 12px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-.stat-list .stat-item:hover { background: #e4e6eb; }
-.stat-list .stat-item .mini-avatar {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: #1877f2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 9px;
-    overflow: hidden;
-}
-.stat-list .stat-item .mini-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.stat-private {
-    color: #65676b;
-    font-size: 14px;
-    text-align: center;
-    padding: 16px 0;
-}
-
-/* Админ-кнопки */
 .admin-delete-btn {
     display: none !important;
 }
 .admin-mode .admin-delete-btn {
     display: inline-flex !important;
+}
+
+@keyframes scrollMarquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
 }
