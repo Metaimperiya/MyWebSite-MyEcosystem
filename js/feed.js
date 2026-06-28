@@ -1,5 +1,8 @@
-let feedEditId = null;
+// ================================================================
+// ЛЕНТА, ПОСТЫ, КОММЕНТАРИИ, ЛАЙКИ, РЕДАКТИРОВАНИЕ
+// ================================================================
 
+// ===== ЗАГРУЗКА ЛЕНТЫ =====
 function loadFeed() {
     if (!USER_UID) {
         document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
@@ -22,6 +25,14 @@ function loadFeed() {
     });
 }
 
+// ===== ПУТЬ К ПОСТАМ =====
+function getPostPath(type) {
+    return type === 'group' ? 'group_posts/' + currentGroup : 'feed_posts';
+}
+
+let currentGroup = null;
+
+// ===== РЕНДЕР ПОСТА =====
 function renderPost(p, type) {
     const div = document.createElement('div');
     div.className = 'post';
@@ -31,7 +42,7 @@ function renderPost(p, type) {
     const letter = (p.author || '?').charAt(0).toUpperCase();
     const avatarHtml = `<span class="avatar-wrap" id="post-avatar-${p.id}"><span class="letter">${letter}</span></span>`;
 
-    let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
+    let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>' : '';
     let textHtml = esc(p.text || '');
     let imgHtml = p.img ? `<img src="${p.img}" class="post-img" onclick="window.open(this.src)">` : '';
     
@@ -60,6 +71,7 @@ function renderPost(p, type) {
         hashtagsHtml += '</div>';
     }
 
+    // ===== МЕНЮ ПОСТА (ТРИ ТОЧКИ) =====
     let menuHtml = '';
     if (p.author === USER || IS_ADMIN) {
         menuHtml = `
@@ -73,26 +85,33 @@ function renderPost(p, type) {
         `;
     }
 
+    // ===== КНОПКИ ЛАЙКОВ И КОММЕНТАРИЕВ =====
     let actionsHtml = `
         <div class="stats">
             <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
                 👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
             </button>
-            <button class="comments-toggle" id="commentsToggle_${p.id}" onclick="toggleComments('${p.id}', '${type}')">
-                💬 <span class="count" id="commentCount_${p.id}">${p.commentCount || 0}</span>
+            <button onclick="toggleComments('${p.id}', '${type}')">
+                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
             </button>
         </div>
+    `;
+
+    // ===== БЛОК КОММЕНТАРИЕВ =====
+    let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
-            <div class="comments-body" id="commentsBody_${p.id}">
-                <div class="comments-list" id="commentsContainer_${p.id}"></div>
+            <button class="toggle" onclick="toggleComments('${p.id}', '${type}')">💬 Показать комментарии</button>
+            <div class="list" id="commentsList_${p.id}">
+                <div id="commentsContainer_${p.id}"></div>
                 <div class="input-wrap">
-                    <input type="text" id="commentInput_${p.id}" placeholder="Комментарий...">
+                    <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
                     <button onclick="submitComment('${p.id}', '${type}')">→</button>
                 </div>
             </div>
         </div>
     `;
 
+    // ===== СБОРКА ПОСТА =====
     div.innerHTML = `
         ${menuHtml}
         ${marqueeHtml}
@@ -107,25 +126,23 @@ function renderPost(p, type) {
         ${previewHtml}
         ${hashtagsHtml}
         ${actionsHtml}
+        ${commentsHtml}
     `;
 
+    // ===== АВАТАРКА АВТОРА =====
     if (p.authorUid) {
         const avatarEl = document.getElementById('post-avatar-' + p.id);
         if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
     }
 
+    // ===== ЗАГРУЗКА КОММЕНТАРИЕВ =====
     loadComments(p.id, type);
     return div;
 }
 
 // ================================================================
-// КОММЕНТАРИИ (НОВАЯ ЛОГИКА: toggle, три точки, редактирование)
+// КОММЕНТАРИИ (ОТКРЫТИЕ/ЗАКРЫТИЕ + ВВОД)
 // ================================================================
-function getPostPath(type) {
-    return type === 'group' ? 'group_posts/' + currentGroup : 'feed_posts';
-}
-
-let currentGroup = null;
 
 function loadComments(postId, type) {
     const path = getPostPath(type);
@@ -136,12 +153,13 @@ function loadComments(postId, type) {
         const data = snap.val() || {};
         const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
 
+        const count = keys.length;
         const countEl = document.getElementById('commentCount_' + postId);
-        if (countEl) countEl.textContent = keys.length;
-        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(keys.length);
+        if (countEl) countEl.textContent = count;
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(count);
 
         if (!keys.length) {
-            container.innerHTML = '<div style="color:#bbb;font-size:0.6rem;padding:6px 0;">Нет комментариев</div>';
+            container.innerHTML = '<div style="color:#bbb;font-size:0.55rem;padding:3px 0;">Нет комментариев</div>';
             return;
         }
 
@@ -150,30 +168,17 @@ function loadComments(postId, type) {
             const div = document.createElement('div');
             div.className = 'comment';
             const letter = (c.author || '?').charAt(0).toUpperCase();
-            
-            const canEdit = (c.author === USER || IS_ADMIN);
-            
+            const canDelete = (c.author === USER || IS_ADMIN);
             div.innerHTML = `
                 <span class="avatar-wrap" id="comment-avatar-${k}"><span class="letter">${letter}</span></span>
                 <div class="body">
                     <span class="name">${esc(c.author || 'Аноним')}</span>
                     <span class="time">${c.time || ''}</span>
-                    <div class="text" id="comment-text-${k}">${esc(c.text || '')}</div>
+                    <div class="text">${esc(c.text || '')}</div>
                 </div>
-                <div class="comment-actions">
-                    ${canEdit ? `
-                    <div class="comment-menu">
-                        <button class="more-btn" onclick="toggleCommentMenu('${k}')">⋮</button>
-                        <div class="dropdown" id="commentMenu_${k}">
-                            <button class="edit-btn" onclick="editComment('${postId}','${k}','${type}')">✏️ Редактировать</button>
-                            <button class="del-btn" onclick="deleteComment('${postId}','${k}','${type}')">🗑 Удалить</button>
-                        </div>
-                    </div>
-                    ` : ''}
-                </div>
+                ${canDelete ? `<button onclick="deleteComment('${postId}','${k}','${type}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.45rem;">✕</button>` : ''}
             `;
             container.appendChild(div);
-            
             if (c.authorUid) {
                 const avatarEl = document.getElementById('comment-avatar-' + k);
                 if (avatarEl) renderAvatar(c.authorUid, avatarEl, letter);
@@ -182,29 +187,20 @@ function loadComments(postId, type) {
     });
 }
 
-function toggleComments(postId, type) {
-    const body = document.getElementById('commentsBody_' + postId);
-    if (!body) return;
-    body.classList.toggle('open');
-}
-
-function toggleCommentMenu(commentId) {
-    const menu = document.getElementById('commentMenu_' + commentId);
-    if (!menu) return;
-    document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => {
-        if (el.id !== 'commentMenu_' + commentId) el.classList.remove('open');
-    });
-    menu.classList.toggle('open');
-}
-
-// Закрываем меню при клике вне
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.comment-menu')) {
-        document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => el.classList.remove('open'));
+// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
+window.toggleComments = function(postId, type) {
+    const list = document.getElementById('commentsList_' + postId);
+    const toggle = document.querySelector(`#comments_${postId} .toggle`);
+    if (list) {
+        list.classList.toggle('open');
+        if (toggle) {
+            toggle.textContent = list.classList.contains('open') ? '▲ Скрыть комментарии' : '💬 Показать комментарии';
+        }
     }
-});
+};
 
-function submitComment(postId, type) {
+// ===== ОТПРАВИТЬ КОММЕНТАРИЙ =====
+window.submitComment = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
     const input = document.getElementById('commentInput_' + postId);
     const text = input.value.trim();
@@ -219,66 +215,183 @@ function submitComment(postId, type) {
         timestamp: Date.now()
     });
     input.value = '';
-}
+    
+    // Автоматически открываем комментарии после отправки
+    const list = document.getElementById('commentsList_' + postId);
+    const toggle = document.querySelector(`#comments_${postId} .toggle`);
+    if (list) {
+        list.classList.add('open');
+        if (toggle) toggle.textContent = '▲ Скрыть комментарии';
+    }
+};
 
-function deleteComment(postId, commentId, type) {
+// ===== УДАЛИТЬ КОММЕНТАРИЙ =====
+window.deleteComment = function(postId, commentId, type) {
     if (!confirm('Удалить комментарий?')) return;
     const path = getPostPath(type);
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
-    const menu = document.getElementById('commentMenu_' + commentId);
-    if (menu) menu.classList.remove('open');
-}
+};
 
-function editComment(postId, commentId, type) {
+// ================================================================
+// ЛАЙКИ
+// ================================================================
+
+window.toggleLike = function(postId, type) {
+    if (!USER) { alert('Войдите!'); return; }
+    const key = 'lk_' + postId + '_' + USER_UID;
+    const liked = localStorage.getItem(key) === '1';
     const path = getPostPath(type);
-    const textEl = document.getElementById('comment-text-' + commentId);
-    if (!textEl) return;
-    
-    const menu = document.getElementById('commentMenu_' + commentId);
-    if (menu) menu.classList.remove('open');
-    
-    const currentText = textEl.textContent;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = currentText;
-    input.className = 'edit-comment-input';
-    input.style.cssText = 'width:100%;padding:2px 8px;border:1px solid #1877f2;border-radius:4px;font-size:0.7rem;outline:none;';
-    
-    textEl.innerHTML = '';
-    textEl.appendChild(input);
-    input.focus();
-    input.select();
-    
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            saveCommentEdit(postId, commentId, type, input.value.trim());
-        }
-    });
-    
-    input.addEventListener('blur', function() {
-        setTimeout(() => {
-            if (document.activeElement !== input) {
-                saveCommentEdit(postId, commentId, type, input.value.trim());
-            }
-        }, 200);
-    });
-}
 
-function saveCommentEdit(postId, commentId, type, newText) {
-    if (!newText) {
-        deleteComment(postId, commentId, type);
-        return;
+    const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/likes');
+    if (liked) {
+        ref.transaction(v => Math.max(0, (v || 0) - 1));
+        localStorage.removeItem(key);
+    } else {
+        ref.transaction(v => (v || 0) + 1);
+        localStorage.setItem(key, '1');
     }
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
-        text: newText,
-        edited: true
-    });
-}
+};
 
 // ================================================================
-// ПОСТЫ (СОЗДАНИЕ, РЕДАКТИРОВАНИЕ, УДАЛЕНИЕ)
+// УДАЛИТЬ ПОСТ
 // ================================================================
+
+window.deletePost = function(id, type) {
+    if (!confirm('🗑 Удалить пост?')) return;
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
+    const menu = document.getElementById('menu_' + id);
+    if (menu) menu.classList.remove('open');
+};
+
+// ================================================================
+// РЕДАКТИРОВАНИЕ ПОСТА (бегущая строка, текст, ссылка, хештеги, кнопки)
+// ================================================================
+
+window.openEdit = function(id, type) {
+    EDITING_ID = { id: id, type: type };
+    document.getElementById('editModal').classList.add('open');
+    const path = getPostPath(type);
+
+    const menu = document.getElementById('menu_' + id);
+    if (menu) menu.classList.remove('open');
+
+    db.ref('sites/' + SITE + '/' + path + '/' + id).once('value', snap => {
+        const p = snap.val();
+        if (!p) return;
+
+        document.getElementById('editMarquee').value = p.marquee || '';
+        document.getElementById('editText').value = p.text || '';
+        document.getElementById('editLink').value = p.link || '';
+        document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
+
+        const container = document.getElementById('editButtonsContainer');
+        container.innerHTML = '';
+        const btns = p.buttons || [];
+        btns.forEach(btn => addEditBtn(btn.label, btn.url));
+        if (btns.length === 0) addEditBtn('', '');
+    });
+};
+
+// ===== ДОБАВИТЬ КНОПКУ В РЕДАКТОРЕ =====
+window.addEditBtn = function(label = '', url = '') {
+    const container = document.getElementById('editButtonsContainer');
+    const div = document.createElement('div');
+    div.className = 'btn-group';
+    div.innerHTML = `
+        <input class="btn-label-input" placeholder="Текст кнопки" value="${esc(label)}">
+        <input class="btn-url-input" placeholder="Ссылка" value="${esc(url)}">
+        <button class="btn-remove" onclick="removeEditBtn(this)">✕</button>
+    `;
+    container.appendChild(div);
+};
+
+// ===== УДАЛИТЬ КНОПКУ В РЕДАКТОРЕ =====
+window.removeEditBtn = function(btn) {
+    const group = btn.parentElement;
+    if (document.getElementById('editButtonsContainer').children.length > 1) {
+        group.remove();
+    } else {
+        group.querySelector('.btn-label-input').value = '';
+        group.querySelector('.btn-url-input').value = '';
+    }
+};
+
+// ===== СОХРАНИТЬ РЕДАКТИРОВАНИЕ =====
+window.saveEdit = function() {
+    if (!EDITING_ID) return;
+    const { id, type } = EDITING_ID;
+    const path = getPostPath(type);
+
+    const marquee = document.getElementById('editMarquee').value.trim();
+    const text = document.getElementById('editText').value.trim();
+    const link = document.getElementById('editLink').value.trim();
+    const hashtagsRaw = document.getElementById('editHashtags').value.trim();
+    const hashtags = hashtagsRaw ? hashtagsRaw.split(/\s+/).filter(t => t.startsWith('#')) : [];
+
+    const buttons = [];
+    document.querySelectorAll('#editButtonsContainer .btn-group').forEach(g => {
+        const label = g.querySelector('.btn-label-input').value.trim();
+        const url = g.querySelector('.btn-url-input').value.trim();
+        if (url) buttons.push({ label: label || '🔗 Перейти', url });
+    });
+
+    const updates = {
+        marquee: marquee || null,
+        text: text || '📝',
+        link: link || null,
+        hashtags: hashtags,
+        buttons: buttons,
+        edited: true,
+        editedAt: Date.now()
+    };
+
+    db.ref('sites/' + SITE + '/' + path + '/' + id).update(updates);
+    closeEdit();
+    alert('✅ Пост обновлён!');
+};
+
+// ===== УДАЛИТЬ ПОСТ ИЗ РЕДАКТОРА =====
+window.deleteEditPost = function() {
+    if (!EDITING_ID) return;
+    if (!confirm('🗑 Удалить пост навсегда?')) return;
+    const { id, type } = EDITING_ID;
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
+    closeEdit();
+};
+
+// ===== ЗАКРЫТЬ РЕДАКТОР =====
+window.closeEdit = function() {
+    document.getElementById('editModal').classList.remove('open');
+    EDITING_ID = null;
+};
+
+// ================================================================
+// МЕНЮ ПОСТА (ТРИ ТОЧКИ)
+// ================================================================
+
+window.togglePostMenu = function(id) {
+    const menu = document.getElementById('menu_' + id);
+    if (menu) {
+        document.querySelectorAll('.post-menu .dropdown.open').forEach(el => {
+            if (el.id !== 'menu_' + id) el.classList.remove('open');
+        });
+        menu.classList.toggle('open');
+    }
+};
+
+// ===== ЗАКРЫВАТЬ МЕНЮ ПРИ КЛИКЕ ВНЕ =====
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.post-menu')) {
+        document.querySelectorAll('.post-menu .dropdown.open').forEach(el => el.classList.remove('open'));
+    }
+});
+
+// ================================================================
+// СОЗДАНИЕ ПОСТА
+// ================================================================
+
 function extractHashtags(text) {
     if (!text) return [];
     const matches = text.match(/#[\wа-яё]+/gi) || [];
@@ -339,6 +452,7 @@ function clearPostForm() {
     document.getElementById('fileInput').value = '';
 }
 
+// ===== ЗАГРУЗКА ФОТО =====
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -361,129 +475,4 @@ window.removeImage = function() {
     pendingImageFile = null;
     document.getElementById('previewBox').classList.remove('visible');
     document.getElementById('fileInput').value = '';
-};
-
-window.togglePostMenu = function(id) {
-    const menu = document.getElementById('menu_' + id);
-    if (menu) {
-        document.querySelectorAll('.post-menu .dropdown.open').forEach(el => {
-            if (el.id !== 'menu_' + id) el.classList.remove('open');
-        });
-        menu.classList.toggle('open');
-    }
-};
-
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.post-menu')) {
-        document.querySelectorAll('.post-menu .dropdown.open').forEach(el => el.classList.remove('open'));
-    }
-});
-
-window.deletePost = function(id, type) {
-    if (!confirm('🗑 Удалить пост?')) return;
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
-    const menu = document.getElementById('menu_' + id);
-    if (menu) menu.classList.remove('open');
-};
-
-window.openEdit = function(id, type) {
-    EDITING_ID = { id: id, type: type };
-    document.getElementById('editModal').classList.add('open');
-    const path = getPostPath(type);
-    const menu = document.getElementById('menu_' + id);
-    if (menu) menu.classList.remove('open');
-    db.ref('sites/' + SITE + '/' + path + '/' + id).once('value', snap => {
-        const p = snap.val();
-        if (!p) return;
-        document.getElementById('editMarquee').value = p.marquee || '';
-        document.getElementById('editText').value = p.text || '';
-        document.getElementById('editLink').value = p.link || '';
-        document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
-        const container = document.getElementById('editButtonsContainer');
-        container.innerHTML = '';
-        const btns = p.buttons || [];
-        btns.forEach(btn => addEditBtn(btn.label, btn.url));
-        if (btns.length === 0) addEditBtn('', '');
-    });
-};
-
-window.addEditBtn = function(label = '', url = '') {
-    const container = document.getElementById('editButtonsContainer');
-    const div = document.createElement('div');
-    div.className = 'btn-group';
-    div.innerHTML = `
-        <input class="btn-label-input" placeholder="Текст кнопки" value="${esc(label)}">
-        <input class="btn-url-input" placeholder="Ссылка" value="${esc(url)}">
-        <button class="btn-remove" onclick="removeEditBtn(this)">✕</button>
-    `;
-    container.appendChild(div);
-};
-
-window.removeEditBtn = function(btn) {
-    const group = btn.parentElement;
-    if (document.getElementById('editButtonsContainer').children.length > 1) {
-        group.remove();
-    } else {
-        group.querySelector('.btn-label-input').value = '';
-        group.querySelector('.btn-url-input').value = '';
-    }
-};
-
-window.saveEdit = function() {
-    if (!EDITING_ID) return;
-    const { id, type } = EDITING_ID;
-    const path = getPostPath(type);
-    const marquee = document.getElementById('editMarquee').value.trim();
-    const text = document.getElementById('editText').value.trim();
-    const link = document.getElementById('editLink').value.trim();
-    const hashtagsRaw = document.getElementById('editHashtags').value.trim();
-    const hashtags = hashtagsRaw ? hashtagsRaw.split(/\s+/).filter(t => t.startsWith('#')) : [];
-    const buttons = [];
-    document.querySelectorAll('#editButtonsContainer .btn-group').forEach(g => {
-        const label = g.querySelector('.btn-label-input').value.trim();
-        const url = g.querySelector('.btn-url-input').value.trim();
-        if (url) buttons.push({ label: label || '🔗 Перейти', url });
-    });
-    const updates = {
-        marquee: marquee || null,
-        text: text || '📝',
-        link: link || null,
-        hashtags: hashtags,
-        buttons: buttons,
-        edited: true,
-        editedAt: Date.now()
-    };
-    db.ref('sites/' + SITE + '/' + path + '/' + id).update(updates);
-    closeEdit();
-    alert('✅ Пост обновлён!');
-};
-
-window.deleteEditPost = function() {
-    if (!EDITING_ID) return;
-    if (!confirm('🗑 Удалить пост навсегда?')) return;
-    const { id, type } = EDITING_ID;
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
-    closeEdit();
-};
-
-window.closeEdit = function() {
-    document.getElementById('editModal').classList.remove('open');
-    EDITING_ID = null;
-};
-
-window.toggleLike = function(postId, type) {
-    if (!USER) { alert('Войдите!'); return; }
-    const key = 'lk_' + postId + '_' + USER_UID;
-    const liked = localStorage.getItem(key) === '1';
-    const path = getPostPath(type);
-    const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/likes');
-    if (liked) {
-        ref.transaction(v => Math.max(0, (v || 0) - 1));
-        localStorage.removeItem(key);
-    } else {
-        ref.transaction(v => (v || 0) + 1);
-        localStorage.setItem(key, '1');
-    }
 };
