@@ -66,3 +66,24 @@
         font-size: 1.5rem;
     }
 }
+
+/* ================================================================
+   МЕНЮ НА ТЕЛЕФОНЕ
+   ================================================================ */
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        max-width: 300px;
+        left: -320px;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .nav-item {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+    .sidebar-title {
+        font-size: 0.55rem;
+    }
+}
