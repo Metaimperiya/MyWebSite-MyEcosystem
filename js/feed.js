@@ -71,7 +71,7 @@ function renderPost(p, type) {
         hashtagsHtml += '</div>';
     }
 
-    // ===== ТРИ ТОЧКИ В ПРАВОМ ВЕРХНЕМ УГЛУ (ВЕРТИКАЛЬНЫЕ) =====
+    // ===== ТРИ ТОЧКИ ВЕРТИКАЛЬНЫЕ В ПРАВОМ ВЕРХНЕМ УГЛУ =====
     let menuHtml = '';
     if (p.author === USER || IS_ADMIN) {
         menuHtml = `
@@ -85,7 +85,7 @@ function renderPost(p, type) {
         `;
     }
 
-    // ===== КНОПКИ ЛАЙКОВ И КОММЕНТАРИЕВ (счетчик комментариев рядом с 💬) =====
+    // ===== КНОПКИ ЛАЙКОВ И КОММЕНТАРИЕВ =====
     let actionsHtml = `
         <div class="stats">
             <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
@@ -97,7 +97,7 @@ function renderPost(p, type) {
         </div>
     `;
 
-    // ===== КОММЕНТАРИИ (ВСЕГДА ВИДНЫ, СКРЫВАЕТСЯ ТОЛЬКО СПИСОК) =====
+    // ===== КОММЕНТАРИИ (СПИСОК СКРЫТ, ПОЛЕ ВВОДА ВСЕГДА ВИДНО) =====
     let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
             <div class="list" id="commentsList_${p.id}">
@@ -140,7 +140,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// КОММЕНТАРИИ (ОТКРЫТИЕ/ЗАКРЫТИЕ ПО КЛИКУ НА 💬)
+// КОММЕНТАРИИ
 // ================================================================
 
 function loadComments(postId, type) {
@@ -186,7 +186,7 @@ function loadComments(postId, type) {
     });
 }
 
-// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ (ПО КЛИКУ НА 💬) =====
+// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
 window.toggleComments = function(postId, type) {
     const list = document.getElementById('commentsList_' + postId);
     if (list) {
@@ -211,7 +211,6 @@ window.submitComment = function(postId, type) {
     });
     input.value = '';
     
-    // Автоматически открываем комментарии после отправки
     const list = document.getElementById('commentsList_' + postId);
     if (list) {
         list.classList.add('open');
@@ -258,7 +257,7 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ ПОСТА (бегущая строка, текст, ссылка, хештеги, кнопки)
+// РЕДАКТИРОВАНИЕ ПОСТА
 // ================================================================
 
 window.openEdit = function(id, type) {
@@ -286,7 +285,6 @@ window.openEdit = function(id, type) {
     });
 };
 
-// ===== ДОБАВИТЬ КНОПКУ В РЕДАКТОРЕ =====
 window.addEditBtn = function(label = '', url = '') {
     const container = document.getElementById('editButtonsContainer');
     const div = document.createElement('div');
@@ -299,7 +297,6 @@ window.addEditBtn = function(label = '', url = '') {
     container.appendChild(div);
 };
 
-// ===== УДАЛИТЬ КНОПКУ В РЕДАКТОРЕ =====
 window.removeEditBtn = function(btn) {
     const group = btn.parentElement;
     if (document.getElementById('editButtonsContainer').children.length > 1) {
@@ -310,7 +307,6 @@ window.removeEditBtn = function(btn) {
     }
 };
 
-// ===== СОХРАНИТЬ РЕДАКТИРОВАНИЕ =====
 window.saveEdit = function() {
     if (!EDITING_ID) return;
     const { id, type } = EDITING_ID;
@@ -344,7 +340,6 @@ window.saveEdit = function() {
     alert('✅ Пост обновлён!');
 };
 
-// ===== УДАЛИТЬ ПОСТ ИЗ РЕДАКТОРА =====
 window.deleteEditPost = function() {
     if (!EDITING_ID) return;
     if (!confirm('🗑 Удалить пост навсегда?')) return;
@@ -354,7 +349,6 @@ window.deleteEditPost = function() {
     closeEdit();
 };
 
-// ===== ЗАКРЫТЬ РЕДАКТОР =====
 window.closeEdit = function() {
     document.getElementById('editModal').classList.remove('open');
     EDITING_ID = null;
@@ -374,7 +368,6 @@ window.togglePostMenu = function(id) {
     }
 };
 
-// ===== ЗАКРЫВАТЬ МЕНЮ ПРИ КЛИКЕ ВНЕ =====
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.post-menu')) {
         document.querySelectorAll('.post-menu .dropdown.open').forEach(el => el.classList.remove('open'));
@@ -445,7 +438,6 @@ function clearPostForm() {
     document.getElementById('fileInput').value = '';
 }
 
-// ===== ЗАГРУЗКА ФОТО =====
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
