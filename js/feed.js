@@ -1,115 +1,489 @@
 let feedEditId = null;
 
 function loadFeed() {
+    if (!USER_UID) {
+        document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
+        return;
+    }
     db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
-        const container = document.getElementById('feedPosts');
-        container.innerHTML = '';
+        const el = document.getElementById('feed');
+        el.innerHTML = '';
         const data = snap.val() || {};
         const keys = Object.keys(data).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
         if (!keys.length) {
-            container.innerHTML = '<div style="text-align:center;padding:30px;color:#65676b;">Пока пусто</div>';
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока пусто</div>';
             return;
         }
-        keys.forEach(k => { const p = data[k]; p.id = k; container.appendChild(renderFeedPost(p)); });
+        keys.forEach(k => {
+            const p = data[k];
+            p.id = k;
+            el.appendChild(renderPost(p, 'feed'));
+        });
     });
 }
 
-function renderFeedPost(p) {
+function renderPost(p, type) {
     const div = document.createElement('div');
-    div.className = 'card';
-    div.style.marginBottom = '10px';
-    const mq = p.marquee ? `<div style="background:#f5f5f5;padding:4px 10px;border-radius:6px;color:#e67e22;font-weight:600;margin-bottom:4px;overflow:hidden;white-space:nowrap;"><span style="display:inline-block;animation:scrollMarquee 12s linear infinite;padding-left:100%;">${esc(p.marquee)}</span></div>` : '';
-    const fr = p.link ? `<iframe src="${esc(p.link)}" style="width:100%;height:180px;border:1px solid #e0e0e0;border-radius:8px;margin:4px 0;"></iframe>` : '';
-    let btns = '';
-    if (p.buttons && p.buttons.length) {
-        btns = p.buttons.filter(b => b.url).map(b => `<a href="${esc(b.url)}" target="_blank" style="display:inline-block;background:#e67e22;color:#fff;padding:4px 14px;border-radius:40px;text-decoration:none;font-weight:700;font-size:12px;margin:2px 4px 2px 0;">${esc(b.label || '🔗')}</a>`).join('');
+    div.className = 'post';
+    div.dataset.id = p.id;
+
+    const isLiked = localStorage.getItem('lk_' + p.id + '_' + USER_UID) === '1';
+    const letter = (p.author || '?').charAt(0).toUpperCase();
+    const avatarHtml = `<span class="avatar-wrap" id="post-avatar-${p.id}"><span class="letter">${letter}</span></span>`;
+
+    let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
+    let textHtml = esc(p.text || '');
+    let imgHtml = p.img ? `<img src="${p.img}" class="post-img" onclick="window.open(this.src)">` : '';
+    
+    let buttonsHtml = '';
+    if (p.buttons && p.buttons.length > 0) {
+        buttonsHtml = '<div class="buttons-wrap">';
+        p.buttons.forEach(btn => {
+            if (btn.url) {
+                buttonsHtml += `<a href="${esc(btn.url)}" target="_blank" class="btn-item">${esc(btn.label || '🔗 Перейти')}</a>`;
+            }
+        });
+        buttonsHtml += '</div>';
     }
-    let tags = '';
-    if (p.hashtags && p.hashtags.length) {
-        tags = p.hashtags.map(t => `<span style="color:#1877f2;font-size:11px;background:#f0f7ff;padding:0 8px;border-radius:20px;border:1px solid #d0e4ff;display:inline-block;margin:2px;">${esc(t)}</span>`).join(' ');
+
+    let previewHtml = '';
+    if (p.link) {
+        previewHtml = `<div class="link-preview"><iframe src="${p.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
     }
-    let actions = '';
-    if (isAdmin) {
-        actions = `<div style="margin-top:6px;display:flex;gap:4px;"><button onclick="feedEdit('${p.id}')" style="background:#f0f0f0;border:1px solid #ddd;padding:2px 12px;border-radius:20px;cursor:pointer;font-size:11px;">✏️</button><button onclick="feedDel('${p.id}')" style="background:#f0f0f0;border:1px solid #ddd;padding:2px 12px;border-radius:20px;cursor:pointer;font-size:11px;">🗑</button></div>`;
+
+    let hashtagsHtml = '';
+    if (p.hashtags && p.hashtags.length > 0) {
+        hashtagsHtml = '<div class="hashtags">';
+        p.hashtags.forEach(tag => {
+            hashtagsHtml += `<span class="tag" onclick="searchByTag('${esc(tag)}')">${esc(tag)}</span>`;
+        });
+        hashtagsHtml += '</div>';
     }
-    div.innerHTML = `${mq}<div><span style="font-weight:700;color:#e67e22;">${esc(p.author || 'Аноним')}</span><span style="color:#999;font-size:11px;margin-left:6px;">${p.time || ''}${p.edited ? ' (ред.)' : ''}</span></div>
-        <div style="margin:4px 0;line-height:1.5;">${esc(p.text || '')}</div>${btns}${fr}<div style="margin-top:4px;">${tags}</div>${actions}
-        <button onclick="openPrivateChat('${p.authorUid || ''}')" style="background:#f0f0f0;border:1px solid #ddd;color:#1877f2;padding:2px 14px;border-radius:40px;font-size:11px;cursor:pointer;margin-top:4px;">💬 Обсудить</button>`;
+
+    let menuHtml = '';
+    if (p.author === USER || IS_ADMIN) {
+        menuHtml = `
+            <div class="post-menu">
+                <button class="dots" onclick="togglePostMenu('${p.id}')">•••</button>
+                <div class="dropdown" id="menu_${p.id}">
+                    <button class="edit-btn" onclick="openEdit('${p.id}', '${type}')">✏️ Редактировать</button>
+                    <button class="del-btn" onclick="deletePost('${p.id}', '${type}')">🗑 Удалить</button>
+                </div>
+            </div>
+        `;
+    }
+
+    let actionsHtml = `
+        <div class="stats">
+            <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
+                👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
+            </button>
+            <button class="comments-toggle" id="commentsToggle_${p.id}" onclick="toggleComments('${p.id}', '${type}')">
+                💬 <span class="count" id="commentCount_${p.id}">${p.commentCount || 0}</span>
+            </button>
+        </div>
+        <div class="comments" id="comments_${p.id}">
+            <div class="comments-body" id="commentsBody_${p.id}">
+                <div class="comments-list" id="commentsContainer_${p.id}"></div>
+                <div class="input-wrap">
+                    <input type="text" id="commentInput_${p.id}" placeholder="Комментарий...">
+                    <button onclick="submitComment('${p.id}', '${type}')">→</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    div.innerHTML = `
+        ${menuHtml}
+        ${marqueeHtml}
+        <div class="author">
+            ${avatarHtml}
+            <span class="name" onclick="viewUser('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
+            <span class="time">${p.time || ''}${p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
+        </div>
+        <div class="text">${textHtml}</div>
+        ${imgHtml}
+        ${buttonsHtml}
+        ${previewHtml}
+        ${hashtagsHtml}
+        ${actionsHtml}
+    `;
+
+    if (p.authorUid) {
+        const avatarEl = document.getElementById('post-avatar-' + p.id);
+        if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
+    }
+
+    loadComments(p.id, type);
     return div;
 }
 
-function fAddBtn(l = '', u = '') {
-    const c = document.getElementById('fBtns');
-    if (!c) return;
-    const d = document.createElement('div');
-    d.style.display = 'flex';
-    d.style.gap = '4px';
-    d.style.marginBottom = '4px';
-    d.innerHTML = `<input placeholder="Текст" value="${esc(l)}" style="flex:1;padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-family:inherit;"><input placeholder="Ссылка" value="${esc(u)}" style="flex:1;padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-family:inherit;"><button onclick="this.parentElement.remove()" style="background:transparent;border:none;color:#e74c3c;cursor:pointer;">✕</button>`;
-    c.appendChild(d);
+// ================================================================
+// КОММЕНТАРИИ (НОВАЯ ЛОГИКА: toggle, три точки, редактирование)
+// ================================================================
+function getPostPath(type) {
+    return type === 'group' ? 'group_posts/' + currentGroup : 'feed_posts';
 }
 
-function fSubmit() {
-    if (!USER) { alert('Войдите!'); return; }
-    const marquee = document.getElementById('fMarquee').value.trim();
-    const text = document.getElementById('fText').value.trim();
-    const link = document.getElementById('fLink').value.trim();
-    const hr = document.getElementById('fHashtags').value.trim();
-    const hashtags = hr ? hr.split(/\s+/).filter(t => t.startsWith('#')).slice(0, 5) : [];
-    if (!text && !link) { alert('Введите текст или ссылку'); return; }
-    const buttons = [];
-    document.querySelectorAll('#fBtns > div').forEach(g => {
-        const inputs = g.querySelectorAll('input');
-        if (inputs[1] && inputs[1].value.trim()) buttons.push({ label: (inputs[0]?.value.trim() || '🔗'), url: inputs[1].value.trim() });
+let currentGroup = null;
+
+function loadComments(postId, type) {
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').orderByChild('timestamp').on('value', snap => {
+        const container = document.getElementById('commentsContainer_' + postId);
+        if (!container) return;
+        container.innerHTML = '';
+        const data = snap.val() || {};
+        const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
+
+        const countEl = document.getElementById('commentCount_' + postId);
+        if (countEl) countEl.textContent = keys.length;
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(keys.length);
+
+        if (!keys.length) {
+            container.innerHTML = '<div style="color:#bbb;font-size:0.6rem;padding:6px 0;">Нет комментариев</div>';
+            return;
+        }
+
+        keys.forEach(k => {
+            const c = data[k];
+            const div = document.createElement('div');
+            div.className = 'comment';
+            const letter = (c.author || '?').charAt(0).toUpperCase();
+            
+            const canEdit = (c.author === USER || IS_ADMIN);
+            
+            div.innerHTML = `
+                <span class="avatar-wrap" id="comment-avatar-${k}"><span class="letter">${letter}</span></span>
+                <div class="body">
+                    <span class="name">${esc(c.author || 'Аноним')}</span>
+                    <span class="time">${c.time || ''}</span>
+                    <div class="text" id="comment-text-${k}">${esc(c.text || '')}</div>
+                </div>
+                <div class="comment-actions">
+                    ${canEdit ? `
+                    <div class="comment-menu">
+                        <button class="more-btn" onclick="toggleCommentMenu('${k}')">⋮</button>
+                        <div class="dropdown" id="commentMenu_${k}">
+                            <button class="edit-btn" onclick="editComment('${postId}','${k}','${type}')">✏️ Редактировать</button>
+                            <button class="del-btn" onclick="deleteComment('${postId}','${k}','${type}')">🗑 Удалить</button>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            container.appendChild(div);
+            
+            if (c.authorUid) {
+                const avatarEl = document.getElementById('comment-avatar-' + k);
+                if (avatarEl) renderAvatar(c.authorUid, avatarEl, letter);
+            }
+        });
     });
-    const post = {
+}
+
+function toggleComments(postId, type) {
+    const body = document.getElementById('commentsBody_' + postId);
+    if (!body) return;
+    body.classList.toggle('open');
+}
+
+function toggleCommentMenu(commentId) {
+    const menu = document.getElementById('commentMenu_' + commentId);
+    if (!menu) return;
+    document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => {
+        if (el.id !== 'commentMenu_' + commentId) el.classList.remove('open');
+    });
+    menu.classList.toggle('open');
+}
+
+// Закрываем меню при клике вне
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.comment-menu')) {
+        document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => el.classList.remove('open'));
+    }
+});
+
+function submitComment(postId, type) {
+    if (!USER) { alert('Войдите!'); return; }
+    const input = document.getElementById('commentInput_' + postId);
+    const text = input.value.trim();
+    if (!text) return;
+
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
         author: USER,
         authorUid: USER_UID,
-        text: text || '📝',
+        text: text,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now(),
-        marquee: marquee || null,
-        link: link || null,
-        buttons: buttons,
-        hashtags: hashtags,
-        edited: false
-    };
-    const ref = db.ref('sites/' + SITE + '/feed_posts');
-    if (feedEditId) {
-        ref.child(feedEditId).update({ ...post, edited: true, editedAt: Date.now() }).then(fCancel);
-    } else {
-        ref.push(post).then(fCancel);
-    }
+        timestamp: Date.now()
+    });
+    input.value = '';
 }
 
-function fCancel() {
-    ['fMarquee', 'fText', 'fLink', 'fHashtags'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    const btns = document.getElementById('fBtns');
-    if (btns) btns.innerHTML = '';
-    const submitBtn = document.getElementById('fSubmitBtn');
-    if (submitBtn) submitBtn.textContent = '📤 Опубликовать';
-    feedEditId = null;
+function deleteComment(postId, commentId, type) {
+    if (!confirm('Удалить комментарий?')) return;
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
+    const menu = document.getElementById('commentMenu_' + commentId);
+    if (menu) menu.classList.remove('open');
 }
 
-function feedEdit(id) {
-    feedEditId = id;
-    db.ref('sites/' + SITE + '/feed_posts/' + id).once('value', snap => {
-        const p = snap.val();
-        if (!p) return;
-        document.getElementById('fMarquee').value = p.marquee || '';
-        document.getElementById('fText').value = p.text || '';
-        document.getElementById('fLink').value = p.link || '';
-        document.getElementById('fHashtags').value = (p.hashtags || []).join(' ');
-        const btns = document.getElementById('fBtns');
-        if (btns) btns.innerHTML = '';
-        (p.buttons || []).forEach(b => fAddBtn(b.label, b.url));
-        document.getElementById('fSubmitBtn').textContent = '💾 Обновить';
-        const form = document.getElementById('feedForm');
-        if (form) { form.style.display = 'block'; form.scrollIntoView({ behavior: 'smooth' }); }
+function editComment(postId, commentId, type) {
+    const path = getPostPath(type);
+    const textEl = document.getElementById('comment-text-' + commentId);
+    if (!textEl) return;
+    
+    const menu = document.getElementById('commentMenu_' + commentId);
+    if (menu) menu.classList.remove('open');
+    
+    const currentText = textEl.textContent;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentText;
+    input.className = 'edit-comment-input';
+    input.style.cssText = 'width:100%;padding:2px 8px;border:1px solid #1877f2;border-radius:4px;font-size:0.7rem;outline:none;';
+    
+    textEl.innerHTML = '';
+    textEl.appendChild(input);
+    input.focus();
+    input.select();
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            saveCommentEdit(postId, commentId, type, input.value.trim());
+        }
+    });
+    
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (document.activeElement !== input) {
+                saveCommentEdit(postId, commentId, type, input.value.trim());
+            }
+        }, 200);
     });
 }
 
-function feedDel(id) {
-    if (!confirm('Удалить пост?')) return;
-    db.ref('sites/' + SITE + '/feed_posts/' + id).remove();
+function saveCommentEdit(postId, commentId, type, newText) {
+    if (!newText) {
+        deleteComment(postId, commentId, type);
+        return;
+    }
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
+        text: newText,
+        edited: true
+    });
 }
+
+// ================================================================
+// ПОСТЫ (СОЗДАНИЕ, РЕДАКТИРОВАНИЕ, УДАЛЕНИЕ)
+// ================================================================
+function extractHashtags(text) {
+    if (!text) return [];
+    const matches = text.match(/#[\wа-яё]+/gi) || [];
+    return matches.slice(0, 8);
+}
+
+window.searchByTag = function(tag) {
+    const input = document.getElementById('postInput');
+    if (input) {
+        input.value = tag + ' ';
+        input.focus();
+    }
+};
+
+window.submitPost = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    const text = document.getElementById('postInput').value.trim();
+    if (!text && !pendingImageFile) { alert('Введите текст или добавьте фото'); return; }
+
+    const hashtags = extractHashtags(text);
+    const postData = {
+        author: USER,
+        authorUid: USER_UID,
+        text: text || '📷',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now(),
+        likes: 0,
+        commentCount: 0,
+        hashtags: hashtags,
+        marquee: null,
+        link: null,
+        buttons: [],
+        edited: false
+    };
+
+    const linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+    if (linkMatch) postData.link = linkMatch[1];
+
+    if (pendingImageFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            postData.img = e.target.result;
+            db.ref('sites/' + SITE + '/feed_posts').push(postData);
+            clearPostForm();
+        };
+        reader.readAsDataURL(pendingImageFile);
+    } else {
+        db.ref('sites/' + SITE + '/feed_posts').push(postData);
+        clearPostForm();
+    }
+};
+
+function clearPostForm() {
+    document.getElementById('postInput').value = '';
+    pendingImage = null;
+    pendingImageFile = null;
+    document.getElementById('previewBox').classList.remove('visible');
+    document.getElementById('fileInput').value = '';
+}
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('Только изображения!'); this.value = ''; return; }
+    if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); this.value = ''; return; }
+
+    pendingImageFile = file;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        pendingImage = ev.target.result;
+        document.getElementById('previewImg').src = pendingImage;
+        document.getElementById('previewName').textContent = file.name.slice(0, 16);
+        document.getElementById('previewBox').classList.add('visible');
+    };
+    reader.readAsDataURL(file);
+});
+
+window.removeImage = function() {
+    pendingImage = null;
+    pendingImageFile = null;
+    document.getElementById('previewBox').classList.remove('visible');
+    document.getElementById('fileInput').value = '';
+};
+
+window.togglePostMenu = function(id) {
+    const menu = document.getElementById('menu_' + id);
+    if (menu) {
+        document.querySelectorAll('.post-menu .dropdown.open').forEach(el => {
+            if (el.id !== 'menu_' + id) el.classList.remove('open');
+        });
+        menu.classList.toggle('open');
+    }
+};
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.post-menu')) {
+        document.querySelectorAll('.post-menu .dropdown.open').forEach(el => el.classList.remove('open'));
+    }
+});
+
+window.deletePost = function(id, type) {
+    if (!confirm('🗑 Удалить пост?')) return;
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
+    const menu = document.getElementById('menu_' + id);
+    if (menu) menu.classList.remove('open');
+};
+
+window.openEdit = function(id, type) {
+    EDITING_ID = { id: id, type: type };
+    document.getElementById('editModal').classList.add('open');
+    const path = getPostPath(type);
+    const menu = document.getElementById('menu_' + id);
+    if (menu) menu.classList.remove('open');
+    db.ref('sites/' + SITE + '/' + path + '/' + id).once('value', snap => {
+        const p = snap.val();
+        if (!p) return;
+        document.getElementById('editMarquee').value = p.marquee || '';
+        document.getElementById('editText').value = p.text || '';
+        document.getElementById('editLink').value = p.link || '';
+        document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
+        const container = document.getElementById('editButtonsContainer');
+        container.innerHTML = '';
+        const btns = p.buttons || [];
+        btns.forEach(btn => addEditBtn(btn.label, btn.url));
+        if (btns.length === 0) addEditBtn('', '');
+    });
+};
+
+window.addEditBtn = function(label = '', url = '') {
+    const container = document.getElementById('editButtonsContainer');
+    const div = document.createElement('div');
+    div.className = 'btn-group';
+    div.innerHTML = `
+        <input class="btn-label-input" placeholder="Текст кнопки" value="${esc(label)}">
+        <input class="btn-url-input" placeholder="Ссылка" value="${esc(url)}">
+        <button class="btn-remove" onclick="removeEditBtn(this)">✕</button>
+    `;
+    container.appendChild(div);
+};
+
+window.removeEditBtn = function(btn) {
+    const group = btn.parentElement;
+    if (document.getElementById('editButtonsContainer').children.length > 1) {
+        group.remove();
+    } else {
+        group.querySelector('.btn-label-input').value = '';
+        group.querySelector('.btn-url-input').value = '';
+    }
+};
+
+window.saveEdit = function() {
+    if (!EDITING_ID) return;
+    const { id, type } = EDITING_ID;
+    const path = getPostPath(type);
+    const marquee = document.getElementById('editMarquee').value.trim();
+    const text = document.getElementById('editText').value.trim();
+    const link = document.getElementById('editLink').value.trim();
+    const hashtagsRaw = document.getElementById('editHashtags').value.trim();
+    const hashtags = hashtagsRaw ? hashtagsRaw.split(/\s+/).filter(t => t.startsWith('#')) : [];
+    const buttons = [];
+    document.querySelectorAll('#editButtonsContainer .btn-group').forEach(g => {
+        const label = g.querySelector('.btn-label-input').value.trim();
+        const url = g.querySelector('.btn-url-input').value.trim();
+        if (url) buttons.push({ label: label || '🔗 Перейти', url });
+    });
+    const updates = {
+        marquee: marquee || null,
+        text: text || '📝',
+        link: link || null,
+        hashtags: hashtags,
+        buttons: buttons,
+        edited: true,
+        editedAt: Date.now()
+    };
+    db.ref('sites/' + SITE + '/' + path + '/' + id).update(updates);
+    closeEdit();
+    alert('✅ Пост обновлён!');
+};
+
+window.deleteEditPost = function() {
+    if (!EDITING_ID) return;
+    if (!confirm('🗑 Удалить пост навсегда?')) return;
+    const { id, type } = EDITING_ID;
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
+    closeEdit();
+};
+
+window.closeEdit = function() {
+    document.getElementById('editModal').classList.remove('open');
+    EDITING_ID = null;
+};
+
+window.toggleLike = function(postId, type) {
+    if (!USER) { alert('Войдите!'); return; }
+    const key = 'lk_' + postId + '_' + USER_UID;
+    const liked = localStorage.getItem(key) === '1';
+    const path = getPostPath(type);
+    const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/likes');
+    if (liked) {
+        ref.transaction(v => Math.max(0, (v || 0) - 1));
+        localStorage.removeItem(key);
+    } else {
+        ref.transaction(v => (v || 0) + 1);
+        localStorage.setItem(key, '1');
+    }
+};
