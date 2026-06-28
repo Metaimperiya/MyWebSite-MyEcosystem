@@ -1,87 +1,253 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAIMPERIYA - Социальная сеть</title>
-    <meta name="description" content="Социальная сеть нового поколения для общения и знакомств">
-    <meta name="keywords" content="социальная сеть, общение, друзья, сообщества">
-    <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>METAIMPERIYA</title>
+
+    <!-- ===== ПОДКЛЮЧАЕМ СТИЛИ ===== -->
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/mobile.css" />
+
+    <!-- ===== FIREBASE ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <style>
+        /* Базовые стили прямо здесь, остальное в css/ */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background:#f0f2f5;
+            font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding:16px;
+            max-width:800px;
+            margin:0 auto;
+            min-height:100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        /* Тёмная тема */
+        body.dark { background:#18191a; color:#e4e6eb; }
+        body.dark .card { background:#242526; }
+        body.dark .user-item { border-color:#3a3b3c; }
+        body.dark .user-item:hover { background:#3a3b3c; }
+        body.dark .tab-bar { background:#242526; }
+        body.dark .tab { color:#b0b3b8; }
+        body.dark .tab.active { background:#1877f2; color:white; }
+        body.dark .header { background:#242526; }
+        body.dark .profile-page { background:#242526; }
+        body.dark .chat-window { background:#242526; }
+        body.dark .chat-window .chat-messages { background:#18191a; }
+        body.dark .chat-window .chat-messages .msg { background:#3a3b3c; color:#e4e6eb; }
+        body.dark .chat-window .chat-messages .msg.self { background:#1877f2; color:white; }
+        body.dark .chat-window .chat-input-wrap { background:#242526; border-color:#3a3b3c; }
+        body.dark .chat-window .chat-input-wrap input { background:#3a3b3c; color:#e4e6eb; border-color:#4a4b4c; }
+        body.dark .modal-content { background:#242526; }
+        body.dark .modal-content input { background:#3a3b3c; color:#e4e6eb; border-color:#4a4b4c; }
+        body.dark .profile-dropdown { background:#242526; border-color:#3a3b3c; }
+        body.dark .profile-dropdown .dropdown-item:hover { background:#3a3b3c; }
+        body.dark .profile-dropdown .toggle-wrap { color:#e4e6eb; }
+        body.dark .context-menu { background:#242526; border-color:#3a3b3c; }
+        body.dark .context-menu .menu-item:hover { background:#3a3b3c; }
+        body.dark .btn-action { background:#3a3b3c; color:#e4e6eb; }
+        body.dark .btn-action:hover { background:#4a4b4c; }
+        body.dark .google-btn { background:#3a3b3c; color:#e4e6eb; border-color:#4a4b4c; }
+        body.dark .google-btn:hover { background:#4a4b4c; }
+        body.dark .notif-item.unread { background:#2d3a4a; }
+        body.dark .notif-item:hover { background:#3a3b3c; }
+        body.dark .room-card { background:#3a3b3c; }
+        body.dark .room-card:hover { background:#4a4b4c; }
+        body.dark .stat-toggle { background:#3a3b3c; color:#b0b3b8; }
+        body.dark .stat-toggle.active { background:#1877f2; color:white; }
+        body.dark .stat-list .stat-item { background:#3a3b3c; color:#e4e6eb; }
+        body.dark .stat-private { color:#b0b3b8; }
+        body.dark .admin-panel { background:#1a2a3a; border-color:#1877f2; }
+        body.dark .header .avatar-small { background:#3a3b3c; }
+    </style>
 </head>
 <body>
-    <!-- ===== HEADER ===== -->
-    <header class="header">
-        <div class="header-inner">
-            <a href="/" class="logo">🏠 METAIMPERIYA</a>
-            <div class="header-right">
-                <a href="/admin/" class="admin-link">⚙️ Админ</a>
-                <div class="avatar-small" id="headerAvatar">?</div>
+
+<!-- ============================================================ -->
+<!-- ШАПКА -->
+<!-- ============================================================ -->
+<header class="header">
+    <div class="left">
+        <h2 onclick="navigateToFeed()">🏠 METAIMPERIYA</h2>
+    </div>
+    <div class="right">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Тёмная тема">🌙</button>
+        <button class="notif-btn" onclick="openNotifications()" id="notifBtn">
+            🔔
+            <span class="badge" id="notifBadge" style="display:none;">0</span>
+        </button>
+        <div class="avatar-small" id="headerAvatar" onclick="navigateToProfile(USER_UID)">
+            <span>?</span>
+        </div>
+    </div>
+</header>
+
+<!-- ============================================================ -->
+<!-- АДМИН-ПАНЕЛЬ -->
+<!-- ============================================================ -->
+<div class="admin-panel" id="adminPanel">
+    <span style="font-weight:600;color:#1877f2;font-size:13px;">👑 Админ-панель</span>
+    <button class="btn-action admin-only" onclick="adminDeleteAllUsers()" style="background:#e74c3c;color:white;">🗑 Удалить всех</button>
+    <button class="btn-action admin-only" onclick="adminClearRooms()" style="background:#e74c3c;color:white;">🧹 Очистить комнаты</button>
+    <button class="btn-action admin-only" onclick="adminClearNotifications()" style="background:#e74c3c;color:white;">🔔 Очистить уведомления</button>
+    <button class="btn-action admin-only" onclick="adminExportData()" style="background:#27ae60;color:white;">📤 Экспорт</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- МЕНЮ (ТАБЫ) -->
+<!-- ============================================================ -->
+<nav class="tab-bar">
+    <button class="tab active" onclick="showTab('feed')">📰 Лента</button>
+    <button class="tab" onclick="showTab('groups')">👥 Группы</button>
+    <button class="tab" onclick="showTab('people')">👤 Люди</button>
+</nav>
+
+<!-- ============================================================ -->
+<!-- СТРАНИЦЫ -->
+<!-- ============================================================ -->
+
+<!-- ЛЕНТА -->
+<section id="feedPage" class="page active">
+    <div class="card">
+        <h3>📰 Лента</h3>
+        <div id="feedForm" style="display:none;margin-bottom:12px;">
+            <input type="text" id="fMarquee" placeholder="Бегущая строка" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;margin-bottom:4px;font-family:inherit;">
+            <textarea id="fText" placeholder="Текст поста..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;margin-bottom:4px;font-family:inherit;min-height:50px;"></textarea>
+            <input type="url" id="fLink" placeholder="Ссылка (iframe)" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;margin-bottom:4px;font-family:inherit;">
+            <input type="text" id="fHashtags" placeholder="#хештеги через пробел" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;margin-bottom:4px;font-family:inherit;">
+            <div id="fBtns" style="margin-bottom:4px;"></div>
+            <button onclick="fAddBtn()" style="background:transparent;border:1px solid #ddd;border-radius:20px;padding:2px 12px;cursor:pointer;font-size:12px;margin-bottom:6px;">➕ Кнопку</button>
+            <div style="display:flex;gap:6px;">
+                <button id="fSubmitBtn" onclick="fSubmit()" style="flex:1;background:#1877f2;color:white;border:none;border-radius:8px;padding:8px;font-weight:600;cursor:pointer;">📤 Опубликовать</button>
+                <button onclick="fCancel()" style="flex:1;background:#e4e6eb;border:none;border-radius:8px;padding:8px;font-weight:600;cursor:pointer;">✕ Отмена</button>
             </div>
         </div>
-    </header>
+        <div id="feedPosts"></div>
+    </div>
+</section>
 
-    <!-- ===== NAV ===== -->
-    <nav class="tab-bar">
-        <a href="/" class="tab active">👥 Группы</a>
-        <a href="/people.html" class="tab">👤 Люди</a>
-    </nav>
+<!-- ГРУППЫ -->
+<section id="groupsPage" class="page hidden">
+    <div class="card">
+        <h3>👥 Группы</h3>
+        <div id="roomsList" class="room-grid"></div>
+    </div>
+</section>
 
-    <!-- ===== CONTENT ===== -->
-    <main class="container">
-        <div class="card">
-            <h3>👥 Группы</h3>
-            <div class="group-grid">
-                <a href="/group/general/" class="group-card">
-                    <div class="icon">🌍</div>
-                    <div class="name">Общий</div>
-                    <div class="count">💬 0</div>
-                </a>
-                <a href="/group/sport/" class="group-card">
-                    <div class="icon">⚽</div>
-                    <div class="name">Спорт</div>
-                    <div class="count">💬 0</div>
-                </a>
-                <a href="/group/games/" class="group-card">
-                    <div class="icon">🎮</div>
-                    <div class="name">Игры</div>
-                    <div class="count">💬 0</div>
-                </a>
-                <a href="/group/music/" class="group-card">
-                    <div class="icon">🎵</div>
-                    <div class="name">Музыка</div>
-                    <div class="count">💬 0</div>
-                </a>
-            </div>
+<!-- ЛЮДИ -->
+<section id="peoplePage" class="page hidden">
+    <div class="card">
+        <h3>👤 Все пользователи</h3>
+        <div id="peopleList"></div>
+    </div>
+</section>
+
+<!-- ПРОФИЛЬ -->
+<section id="profilePage" class="page hidden">
+    <div id="profileContent"></div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ЧАТ (ПЛАВАЮЩЕЕ ОКНО) -->
+<!-- ============================================================ -->
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <span class="title" id="chatTitle">💬 Чат</span>
+        <button class="close-btn" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendChat()">
+        <button onclick="sendChat()">→</button>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- КОНТЕКСТНОЕ МЕНЮ -->
+<!-- ============================================================ -->
+<div class="context-menu" id="contextMenu">
+    <button class="menu-item" onclick="editProfile();closeContextMenu();">
+        <span class="icon">✏️</span> Редактировать
+    </button>
+    <button class="menu-item" onclick="uploadAvatar();closeContextMenu();">
+        <span class="icon">📷</span> Сменить аватар
+    </button>
+    <div class="menu-divider"></div>
+    <button class="menu-item danger" onclick="logout();closeContextMenu();">
+        <span class="icon">🚪</span> Выйти
+    </button>
+</div>
+<div class="context-overlay" id="contextOverlay" onclick="closeContextMenu()"></div>
+
+<!-- ============================================================ -->
+<!-- УВЕДОМЛЕНИЯ (МОДАЛКА) -->
+<!-- ============================================================ -->
+<div class="modal" id="notificationsModal">
+    <div class="modal-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h3 style="margin:0;">🔔 Уведомления</h3>
+            <button onclick="closeNotifications()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#999;">✕</button>
         </div>
+        <div id="notificationsList"></div>
+    </div>
+</div>
 
-        <div class="card">
-            <h3>👤 Пользователи</h3>
-            <div class="user-list">
-                <a href="/user/playerlikee/" class="user-item">
-                    <div class="avatar">P</div>
-                    <div class="info">
-                        <div class="name">PLAYER Likee</div>
-                        <div class="username">@playerlikee</div>
-                    </div>
-                </a>
-                <a href="/user/jobsmoscowru/" class="user-item">
-                    <div class="avatar">J</div>
-                    <div class="info">
-                        <div class="name">Jobs Moscow ru</div>
-                        <div class="username">@jobsmoscowru</div>
-                    </div>
-                </a>
-                <a href="/user/allrabotniki/" class="user-item">
-                    <div class="avatar">В</div>
-                    <div class="info">
-                        <div class="name">Все Работники</div>
-                        <div class="username">@allrabotniki</div>
-                    </div>
-                </a>
-            </div>
+<!-- ============================================================ -->
+<!-- ВХОД (МОДАЛКА) -->
+<!-- ============================================================ -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <h3>👤 Вход</h3>
+        <button class="google-btn" id="googleBtn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+            Войти через Google
+        </button>
+        <div style="text-align:center;margin:8px 0;color:#65676b;font-size:13px;">или</div>
+        <div style="display:flex;gap:8px;">
+            <input type="text" id="nameInput" placeholder="Введите имя" style="flex:1;">
+            <button class="btn-action" onclick="loginName()" style="flex-shrink:0;background:#1877f2;color:white;padding:8px 14px;border-radius:8px;border:none;font-weight:600;cursor:pointer;">Войти</button>
         </div>
-    </main>
+        <div id="savedProfiles" style="margin-top:12px;border-top:1px solid #e4e6eb;padding-top:12px;">
+            <p style="color:#65676b;font-size:13px;margin-bottom:8px;">📱 Сохраненные профили:</p>
+            <div id="profileSelector" class="profile-selector"></div>
+        </div>
+    </div>
+</div>
 
-    <script src="/script.js"></script>
+<!-- ============================================================ -->
+<!-- РЕДАКТИРОВАНИЕ ПРОФИЛЯ (МОДАЛКА) -->
+<!-- ============================================================ -->
+<div class="modal" id="editProfileModal">
+    <div class="modal-content">
+        <h3>✏️ Редактировать</h3>
+        <input type="text" id="editName" placeholder="Имя">
+        <input type="text" id="editBio" placeholder="О себе">
+        <div class="btns">
+            <button class="cancel" onclick="closeEditProfile()">Отмена</button>
+            <button class="save" onclick="saveProfile()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- СКРИПТЫ -->
+<!-- ============================================================ -->
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/friends.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/groups.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/feed.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/app.js"></script>
+
 </body>
 </html>
