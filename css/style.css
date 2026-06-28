@@ -650,3 +650,212 @@ body.dark .card h3 { color:#e4e6eb; }
         font-size: 10px;
     }
 }
+
+/* ===== ПЛЕЕР-КАРТОЧКА (ВНУТРИ ЛЕНТЫ) ===== */
+.player-card {
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.player-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1877f2;
+}
+
+.player-toggle {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #555;
+    transition: 0.2s;
+}
+
+.player-toggle:hover {
+    background: #f0f2f5;
+    border-color: #1877f2;
+    color: #1877f2;
+}
+
+.player-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.play-btn-big {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: 0.2s;
+}
+
+.play-btn-big:hover {
+    background: #4a9eff;
+    transform: scale(1.05);
+}
+
+.player-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.track-name-big {
+    font-weight: 600;
+    font-size: 13px;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.track-progress span {
+    font-size: 10px;
+    color: #888;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 4px;
+    background: #e4e6eb;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #1877f2;
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.1s;
+}
+
+.player-controls-big {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.player-controls-big button {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-controls-big button:hover {
+    background: #f0f2f5;
+    border-color: #1877f2;
+    color: #1877f2;
+}
+
+/* ===== ВЫПАДАЮЩИЙ СПИСОК ===== */
+.playlist-dropdown {
+    display: none;
+    margin-top: 10px;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.playlist-dropdown.open {
+    display: block;
+}
+
+.playlist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.15s;
+    font-size: 13px;
+}
+
+.playlist-item:hover {
+    background: #f0f2f5;
+}
+
+.playlist-item.active {
+    background: #e8f0fe;
+    color: #1877f2;
+    font-weight: 600;
+}
+
+.playlist-item .playlist-num {
+    color: #999;
+    font-size: 11px;
+    width: 24px;
+    flex-shrink: 0;
+}
+
+.playlist-item .playlist-name {
+    flex: 1;
+}
+
+.playlist-item .playlist-duration {
+    color: #999;
+    font-size: 11px;
+}
+
+/* Адаптив для плеера */
+@media (max-width: 480px) {
+    .play-btn-big {
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+    }
+    .track-name-big {
+        font-size: 12px;
+    }
+    .player-controls-big button {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    .playlist-item {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    .playlist-item .playlist-num {
+        font-size: 10px;
+        width: 20px;
+    }
+}
