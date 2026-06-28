@@ -3,13 +3,11 @@
 // АДМИНКА ОСТАЕТСЯ! РЕДАКТИРОВАТЬ МОЖЕТ ТОЛЬКО АДМИН ИЛИ АВТОР
 // ================================================================
 
-// ===== РАЗМЕР ФРЕЙМА (ТУМБЛЕР) =====
-let currentFrameSize = localStorage.getItem('frameSize_' + SITE) || 'small';
+// ===== РАЗМЕР ФРЕЙМА (ТУМБЛЕР ДЛЯ РЕДАКТИРОВАНИЯ) =====
+let currentFrameSize = 'small';
 
 function setFrameSize(size) {
     currentFrameSize = size;
-    localStorage.setItem('frameSize_' + SITE, size);
-    
     document.querySelectorAll('.frame-size-btn').forEach(btn => {
         btn.classList.remove('active');
     });
@@ -20,10 +18,6 @@ function setFrameSize(size) {
         const btn = document.getElementById('frameSizeLarge');
         if (btn) btn.classList.add('active');
     }
-    
-    document.querySelectorAll('.post .link-preview iframe').forEach(iframe => {
-        iframe.className = size;
-    });
 }
 
 // ===== ЗАГРУЗКА ЛЕНТЫ =====
@@ -81,10 +75,11 @@ function renderPost(p, type) {
         buttonsHtml += '</div>';
     }
 
-    // ===== ФРЕЙМ С РАЗМЕРОМ =====
+    // ===== ФРЕЙМ С РАЗМЕРОМ ИЗ ПОСТА =====
     let previewHtml = '';
     if (p.link) {
-        previewHtml = `<div class="link-preview"><iframe src="${p.link}" class="${currentFrameSize}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
+        const frameSize = p.frameSize || 'small';
+        previewHtml = `<div class="link-preview"><iframe src="${p.link}" class="${frameSize}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
     }
 
     let hashtagsHtml = '';
@@ -96,7 +91,7 @@ function renderPost(p, type) {
         hashtagsHtml += '</div>';
     }
 
-    // ===== ТРИ ТОЧКИ ВЕРТИКАЛЬНЫЕ (ТОЛЬКО ДЛЯ АДМИНА ИЛИ АВТОРА) =====
+    // ===== ТРИ ТОЧКИ =====
     let menuHtml = '';
     if (p.author === USER || IS_ADMIN) {
         menuHtml = `
@@ -110,7 +105,6 @@ function renderPost(p, type) {
         `;
     }
 
-    // ===== КНОПКИ ЛАЙКОВ И КОММЕНТАРИЕВ =====
     let actionsHtml = `
         <div class="stats">
             <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
@@ -122,7 +116,6 @@ function renderPost(p, type) {
         </div>
     `;
 
-    // ===== КОММЕНТАРИИ (СПИСОК СКРЫТ, ПОЛЕ ВВОДА ВСЕГДА ВИДНО) =====
     let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
             <button class="toggle" onclick="toggleComments('${p.id}', '${type}')" id="commentsToggle_${p.id}">
@@ -138,7 +131,6 @@ function renderPost(p, type) {
         </div>
     `;
 
-    // ===== СБОРКА ПОСТА =====
     div.innerHTML = `
         ${menuHtml}
         ${marqueeHtml}
@@ -156,19 +148,17 @@ function renderPost(p, type) {
         ${commentsHtml}
     `;
 
-    // ===== АВАТАРКА АВТОРА =====
     if (p.authorUid) {
         const avatarEl = document.getElementById('post-avatar-' + p.id);
         if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
     }
 
-    // ===== ЗАГРУЗКА КОММЕНТАРИЕВ =====
     loadComments(p.id, type);
     return div;
 }
 
 // ================================================================
-// КОММЕНТАРИИ (С РЕДАКТИРОВАНИЕМ И ТРЕМЯ ТОЧКАМИ)
+// КОММЕНТАРИИ
 // ================================================================
 
 function loadComments(postId, type) {
@@ -196,7 +186,6 @@ function loadComments(postId, type) {
             div.className = 'comment';
             const letter = (c.author || '?').charAt(0).toUpperCase();
             
-            // ===== ТРИ ТОЧКИ ДЛЯ КОММЕНТАРИЯ (ТОЛЬКО АДМИН ИЛИ АВТОР) =====
             const canEdit = (c.author === USER || IS_ADMIN);
             
             div.innerHTML = `
@@ -228,7 +217,6 @@ function loadComments(postId, type) {
     });
 }
 
-// ===== ТОГГЛ МЕНЮ КОММЕНТАРИЯ =====
 function toggleCommentMenu(commentId) {
     const menu = document.getElementById('commentMenu_' + commentId);
     if (!menu) return;
@@ -238,14 +226,12 @@ function toggleCommentMenu(commentId) {
     menu.classList.toggle('open');
 }
 
-// ===== ЗАКРЫТИЕ МЕНЮ ПРИ КЛИКЕ ВНЕ =====
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.comment-menu')) {
         document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => el.classList.remove('open'));
     }
 });
 
-// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
 window.toggleComments = function(postId, type) {
     const list = document.getElementById('commentsList_' + postId);
     const toggle = document.getElementById('commentsToggle_' + postId);
@@ -257,7 +243,6 @@ window.toggleComments = function(postId, type) {
     }
 };
 
-// ===== ОТПРАВИТЬ КОММЕНТАРИЙ =====
 window.submitComment = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
     const input = document.getElementById('commentInput_' + postId);
@@ -274,7 +259,6 @@ window.submitComment = function(postId, type) {
     });
     input.value = '';
     
-    // ===== ОТКРЫВАЕМ КОММЕНТАРИИ ПОСЛЕ ОТПРАВКИ =====
     const list = document.getElementById('commentsList_' + postId);
     const toggle = document.getElementById('commentsToggle_' + postId);
     if (list) {
@@ -285,12 +269,10 @@ window.submitComment = function(postId, type) {
     }
 };
 
-// ===== УДАЛИТЬ КОММЕНТАРИЙ =====
 window.deleteComment = function(postId, commentId, type) {
     if (!confirm('Удалить комментарий?')) return;
     const path = getPostPath(type);
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
-    // Закрываем меню
     const menu = document.getElementById('commentMenu_' + commentId);
     if (menu) menu.classList.remove('open');
 };
@@ -304,7 +286,6 @@ function editComment(postId, commentId, type) {
     const textEl = document.getElementById('comment-text-' + commentId);
     if (!textEl) return;
     
-    // Закрываем меню
     const menu = document.getElementById('commentMenu_' + commentId);
     if (menu) menu.classList.remove('open');
     
@@ -368,7 +349,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// УДАЛИТЬ ПОСТ (ТОЛЬКО АДМИН ИЛИ АВТОР)
+// УДАЛИТЬ ПОСТ
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -380,7 +361,7 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ ПОСТА (ТОЛЬКО АДМИН ИЛИ АВТОР)
+// РЕДАКТИРОВАНИЕ ПОСТА
 // ================================================================
 
 window.openEdit = function(id, type) {
@@ -400,9 +381,9 @@ window.openEdit = function(id, type) {
         document.getElementById('editLink').value = p.link || '';
         document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
 
-        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА =====
-        const size = localStorage.getItem('frameSize_' + SITE) || 'small';
-        setFrameSize(size);
+        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА ИЗ ПОСТА =====
+        const frameSize = p.frameSize || 'small';
+        setFrameSize(frameSize);
 
         const container = document.getElementById('editButtonsContainer');
         container.innerHTML = '';
@@ -458,6 +439,7 @@ window.saveEdit = function() {
         link: link || null,
         hashtags: hashtags,
         buttons: buttons,
+        frameSize: currentFrameSize, // СОХРАНЯЕМ РАЗМЕР ФРЕЙМА В ПОСТ
         edited: true,
         editedAt: Date.now()
     };
@@ -482,7 +464,7 @@ window.closeEdit = function() {
 };
 
 // ================================================================
-// МЕНЮ ПОСТА (ТРИ ТОЧКИ ВЕРТИКАЛЬНЫЕ)
+// МЕНЮ ПОСТА
 // ================================================================
 
 window.togglePostMenu = function(id) {
@@ -537,6 +519,7 @@ window.submitPost = function() {
         marquee: null,
         link: null,
         buttons: [],
+        frameSize: 'small', // ПО УМОЛЧАНИЮ МАЛЕНЬКИЙ ФРЕЙМ
         edited: false
     };
 
