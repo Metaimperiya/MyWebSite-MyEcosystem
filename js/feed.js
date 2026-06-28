@@ -141,7 +141,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// КОММЕНТАРИИ
+// КОММЕНТАРИИ (С РЕДАКТИРОВАНИЕМ И ТРЕМЯ ТОЧКАМИ)
 // ================================================================
 
 function loadComments(postId, type) {
@@ -168,17 +168,31 @@ function loadComments(postId, type) {
             const div = document.createElement('div');
             div.className = 'comment';
             const letter = (c.author || '?').charAt(0).toUpperCase();
-            const canDelete = (c.author === USER || IS_ADMIN);
+            
+            // ===== ТРИ ТОЧКИ ДЛЯ КОММЕНТАРИЯ (ТОЛЬКО АДМИН ИЛИ АВТОР) =====
+            const canEdit = (c.author === USER || IS_ADMIN);
+            
             div.innerHTML = `
                 <span class="avatar-wrap" id="comment-avatar-${k}"><span class="letter">${letter}</span></span>
                 <div class="body">
                     <span class="name">${esc(c.author || 'Аноним')}</span>
-                    <span class="time">${c.time || ''}</span>
-                    <div class="text">${esc(c.text || '')}</div>
+                    <span class="time">${c.time || ''}${c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
+                    <div class="text" id="comment-text-${k}">${esc(c.text || '')}</div>
                 </div>
-                ${canDelete ? `<button onclick="deleteComment('${postId}','${k}','${type}')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:0.45rem;">✕</button>` : ''}
+                ${canEdit ? `
+                <div class="comment-actions">
+                    <div class="comment-menu">
+                        <button class="more-btn" onclick="toggleCommentMenu('${k}')">⋮</button>
+                        <div class="dropdown" id="commentMenu_${k}">
+                            <button class="edit-btn" onclick="editComment('${postId}','${k}','${type}')">✏️ Редактировать</button>
+                            <button class="del-btn" onclick="deleteComment('${postId}','${k}','${type}')">🗑 Удалить</button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
             `;
             container.appendChild(div);
+            
             if (c.authorUid) {
                 const avatarEl = document.getElementById('comment-avatar-' + k);
                 if (avatarEl) renderAvatar(c.authorUid, avatarEl, letter);
@@ -186,6 +200,23 @@ function loadComments(postId, type) {
         });
     });
 }
+
+// ===== ТОГГЛ МЕНЮ КОММЕНТАРИЯ =====
+function toggleCommentMenu(commentId) {
+    const menu = document.getElementById('commentMenu_' + commentId);
+    if (!menu) return;
+    document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => {
+        if (el.id !== 'commentMenu_' + commentId) el.classList.remove('open');
+    });
+    menu.classList.toggle('open');
+}
+
+// ===== ЗАКРЫТИЕ МЕНЮ ПРИ КЛИКЕ ВНЕ =====
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.comment-menu')) {
+        document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => el.classList.remove('open'));
+    }
+});
 
 // ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
 window.toggleComments = function(postId, type) {
@@ -223,7 +254,62 @@ window.deleteComment = function(postId, commentId, type) {
     if (!confirm('Удалить комментарий?')) return;
     const path = getPostPath(type);
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
+    // Закрываем меню
+    const menu = document.getElementById('commentMenu_' + commentId);
+    if (menu) menu.classList.remove('open');
 };
+
+// ================================================================
+// РЕДАКТИРОВАНИЕ КОММЕНТАРИЕВ
+// ================================================================
+
+function editComment(postId, commentId, type) {
+    const path = getPostPath(type);
+    const textEl = document.getElementById('comment-text-' + commentId);
+    if (!textEl) return;
+    
+    // Закрываем меню
+    const menu = document.getElementById('commentMenu_' + commentId);
+    if (menu) menu.classList.remove('open');
+    
+    const currentText = textEl.textContent;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentText;
+    input.className = 'edit-comment-input';
+    input.style.cssText = 'width:100%;padding:2px 8px;border:1px solid #1877f2;border-radius:4px;font-size:0.7rem;outline:none;background:#fff;color:#222;';
+    
+    textEl.innerHTML = '';
+    textEl.appendChild(input);
+    input.focus();
+    input.select();
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            saveCommentEdit(postId, commentId, type, input.value.trim());
+        }
+    });
+    
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (document.activeElement !== input) {
+                saveCommentEdit(postId, commentId, type, input.value.trim());
+            }
+        }, 200);
+    });
+}
+
+function saveCommentEdit(postId, commentId, type, newText) {
+    if (!newText) {
+        deleteComment(postId, commentId, type);
+        return;
+    }
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
+        text: newText,
+        edited: true
+    });
+}
 
 // ================================================================
 // ЛАЙКИ
@@ -462,54 +548,3 @@ window.removeImage = function() {
     document.getElementById('previewBox').classList.remove('visible');
     document.getElementById('fileInput').value = '';
 };
-
-// ================================================================
-// РЕДАКТИРОВАНИЕ КОММЕНТАРИЕВ
-// ================================================================
-
-function editComment(postId, commentId, type) {
-    const path = getPostPath(type);
-    const textEl = document.getElementById('comment-text-' + commentId);
-    if (!textEl) return;
-    
-    const menu = document.getElementById('commentMenu_' + commentId);
-    if (menu) menu.classList.remove('open');
-    
-    const currentText = textEl.textContent;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = currentText;
-    input.className = 'edit-comment-input';
-    input.style.cssText = 'width:100%;padding:2px 8px;border:1px solid #1877f2;border-radius:4px;font-size:0.7rem;outline:none;';
-    
-    textEl.innerHTML = '';
-    textEl.appendChild(input);
-    input.focus();
-    input.select();
-    
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            saveCommentEdit(postId, commentId, type, input.value.trim());
-        }
-    });
-    
-    input.addEventListener('blur', function() {
-        setTimeout(() => {
-            if (document.activeElement !== input) {
-                saveCommentEdit(postId, commentId, type, input.value.trim());
-            }
-        }, 200);
-    });
-}
-
-function saveCommentEdit(postId, commentId, type, newText) {
-    if (!newText) {
-        deleteComment(postId, commentId, type);
-        return;
-    }
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
-        text: newText,
-        edited: true
-    });
-}
