@@ -3,6 +3,29 @@
 // АДМИНКА ОСТАЕТСЯ! РЕДАКТИРОВАТЬ МОЖЕТ ТОЛЬКО АДМИН ИЛИ АВТОР
 // ================================================================
 
+// ===== РАЗМЕР ФРЕЙМА (ТУМБЛЕР) =====
+let currentFrameSize = localStorage.getItem('frameSize_' + SITE) || 'small';
+
+function setFrameSize(size) {
+    currentFrameSize = size;
+    localStorage.setItem('frameSize_' + SITE, size);
+    
+    document.querySelectorAll('.frame-size-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (size === 'small') {
+        const btn = document.getElementById('frameSizeSmall');
+        if (btn) btn.classList.add('active');
+    } else {
+        const btn = document.getElementById('frameSizeLarge');
+        if (btn) btn.classList.add('active');
+    }
+    
+    document.querySelectorAll('.post .link-preview iframe').forEach(iframe => {
+        iframe.className = size;
+    });
+}
+
 // ===== ЗАГРУЗКА ЛЕНТЫ =====
 function loadFeed() {
     if (!USER_UID) {
@@ -58,9 +81,10 @@ function renderPost(p, type) {
         buttonsHtml += '</div>';
     }
 
+    // ===== ФРЕЙМ С РАЗМЕРОМ =====
     let previewHtml = '';
     if (p.link) {
-        previewHtml = `<div class="link-preview"><iframe src="${p.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
+        previewHtml = `<div class="link-preview"><iframe src="${p.link}" class="${currentFrameSize}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
     }
 
     let hashtagsHtml = '';
@@ -101,6 +125,9 @@ function renderPost(p, type) {
     // ===== КОММЕНТАРИИ (СПИСОК СКРЫТ, ПОЛЕ ВВОДА ВСЕГДА ВИДНО) =====
     let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
+            <button class="toggle" onclick="toggleComments('${p.id}', '${type}')" id="commentsToggle_${p.id}">
+                💬 Показать
+            </button>
             <div class="list" id="commentsList_${p.id}">
                 <div id="commentsContainer_${p.id}"></div>
             </div>
@@ -221,8 +248,12 @@ document.addEventListener('click', function(e) {
 // ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
 window.toggleComments = function(postId, type) {
     const list = document.getElementById('commentsList_' + postId);
+    const toggle = document.getElementById('commentsToggle_' + postId);
     if (list) {
         list.classList.toggle('open');
+        if (toggle) {
+            toggle.textContent = list.classList.contains('open') ? '▲ Скрыть' : '💬 Показать';
+        }
     }
 };
 
@@ -243,9 +274,14 @@ window.submitComment = function(postId, type) {
     });
     input.value = '';
     
+    // ===== ОТКРЫВАЕМ КОММЕНТАРИИ ПОСЛЕ ОТПРАВКИ =====
     const list = document.getElementById('commentsList_' + postId);
+    const toggle = document.getElementById('commentsToggle_' + postId);
     if (list) {
         list.classList.add('open');
+        if (toggle) {
+            toggle.textContent = '▲ Скрыть';
+        }
     }
 };
 
@@ -363,6 +399,10 @@ window.openEdit = function(id, type) {
         document.getElementById('editText').value = p.text || '';
         document.getElementById('editLink').value = p.link || '';
         document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
+
+        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА =====
+        const size = localStorage.getItem('frameSize_' + SITE) || 'small';
+        setFrameSize(size);
 
         const container = document.getElementById('editButtonsContainer');
         container.innerHTML = '';
