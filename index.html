@@ -1120,15 +1120,41 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ (ОДНА, С ТУМБЛЕРОМ) ===== -->
-    <div class="modal" id="editModal">
-        <div class="box">
-            <h3>✏️ Редактировать пост</h3>
-            <div class="sub">Измените содержимое поста</div>
-            
-            <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
-            <textarea id="editText" placeholder="📝 Текст поста"></textarea>
-            <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
+   <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ (ОДНА, С ТУМБЛЕРОМ) ===== -->
+<div class="modal" id="editModal">
+    <div class="box">
+        <h3>✏️ Редактировать пост</h3>
+        <div class="sub">Измените содержимое поста</div>
+        
+        <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
+        <textarea id="editText" placeholder="📝 Текст поста"></textarea>
+        <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
+        
+        <!-- ===== ТУМБЛЕР РАЗМЕРА ФРЕЙМА ===== -->
+        <div class="frame-size-toggle">
+            <span class="label">📐 Размер фрейма:</span>
+            <div class="btn-group">
+                <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">
+                    📱 Обычный
+                </button>
+                <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">
+                    🖥️ Широкий
+                </button>
+            </div>
+        </div>
+        
+        <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
+        <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
+        <div id="editButtonsContainer"></div>
+        <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
+        
+        <div class="btns" style="margin-top:6px;">
+            <button class="save" onclick="saveEdit()">💾 Сохранить</button>
+            <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
+        </div>
+        <button onclick="deleteEditPost()" style="width:100%;padding:3px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
+    </div>
+</div>
             
             <!-- ===== ТУМБЛЕР РАЗМЕРА ФРЕЙМА ===== -->
             <div class="frame-size-toggle">
