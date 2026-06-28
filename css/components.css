@@ -1,51 +1,491 @@
-/* Дополнительные стили для компонентов */
-.marquee-wrap {
-    background: #f5f5f5;
-    padding: 4px 10px;
+/* ================================================================
+   ФОРМА ПОСТА
+   ================================================================ */
+.post-form textarea {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
     border-radius: 6px;
-    color: #e67e22;
+    resize: vertical;
+    min-height: 36px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    outline: none;
+}
+
+.post-form textarea:focus {
+    border-color: #1877f2;
+}
+
+.post-form .actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+
+.post-form .actions button {
+    padding: 3px 12px;
+    border: none;
+    border-radius: 16px;
     font-weight: 600;
-    margin-bottom: 4px;
+    cursor: pointer;
+    font-size: 0.6rem;
+}
+
+.post-form .actions .submit {
+    background: #1877f2;
+    color: #fff;
+}
+
+.post-form .actions .cancel {
+    background: #e4e6eb;
+    color: #555;
+}
+
+.post-form .file-label {
+    background: #e4e6eb;
+    padding: 2px 10px;
+    border-radius: 16px;
+    font-size: 0.55rem;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 3px;
+    color: #555;
+}
+
+.post-form .hidden {
+    display: none;
+}
+
+.post-form .preview-box {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    background: #f5f5f5;
+    padding: 3px 8px 3px 3px;
+    border-radius: 30px;
+    margin-top: 4px;
+    border: 1px solid #ddd;
+}
+
+.post-form .preview-box.visible {
+    display: flex;
+}
+
+.post-form .preview-box img {
+    width: 24px;
+    height: 24px;
+    border-radius: 30px;
+    object-fit: cover;
+}
+
+.post-form .remove-pic {
+    background: #ffebee;
+    color: #c62828;
+    border: none;
+    border-radius: 30px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.5rem;
+}
+
+/* ================================================================
+   ПОСТ
+   ================================================================ */
+.post {
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid #e8e8e8;
+    position: relative;
+}
+
+.post .marquee {
+    background: #f5f5f5;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: #e67e22;
+    font-weight: 700;
     overflow: hidden;
     white-space: nowrap;
+    margin-bottom: 4px;
+    border: 1px solid #eee;
+    font-size: 0.7rem;
 }
-.marquee-wrap span {
+
+.post .marquee span {
     display: inline-block;
-    animation: scrollMarquee 12s linear infinite;
+    animation: scroll 12s linear infinite;
     padding-left: 100%;
 }
 
-.btn-link {
-    display: inline-block;
-    background: #e67e22;
-    color: #fff;
-    padding: 4px 14px;
-    border-radius: 40px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 12px;
-    margin: 2px 4px 2px 0;
-}
-
-.tag {
-    color: #1877f2;
-    font-size: 11px;
-    background: #f0f7ff;
-    padding: 0 8px;
-    border-radius: 20px;
-    border: 1px solid #d0e4ff;
-    display: inline-block;
-    margin: 2px;
-}
-
-.admin-delete-btn {
-    display: none !important;
-}
-.admin-mode .admin-delete-btn {
-    display: inline-flex !important;
-}
-
-@keyframes scrollMarquee {
+@keyframes scroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(-100%); }
+}
+
+.post .author {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.post .author .avatar-wrap {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1877f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post .author .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post .author .avatar-wrap .letter {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.5rem;
+}
+
+.post .name {
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: #1877f2;
+    cursor: pointer;
+}
+
+.post .time {
+    color: #999;
+    font-size: 0.45rem;
+    margin-left: 4px;
+}
+
+.post .text {
+    margin: 4px 0;
+    word-break: break-word;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: #333;
+}
+
+.post .post-img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 6px;
+    margin: 4px 0;
+    border: 1px solid #eee;
+    cursor: pointer;
+}
+
+.post .link-preview {
+    margin: 4px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.post .link-preview iframe {
+    width: 100%;
+    height: 150px;
+    border: none;
+    display: block;
+}
+
+.post .buttons-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 4px 0;
+}
+
+.post .buttons-wrap .btn-item {
+    display: block;
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.7rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.post .buttons-wrap .btn-item:hover {
+    background: #4a9eff;
+}
+
+.post .hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin: 4px 0;
+    padding-top: 4px;
+    border-top: 1px solid #eee;
+}
+
+.post .hashtags .tag {
+    color: #1877f2;
+    font-size: 0.55rem;
+    background: #e8f0fe;
+    padding: 1px 8px;
+    border-radius: 12px;
+    border: 1px solid #d0e4ff;
+    cursor: pointer;
+}
+
+.post .stats {
+    display: flex;
+    gap: 6px;
+    font-size: 0.55rem;
+    color: #888;
+    border-top: 1px solid #eee;
+    padding-top: 4px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+
+.post .stats button {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.55rem;
+    padding: 2px 4px;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.post .stats button:hover {
+    background: #f0f2f5;
+    color: #1877f2;
+}
+
+.post .stats button.liked {
+    color: #1877f2;
+}
+
+/* ================================================================
+   КОММЕНТАРИИ (НОВАЯ ЛОГИКА)
+   ================================================================ */
+.comments {
+    margin-top: 4px;
+    border-top: 1px solid #eee;
+    padding-top: 4px;
+}
+
+.comments .comments-toggle {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: 0.2s;
+}
+
+.comments .comments-toggle:hover {
+    color: #1877f2;
+}
+
+.comments .comments-toggle .count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+}
+
+.comments .comments-body {
+    display: none;
+    margin-top: 6px;
+}
+
+.comments .comments-body.open {
+    display: block;
+}
+
+.comments .comments-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 6px;
+}
+
+.comments .comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.comments .comment:last-child {
+    border-bottom: none;
+}
+
+.comments .comment .avatar-wrap {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1877f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.comments .comment .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comments .comment .avatar-wrap .letter {
+    color: #fff;
+    font-size: 0.5rem;
+    font-weight: 700;
+}
+
+.comments .comment .body {
+    flex: 1;
+    font-size: 0.75rem;
+    line-height: 1.3;
+}
+
+.comments .comment .body .name {
+    font-weight: 600;
+    color: #1877f2;
+    font-size: 0.7rem;
+}
+
+.comments .comment .body .time {
+    color: #999;
+    font-size: 0.45rem;
+    margin-left: 4px;
+}
+
+.comments .comment .body .text {
+    color: #333;
+    margin-top: 1px;
+    font-size: 0.75rem;
+}
+
+.comments .comment .comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.comments .comment .comment-actions .more-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.comments .comment .comment-actions .more-btn:hover {
+    color: #1877f2;
+}
+
+.comments .comment .comment-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.comments .comment .comment-menu .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 60;
+    min-width: 120px;
+    padding: 4px 0;
+}
+
+.comments .comment .comment-menu .dropdown.open {
+    display: block;
+}
+
+.comments .comment .comment-menu .dropdown button {
+    display: block;
+    width: 100%;
+    padding: 4px 14px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.comments .comment .comment-menu .dropdown button:hover {
+    background: #f0f2f5;
+}
+
+.comments .comment .comment-menu .dropdown .edit-btn {
+    color: #e67e22;
+}
+
+.comments .comment .comment-menu .dropdown .del-btn {
+    color: #e74c3c;
+}
+
+.comments .input-wrap {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.comments .input-wrap input {
+    flex: 1;
+    padding: 4px 10px;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    font-size: 0.7rem;
+    outline: none;
+}
+
+.comments .input-wrap input:focus {
+    border-color: #1877f2;
+}
+
+.comments .input-wrap button {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 3px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.6rem;
+}
+
+.comments .input-wrap button:hover {
+    background: #4a9eff;
 }
