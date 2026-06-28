@@ -85,9 +85,7 @@ function renderPost(p, type) {
     let hashtagsHtml = '';
     if (p.hashtags && p.hashtags.length > 0) {
         hashtagsHtml = '<div class="hashtags">';
-        p.hashtags.forEach(tag => {
-            hashtagsHtml += `<span class="tag" onclick="searchByTag('${esc(tag)}')">${esc(tag)}</span>`;
-        });
+        p.hashtags.forEach(tag => { hashtagsHtml += `<span class="tag" onclick="searchByTag('${esc(tag)}')">${esc(tag)}</span>`; });
         hashtagsHtml += '</div>';
     }
 
@@ -158,7 +156,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// КОММЕНТАРИИ
+// КОММЕНТАРИИ (С РЕДАКТИРОВАНИЕМ И ТРЕМЯ ТОЧКАМИ)
 // ================================================================
 
 function loadComments(postId, type) {
@@ -217,6 +215,7 @@ function loadComments(postId, type) {
     });
 }
 
+// ===== ТОГГЛ МЕНЮ КОММЕНТАРИЯ =====
 function toggleCommentMenu(commentId) {
     const menu = document.getElementById('commentMenu_' + commentId);
     if (!menu) return;
@@ -226,12 +225,14 @@ function toggleCommentMenu(commentId) {
     menu.classList.toggle('open');
 }
 
+// ===== ЗАКРЫТИЕ МЕНЮ ПРИ КЛИКЕ ВНЕ =====
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.comment-menu')) {
         document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => el.classList.remove('open'));
     }
 });
 
+// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
 window.toggleComments = function(postId, type) {
     const list = document.getElementById('commentsList_' + postId);
     const toggle = document.getElementById('commentsToggle_' + postId);
@@ -243,6 +244,7 @@ window.toggleComments = function(postId, type) {
     }
 };
 
+// ===== ОТПРАВИТЬ КОММЕНТАРИЙ =====
 window.submitComment = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
     const input = document.getElementById('commentInput_' + postId);
@@ -269,6 +271,7 @@ window.submitComment = function(postId, type) {
     }
 };
 
+// ===== УДАЛИТЬ КОММЕНТАРИЙ =====
 window.deleteComment = function(postId, commentId, type) {
     if (!confirm('Удалить комментарий?')) return;
     const path = getPostPath(type);
@@ -349,7 +352,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// УДАЛИТЬ ПОСТ
+// УДАЛИТЬ ПОСТ (ТОЛЬКО АДМИН ИЛИ АВТОР)
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -361,7 +364,7 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ ПОСТА
+// РЕДАКТИРОВАНИЕ ПОСТА (ТОЛЬКО АДМИН ИЛИ АВТОР)
 // ================================================================
 
 window.openEdit = function(id, type) {
@@ -439,7 +442,7 @@ window.saveEdit = function() {
         link: link || null,
         hashtags: hashtags,
         buttons: buttons,
-        frameSize: currentFrameSize,
+        frameSize: currentFrameSize, // СОХРАНЯЕМ РАЗМЕР ФРЕЙМА В ПОСТ
         edited: true,
         editedAt: Date.now()
     };
@@ -464,7 +467,7 @@ window.closeEdit = function() {
 };
 
 // ================================================================
-// МЕНЮ ПОСТА
+// МЕНЮ ПОСТА (ТРИ ТОЧКИ ВЕРТИКАЛЬНЫЕ)
 // ================================================================
 
 window.togglePostMenu = function(id) {
@@ -519,7 +522,7 @@ window.submitPost = function() {
         marquee: null,
         link: null,
         buttons: [],
-        frameSize: 'small',
+        frameSize: 'small', // ПО УМОЛЧАНИЮ МАЛЕНЬКИЙ ФРЕЙМ
         edited: false
     };
 
