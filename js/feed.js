@@ -462,3 +462,54 @@ window.removeImage = function() {
     document.getElementById('previewBox').classList.remove('visible');
     document.getElementById('fileInput').value = '';
 };
+
+// ================================================================
+// РЕДАКТИРОВАНИЕ КОММЕНТАРИЕВ
+// ================================================================
+
+function editComment(postId, commentId, type) {
+    const path = getPostPath(type);
+    const textEl = document.getElementById('comment-text-' + commentId);
+    if (!textEl) return;
+    
+    const menu = document.getElementById('commentMenu_' + commentId);
+    if (menu) menu.classList.remove('open');
+    
+    const currentText = textEl.textContent;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentText;
+    input.className = 'edit-comment-input';
+    input.style.cssText = 'width:100%;padding:2px 8px;border:1px solid #1877f2;border-radius:4px;font-size:0.7rem;outline:none;';
+    
+    textEl.innerHTML = '';
+    textEl.appendChild(input);
+    input.focus();
+    input.select();
+    
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            saveCommentEdit(postId, commentId, type, input.value.trim());
+        }
+    });
+    
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (document.activeElement !== input) {
+                saveCommentEdit(postId, commentId, type, input.value.trim());
+            }
+        }, 200);
+    });
+}
+
+function saveCommentEdit(postId, commentId, type, newText) {
+    if (!newText) {
+        deleteComment(postId, commentId, type);
+        return;
+    }
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
+        text: newText,
+        edited: true
+    });
+}
