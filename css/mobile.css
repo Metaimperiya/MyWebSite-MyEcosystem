@@ -1,20 +1,20 @@
 @media (max-width: 480px) {
-    body { padding: 10px; }
-    .header { padding: 8px 12px; }
-    .header .left h2 { font-size: 15px; }
-    .user-item { padding: 5px 8px; }
-    .user-item .avatar { width: 32px; height: 32px; }
-    .user-item .info .name { font-size: 13px; }
-    .btn-action { padding: 4px 8px; height: 26px; font-size: 11px; }
-    .profile-page .profile-avatar { width: 72px; height: 72px; font-size: 28px; }
-    .profile-page .profile-name { font-size: 17px; }
-    .chat-window { width: calc(100% - 20px); right: 10px; bottom: 10px; height: 380px; }
-    .tab { font-size: 12px; padding: 8px 4px; }
-    .room-grid { grid-template-columns: 1fr; }
+    body { padding:10px; }
+    .header { padding:8px 12px; }
+    .header .left h2 { font-size:15px; }
+    .user-item { padding:5px 8px; }
+    .user-item .avatar { width:32px; height:32px; }
+    .user-item .info .name { font-size:13px; }
+    .btn-action { padding:4px 8px; height:26px; font-size:11px; }
+    .profile-page .profile-avatar { width:72px; height:72px; font-size:28px; }
+    .profile-page .profile-name { font-size:17px; }
+    .chat-window { width:calc(100% - 20px); right:10px; bottom:10px; height:380px; }
+    .tab { font-size:12px; padding:8px 4px; }
+    .room-grid { grid-template-columns:1fr; }
 }
 @media (max-width: 380px) {
-    .header .right .notif-btn { font-size: 16px; padding: 4px 8px; }
-    .header .right .avatar-small { width: 30px; height: 30px; font-size: 13px; }
-    .user-item .actions { gap: 4px; }
-    .btn-action { font-size: 10px; padding: 3px 6px; height: 22px; }
+    .header .right .notif-btn { font-size:16px; padding:4px 8px; }
+    .header .right .avatar-small { width:30px; height:30px; font-size:13px; }
+    .user-item .actions { gap:4px; }
+    .btn-action { font-size:10px; padding:3px 6px; height:22px; }
 }
