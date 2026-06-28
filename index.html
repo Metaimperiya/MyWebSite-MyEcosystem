@@ -2768,3 +2768,642 @@ console.log('👥 Группы, лента, люди, профиль, чаты �
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>METAIMPERIYA — Социальная платформа нового поколения</title>
+    
+    <meta name="description" content="METAIMPERIYA — социальная платформа нового поколения. Общайся, создавай группы, делись постами и музыкой." />
+    <meta name="keywords" content="социальная сеть, общение, группы, посты, музыка, метаимперия, metaimperiya, чат, друзья" />
+    <meta name="author" content="METAIMPERIYA" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://metaimperiya.github.io/" />
+    
+    <meta property="og:title" content="METAIMPERIYA — Социальная платформа" />
+    <meta property="og:description" content="Общайся, создавай группы, делись постами и музыкой. Присоединяйся к METAIMPERIYA!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://metaimperiya.github.io/" />
+    <meta property="og:image" content="https://metaimperiya.github.io/metaimperiya-512x512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:site_name" content="METAIMPERIYA" />
+    <meta property="og:locale" content="ru_RU" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="METAIMPERIYA — Социальная платформа" />
+    <meta name="twitter:description" content="Общайся, создавай группы, делись постами и музыкой." />
+    <meta name="twitter:image" content="https://metaimperiya.github.io/metaimperiya-512x512.png" />
+    
+    <meta name="theme-color" content="#1877f2" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="site.webmanifest" />
+    
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-32x32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-192x192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-icon.png" />
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f2f5; color: #222; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; min-height: 100vh; display: flex; justify-content: center; }
+        .app { max-width: 480px; width: 100%; background: #f0f2f5; min-height: 100vh; position: relative; }
+        
+        .topbar { background: #fff; padding: 8px 12px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; gap: 6px; }
+        .topbar .left { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .topbar .left .menu-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #1877f2; padding: 2px; }
+        .topbar .left .logo { font-size: 0.85rem; font-weight: 700; color: #1877f2; cursor: pointer; white-space: nowrap; }
+        .topbar .center { flex: 1; display: flex; justify-content: center; min-width: 0; }
+        .topbar .right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .topbar .right .avatar-wrap { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; background: #1877f2; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .topbar .right .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .topbar .right .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.7rem; }
+        .topbar .right .name { font-weight: 600; font-size: 0.65rem; cursor: pointer; max-width: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .topbar .right .logout-btn { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 0.75rem; padding: 0 2px; }
+        
+        .player-mini { display: flex; align-items: center; gap: 4px; background: #f0f2f5; padding: 3px 8px; border-radius: 16px; max-width: 220px; }
+        .player-mini .play-btn-mini { background: #1877f2; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .player-mini .play-btn-mini:hover { background: #4a9eff; }
+        .player-mini .track-name-mini { font-weight: 500; font-size: 0.6rem; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
+        .player-mini .track-time { font-size: 0.5rem; color: #888; flex-shrink: 0; }
+        .player-mini .playlist-btn-mini { background: none; border: none; font-size: 0.8rem; cursor: pointer; color: #888; padding: 0 2px; }
+        .player-mini .playlist-btn-mini:hover { color: #1877f2; }
+        
+        .playlist-dropdown { display: none; position: absolute; top: 40px; right: 10px; background: #fff; border: 1px solid #ddd; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); padding: 4px 0; max-height: 180px; overflow-y: auto; min-width: 160px; z-index: 200; }
+        .playlist-dropdown.open { display: block; }
+        .playlist-dropdown .playlist-item { display: flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; transition: 0.15s; }
+        .playlist-dropdown .playlist-item:hover { background: #f0f2f5; }
+        .playlist-dropdown .playlist-item.active { background: #e8f0fe; color: #1877f2; font-weight: 600; }
+        .playlist-dropdown .playlist-item .playlist-num { color: #999; font-size: 9px; width: 16px; flex-shrink: 0; }
+        .playlist-dropdown .playlist-item .playlist-name { flex: 1; }
+        
+        .tab-bar { background: #fff; display: flex; justify-content: center; gap: 2px; padding: 4px 8px; border-bottom: 1px solid #ddd; position: sticky; top: 48px; z-index: 99; overflow-x: auto; }
+        .tab-bar .tab { background: none; border: none; color: #555; font-weight: 600; font-size: 0.65rem; cursor: pointer; padding: 6px 12px; border-radius: 8px; white-space: nowrap; transition: 0.2s; }
+        .tab-bar .tab:hover { background: #f0f0f0; }
+        .tab-bar .tab.active { color: #1877f2; background: #e8f0fe; }
+        
+        .sidebar { position: fixed; top: 0; left: -280px; width: 260px; height: 100vh; background: #fff; border-right: 1px solid #ddd; transition: left 0.3s; z-index: 1000; overflow-y: auto; padding: 14px; }
+        .sidebar.open { left: 0; }
+        .sidebar .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .sidebar .head h3 { font-size: 1rem; color: #1877f2; }
+        .sidebar .head .close { background: none; border: none; font-size: 1.3rem; cursor: pointer; }
+        .sidebar .user { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f5f5f5; border-radius: 10px; margin-bottom: 12px; }
+        .sidebar .user .avatar-wrap { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .sidebar .user .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .sidebar .user .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.8rem; }
+        .sidebar .user .name { font-weight: 600; font-size: 0.85rem; }
+        .sidebar .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; cursor: pointer; color: #555; font-size: 0.85rem; border: 1px solid transparent; margin-bottom: 2px; }
+        .sidebar .nav-item:hover { background: #f0f0f0; }
+        .sidebar .nav-item.active { background: #e8f0fe; color: #1877f2; border-color: #1877f2; }
+        .sidebar .footer { margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd; }
+        .sidebar .footer .create-btn { background: #1877f2; color: #fff; border: none; border-radius: 40px; padding: 6px; width: 100%; font-weight: 700; cursor: pointer; font-size: 0.75rem; }
+        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 999; display: none; }
+        .overlay.show { display: block; }
+        
+        .container { padding: 8px 10px 60px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .card { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; }
+        .card h3 { font-size: 15px; color: #050505; margin-bottom: 10px; }
+        
+        .post-form textarea { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical; min-height: 36px; font-family: inherit; font-size: 0.75rem; outline: none; }
+        .post-form textarea:focus { border-color: #1877f2; }
+        .post-form .actions { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+        .post-form .actions button { padding: 3px 12px; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; font-size: 0.6rem; }
+        .post-form .actions .submit { background: #1877f2; color: #fff; }
+        .post-form .actions .cancel { background: #e4e6eb; color: #555; }
+        .post-form .file-label { background: #e4e6eb; padding: 2px 10px; border-radius: 16px; font-size: 0.55rem; cursor: pointer; display: inline-block; margin-top: 3px; color: #555; }
+        .post-form .hidden { display: none; }
+        .post-form .preview-box { display: none; align-items: center; gap: 4px; background: #f5f5f5; padding: 3px 8px 3px 3px; border-radius: 30px; margin-top: 4px; border: 1px solid #ddd; }
+        .post-form .preview-box.visible { display: flex; }
+        .post-form .preview-box img { width: 24px; height: 24px; border-radius: 30px; object-fit: cover; }
+        .post-form .remove-pic { background: #ffebee; color: #c62828; border: none; border-radius: 30px; padding: 2px 6px; cursor: pointer; font-size: 0.5rem; }
+        
+        .post { background: #fff; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; position: relative; }
+        .post .marquee { background: #f5f5f5; padding: 3px 8px; border-radius: 4px; color: #e67e22; font-weight: 700; overflow: hidden; white-space: nowrap; margin-bottom: 4px; border: 1px solid #eee; font-size: 0.7rem; }
+        .post .marquee span { display: inline-block; animation: scroll 12s linear infinite; padding-left: 100%; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        .post .author { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        .post .author .avatar-wrap { width: 24px; height: 24px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .post .author .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .post .author .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.5rem; }
+        .post .name { font-weight: 600; font-size: 0.7rem; color: #1877f2; cursor: pointer; }
+        .post .time { color: #999; font-size: 0.45rem; margin-left: 4px; }
+        .post .text { margin: 4px 0; word-break: break-word; font-size: 0.75rem; line-height: 1.4; color: #333; }
+        .post .post-img { max-width: 100%; max-height: 200px; border-radius: 6px; margin: 4px 0; border: 1px solid #eee; cursor: pointer; }
+        .post .link-preview { margin: 4px 0; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; background: #f5f5f5; }
+        .post .link-preview iframe { width: 100%; height: 150px; border: none; display: block; }
+        .post .buttons-wrap { display: flex; flex-direction: column; gap: 3px; margin: 4px 0; }
+        .post .buttons-wrap .btn-item { display: block; background: #1877f2; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; text-align: center; text-decoration: none; font-weight: 700; font-size: 0.7rem; transition: 0.2s; cursor: pointer; }
+        .post .buttons-wrap .btn-item:hover { background: #4a9eff; }
+        .post .hashtags { display: flex; flex-wrap: wrap; gap: 3px; margin: 4px 0; padding-top: 4px; border-top: 1px solid #eee; }
+        .post .hashtags .tag { color: #1877f2; font-size: 0.55rem; background: #e8f0fe; padding: 1px 8px; border-radius: 12px; border: 1px solid #d0e4ff; cursor: pointer; }
+        .post .stats { display: flex; gap: 6px; font-size: 0.55rem; color: #888; border-top: 1px solid #eee; padding-top: 4px; margin-top: 4px; flex-wrap: wrap; }
+        .post .stats button { background: none; border: none; color: #888; cursor: pointer; display: flex; align-items: center; gap: 2px; font-size: 0.55rem; padding: 2px 4px; border-radius: 12px; transition: 0.2s; }
+        .post .stats button:hover { background: #f0f2f5; color: #1877f2; }
+        .post .stats button.liked { color: #1877f2; }
+        .post-menu { position: absolute; top: 6px; right: 6px; }
+        .post-menu .dots { background: none; border: none; font-size: 1.1rem; color: #888; cursor: pointer; padding: 0 4px; }
+        .post-menu .dropdown { display: none; position: absolute; right: 0; top: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); z-index: 60; min-width: 120px; padding: 4px 0; }
+        .post-menu .dropdown.open { display: block; }
+        .post-menu .dropdown button { display: block; width: 100%; padding: 4px 14px; background: none; border: none; text-align: left; font-size: 0.7rem; cursor: pointer; color: #555; }
+        .post-menu .dropdown button:hover { background: #f0f2f5; }
+        .post-menu .dropdown .edit-btn { color: #e67e22; }
+        .post-menu .dropdown .del-btn { color: #e74c3c; }
+        
+        .comments { margin-top: 4px; border-top: 1px solid #eee; padding-top: 4px; }
+        .comments .list { display: none; }
+        .comments .list.open { display: block; }
+        .comments .comment { display: flex; gap: 4px; margin-bottom: 2px; padding: 3px 0; border-bottom: 1px solid #f5f5f5; align-items: flex-start; }
+        .comments .comment .avatar-wrap { width: 18px; height: 18px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .comments .comment .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .comments .comment .avatar-wrap .letter { color: #fff; font-size: 0.4rem; font-weight: 700; }
+        .comments .comment .body { flex: 1; font-size: 0.65rem; line-height: 1.3; }
+        .comments .comment .body .name { font-weight: 600; color: #1877f2; }
+        .comments .comment .body .time { color: #999; font-size: 0.4rem; margin-left: 3px; }
+        .comments .comment .body .text { color: #333; margin-top: 1px; }
+        .comments .input-wrap { display: flex; gap: 3px; margin-top: 3px; }
+        .comments .input-wrap input { flex: 1; padding: 3px 8px; border: 1px solid #ddd; border-radius: 12px; font-size: 0.6rem; outline: none; }
+        .comments .input-wrap input:focus { border-color: #1877f2; }
+        .comments .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 12px; padding: 2px 10px; cursor: pointer; font-weight: 600; font-size: 0.55rem; }
+        
+        .profile-header { background: #fff; border-radius: 12px; padding: 14px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; margin-bottom: 8px; }
+        .profile-header .avatar-wrap { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; margin: 0 auto 6px; background: #1877f2; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .profile-header .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-header .avatar-wrap .letter { color: #fff; font-size: 1.5rem; font-weight: 700; }
+        .profile-header .name { font-size: 0.9rem; font-weight: 700; }
+        .profile-header .bio { color: #888; font-size: 0.65rem; margin-top: 2px; }
+        .profile-header .actions { display: flex; gap: 4px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+        .profile-header .actions button { padding: 2px 10px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 0.55rem; }
+        .profile-header .actions .edit-btn { background: #e4e6eb; color: #555; }
+        .profile-header .actions .avatar-btn { background: #333; color: #fff; }
+        .profile-stats { display: flex; gap: 10px; justify-content: center; margin: 4px 0; font-size: 0.6rem; color: #888; }
+        .profile-stats span { cursor: pointer; }
+        .friends-section { background: #fff; border-radius: 12px; padding: 8px 10px; margin-bottom: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; }
+        .friends-section h4 { margin-bottom: 4px; color: #555; font-size: 0.7rem; }
+        .friend-list { display: flex; flex-wrap: wrap; gap: 4px; }
+        .friend-item { background: #f0f2f5; padding: 2px 6px; border-radius: 10px; font-size: 0.6rem; display: flex; align-items: center; gap: 3px; cursor: pointer; }
+        .friend-item .avatar-wrap { width: 14px; height: 14px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .friend-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .friend-item .avatar-wrap .letter { color: #fff; font-size: 0.35rem; font-weight: 700; }
+        
+        .group-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .group-card { background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .group-card:hover { transform: translateY(-2px); border-color: #1877f2; }
+        .group-card .icon { font-size: 1.3rem; }
+        .group-card .name { font-weight: 600; font-size: 0.7rem; margin-top: 2px; }
+        .group-card .count { color: #888; font-size: 0.55rem; }
+        
+        .people-list { display: flex; flex-direction: column; gap: 4px; }
+        .people-item { background: #fff; border-radius: 10px; padding: 6px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .people-item .avatar-wrap { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; }
+        .people-item .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .people-item .avatar-wrap .letter { color: #fff; font-weight: 700; font-size: 0.65rem; }
+        .people-item .info { flex: 1; }
+        .people-item .info .name { font-weight: 600; font-size: 0.7rem; }
+        .people-item .info .status { color: #888; font-size: 0.55rem; }
+        
+        .chat-view { display: none; background: #fff; border-radius: 12px; padding: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; height: 55vh; flex-direction: column; }
+        .chat-view.active { display: flex; }
+        .chat-view .back { background: none; border: none; color: #1877f2; cursor: pointer; font-weight: 600; margin-bottom: 4px; font-size: 0.7rem; }
+        .chat-view .messages { flex: 1; overflow-y: auto; margin-bottom: 4px; }
+        .chat-view .messages .msg { padding: 3px 6px; margin-bottom: 2px; background: #f5f5f5; border-radius: 6px; font-size: 0.7rem; }
+        .chat-view .messages .msg .author { font-weight: 600; font-size: 0.6rem; color: #1877f2; }
+        .chat-view .messages .msg .time { color: #999; font-size: 0.4rem; margin-left: 3px; }
+        .chat-view .input-wrap { display: flex; gap: 4px; }
+        .chat-view .input-wrap input { flex: 1; padding: 3px 8px; border: 1px solid #ddd; border-radius: 12px; outline: none; font-size: 0.7rem; }
+        .chat-view .input-wrap input:focus { border-color: #1877f2; }
+        .chat-view .input-wrap button { background: #1877f2; color: #fff; border: none; border-radius: 12px; padding: 0 10px; font-weight: 600; cursor: pointer; font-size: 0.65rem; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; padding: 16px; }
+        .modal.open { display: flex; }
+        .modal .box { background: #fff; border-radius: 12px; padding: 14px; max-width: 360px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .modal .box h3 { margin-bottom: 4px; font-size: 0.85rem; color: #e67e22; }
+        .modal .box .sub { color: #888; font-size: 0.7rem; margin-bottom: 6px; }
+        .modal .box input, .modal .box textarea { width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; margin: 3px 0; font-family: inherit; font-size: 0.75rem; outline: none; }
+        .modal .box input:focus, .modal .box textarea:focus { border-color: #e67e22; }
+        .modal .box textarea { min-height: 36px; resize: vertical; }
+        .modal .box .btns { display: flex; gap: 4px; justify-content: flex-end; margin-top: 6px; }
+        .modal .box .btns button { padding: 3px 12px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 0.65rem; }
+        .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
+        .modal .box .btns .save { background: #e67e22; color: #fff; }
+        .modal .box .btn-add { background: #e4e6eb; color: #555; border: none; border-radius: 12px; padding: 3px 12px; cursor: pointer; font-size: 0.6rem; margin-top: 2px; }
+        .modal .box .btn-group { display: flex; gap: 4px; margin: 2px 0; align-items: center; }
+        .modal .box .btn-group input { flex: 1; margin: 0; }
+        .modal .box .btn-group .btn-remove { background: #ffebee; color: #c62828; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 0.6rem; }
+        
+        .google-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 6px; background: #fff; border: 1px solid #ddd; border-radius: 40px; font-weight: 600; cursor: pointer; margin: 4px 0; font-size: 0.75rem; }
+        .google-btn:hover { background: #f5f5f5; }
+        .google-btn img { width: 16px; height: 16px; }
+        .divider { display: flex; align-items: center; gap: 6px; color: #bbb; font-size: 0.6rem; margin: 4px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
+        
+        .admin-dot { position: fixed; bottom: 8px; right: 8px; width: 8px; height: 8px; border-radius: 50%; border: 2px solid #ddd; cursor: pointer; background: #f0f0f0; z-index: 99; }
+        .admin-dot.active { background: #e67e22; border-color: #e67e22; }
+        
+        @media (max-width: 480px) {
+            .topbar { padding: 6px 8px; }
+            .topbar .left .logo { font-size: 0.75rem; }
+            .topbar .left .menu-btn { font-size: 1rem; }
+            .topbar .right .name { display: none; }
+            .topbar .right .avatar-wrap { width: 24px; height: 24px; }
+            .player-mini { max-width: 150px; padding: 2px 6px; }
+            .player-mini .track-name-mini { max-width: 40px; font-size: 0.5rem; }
+            .player-mini .play-btn-mini { width: 18px; height: 18px; font-size: 7px; }
+            .player-mini .track-time { font-size: 0.4rem; }
+            .tab-bar .tab { font-size: 0.55rem; padding: 4px 8px; }
+            .container { padding: 6px 8px 50px; }
+            .post .link-preview iframe { height: 120px; }
+            .group-list { grid-template-columns: 1fr 1fr; }
+            .playlist-dropdown { min-width: 130px; right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+
+    <div class="topbar">
+        <div class="left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
+        </div>
+        <div class="center">
+            <div class="player-mini">
+                <button class="play-btn-mini" id="playBtn" onclick="playMusic()">▶</button>
+                <span class="track-name-mini" id="trackName">Capitulation</span>
+                <span class="track-time" id="currentTime">0:00</span>
+                <button class="playlist-btn-mini" onclick="togglePlaylist()">📋</button>
+            </div>
+        </div>
+        <div class="right">
+            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
+                <span class="letter">?</span>
+            </div>
+            <span class="name" id="topName" onclick="goToProfile()">Гость</span>
+            <button class="logout-btn" onclick="logout()" title="Выйти">🚪</button>
+        </div>
+    </div>
+
+    <div class="playlist-dropdown" id="playlistDropdown">
+        <div class="playlist-item active" onclick="playTrack(0)">
+            <span class="playlist-num">01</span>
+            <span class="playlist-name">Capitulation</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(1)">
+            <span class="playlist-num">02</span>
+            <span class="playlist-name">Clean Victory</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(2)">
+            <span class="playlist-num">03</span>
+            <span class="playlist-name">Covenant of Change</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(3)">
+            <span class="playlist-num">04</span>
+            <span class="playlist-name">Dreams in the Wind</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(4)">
+            <span class="playlist-num">05</span>
+            <span class="playlist-name">Memory Like Dust</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(5)">
+            <span class="playlist-num">06</span>
+            <span class="playlist-name">Nobody</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(6)">
+            <span class="playlist-num">07</span>
+            <span class="playlist-name">Touch of Choice</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(7)">
+            <span class="playlist-num">08</span>
+            <span class="playlist-name">You Are Not in the Game</span>
+        </div>
+        <div class="playlist-item" onclick="playTrack(8)">
+            <span class="playlist-num">09</span>
+            <span class="playlist-name">You Can't See Me</span>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <button class="tab active" onclick="goToFeed()">📰 Лента</button>
+        <button class="tab" onclick="goToGroups()">👥 Группы</button>
+        <button class="tab" onclick="goToPeople()">👤 Люди</button>
+        <button class="tab" onclick="goToProfile()">👤 Профиль</button>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="head"><h3>📱 Меню</h3><button class="close" onclick="closeSidebar()">✕</button></div>
+        <div class="user">
+            <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
+            <div><div class="name" id="sName">Гость</div></div>
+        </div>
+        <div class="nav-item active" onclick="goToFeed();closeSidebar();">📰 Лента</div>
+        <div class="nav-item" onclick="goToGroups();closeSidebar();">👥 Группы</div>
+        <div class="nav-item" onclick="goToPeople();closeSidebar();">👤 Люди</div>
+        <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
+        <div class="footer"><button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button></div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <div class="container">
+
+        <div class="page feed-page active" id="feedPage">
+            <div class="card">
+                <div class="post-form">
+                    <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
+                    <div class="actions">
+                        <label class="file-label" for="fileInput">📎 Фото</label>
+                        <button class="submit" onclick="submitPost()">📤 Опубликовать</button>
+                        <button class="cancel" onclick="document.getElementById('postInput').value='';removeImage();">Очистить</button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" class="hidden">
+                    <div id="previewBox" class="preview-box">
+                        <img id="previewImg">
+                        <span id="previewName" style="font-size:0.55rem;max-width:60px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"></span>
+                        <button class="remove-pic" onclick="removeImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+            <div id="feed"></div>
+        </div>
+
+        <div class="page groups-page" id="groupsPage">
+            <div class="card">
+                <h3>👥 Группы</h3>
+                <div class="group-list" id="groupList"></div>
+            </div>
+        </div>
+
+        <div class="page people-page" id="peoplePage">
+            <div class="card">
+                <h3>👤 Все пользователи</h3>
+                <div class="people-list" id="peopleList"></div>
+            </div>
+        </div>
+
+        <div class="page profile-page" id="profilePage">
+            <div class="profile-header">
+                <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()">
+                    <span class="letter">?</span>
+                </div>
+                <div class="name" id="profileName">Гость</div>
+                <div class="bio" id="profileBio">Настройте свой профиль</div>
+                <div class="profile-stats">
+                    <span onclick="toggleStat('friends')">🤝 Друзья: <span id="friendsCount">0</span></span>
+                    <span onclick="toggleStat('subscribers')">👀 Подписчики: <span id="subscribersCount">0</span></span>
+                    <span onclick="toggleStat('subscriptions')">📌 Подписки: <span id="subscriptionsCount">0</span></span>
+                </div>
+                <div class="actions" id="profileActions">
+                    <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
+                    <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
+                </div>
+            </div>
+            <div class="friends-section" id="friendsSection">
+                <h4>🤝 Друзья</h4>
+                <div class="friend-list" id="friendList"></div>
+            </div>
+            <h4 style="margin:4px 0;font-size:0.7rem;color:#555;">📰 Посты пользователя</h4>
+            <div id="profilePosts"></div>
+        </div>
+
+        <div class="chat-view" id="chatView">
+            <button class="back" onclick="closeChat()">← Назад</button>
+            <div class="messages" id="chatMessages"></div>
+            <div class="input-wrap">
+                <input type="text" id="chatInput" placeholder="Сообщение...">
+                <button onclick="sendChat()">→</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
+
+    <div class="modal" id="loginModal">
+        <div class="box">
+            <h3>👤 Вход</h3>
+            <button class="google-btn" id="googleBtn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Войти через Google
+            </button>
+            <div class="divider">или</div>
+            <input type="text" id="nameInput" placeholder="Введите имя...">
+            <div class="btns">
+                <button class="cancel" onclick="closeLogin()">Отмена</button>
+                <button class="save" onclick="loginName()">Войти</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="box">
+            <h3>✏️ Редактировать пост</h3>
+            <div class="sub">Измените содержимое поста</div>
+            <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
+            <textarea id="editText" placeholder="📝 Текст поста"></textarea>
+            <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
+            <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
+            <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
+            <div id="editButtonsContainer"></div>
+            <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
+            <div class="btns" style="margin-top:6px;">
+                <button class="save" onclick="saveEdit()">💾 Сохранить</button>
+                <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
+            </div>
+            <button onclick="deleteEditPost()" style="width:100%;padding:3px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
+        </div>
+    </div>
+
+    <div class="modal" id="editProfileModal">
+        <div class="box">
+            <h3>✏️ Редактировать профиль</h3>
+            <input type="text" id="editName" placeholder="Имя">
+            <textarea id="editBio" placeholder="О себе..."></textarea>
+            <div class="btns">
+                <button class="cancel" onclick="closeEditProfile()">Отмена</button>
+                <button class="save" onclick="saveProfile()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createRoomModal">
+        <div class="box">
+            <h3>📝 Новая группа</h3>
+            <input type="text" id="roomName" placeholder="Название...">
+            <div class="btns">
+                <button class="cancel" onclick="closeCreateRoom()">Отмена</button>
+                <button class="save" onclick="doCreateRoom()">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="adminModal">
+        <div class="box">
+            <h3>🏴‍☠️ Админ</h3>
+            <input type="password" id="adminPass" placeholder="Пароль...">
+            <div class="btns">
+                <button class="cancel" onclick="closeAdminModal()">Отмена</button>
+                <button class="save" onclick="checkAdmin()">Войти</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ================================================================
+// FIREBASE
+// ================================================================
+const FB_CONFIG = {
+    apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
+    authDomain: "myecosystem-e6414.firebaseapp.com",
+    databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
+    projectId: "myecosystem-e6414",
+    storageBucket: "myecosystem-e6414.firebasestorage.app",
+    messagingSenderId: "426302111033",
+    appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
+};
+firebase.initializeApp(FB_CONFIG);
+const db = firebase.database();
+const auth = firebase.auth();
+const storage = firebase.storage();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// ================================================================
+// ПЛЕЕР (ИСПРАВЛЕННЫЙ - БЕЗ ОШИБОК)
+// ================================================================
+const PLAYLIST = [
+    { name: 'Capitulation', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/capitulation.mp3' },
+    { name: 'Clean Victory', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/clean_victory.mp3' },
+    { name: 'Covenant of Change', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/covenant_of_change.mp3' },
+    { name: 'Dreams in the Wind', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/dreams_in_the_wind.mp3' },
+    { name: 'Memory Like Dust', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/memory_like_dust_path_like_fire.mp3' },
+    { name: 'Nobody', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/nobody.mp3' },
+    { name: 'Touch of Choice', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/touch_of_choice.mp3' },
+    { name: 'You Are Not in the Game', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/you_are_not_in_the_game.mp3' },
+    { name: 'You Can\'t See Me', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/you_cant_see_me.mp3' }
+];
+
+let currentTrack = 0, isPlaying = false, audio = null;
+
+function initAudio() {
+    if (!audio) {
+        audio = new Audio(PLAYLIST[currentTrack].url);
+        audio.crossOrigin = 'anonymous';
+        audio.addEventListener('timeupdate', function() {
+            const el = document.getElementById('currentTime');
+            if (el) el.textContent = formatTime(audio.currentTime);
+        });
+        audio.addEventListener('ended', function() {
+            currentTrack = (currentTrack + 1) % PLAYLIST.length;
+            audio.src = PLAYLIST[currentTrack].url;
+            audio.play().catch(function() {});
+            document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+            updatePlaylistActive();
+        });
+    }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+}
+
+function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function updatePlaylistActive() {
+    document.querySelectorAll('.playlist-item').forEach(function(el, i) {
+        el.classList.toggle('active', i === currentTrack);
+    });
+}
+
+window.playMusic = function() {
+    initAudio();
+    if (!audio) return;
+    if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        document.getElementById('playBtn').textContent = '▶';
+    } else {
+        audio.play().catch(function(e) { console.log('Ошибка:', e); });
+        isPlaying = true;
+        document.getElementById('playBtn').textContent = '⏸';
+    }
+};
+
+window.playTrack = function(index) {
+    if (index === currentTrack && isPlaying) { playMusic(); return; }
+    currentTrack = index;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (isPlaying) audio.play().catch(function() {});
+    } else { initAudio(); playMusic(); }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+};
+
+window.togglePlaylist = function() {
+    document.getElementById('playlistDropdown').classList.toggle('open');
+};
+
+window.prevTrack = function() {
+    currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
+    if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(function() {}); }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+};
+
+window.nextTrack = function() {
+    currentTrack = (currentTrack + 1) % PLAYLIST.length;
+    if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(function() {}); }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+};
+
+initAudio();
+
+// ================================================================
+// ОСНОВНЫЕ ПЕРЕМЕННЫЕ
+// ================================================================
+const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
+let USER = null;
+let USER_UID = null;
+let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
+let CURRENT_ROOM = null;
+let chatUnsub = null;
+let VIEWING_USER = null;
+let avatarUrlCache = {};
+let pendingImage = null;
+let pendingImageFile = null;
+let EDITING_ID = null;
+let showStat = 'friends';
+
+// ================================================================
+// ВСЕ ОСТАЛЬНЫЕ ФУНКЦИИ (ТВОИ, БЕЗ ИЗМЕНЕНИЙ)
+// ================================================================
+
+// ... сюда вставляешь ВСЕ твои функции: auth, feed, profile, groups, people, chat, admin ...
+// Я их не трогаю, они у тебя уже есть в отдельных файлах.
+
+</script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/feed.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/groups.js"></script>
+<script src="js/people.js"></script>
+<script src="js/chat.js"></script>
+
+</body>
+</html>
