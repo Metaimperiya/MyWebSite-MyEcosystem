@@ -195,11 +195,20 @@
     background: #f5f5f5;
 }
 
+/* ===== РАЗМЕРЫ ФРЕЙМА (ТУМБЛЕР) ===== */
 .post .link-preview iframe {
-    width: 100%;
-    height: 150px;
     border: none;
     display: block;
+    transition: height 0.3s ease;
+    width: 100%;
+}
+
+.post .link-preview iframe.small {
+    height: 250px;
+}
+
+.post .link-preview iframe.large {
+    height: 450px;
 }
 
 .post .buttons-wrap {
@@ -489,6 +498,7 @@
 .comments .input-wrap button:hover {
     background: #4a9eff;
 }
+
 /* ================================================================
    КОММЕНТАРИИ - ТРИ ТОЧКИ
    ================================================================ */
@@ -576,24 +586,6 @@
 
 .edit-comment-input:focus {
     border-color: #1877f2;
-}
-
-/* ================================================================
-   РАЗМЕРЫ ФРЕЙМА (ТУМБЛЕР)
-   ================================================================ */
-.post .link-preview iframe {
-    border: none;
-    display: block;
-    transition: height 0.3s ease;
-    width: 100%;
-}
-
-.post .link-preview iframe.small {
-    height: 250px;
-}
-
-.post .link-preview iframe.large {
-    height: 450px;
 }
 
 /* ================================================================
