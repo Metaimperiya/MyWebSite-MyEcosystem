@@ -577,3 +577,69 @@
 .edit-comment-input:focus {
     border-color: #1877f2;
 }
+
+/* ================================================================
+   РАЗМЕРЫ ФРЕЙМА (ТУМБЛЕР)
+   ================================================================ */
+.post .link-preview iframe {
+    border: none;
+    display: block;
+    transition: height 0.3s ease;
+    width: 100%;
+}
+
+.post .link-preview iframe.small {
+    height: 250px;
+}
+
+.post .link-preview iframe.large {
+    height: 450px;
+}
+
+/* ================================================================
+   ТУМБЛЕР В МОДАЛКЕ РЕДАКТИРОВАНИЯ
+   ================================================================ */
+.frame-size-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 6px 0 8px 0;
+    padding: 4px 0;
+}
+
+.frame-size-toggle .label {
+    color: #888;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.frame-size-toggle .btn-group {
+    display: flex;
+    gap: 4px;
+    background: #f0f2f5;
+    border-radius: 20px;
+    padding: 3px;
+}
+
+.frame-size-btn {
+    padding: 4px 14px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.6rem;
+    font-weight: 600;
+    background: transparent;
+    color: #888;
+    transition: all 0.2s ease;
+}
+
+.frame-size-btn:hover {
+    background: #e8f0fe;
+    color: #1877f2;
+}
+
+.frame-size-btn.active {
+    background: #1877f2;
+    color: #fff;
+}
