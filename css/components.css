@@ -489,3 +489,91 @@
 .comments .input-wrap button:hover {
     background: #4a9eff;
 }
+/* ================================================================
+   КОММЕНТАРИИ - ТРИ ТОЧКИ
+   ================================================================ */
+.comment .comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.comment .comment-actions .more-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.comment .comment-actions .more-btn:hover {
+    color: #1877f2;
+}
+
+.comment .comment-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.comment .comment-menu .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 60;
+    min-width: 120px;
+    padding: 4px 0;
+}
+
+.comment .comment-menu .dropdown.open {
+    display: block;
+}
+
+.comment .comment-menu .dropdown button {
+    display: block;
+    width: 100%;
+    padding: 4px 14px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.comment .comment-menu .dropdown button:hover {
+    background: #f0f2f5;
+}
+
+.comment .comment-menu .dropdown .edit-btn {
+    color: #e67e22;
+}
+
+.comment .comment-menu .dropdown .del-btn {
+    color: #e74c3c;
+}
+
+.comment .comment-menu .dropdown .edit-btn:hover,
+.comment .comment-menu .dropdown .del-btn:hover {
+    background: #f0f2f5;
+}
+
+.edit-comment-input {
+    width: 100%;
+    padding: 2px 8px;
+    border: 1px solid #1877f2;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    outline: none;
+}
+
+.edit-comment-input:focus {
+    border-color: #1877f2;
+}
