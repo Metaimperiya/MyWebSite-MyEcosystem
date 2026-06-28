@@ -64,3 +64,25 @@ function adminExportData() {
         URL.revokeObjectURL(url);
     });
 }
+
+window.adminLogin = function() {
+    document.getElementById('adminModal').classList.add('open');
+    document.getElementById('adminPass').value = '';
+};
+
+window.closeAdminModal = function() {
+    document.getElementById('adminModal').classList.remove('open');
+};
+
+window.checkAdmin = function() {
+    if (document.getElementById('adminPass').value.trim() === '12345') {
+        IS_ADMIN = true;
+        localStorage.setItem('dc_admin_' + SITE, '1');
+        document.getElementById('adminDot').classList.add('active');
+        closeAdminModal();
+        alert('🏴‍☠️ Админ-режим включён!');
+        loadFeed();
+    } else {
+        alert('❌ Неверный пароль');
+    }
+};
