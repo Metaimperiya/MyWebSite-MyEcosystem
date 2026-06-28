@@ -71,6 +71,10 @@
             position: relative;
         }
 
+        .container {
+            padding: 6px 8px 70px;
+        }
+
         /* ================================================================
            ШАПКА
            ================================================================ */
@@ -321,122 +325,162 @@
             background: #e8f0fe;
         }
 
-       <!-- ===== НОВЫЙ САЙДБАР С РАЗДЕЛАМИ ===== -->
-<div class="sidebar" id="sidebar">
-    <div class="head">
-        <h3>📱 Меню</h3>
-        <button class="close" onclick="closeSidebar()">✕</button>
-    </div>
+        /* ================================================================
+           САЙДБАР
+           ================================================================ */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: #fff;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+            padding: 12px 0 80px 0;
+        }
 
-    <!-- ===== ЮЗЕР ===== -->
-    <div class="user">
-        <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
-        <div>
-            <div class="name" id="sName">Гость</div>
-            <div style="font-size:0.6rem;color:#888;">онлайн</div>
-        </div>
-    </div>
+        .sidebar.open {
+            left: 0;
+        }
 
-    <!-- ===== ГЛАВНЫЕ РАЗДЕЛЫ ===== -->
-    <div class="nav-item active" onclick="goToFeed();closeSidebar();">🏠 Главная</div>
-    <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
-    <div class="nav-item" onclick="goToPeople();closeSidebar();">👥 Люди</div>
-    <div class="nav-item" onclick="goToGroups();closeSidebar();">💬 Сообщества</div>
+        .sidebar .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .head h3 {
+            font-size: 1rem;
+            color: #1877f2;
+        }
 
-    <!-- ===== МУЛЬТИМЕДИА ===== -->
-    <div class="sidebar-title">🎵 Мультимедиа</div>
-    <div class="nav-item" onclick="closeSidebar();">📸 Фото</div>
-    <div class="nav-item" onclick="closeSidebar();">🎥 Видео</div>
-    <div class="nav-item" onclick="closeSidebar();">🎵 Музыка</div>
-    <div class="nav-item" onclick="closeSidebar();">📚 Книги</div>
+        .sidebar .head .close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #888;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .head .close:hover {
+            color: #222;
+        }
 
-    <!-- ===== ТЕХНОЛОГИИ ===== -->
-    <div class="sidebar-title">💻 Технологии</div>
-    <div class="nav-item" onclick="closeSidebar();">💻 Программирование</div>
-    <div class="nav-item" onclick="closeSidebar();">🌐 Сайты</div>
-    <div class="nav-item" onclick="closeSidebar();">🤖 AI / ChatGPT</div>
-    <div class="nav-item" onclick="closeSidebar();">🕶️ VR / AR</div>
-    <div class="nav-item" onclick="closeSidebar();">🔐 Безопасность</div>
-    <div class="nav-item" onclick="closeSidebar();">☁️ Cloud</div>
-    <div class="nav-item" onclick="closeSidebar();">🌐 Open Source</div>
-    <div class="nav-item" onclick="closeSidebar();">🧩 API / SDK</div>
+        .sidebar .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .user .avatar-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    <!-- ===== БИЗНЕС И ФИНАНСЫ ===== -->
-    <div class="sidebar-title">💰 Бизнес</div>
-    <div class="nav-item" onclick="closeSidebar();">💰 Бизнес</div>
-    <div class="nav-item" onclick="closeSidebar();">📈 Финансы</div>
-    <div class="nav-item" onclick="closeSidebar();">🪙 Криптовалюты</div>
-    <div class="nav-item" onclick="closeSidebar();">🛒 Маркетплейс</div>
-    <div class="nav-item" onclick="closeSidebar();">💼 Работа</div>
-    <div class="nav-item" onclick="closeSidebar();">📦 Проекты</div>
-    <div class="nav-item" onclick="closeSidebar();">🚀 Стартапы</div>
+        .sidebar .user .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .user .avatar-wrap .letter {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
 
-    <!-- ===== ЖИЗНЬ И ХОББИ ===== -->
-    <div class="sidebar-title">🌍 Жизнь</div>
-    <div class="nav-item" onclick="closeSidebar();">✈️ Путешествия</div>
-    <div class="nav-item" onclick="closeSidebar();">🍔 Еда</div>
-    <div class="nav-item" onclick="closeSidebar();">🏠 Недвижимость</div>
-    <div class="nav-item" onclick="closeSidebar();">⚽ Спорт</div>
-    <div class="nav-item" onclick="closeSidebar();">🎮 Игры</div>
-    <div class="nav-item" onclick="closeSidebar();">🎭 Аниме</div>
-    <div class="nav-item" onclick="closeSidebar();">🎬 Кино</div>
-    <div class="nav-item" onclick="closeSidebar();">📺 Сериалы</div>
-    <div class="nav-item" onclick="closeSidebar();">🎤 Блогеры</div>
-    <div class="nav-item" onclick="closeSidebar();">🎭 Мемы</div>
-    <div class="nav-item" onclick="closeSidebar();">👗 Мода</div>
-    <div class="nav-item" onclick="closeSidebar();">🚗 Автомобили</div>
-    <div class="nav-item" onclick="closeSidebar();">❤️ Волонтёрство</div>
-    <div class="nav-item" onclick="closeSidebar();">🐾 Животные</div>
-    <div class="nav-item" onclick="closeSidebar();">🎯 Хобби</div>
+        .sidebar .user .name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .nav-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #333;
+            transition: 0.15s;
+            border-left: 3px solid transparent;
+        }
 
-    <!-- ===== ОБЩЕНИЕ ===== -->
-    <div class="sidebar-title">💬 Общение</div>
-    <div class="nav-item" onclick="closeSidebar();">💖 Знакомства</div>
-    <div class="nav-item" onclick="closeSidebar();">🤝 Команда</div>
-    <div class="nav-item" onclick="closeSidebar();">🏳️‍🌈 LGBTQ+</div>
-    <div class="nav-item" onclick="closeSidebar();">🗣️ Языки</div>
-    <div class="nav-item" onclick="closeSidebar();">❓ Q&A</div>
+        .sidebar .nav-item:hover {
+            background: #f0f2f5;
+            color: #1877f2;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .nav-item.active {
+            background: #e8f0fe;
+            color: #1877f2;
+            border-left-color: #1877f2;
+        }
 
-    <!-- ===== НОВОСТИ И МЕДИА ===== -->
-    <div class="sidebar-title">📰 Новости</div>
-    <div class="nav-item" onclick="closeSidebar();">📰 Новости</div>
-    <div class="nav-item" onclick="closeSidebar();">📡 Стримы</div>
-    <div class="nav-item" onclick="closeSidebar();">🎉 События</div>
-    <div class="nav-item" onclick="closeSidebar();">📻 Подкасты</div>
-    <div class="nav-item" onclick="closeSidebar();">🏆 Конкурсы</div>
-    <div class="nav-item" onclick="closeSidebar();">🎁 Акции и скидки</div>
+        .sidebar .sidebar-divider {
+            height: 1px;
+            background: #eee;
+            margin: 6px 16px;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .sidebar-title {
+            padding: 6px 16px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    <!-- ===== ОСТАЛЬНОЕ ===== -->
-    <div class="sidebar-title">🔧 Другое</div>
-    <div class="nav-item" onclick="closeSidebar();">📄 Страницы</div>
-    <div class="nav-item" onclick="closeSidebar();">📝 Блог</div>
-    <div class="nav-item" onclick="closeSidebar();">🛍️ Покупки</div>
-    <div class="nav-item" onclick="closeSidebar();">📞 Услуги</div>
-    <div class="nav-item" onclick="closeSidebar();">🧑‍💼 Фриланс</div>
-    <div class="nav-item" onclick="closeSidebar();">🏛️ Организации</div>
-    <div class="nav-item" onclick="closeSidebar();">🏴‍☠️ METAIMPERIYA</div>
+        .sidebar .footer {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            padding: 8px 16px;
+            border-top: 1px solid #eee;
+        }
 
-    <div class="sidebar-divider"></div>
+        .sidebar .footer .create-btn {
+            width: 100%;
+            padding: 8px;
+            background: #1877f2;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
 
-    <!-- ===== КНОПКА СОЗДАНИЯ ===== -->
-    <div class="footer">
-        <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
-    </div>
-</div>
+        .sidebar .footer .create-btn:hover {
+            background: #4a9eff;
+        }
+
+        /* ===== ОВЕРЛЕЙ ===== */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
 
         /* ================================================================
            КАРТОЧКИ
@@ -878,6 +922,17 @@
         }
 
         /* ================================================================
+           СТРАНИЦЫ
+           ================================================================ */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ================================================================
            АДАПТИВ
            ================================================================ */
         @media (max-width: 480px) {
@@ -1273,6 +1328,7 @@ let pendingImage = null;
 let pendingImageFile = null;
 let EDITING_ID = null;
 let showStat = 'friends';
+let currentFrameSize = 'small';
 
 // ===== УТИЛИТЫ =====
 const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
@@ -1460,8 +1516,6 @@ window.goToProfile = function() {
 };
 
 // ===== РАЗМЕР ФРЕЙМА (ДЛЯ РЕДАКТИРОВАНИЯ) =====
-let currentFrameSize = 'small';
-
 function setFrameSize(size) {
     currentFrameSize = size;
     document.querySelectorAll('.frame-size-btn').forEach(btn => {
@@ -1531,7 +1585,6 @@ function renderPost(p, type) {
         buttonsHtml += '</div>';
     }
 
-    // ===== ФРЕЙМ С РАЗМЕРОМ ИЗ ПОСТА =====
     let previewHtml = '';
     if (p.link) {
         const frameSize = p.frameSize || 'small';
@@ -1545,7 +1598,6 @@ function renderPost(p, type) {
         hashtagsHtml += '</div>';
     }
 
-    // ===== ТРИ ТОЧКИ =====
     let menuHtml = '';
     if (p.author === USER || IS_ADMIN) {
         menuHtml = `
@@ -1835,7 +1887,6 @@ window.openEdit = function(id, type) {
         document.getElementById('editLink').value = p.link || '';
         document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
 
-        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА ИЗ ПОСТА =====
         const frameSize = p.frameSize || 'small';
         setFrameSize(frameSize);
 
