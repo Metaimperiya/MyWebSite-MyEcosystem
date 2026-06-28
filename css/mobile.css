@@ -1,20 +1,392 @@
+/* ================================================================
+   МОБИЛЬНЫЙ АДАПТИВ ДЛЯ METAIMPERIYA
+   ================================================================ */
+
+/* ===== ОСНОВНЫЕ НАСТРОЙКИ ===== */
 @media (max-width: 480px) {
-    body { padding:10px; }
-    .header { padding:8px 12px; }
-    .header .left h2 { font-size:15px; }
-    .user-item { padding:5px 8px; }
-    .user-item .avatar { width:32px; height:32px; }
-    .user-item .info .name { font-size:13px; }
-    .btn-action { padding:4px 8px; height:26px; font-size:11px; }
-    .profile-page .profile-avatar { width:72px; height:72px; font-size:28px; }
-    .profile-page .profile-name { font-size:17px; }
-    .chat-window { width:calc(100% - 20px); right:10px; bottom:10px; height:380px; }
-    .tab { font-size:12px; padding:8px 4px; }
-    .room-grid { grid-template-columns:1fr; }
+    body {
+        padding: 8px;
+    }
+
+    /* ===== ТОПБАР ===== */
+    .topbar {
+        padding: 6px 10px;
+        gap: 4px;
+    }
+    .topbar .left .logo {
+        font-size: 0.85rem;
+    }
+    .topbar .left .menu-btn {
+        font-size: 1.1rem;
+    }
+    .topbar .right .name {
+        display: none; /* Скрываем имя на телефоне */
+    }
+    .topbar .right .avatar-wrap {
+        width: 24px;
+        height: 24px;
+    }
+    .topbar .right .avatar-wrap .letter {
+        font-size: 0.6rem;
+    }
+    .topbar .right .logout-btn {
+        font-size: 0.7rem;
+    }
+
+    /* ===== МЕНЮ ===== */
+    .hor-menu {
+        padding: 4px 6px;
+        gap: 2px;
+        top: 48px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+    .hor-menu button {
+        font-size: 0.55rem;
+        padding: 4px 8px;
+        flex-shrink: 0;
+    }
+
+    /* ===== САЙДБАР ===== */
+    .sidebar {
+        width: 220px;
+        left: -240px;
+        padding: 10px;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .sidebar .user {
+        padding: 6px 10px;
+    }
+    .sidebar .user .avatar-wrap {
+        width: 28px;
+        height: 28px;
+    }
+    .sidebar .user .name {
+        font-size: 0.75rem;
+    }
+    .sidebar .nav-item {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+    .sidebar .footer .create-btn {
+        font-size: 0.65rem;
+        padding: 4px;
+    }
+
+    /* ===== КОНТЕЙНЕР ===== */
+    .container {
+        padding: 4px 6px 50px;
+    }
+
+    /* ===== НОВЫЙ ПЛЕЕР (НАД ЛЕНТОЙ) ===== */
+    .player-wrap {
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 10px;
+    }
+    .player-simple {
+        gap: 6px;
+    }
+    .player-simple .play-btn-simple {
+        width: 30px;
+        height: 30px;
+        font-size: 11px;
+    }
+    .player-simple .track-name-simple {
+        font-size: 0.65rem;
+        max-width: 80px;
+    }
+    .player-simple .player-controls button {
+        width: 22px;
+        height: 22px;
+        font-size: 9px;
+    }
+
+    /* ===== ПОСТЫ ===== */
+    .post-form {
+        padding: 8px 10px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+    }
+    .post-form textarea {
+        font-size: 0.75rem;
+        min-height: 32px;
+        padding: 5px 8px;
+    }
+    .post-form .actions button {
+        font-size: 0.55rem;
+        padding: 3px 10px;
+    }
+    .post-form .file-label {
+        font-size: 0.5rem;
+        padding: 2px 10px;
+    }
+
+    .post {
+        padding: 10px 12px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+    }
+    .post .marquee {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+    .post .author .avatar-wrap {
+        width: 22px;
+        height: 22px;
+    }
+    .post .author .avatar-wrap .letter {
+        font-size: 0.5rem;
+    }
+    .post .name {
+        font-size: 0.7rem;
+    }
+    .post .time {
+        font-size: 0.45rem;
+    }
+    .post .text {
+        font-size: 0.75rem;
+    }
+    .post .post-img {
+        max-height: 200px;
+    }
+    .post .link-preview iframe {
+        height: 150px;
+    }
+    .post .buttons-wrap .btn-item {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
+    .post .hashtags .tag {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+    }
+    .post .stats button {
+        font-size: 0.55rem;
+        padding: 1px 4px;
+    }
+    .post .stats {
+        gap: 4px;
+        font-size: 0.55rem;
+        padding-top: 4px;
+    }
+
+    /* ===== КОММЕНТАРИИ ===== */
+    .comments .comment .avatar-wrap {
+        width: 16px;
+        height: 16px;
+    }
+    .comments .comment .body {
+        font-size: 0.6rem;
+    }
+    .comments .input-wrap input {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+    }
+    .comments .input-wrap button {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+    }
+
+    /* ===== ГРУППЫ ===== */
+    .groups-page .group-list {
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+    }
+    .groups-page .group-card {
+        padding: 8px;
+        border-radius: 10px;
+    }
+    .groups-page .group-card .icon {
+        font-size: 1.2rem;
+    }
+    .groups-page .group-card .name {
+        font-size: 0.65rem;
+    }
+    .groups-page .group-card .count {
+        font-size: 0.5rem;
+    }
+
+    /* ===== ЛЮДИ ===== */
+    .people-page .people-item {
+        padding: 6px 10px;
+        border-radius: 8px;
+    }
+    .people-page .people-item .avatar-wrap {
+        width: 26px;
+        height: 26px;
+    }
+    .people-page .people-item .avatar-wrap .letter {
+        font-size: 0.6rem;
+    }
+    .people-page .people-item .info .name {
+        font-size: 0.65rem;
+    }
+    .people-page .people-item .info .status {
+        font-size: 0.5rem;
+    }
+
+    /* ===== ПРОФИЛЬ ===== */
+    .profile-header {
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+    }
+    .profile-header .avatar-wrap {
+        width: 56px;
+        height: 56px;
+    }
+    .profile-header .avatar-wrap .letter {
+        font-size: 1.5rem;
+    }
+    .profile-header .name {
+        font-size: 0.85rem;
+    }
+    .profile-header .bio {
+        font-size: 0.6rem;
+    }
+    .profile-header .actions button {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+    }
+    .profile-stats {
+        font-size: 0.55rem;
+        gap: 8px;
+    }
+    .friends-section {
+        padding: 6px 10px;
+        border-radius: 10px;
+    }
+    .friends-section h4 {
+        font-size: 0.65rem;
+    }
+    .friend-item {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+    }
+    .friend-item .avatar-wrap {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* ===== ЧАТ ===== */
+    .chat-view {
+        padding: 8px;
+        border-radius: 10px;
+        height: 55vh;
+    }
+    .chat-view .messages .msg {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+    }
+    .chat-view .messages .msg .author {
+        font-size: 0.55rem;
+    }
+    .chat-view .messages .msg .time {
+        font-size: 0.4rem;
+    }
+    .chat-view .input-wrap input {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+    .chat-view .input-wrap button {
+        font-size: 0.6rem;
+        padding: 0 10px;
+    }
+
+    /* ===== МОДАЛКИ ===== */
+    .modal .box {
+        padding: 12px;
+        max-width: 340px;
+        width: 95%;
+    }
+    .modal .box h3 {
+        font-size: 0.8rem;
+    }
+    .modal .box .sub {
+        font-size: 0.65rem;
+    }
+    .modal .box input,
+    .modal .box textarea {
+        font-size: 0.7rem;
+        padding: 5px 8px;
+    }
+    .modal .box .btns button {
+        font-size: 0.6rem;
+        padding: 3px 10px;
+    }
+    .modal .box .btn-add {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+    }
+    .google-btn {
+        font-size: 0.7rem;
+        padding: 4px;
+    }
+    .google-btn img {
+        width: 14px;
+        height: 14px;
+    }
+    .divider {
+        font-size: 0.55rem;
+    }
+
+    /* ===== АДМИН ТОЧКА ===== */
+    .admin-dot {
+        width: 8px;
+        height: 8px;
+        bottom: 6px;
+        right: 6px;
+    }
 }
-@media (max-width: 380px) {
-    .header .right .notif-btn { font-size:16px; padding:4px 8px; }
-    .header .right .avatar-small { width:30px; height:30px; font-size:13px; }
-    .user-item .actions { gap:4px; }
-    .btn-action { font-size:10px; padding:3px 6px; height:22px; }
+
+/* ===== ОЧЕНЬ МАЛЕНЬКИЕ ЭКРАНЫ (до 360px) ===== */
+@media (max-width: 360px) {
+    .topbar .left .logo {
+        font-size: 0.7rem;
+    }
+    .hor-menu button {
+        font-size: 0.5rem;
+        padding: 3px 6px;
+    }
+    .player-simple .track-name-simple {
+        font-size: 0.55rem;
+        max-width: 60px;
+    }
+    .player-simple .play-btn-simple {
+        width: 26px;
+        height: 26px;
+        font-size: 10px;
+    }
+    .player-simple .player-controls button {
+        width: 20px;
+        height: 20px;
+        font-size: 8px;
+    }
+    .post .text {
+        font-size: 0.7rem;
+    }
+    .groups-page .group-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== ПЛАНШЕТЫ (481px - 768px) ===== */
+@media (min-width: 481px) and (max-width: 768px) {
+    .player-simple .track-name-simple {
+        max-width: 150px;
+    }
+    .groups-page .group-list {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ===== ДЕСКТОП (769px+) ===== */
+@media (min-width: 769px) {
+    .container {
+        max-width: 700px;
+    }
 }
