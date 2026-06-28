@@ -75,3 +75,4 @@ function openNotifications() {
 function closeNotifications() {
     document.getElementById('notificationsModal').classList.remove('open');
 }
+
