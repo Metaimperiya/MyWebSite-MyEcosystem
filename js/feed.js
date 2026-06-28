@@ -439,7 +439,7 @@ window.saveEdit = function() {
         link: link || null,
         hashtags: hashtags,
         buttons: buttons,
-        frameSize: currentFrameSize, // СОХРАНЯЕМ РАЗМЕР ФРЕЙМА В ПОСТ
+        frameSize: currentFrameSize,
         edited: true,
         editedAt: Date.now()
     };
@@ -519,7 +519,7 @@ window.submitPost = function() {
         marquee: null,
         link: null,
         buttons: [],
-        frameSize: 'small', // ПО УМОЛЧАНИЮ МАЛЕНЬКИЙ ФРЕЙМ
+        frameSize: 'small',
         edited: false
     };
 
