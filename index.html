@@ -728,27 +728,50 @@
            МОДАЛКИ
            ================================================================ */
         .modal {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
         }
         .modal.open { display: flex; }
         .modal .box {
-            background: #fff; border-radius: 14px; padding: 16px;
-            max-width: 380px; width: 92%; max-height: 80vh; overflow-y: auto;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            max-width: 380px;
+            width: 92%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
         .modal .box h3 { margin-bottom: 4px; font-size: 0.9rem; color: #e67e22; }
         .modal .box .sub { color: #888; font-size: 0.75rem; margin-bottom: 6px; }
         .modal .box input, .modal .box textarea {
-            width: 100%; padding: 6px 10px; border: 1px solid #ddd;
-            border-radius: 6px; margin: 3px 0; font-family: inherit; font-size: 0.8rem;
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin: 3px 0;
+            font-family: inherit;
+            font-size: 0.8rem;
             outline: none;
         }
         .modal .box input:focus, .modal .box textarea:focus { border-color: #e67e22; }
         .modal .box textarea { min-height: 40px; resize: vertical; }
         .modal .box .btns { display: flex; gap: 4px; justify-content: flex-end; margin-top: 6px; }
         .modal .box .btns button {
-            padding: 4px 14px; border: none; border-radius: 16px;
-            font-weight: 600; cursor: pointer; font-size: 0.7rem;
+            padding: 4px 14px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.7rem;
         }
         .modal .box .btns .cancel { background: #e4e6eb; color: #555; }
         .modal .box .btns .save { background: #e67e22; color: #fff; }
@@ -756,26 +779,6 @@
         .modal .box .btn-group input { margin-bottom: 0; flex: 1; }
         .modal .box .btn-group .btn-remove { background: #ffebee; color: #c62828; border: none; border-radius: 30px; padding: 4px 10px; cursor: pointer; font-size: 0.6rem; }
         .modal .box .btn-add { background: #f0f0f0; border: 1px solid #ddd; color: #e67e22; padding: 3px 12px; border-radius: 20px; cursor: pointer; font-size: 0.65rem; margin-top: 3px; }
-
-        .google-btn {
-            display: flex; align-items: center; justify-content: center;
-            gap: 6px; width: 100%; padding: 6px;
-            background: #fff; border: 1px solid #ddd; border-radius: 40px;
-            font-weight: 600; cursor: pointer; margin: 4px 0; font-size: 0.8rem;
-        }
-        .google-btn:hover { background: #f5f5f5; }
-        .google-btn img { width: 16px; height: 16px; }
-
-        .divider { display: flex; align-items: center; gap: 6px; color: #bbb; font-size: 0.65rem; margin: 4px 0; }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
-
-        .admin-dot {
-            position: fixed; bottom: 8px; right: 8px;
-            width: 10px; height: 10px; border-radius: 50%;
-            border: 2px solid #ddd; cursor: pointer;
-            background: #f0f0f0; z-index: 99;
-        }
-        .admin-dot.active { background: #e67e22; border-color: #e67e22; }
 
         /* ================================================================
            ТУМБЛЕР РАЗМЕРА ФРЕЙМА
@@ -838,6 +841,69 @@
 
         .post .link-preview iframe.large {
             height: 450px;
+        }
+
+        /* ================================================================
+           GOOGLE BUTTON
+           ================================================================ */
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 6px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 4px 0;
+            font-size: 0.75rem;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .google-btn img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #bbb;
+            font-size: 0.6rem;
+            margin: 4px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .admin-dot {
+            position: fixed;
+            bottom: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            background: #f0f0f0;
+            z-index: 99;
+        }
+
+        .admin-dot.active {
+            background: #e67e22;
+            border-color: #e67e22;
         }
 
         /* ================================================================
@@ -1054,11 +1120,12 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ С ТУМБЛЕРОМ ===== -->
+    <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ (ОДНА, С ТУМБЛЕРОМ) ===== -->
     <div class="modal" id="editModal">
         <div class="box">
             <h3>✏️ Редактировать пост</h3>
             <div class="sub">Измените содержимое поста</div>
+            
             <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
             <textarea id="editText" placeholder="📝 Текст поста"></textarea>
             <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
@@ -1080,6 +1147,7 @@
             <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
             <div id="editButtonsContainer"></div>
             <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
+            
             <div class="btns" style="margin-top:6px;">
                 <button class="save" onclick="saveEdit()">💾 Сохранить</button>
                 <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
