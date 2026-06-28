@@ -23,3 +23,16 @@ const ADMIN_UIDS = [
 ];
 
 let isAdmin = false;
+let USER = null;
+let USER_UID = null;
+let SAVED_PROFILES = [];
+let avatarCache = null;
+let chatUnsub = null;
+let notifUnsub = null;
+let currentTab = 'feed';
+let viewingProfileUid = null;
+let activeStatToggle = null;
+let profilePrivacy = { hideFriends: false };
+let CURRENT_ROOM = null;
+let friendListeners = {};
+let activeRequests = new Map();
