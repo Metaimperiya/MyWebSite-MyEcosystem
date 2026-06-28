@@ -42,7 +42,7 @@ function renderPost(p, type) {
     const letter = (p.author || '?').charAt(0).toUpperCase();
     const avatarHtml = `<span class="avatar-wrap" id="post-avatar-${p.id}"><span class="letter">${letter}</span></span>`;
 
-    let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>' : '';
+    let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
     let textHtml = esc(p.text || '');
     let imgHtml = p.img ? `<img src="${p.img}" class="post-img" onclick="window.open(this.src)">` : '';
     
@@ -71,12 +71,12 @@ function renderPost(p, type) {
         hashtagsHtml += '</div>';
     }
 
-    // ===== МЕНЮ ПОСТА (ТРИ ТОЧКИ) =====
+    // ===== ТРИ ТОЧКИ В ПРАВОМ ВЕРХНЕМ УГЛУ (ВЕРТИКАЛЬНЫЕ) =====
     let menuHtml = '';
     if (p.author === USER || IS_ADMIN) {
         menuHtml = `
             <div class="post-menu">
-                <button class="dots" onclick="togglePostMenu('${p.id}')">•••</button>
+                <button class="dots" onclick="togglePostMenu('${p.id}')">⋮</button>
                 <div class="dropdown" id="menu_${p.id}">
                     <button class="edit-btn" onclick="openEdit('${p.id}', '${type}')">✏️ Редактировать</button>
                     <button class="del-btn" onclick="deletePost('${p.id}', '${type}')">🗑 Удалить</button>
@@ -85,28 +85,27 @@ function renderPost(p, type) {
         `;
     }
 
-    // ===== КНОПКИ ЛАЙКОВ И КОММЕНТАРИЕВ =====
+    // ===== КНОПКИ ЛАЙКОВ И КОММЕНТАРИЕВ (счетчик комментариев рядом с 💬) =====
     let actionsHtml = `
         <div class="stats">
             <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
                 👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
             </button>
-            <button onclick="toggleComments('${p.id}', '${type}')">
+            <button onclick="toggleComments('${p.id}', '${type}')" id="commentToggle_${p.id}">
                 💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
             </button>
         </div>
     `;
 
-    // ===== БЛОК КОММЕНТАРИЕВ =====
+    // ===== КОММЕНТАРИИ (ВСЕГДА ВИДНЫ, СКРЫВАЕТСЯ ТОЛЬКО СПИСОК) =====
     let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
-            <button class="toggle" onclick="toggleComments('${p.id}', '${type}')">💬 Показать комментарии</button>
             <div class="list" id="commentsList_${p.id}">
                 <div id="commentsContainer_${p.id}"></div>
-                <div class="input-wrap">
-                    <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
-                    <button onclick="submitComment('${p.id}', '${type}')">→</button>
-                </div>
+            </div>
+            <div class="input-wrap">
+                <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
+                <button onclick="submitComment('${p.id}', '${type}')">→</button>
             </div>
         </div>
     `;
@@ -141,7 +140,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// КОММЕНТАРИИ (ОТКРЫТИЕ/ЗАКРЫТИЕ + ВВОД)
+// КОММЕНТАРИИ (ОТКРЫТИЕ/ЗАКРЫТИЕ ПО КЛИКУ НА 💬)
 // ================================================================
 
 function loadComments(postId, type) {
@@ -187,15 +186,11 @@ function loadComments(postId, type) {
     });
 }
 
-// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
+// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ (ПО КЛИКУ НА 💬) =====
 window.toggleComments = function(postId, type) {
     const list = document.getElementById('commentsList_' + postId);
-    const toggle = document.querySelector(`#comments_${postId} .toggle`);
     if (list) {
         list.classList.toggle('open');
-        if (toggle) {
-            toggle.textContent = list.classList.contains('open') ? '▲ Скрыть комментарии' : '💬 Показать комментарии';
-        }
     }
 };
 
@@ -218,10 +213,8 @@ window.submitComment = function(postId, type) {
     
     // Автоматически открываем комментарии после отправки
     const list = document.getElementById('commentsList_' + postId);
-    const toggle = document.querySelector(`#comments_${postId} .toggle`);
     if (list) {
         list.classList.add('open');
-        if (toggle) toggle.textContent = '▲ Скрыть комментарии';
     }
 };
 
@@ -368,7 +361,7 @@ window.closeEdit = function() {
 };
 
 // ================================================================
-// МЕНЮ ПОСТА (ТРИ ТОЧКИ)
+// МЕНЮ ПОСТА (ТРИ ТОЧКИ ВЕРТИКАЛЬНЫЕ)
 // ================================================================
 
 window.togglePostMenu = function(id) {
