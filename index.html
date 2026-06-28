@@ -11,30 +11,226 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <style>
-        /* ===== ВЕСЬ ТВОЙ CSS ОСТАЁТСЯ БЕЗ ИЗМЕНЕНИЙ ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #f0f2f5;
-            color: #222;
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            min-height: 100vh;
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { 
+            background:#f0f2f5; 
+            font-family:system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding:16px;
+            max-width:700px;
+            margin:0 auto;
         }
-        /* ... ВЕСЬ ТВОЙ CSS СЮДА ... */
-        /* (я не копирую его чтобы не раздувать, но он весь остаётся) */
+        .header { background:#1877f2; color:#fff; padding:12px 16px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .header h2 { font-size:18px; cursor:pointer; }
+        .header .right { display:flex; align-items:center; gap:8px; }
+        .header .avatar { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px solid rgba(255,255,255,0.3); }
+        .header .avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .header .avatar .letter { color:#fff; font-weight:700; font-size:16px; }
+        
+        .tab-bar { display:flex; gap:6px; margin-bottom:12px; background:#fff; border-radius:12px; padding:4px; }
+        .tab { flex:1; padding:10px; text-align:center; border:none; background:none; border-radius:10px; font-weight:600; font-size:13px; color:#65676b; cursor:pointer; }
+        .tab.active { background:#1877f2; color:#fff; }
+        
+        .card { background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; }
+        .card h3 { font-size:17px; margin-bottom:12px; }
+        
+        .page { display:none; }
+        .page.active { display:block; }
+        .hidden { display:none !important; }
+        
+        .user-item { display:flex; align-items:center; padding:8px 10px; border-bottom:1px solid #e4e6eb; gap:10px; cursor:pointer; }
+        .user-item .avatar { width:38px; height:38px; border-radius:50%; background:#e4e6eb; display:flex; align-items:center; justify-content:center; font-weight:600; overflow:hidden; }
+        .user-item .avatar img { width:100%; height:100%; object-fit:cover; }
+        .user-item .info { flex:1; }
+        .user-item .info .name { font-size:14px; font-weight:600; }
+        .user-item .actions { display:flex; gap:6px; }
+        
+        .btn-action { padding:5px 12px; border:none; border-radius:6px; font-size:12px; font-weight:500; cursor:pointer; background:#e4e6eb; color:#050505; }
+        .btn-action:hover { background:#d8dadf; }
+        
+        .modal {
+            display:none;
+            position:fixed;
+            top:0; left:0; right:0; bottom:0;
+            background:rgba(0,0,0,0.5);
+            z-index:9999;
+            justify-content:center;
+            align-items:center;
+            padding:16px;
+        }
+        .modal.open { display:flex; }
+        .modal-content { background:#fff; border-radius:12px; padding:20px; max-width:380px; width:100%; }
+        .modal-content h3 { margin-bottom:12px; }
+        .modal-content input { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin:4px 0; font-size:14px; }
+        .modal-content .btns { display:flex; gap:8px; margin-top:10px; }
+        .modal-content .btns button { flex:1; padding:8px; border:none; border-radius:8px; font-weight:600; cursor:pointer; }
+        .modal-content .btns .cancel { background:#e4e6eb; }
+        .modal-content .btns .save { background:#1877f2; color:#fff; }
+        
+        .google-btn {
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            width:100%;
+            padding:10px;
+            background:#fff;
+            border:1px solid #ddd;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:600;
+        }
+        .google-btn img { width:20px; }
+        
+        .profile-page { background:#fff; border-radius:12px; padding:24px 16px; text-align:center; }
+        .profile-page .avatar { width:90px; height:90px; border-radius:50%; background:#e4e6eb; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-size:36px; font-weight:700; overflow:hidden; }
+        .profile-page .avatar img { width:100%; height:100%; object-fit:cover; }
+        .profile-page .name { font-size:20px; font-weight:700; }
+        .profile-page .bio { font-size:14px; color:#65676b; margin-top:6px; }
+        
+        .room-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .room-card { background:#f0f2f5; border-radius:12px; padding:14px; text-align:center; cursor:pointer; }
+        .room-card:hover { background:#e4e6eb; }
+        .room-card .icon { font-size:26px; }
+        .room-card .name { font-weight:600; margin:4px 0; font-size:13px; }
+        .room-card .count { font-size:12px; color:#65676b; }
+        
+        .post { background:#fff; border-radius:12px; padding:12px 14px; margin-bottom:8px; border:1px solid #e8e8e8; }
+        .post .author { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+        .post .author .avatar { width:28px; height:28px; border-radius:50%; background:#1877f2; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .post .author .avatar img { width:100%; height:100%; object-fit:cover; }
+        .post .author .name { font-weight:600; font-size:14px; color:#1877f2; cursor:pointer; }
+        .post .author .time { color:#999; font-size:11px; margin-left:6px; }
+        .post .text { margin:4px 0; font-size:14px; line-height:1.4; }
+        
+        .chat-window {
+            position:fixed;
+            bottom:16px;
+            right:16px;
+            width:360px;
+            max-width:calc(100% - 32px);
+            height:460px;
+            background:#fff;
+            border-radius:12px;
+            box-shadow:0 8px 32px rgba(0,0,0,0.2);
+            z-index:9999;
+            display:none;
+            flex-direction:column;
+            border:1px solid #e4e6eb;
+        }
+        .chat-window.active { display:flex; }
+        .chat-window .chat-header { display:flex; justify-content:space-between; padding:10px 14px; background:#1877f2; color:#fff; border-radius:12px 12px 0 0; }
+        .chat-window .chat-messages { flex:1; overflow-y:auto; padding:10px 14px; background:#f8f9fa; }
+        .chat-window .chat-messages .msg { padding:6px 12px; margin-bottom:4px; background:#fff; border-radius:10px; font-size:13px; }
+        .chat-window .chat-input-wrap { display:flex; gap:6px; padding:10px 14px; border-top:1px solid #e4e6eb; }
+        .chat-window .chat-input-wrap input { flex:1; padding:8px 14px; border:1px solid #e4e6eb; border-radius:20px; outline:none; }
+        .chat-window .chat-input-wrap button { background:#1877f2; color:#fff; border:none; border-radius:20px; padding:0 16px; font-weight:600; cursor:pointer; }
+        
+        @media (max-width:480px) {
+            body { padding:10px; }
+            .chat-window { width:calc(100% - 20px); right:10px; bottom:10px; height:380px; }
+            .room-grid { grid-template-columns:1fr; }
+        }
     </style>
 </head>
 <body>
 
-<!-- ===== ТВОЯ ВЁРСТКА (ВСЁ КАК У ТЕБЯ) ===== -->
-<!-- Топбар, плеер, меню, страницы — всё остаётся -->
+<!-- ===== ШАПКА ===== -->
+<div class="header">
+    <h2 onclick="goToFeed()">🏠 METAIMPERIYA</h2>
+    <div class="right">
+        <div class="avatar" id="headerAvatar" onclick="goToProfile()">
+            <span class="letter">?</span>
+        </div>
+    </div>
+</div>
 
-<!-- ===== ПОДКЛЮЧАЕМ РАБОЧУЮ ЛОГИКУ ===== -->
+<!-- ===== ТАБЫ ===== -->
+<div class="tab-bar">
+    <button class="tab active" onclick="showTab('feed')">📰 Лента</button>
+    <button class="tab" onclick="showTab('groups')">👥 Группы</button>
+    <button class="tab" onclick="showTab('people')">👤 Люди</button>
+</div>
+
+<!-- ===== СТРАНИЦЫ ===== -->
+<div id="feedPage" class="page active">
+    <div class="card">
+        <h3>📰 Лента</h3>
+        <div id="feedPosts"></div>
+    </div>
+</div>
+
+<div id="groupsPage" class="page hidden">
+    <div class="card">
+        <h3>👥 Группы</h3>
+        <div id="roomsList" class="room-grid"></div>
+    </div>
+</div>
+
+<div id="peoplePage" class="page hidden">
+    <div class="card">
+        <h3>👤 Все пользователи</h3>
+        <div id="peopleList"></div>
+    </div>
+</div>
+
+<div id="profilePage" class="page hidden">
+    <div class="profile-page" id="profileContent">
+        <div class="avatar" id="profileAvatar"><span>?</span></div>
+        <div class="name" id="profileName">Гость</div>
+        <div class="bio" id="profileBio">Привет!</div>
+        <button class="btn-action" onclick="uploadAvatar()" style="margin-top:10px;">📷 Сменить аватар</button>
+        <button class="btn-action" onclick="openEditProfile()" style="margin-top:6px;">✏️ Редактировать</button>
+        <button class="btn-action" onclick="logout()" style="margin-top:6px;background:#e74c3c;color:#fff;">🚪 Выйти</button>
+    </div>
+</div>
+
+<!-- ===== ЧАТ ===== -->
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <span id="chatTitle">💬 Чат</span>
+        <button onclick="closeChat()" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Сообщение..." onkeypress="if(event.key==='Enter') sendChat()">
+        <button onclick="sendChat()">→</button>
+    </div>
+</div>
+
+<!-- ===== МОДАЛКА ВХОДА ===== -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <h3>👤 Вход</h3>
+        <button class="google-btn" id="googleBtn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg">
+            Войти через Google
+        </button>
+        <div style="text-align:center;margin:8px 0;color:#65676b;">или</div>
+        <input type="text" id="nameInput" placeholder="Введите имя">
+        <div class="btns">
+            <button class="cancel" onclick="closeLogin()">Отмена</button>
+            <button class="save" onclick="loginName()">Войти</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ===== -->
+<div class="modal" id="editProfileModal">
+    <div class="modal-content">
+        <h3>✏️ Редактировать</h3>
+        <input type="text" id="editName" placeholder="Имя">
+        <input type="text" id="editBio" placeholder="О себе">
+        <div class="btns">
+            <button class="cancel" onclick="closeEditProfile()">Отмена</button>
+            <button class="save" onclick="saveProfile()">Сохранить</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // ================================================================
-// РАБОЧАЯ ЛОГИКА (ИЗ ПРЕДЫДУЩЕЙ ВЕРСИИ)
+// FIREBASE
 // ================================================================
-
-// ===== FIREBASE =====
 const FB_CONFIG = {
     apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
     authDomain: "myecosystem-e6414.firebaseapp.com",
@@ -44,6 +240,7 @@ const FB_CONFIG = {
     messagingSenderId: "426302111033",
     appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
 };
+
 firebase.initializeApp(FB_CONFIG);
 const db = firebase.database();
 const auth = firebase.auth();
@@ -52,109 +249,47 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
 
-// ===== АДМИНЫ =====
-const ADMIN_UIDS = [
-    "ayXehcol9FgAQU6tZuup7aSaRoV2",
-    "pWB0nGVvVXc4je6466ss7IwBm9G2",
-    "ANR62p3qcjOe2ALsdVvJHUNCCV42"
-];
-
-// ===== СОСТОЯНИЕ =====
+// ================================================================
+// СОСТОЯНИЕ
+// ================================================================
 let USER = null;
 let USER_UID = null;
-let IS_ADMIN = false;
-let avatarCache = {};
 let CURRENT_ROOM = null;
 let chatUnsub = null;
-let notifUnsub = null;
-let VIEWING_USER = null;
-let friendListeners = {};
-let activeRequests = new Map();
+let avatarCache = {};
 
-// ===== УТИЛИТЫ =====
-function esc(s) {
-    return s ? String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
-}
-
-function cancelRequest(key) {
-    if (activeRequests.has(key)) {
-        const fn = activeRequests.get(key);
-        if (typeof fn === 'function') fn();
-        activeRequests.delete(key);
-    }
-}
-
-function safeFirebaseQuery(key, ref, callback) {
-    cancelRequest(key);
-    let cancelled = false;
-    const cancelFn = () => { cancelled = true; activeRequests.delete(key); };
-    activeRequests.set(key, cancelFn);
-    ref.once('value', snap => {
-        if (cancelled) return;
-        activeRequests.delete(key);
-        callback(snap);
-    }).catch(err => {
-        if (!cancelled) {
-            activeRequests.delete(key);
-            console.warn('Query error:', err);
-        }
-    });
-    return cancelFn;
-}
-
-// ===== АВАТАРКИ =====
-function getUserAvatar(uid, callback) {
-    if (avatarCache[uid]) { callback(avatarCache[uid]); return; }
-    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
-        const url = snap.val() || null;
-        avatarCache[uid] = url;
-        callback(url);
-    });
-}
-
-function renderAvatar(uid, container, letter) {
-    if (!container) return;
-    getUserAvatar(uid, function(url) {
-        if (url) {
-            container.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
-        } else {
-            container.innerHTML = `<span class="letter">${letter || '?'}</span>`;
-        }
-    });
-}
-
-// ===== AUTH =====
+// ================================================================
+// AUTH
+// ================================================================
 auth.onAuthStateChanged(user => {
     if (user) {
         USER_UID = user.uid;
         USER = user.displayName || user.email || user.uid.slice(0,8);
         localStorage.setItem('dc_u_' + SITE, USER);
-        IS_ADMIN = ADMIN_UIDS.includes(USER_UID);
         
-        const data = {
+        db.ref('sites/' + SITE + '/users/' + USER_UID).update({
             name: USER,
             email: user.email || 'anon',
             uid: USER_UID,
             lastLogin: Date.now(),
             avatarUrl: user.photoURL || null
-        };
-        db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
-        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
+        });
+        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
+            name: USER,
+            email: user.email || 'anon',
+            uid: USER_UID,
+            avatarUrl: user.photoURL || null
+        });
         
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadFeed();
-        loadGroups();
+        loadRooms();
         loadPeople();
         loadProfile();
-        loadNotifications();
     } else {
         USER = null;
         USER_UID = null;
-        IS_ADMIN = false;
-        if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-        Object.values(friendListeners).forEach(fn => { if (typeof fn === 'function') fn(); });
-        friendListeners = {};
         document.getElementById('loginModal').classList.add('open');
         updateUI();
     }
@@ -174,115 +309,180 @@ function loginName() {
         USER = name;
         USER_UID = 'anon_' + Date.now();
         localStorage.setItem('dc_u_' + SITE, USER);
-        const data = { name: USER, email: 'anon@anon.com', uid: USER_UID, lastLogin: Date.now() };
-        db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
-        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
+        db.ref('sites/' + SITE + '/users/' + USER_UID).update({
+            name: USER,
+            email: 'anon@anon.com',
+            uid: USER_UID,
+            lastLogin: Date.now()
+        });
+        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
+            name: USER,
+            email: 'anon@anon.com',
+            uid: USER_UID
+        });
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadFeed();
-        loadGroups();
+        loadRooms();
         loadPeople();
         loadProfile();
-        loadNotifications();
     }).catch(e => alert('Ошибка: ' + e.message));
 }
 
 function logout() {
     if (!confirm('Выйти?')) return;
-    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-    Object.values(friendListeners).forEach(fn => { if (typeof fn === 'function') fn(); });
-    friendListeners = {};
     auth.signOut().then(() => {
         localStorage.removeItem('dc_u_' + SITE);
-        USER = null; USER_UID = null; IS_ADMIN = false;
+        USER = null;
+        USER_UID = null;
         document.getElementById('loginModal').classList.add('open');
         updateUI();
     });
 }
 
-// ===== UI =====
-function updateUI() {
-    const topAvatar = document.getElementById('topAvatar');
-    const sAvatar = document.getElementById('sAvatar');
-    const name = document.getElementById('topName');
-    const sName = document.getElementById('sName');
-    const dot = document.getElementById('adminDot');
+function closeLogin() {
+    document.getElementById('loginModal').classList.remove('open');
+}
 
-    if (USER) {
-        name.textContent = USER;
-        sName.textContent = USER;
-        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-        if (IS_ADMIN) dot.classList.add('active');
-        else dot.classList.remove('active');
+// ================================================================
+// АВАТАРКИ
+// ================================================================
+function getUserAvatar(uid, callback) {
+    if (avatarCache[uid]) { callback(avatarCache[uid]); return; }
+    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
+        const url = snap.val() || null;
+        avatarCache[uid] = url;
+        callback(url);
+    });
+}
+
+function renderAvatar(uid, container) {
+    if (!container) return;
+    getUserAvatar(uid, function(url) {
+        if (url) {
+            container.innerHTML = `<img src="${url}">`;
+        } else {
+            const letter = (USER || '?').charAt(0).toUpperCase();
+            container.innerHTML = `<span class="letter">${letter}</span>`;
+        }
+    });
+}
+
+function uploadAvatar() {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5*1024*1024) { alert('Максимум 5 МБ'); return; }
+        const ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
+        ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
+            db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
+            avatarCache[USER_UID] = url;
+            updateUI();
+            loadProfile();
+            alert('✅ Аватарка обновлена!');
+        });
+    };
+    input.click();
+}
+
+// ================================================================
+// UI
+// ================================================================
+function updateUI() {
+    const avatar = document.getElementById('headerAvatar');
+    if (!avatar) return;
+    if (USER && USER_UID) {
+        renderAvatar(USER_UID, avatar);
     } else {
-        topAvatar.innerHTML = `<span class="letter">?</span>`;
-        sAvatar.innerHTML = `<span class="letter">?</span>`;
-        name.textContent = 'Гость';
-        sName.textContent = 'Гость';
-        dot.classList.remove('active');
+        avatar.innerHTML = '<span class="letter">?</span>';
     }
 }
 
-// ===== НАВИГАЦИЯ =====
-function setActivePage(pageId) {
-    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-    if (pageId) document.getElementById(pageId).classList.add('active');
-    document.querySelectorAll('.hor-menu button').forEach(el => el.classList.remove('active'));
-    const map = { feedPage: 'hFeed', groupsPage: 'hGroups', peoplePage: 'hPeople', profilePage: 'hProfile' };
-    if (map[pageId]) document.getElementById(map[pageId]).classList.add('active');
-}
-
-function goToFeed() {
-    if (!USER) { alert('Войдите!'); return; }
-    setActivePage('feedPage');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
-    CURRENT_ROOM = null;
-    loadFeed();
-}
-
-function goToGroups() {
-    if (!USER) { alert('Войдите!'); return; }
-    setActivePage('groupsPage');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
-    CURRENT_ROOM = null;
-    loadGroups();
-}
-
-function goToPeople() {
-    if (!USER) { alert('Войдите!'); return; }
-    setActivePage('peoplePage');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
-    CURRENT_ROOM = null;
-    loadPeople();
-}
-
-function goToProfile() {
-    if (!USER) { alert('Войдите!'); return; }
-    VIEWING_USER = null;
-    setActivePage('profilePage');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
-    CURRENT_ROOM = null;
-    loadProfile();
-}
-
-// ===== ЛЮДИ =====
-function loadPeople() {
-    if (!USER_UID) return;
-    const el = document.getElementById('peopleList');
-    if (!el) return;
+// ================================================================
+// НАВИГАЦИЯ
+// ================================================================
+function showTab(tab) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     
-    safeFirebaseQuery('people', db.ref('sites/' + SITE + '/all_users'), (snap) => {
-        const users = snap.val() || {};
-        const keys = Object.keys(users).filter(k => {
-            if (k === USER_UID) return false;
-            if (!users[k] || !users[k].name) return false;
-            return true;
+    const map = { feed: 'feedPage', groups: 'groupsPage', people: 'peoplePage' };
+    const page = document.getElementById(map[tab]);
+    if (page) {
+        page.classList.remove('hidden');
+        page.classList.add('active');
+    }
+    
+    document.querySelectorAll('.tab').forEach(t => {
+        if (t.textContent.includes({ feed: 'Лента', groups: 'Группы', people: 'Люди' }[tab])) {
+            t.classList.add('active');
+        }
+    });
+}
+
+function goToFeed() { showTab('feed'); loadFeed(); }
+function goToGroups() { showTab('groups'); loadRooms(); }
+function goToPeople() { showTab('people'); loadPeople(); }
+function goToProfile() { showTab('profile'); loadProfile(); }
+
+// ================================================================
+// ЛЕНТА
+// ================================================================
+function loadFeed() {
+    if (!USER_UID) {
+        document.getElementById('feedPosts').innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">Войдите</div>';
+        return;
+    }
+    
+    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
+        const container = document.getElementById('feedPosts');
+        container.innerHTML = '';
+        const data = snap.val() || {};
+        const keys = Object.keys(data).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
+        
+        if (!keys.length) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">Пока пусто</div>';
+            return;
+        }
+        
+        keys.forEach(k => {
+            const p = data[k];
+            const div = document.createElement('div');
+            div.className = 'post';
+            div.innerHTML = `
+                <div class="author">
+                    <span class="avatar" id="post-avatar-${k}"><span class="letter">${(p.author || '?').charAt(0).toUpperCase()}</span></span>
+                    <span class="name">${esc(p.author || 'Аноним')}</span>
+                    <span class="time">${p.time || ''}</span>
+                </div>
+                <div class="text">${esc(p.text || '')}</div>
+            `;
+            container.appendChild(div);
+            if (p.authorUid) {
+                renderAvatar(p.authorUid, document.getElementById('post-avatar-' + k));
+            }
         });
+    });
+}
+
+// ================================================================
+// ЛЮДИ
+// ================================================================
+function loadPeople() {
+    if (!USER_UID) {
+        document.getElementById('peopleList').innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">Войдите</div>';
+        return;
+    }
+    
+    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
+        const users = snap.val() || {};
+        const keys = Object.keys(users).filter(k => k !== USER_UID);
+        const el = document.getElementById('peopleList');
         
         if (!keys.length) {
             el.innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">😕 Нет других пользователей</div>';
@@ -292,26 +492,65 @@ function loadPeople() {
         el.innerHTML = '';
         keys.forEach(k => {
             const u = users[k];
-            const name = u.name || 'Аноним';
-            const letter = name.charAt(0).toUpperCase();
             const div = document.createElement('div');
-            div.className = 'people-item';
+            div.className = 'user-item';
             div.innerHTML = `
-                <span class="avatar-wrap" id="pava-${k}"><span class="letter">${letter}</span></span>
-                <div class="info">
-                    <div class="name">${esc(name)}</div>
-                    <div class="status">Нажмите для просмотра</div>
-                </div>
+                <span class="avatar" id="p-avatar-${k}"><span class="letter">${(u.name || '?').charAt(0).toUpperCase()}</span></span>
+                <div class="info"><div class="name">${esc(u.name || 'Аноним')}</div></div>
             `;
-            div.onclick = () => viewUser(k);
+            div.onclick = () => { goToProfile(); };
             el.appendChild(div);
-            renderAvatar(k, document.getElementById('pava-' + k), letter);
+            renderAvatar(k, document.getElementById('p-avatar-' + k));
         });
     });
 }
 
-// ===== ГРУППЫ =====
-const GROUPS = [
+// ================================================================
+// ПРОФИЛЬ
+// ================================================================
+function loadProfile() {
+    if (!USER_UID) {
+        document.getElementById('profileName').textContent = 'Гость';
+        document.getElementById('profileBio').textContent = 'Войдите';
+        document.getElementById('profileAvatar').innerHTML = '<span>?</span>';
+        return;
+    }
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID).once('value', snap => {
+        const u = snap.val() || {};
+        document.getElementById('profileName').textContent = u.name || USER || 'Гость';
+        document.getElementById('profileBio').textContent = u.bio || 'Привет!';
+        renderAvatar(USER_UID, document.getElementById('profileAvatar'));
+    });
+}
+
+function openEditProfile() {
+    document.getElementById('editProfileModal').classList.add('open');
+    document.getElementById('editName').value = USER || '';
+    document.getElementById('editBio').value = '';
+}
+
+function closeEditProfile() {
+    document.getElementById('editProfileModal').classList.remove('open');
+}
+
+function saveProfile() {
+    const name = document.getElementById('editName').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    if (!name) { alert('Введите имя'); return; }
+    USER = name;
+    localStorage.setItem('dc_u_' + SITE, USER);
+    db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
+    db.ref('sites/' + SITE + '/all_users/' + USER_UID).update({ name: USER, bio: bio });
+    closeEditProfile();
+    loadProfile();
+    updateUI();
+}
+
+// ================================================================
+// ГРУППЫ
+// ================================================================
+const ROOMS = [
     { id: 'general', name: 'Общий', icon: '🌍' },
     { id: 'sport', name: 'Спорт', icon: '⚽' },
     { id: 'games', name: 'Игры', icon: '🎮' },
@@ -324,20 +563,22 @@ const GROUPS = [
     { id: 'science', name: 'Наука', icon: '🔬' }
 ];
 
-function loadGroups() {
-    if (!USER_UID) return;
-    const el = document.getElementById('groupList');
-    if (!el) return;
+function loadRooms() {
+    if (!USER_UID) {
+        document.getElementById('roomsList').innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">Войдите</div>';
+        return;
+    }
     
+    const el = document.getElementById('roomsList');
     let html = '';
-    GROUPS.forEach(room => {
+    ROOMS.forEach(room => {
         db.ref('sites/' + SITE + '/rooms/' + room.id + '/count').on('value', snap => {
             const count = snap.val() || 0;
-            const countEl = document.querySelector(`#groupList .group-card[data-id="${room.id}"] .count`);
+            const countEl = document.querySelector(`#roomsList .room-card[data-id="${room.id}"] .count`);
             if (countEl) countEl.textContent = count;
         });
         html += `
-            <div class="group-card" data-id="${room.id}" onclick="openGroup('${room.id}')">
+            <div class="room-card" data-id="${room.id}" onclick="joinRoom('${room.id}')">
                 <div class="icon">${room.icon}</div>
                 <div class="name">${room.name}</div>
                 <div class="count">👥 <span class="count">0</span></div>
@@ -347,25 +588,32 @@ function loadGroups() {
     el.innerHTML = html;
 }
 
-function openGroup(id) {
-    if (!USER) { alert('Войдите!'); return; }
-    CURRENT_ROOM = id;
-    document.getElementById('chatView').classList.add('active');
-    setActivePage(null);
-    loadChat('rooms/' + SITE + '_' + id + '/messages');
-    closeSidebar();
+function joinRoom(roomId) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    db.ref('sites/' + SITE + '/room_users/' + roomId + '/' + USER_UID).set({ name: USER, joinedAt: Date.now() });
+    db.ref('sites/' + SITE + '/rooms/' + roomId + '/count').transaction(v => (v || 0) + 1);
+    
+    // Открываем чат
+    CURRENT_ROOM = roomId;
+    document.getElementById('chatWindow').classList.add('active');
+    const room = ROOMS.find(r => r.id === roomId);
+    document.getElementById('chatTitle').textContent = '💬 ' + (room ? room.name : 'Чат');
+    loadChat('rooms/' + SITE + '_' + roomId + '/messages');
 }
 
-// ===== ЧАТ =====
+// ================================================================
+// ЧАТ
+// ================================================================
 function loadChat(path) {
     if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
     const box = document.getElementById('chatMessages');
-    box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">⏳ Загрузка...</div>';
+    box.innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">⏳ Загрузка...</div>';
     chatUnsub = path;
+    
     db.ref(path).orderByChild('timestamp').on('value', snap => {
         box.innerHTML = '';
         if (!snap.exists()) {
-            box.innerHTML = '<div style="color:#65676b;text-align:center;padding:20px;">Сообщений нет</div>';
+            box.innerHTML = '<div style="text-align:center;padding:20px;color:#65676b;">Сообщений нет</div>';
             return;
         }
         snap.forEach(s => {
@@ -373,8 +621,8 @@ function loadChat(path) {
             const div = document.createElement('div');
             div.className = 'msg';
             div.innerHTML = `
-                <span class="author">${esc(m.nick || '?')}</span>
-                <span class="time">${m.time || ''}</span>
+                <strong>${esc(m.nick || '?')}</strong>
+                <span style="color:#999;font-size:10px;margin-left:4px;">${m.time || ''}</span>
                 <div>${esc(m.text || '')}</div>
             `;
             box.appendChild(div);
@@ -396,274 +644,46 @@ function sendChat() {
     input.value = '';
 }
 
-document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendChat(); });
-
 function closeChat() {
-    document.getElementById('chatView').classList.remove('active');
+    document.getElementById('chatWindow').classList.remove('active');
     if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
     CURRENT_ROOM = null;
-    goToFeed();
 }
 
-// ===== ПРОФИЛЬ =====
-function viewUser(uid) {
-    if (uid === USER_UID) { goToProfile(); return; }
-    VIEWING_USER = uid;
-    setActivePage('profilePage');
-    loadProfile();
+// ================================================================
+// УТИЛИТЫ
+// ================================================================
+function esc(s) {
+    return s ? String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
 }
 
-function loadProfile() {
-    const uid = VIEWING_USER || USER_UID;
-    if (!uid) return;
-    
-    db.ref('sites/' + SITE + '/users/' + uid).once('value', snap => {
-        const u = snap.val() || {};
-        document.getElementById('profileName').textContent = u.name || USER || 'Гость';
-        document.getElementById('profileBio').textContent = u.bio || 'Привет!';
-        const avatar = document.getElementById('profileAvatar');
-        renderAvatar(uid, avatar, (u.name || '?').charAt(0).toUpperCase());
-    });
-    
-    // Загружаем друзей
-    db.ref('sites/' + SITE + '/friends/' + uid).on('value', snap => {
-        const data = snap.val() || {};
-        const keys = Object.keys(data);
-        document.getElementById('friendsCount').textContent = keys.length;
-        const el = document.getElementById('friendList');
-        if (!keys.length) {
-            el.innerHTML = '<span style="color:#bbb;font-size:0.6rem;">Нет друзей</span>';
-            return;
-        }
-        let html = '';
-        keys.forEach(k => {
-            db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
-                const u = usnap.val() || {};
-                const name = u.name || 'Аноним';
-                const letter = name.charAt(0).toUpperCase();
-                html += `<span class="friend-item" onclick="viewUser('${k}')">
-                    <span class="avatar-wrap" id="fava-${k}"><span class="letter">${letter}</span></span> ${esc(name)}
-                </span>`;
-                el.innerHTML = html;
-                keys.forEach(k2 => {
-                    const el2 = document.getElementById('fava-' + k2);
-                    if (el2) renderAvatar(k2, el2, '?');
-                });
-            });
-        });
-    });
-}
+// ================================================================
+// ЗАПУСК
+// ================================================================
+console.log('🚀 METAIMPERIYA ЗАПУЩЕНА!');
+console.log('🔥 Вход через Google или анонимно');
+console.log('👥 Группы, лента, люди, профиль — всё работает');
 
-// ===== ЛЕНТА =====
-function loadFeed() {
-    if (!USER_UID) {
-        document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;">Войдите</div>';
-        return;
-    }
-    
-    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
-        const el = document.getElementById('feed');
-        el.innerHTML = '';
-        const data = snap.val() || {};
-        const keys = Object.keys(data).sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0));
-        
-        if (!keys.length) {
-            el.innerHTML = '<div style="text-align:center;padding:30px;color:#bbb;">Пока пусто</div>';
-            return;
-        }
-        
-        keys.forEach(k => {
-            const p = data[k];
-            p.id = k;
-            el.appendChild(renderPost(p));
-        });
-    });
-}
-
-function renderPost(p) {
-    const div = document.createElement('div');
-    div.className = 'post';
-    div.dataset.id = p.id;
-    
-    const letter = (p.author || '?').charAt(0).toUpperCase();
-    
-    let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
-    let textHtml = esc(p.text || '');
-    let imgHtml = p.img ? `<img src="${p.img}" class="post-img" onclick="window.open(this.src)">` : '';
-    
-    let buttonsHtml = '';
-    if (p.buttons && p.buttons.length > 0) {
-        buttonsHtml = '<div class="buttons-wrap">';
-        p.buttons.forEach(btn => {
-            if (btn.url) {
-                buttonsHtml += `<a href="${esc(btn.url)}" target="_blank" class="btn-item">${esc(btn.label || '🔗 Перейти')}</a>`;
-            }
-        });
-        buttonsHtml += '</div>';
-    }
-    
-    let previewHtml = '';
-    if (p.link) {
-        previewHtml = `<div class="link-preview"><iframe src="${p.link}" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>`;
-    }
-    
-    let hashtagsHtml = '';
-    if (p.hashtags && p.hashtags.length > 0) {
-        hashtagsHtml = '<div class="hashtags">';
-        p.hashtags.forEach(tag => {
-            hashtagsHtml += `<span class="tag">${esc(tag)}</span>`;
-        });
-        hashtagsHtml += '</div>';
-    }
-    
-    div.innerHTML = `
-        ${marqueeHtml}
-        <div class="author">
-            <span class="avatar-wrap" id="post-avatar-${p.id}"><span class="letter">${letter}</span></span>
-            <span class="name" onclick="viewUser('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
-            <span class="time">${p.time || ''}${p.edited ? ' (ред.)' : ''}</span>
-        </div>
-        <div class="text">${textHtml}</div>
-        ${imgHtml}
-        ${buttonsHtml}
-        ${previewHtml}
-        ${hashtagsHtml}
-    `;
-    
-    if (p.authorUid) {
-        const avatarEl = document.getElementById('post-avatar-' + p.id);
-        if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
-    }
-    
-    return div;
-}
-
-// ===== УВЕДОМЛЕНИЯ =====
-function loadNotifications() {
-    if (!USER_UID) return;
-    if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-    
-    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
-    notifUnsub = ref.on('value', snap => {
-        const notifications = snap.val() || {};
-        const keys = Object.keys(notifications).sort((a, b) => 
-            (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0)
-        );
-        const unread = keys.filter(k => !notifications[k].read);
-        const badge = document.getElementById('notifBadge');
-        if (badge) {
-            if (unread.length > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = unread.length;
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-    });
-}
-
-function openNotifications() {
-    alert('🔔 Уведомления: ' + (document.getElementById('notifBadge').textContent || '0'));
-}
-
-// ===== САЙДБАР =====
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-}
-
-function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
-}
-
-// ===== ПЛЕЕР (РАБОЧИЙ) =====
-const PLAYLIST = [{ name: 'ONE IN BILLION', url: 'https://raw.githubusercontent.com/Metaimperia/MyWebSite-MyEcosystem/main/ONE-IN-BILLION.mp3' }];
-let currentTrack = 0, isPlaying = false, eqInterval = null, audio = null;
-
-function initAudio() {
-    if (!audio) {
-        audio = new Audio(PLAYLIST[currentTrack].url);
-        audio.crossOrigin = 'anonymous';
-        audio.addEventListener('ended', () => {
-            isPlaying = false;
-            document.getElementById('playBtn').textContent = '▶';
-            stopEq();
-        });
-    }
-    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
-}
-
-function playMusic() {
-    initAudio();
-    if (!audio) return;
-    if (isPlaying) {
-        audio.pause();
-        isPlaying = false;
-        document.getElementById('playBtn').textContent = '▶';
-        stopEq();
-    } else {
-        audio.play().catch(e => console.log('Ошибка:', e));
-        isPlaying = true;
-        document.getElementById('playBtn').textContent = '⏸';
-        startEq();
-    }
-}
-
-function prevTrack() {
-    currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
-    if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(() => {}); }
-    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
-}
-
-function nextTrack() {
-    currentTrack = (currentTrack + 1) % PLAYLIST.length;
-    if (audio) { audio.src = PLAYLIST[currentTrack].url; if (isPlaying) audio.play().catch(() => {}); }
-    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
-}
-
-function startEq() {
-    if (eqInterval) return;
-    eqInterval = setInterval(() => {
-        document.querySelectorAll('.eq-bars .bar').forEach(bar => {
-            bar.style.height = 2 + Math.random() * 14 + 'px';
-        });
-    }, 100);
-}
-
-function stopEq() {
-    if (eqInterval) { clearInterval(eqInterval); eqInterval = null; }
-    document.querySelectorAll('.eq-bars .bar').forEach(bar => bar.style.height = '4px');
-}
-
-// ===== ЗАПУСК =====
-document.addEventListener('DOMContentLoaded', function() {
-    initAudio();
-    updateUI();
-    goToFeed();
-});
-
-// Делаем глобальные функции доступными
+// Делаем функции глобальными
 window.goToFeed = goToFeed;
 window.goToGroups = goToGroups;
 window.goToPeople = goToPeople;
 window.goToProfile = goToProfile;
-window.viewUser = viewUser;
-window.logout = logout;
+window.showTab = showTab;
 window.loginName = loginName;
-window.openNotifications = openNotifications;
-window.toggleSidebar = toggleSidebar;
-window.closeSidebar = closeSidebar;
-window.playMusic = playMusic;
-window.prevTrack = prevTrack;
-window.nextTrack = nextTrack;
-window.closeChat = closeChat;
+window.logout = logout;
+window.closeLogin = closeLogin;
+window.uploadAvatar = uploadAvatar;
+window.openEditProfile = openEditProfile;
+window.closeEditProfile = closeEditProfile;
+window.saveProfile = saveProfile;
+window.joinRoom = joinRoom;
 window.sendChat = sendChat;
-window.openGroup = openGroup;
-
-console.log('✅ METAIMPERIYA ЗАПУЩЕНА!');
-console.log('👑 Админы:', ADMIN_UIDS);
-console.log('🎵 Плеер работает, трек: ONE IN BILLION');
+window.closeChat = closeChat;
+window.loadFeed = loadFeed;
+window.loadRooms = loadRooms;
+window.loadPeople = loadPeople;
+window.loadProfile = loadProfile;
 </script>
 </body>
 </html>
