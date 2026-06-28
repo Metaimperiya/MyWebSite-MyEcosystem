@@ -464,13 +464,12 @@
 </head>
 <body>
 
-<!-- ===== ТОПБАР (БЕЗ СТАРОГО ПЛЕЕРА) ===== -->
+<!-- ===== ТОПБАР ===== -->
 <div class="topbar">
     <div class="left">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
         <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
     </div>
-
     <div class="right">
         <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
             <span class="letter">?</span>
@@ -507,11 +506,11 @@
 <!-- ===== КОНТЕЙНЕР ===== -->
 <div class="container">
 
-    <!-- ===== НОВЫЙ ПЛЕЕР (НАД ЛЕНТОЙ) ===== -->
+    <!-- ===== ПЛЕЕР (НАД ЛЕНТОЙ) ===== -->
     <div class="player-wrap">
         <div class="player-simple">
             <button class="play-btn-simple" id="playBtn" onclick="playMusic()">▶</button>
-            <span class="track-name-simple" id="trackName">ONE IN BILLION</span>
+            <span class="track-name-simple" id="trackName">Capitulation</span>
             <div class="player-controls">
                 <button onclick="prevTrack()">⏮</button>
                 <button onclick="nextTrack()">⏭</button>
@@ -685,18 +684,18 @@ const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 // ================================================================
-// ПЛЕЕР (С МУЗЫКОЙ ИЗ ПАПКИ music/)
+// ПЛЕЕР (С МУЗЫКОЙ ИЗ ПАПКИ music/) - ИСПРАВЛЕННЫЙ
 // ================================================================
 const PLAYLIST = [
-    { name: 'ONE IN BILLION', url: 'music/ONE-IN-BILLION.mp3' },
-    { name: 'Трек 2', url: 'music/track2.mp3' },
-    { name: 'Трек 3', url: 'music/track3.mp3' },
-    { name: 'Трек 4', url: 'music/track4.mp3' },
-    { name: 'Трек 5', url: 'music/track5.mp3' },
-    { name: 'Трек 6', url: 'music/track6.mp3' },
-    { name: 'Трек 7', url: 'music/track7.mp3' },
-    { name: 'Трек 8', url: 'music/track8.mp3' },
-    { name: 'Трек 9', url: 'music/track9.mp3' }
+    { name: 'Capitulation', url: 'music/capitulation.mp3' },
+    { name: 'Clean Victory', url: 'music/clean_victory.mp3' },
+    { name: 'Covenant of Change', url: 'music/covenant_of_change.mp3' },
+    { name: 'Dreams in the Wind', url: 'music/dreams_in_the_wind.mp3' },
+    { name: 'Memory Like Dust', url: 'music/memory_like_dust_path_like_fire.mp3' },
+    { name: 'Nobody', url: 'music/nobody.mp3' },
+    { name: 'Touch of Choice', url: 'music/touch_of_choice.mp3' },
+    { name: 'You Are Not in the Game', url: 'music/you_are_not_in_the_game.mp3' },
+    { name: 'You Can\'t See Me', url: 'music/you_cant_see_me.mp3' }
 ];
 
 let currentTrack = 0, isPlaying = false, audio = null;
