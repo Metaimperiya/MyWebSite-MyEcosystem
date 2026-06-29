@@ -40,6 +40,7 @@ window.openGroup = function(id) {
     document.getElementById('chatView').classList.add('active');
     setActivePage(null);
     loadChat('rooms/' + SITE + '_' + id + '/messages');
+    closeSidebar();
 };
 
 window.openCreateRoom = function() {
@@ -53,10 +54,7 @@ window.closeCreateRoom = function() {
 
 window.doCreateRoom = function() {
     const name = document.getElementById('roomName').value.trim();
-    if (!name || name.length < 2) {
-        alert('Минимум 2 символа');
-        return;
-    }
+    if (!name || name.length < 2) { alert('Минимум 2 символа'); return; }
     GROUPS.push({ id: 'g_' + Date.now(), name: name });
     loadGroups();
     closeCreateRoom();
