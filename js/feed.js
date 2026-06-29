@@ -82,7 +82,7 @@ function loadComments(postId, type) {
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ
+// РЕНДЕР КОММЕНТАРИЕВ (С ЛАЙКАМИ И ОТВЕТАМИ)
 // ================================================================
 
 function renderComments(postId, type) {
@@ -103,6 +103,8 @@ function renderComments(postId, type) {
     commentsToShow.forEach(c => {
         const letter = (c.author || '?').charAt(0).toUpperCase();
         const canEdit = (c.author === USER || IS_ADMIN);
+        const isLiked = localStorage.getItem('clk_' + c.id + '_' + USER_UID) === '1';
+        const likes = c.likes || 0;
 
         html += `
             <div class="comment-item" data-id="${c.id}">
@@ -113,6 +115,22 @@ function renderComments(postId, type) {
                     <span class="name">${esc(c.author || 'Аноним')}</span>
                     <span class="time">${c.time || ''}${c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
                     <div class="text" id="comment-text-${c.id}">${esc(c.text || '')}</div>
+                    <div class="comment-actions-row">
+                        <button class="comment-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleCommentLike('${postId}','${c.id}','${type}')">
+                            👍 <span id="commentLikeCount_${c.id}">${likes}</span>
+                        </button>
+                        <button class="comment-reply-btn" onclick="showReplyInput('${postId}','${c.id}','${type}')">
+                            💬 Ответить
+                        </button>
+                    </div>
+                    <!-- ===== ВЛОЖЕННЫЕ КОММЕНТАРИИ (ОТВЕТЫ) ===== -->
+                    <div class="replies" id="replies_${c.id}">
+                        <div id="repliesContainer_${c.id}"></div>
+                    </div>
+                    <div class="reply-input-wrap" id="replyInputWrap_${c.id}" style="display:none;">
+                        <input type="text" id="replyInput_${c.id}" placeholder="Написать ответ...">
+                        <button onclick="submitReply('${postId}','${c.id}','${type}')">→</button>
+                    </div>
                 </div>
                 ${canEdit ? `
                 <div class="comment-actions">
@@ -142,7 +160,217 @@ function renderComments(postId, type) {
         if (avatarEl && c.authorUid) {
             renderAvatar(c.authorUid, avatarEl, (c.author || '?').charAt(0).toUpperCase());
         }
+        // Загружаем ответы на комментарий
+        loadReplies(postId, c.id, type);
     });
+}
+
+// ================================================================
+// ЛАЙКИ НА КОММЕНТАРИИ
+// ================================================================
+
+window.toggleCommentLike = function(postId, commentId, type) {
+    if (!USER) {
+        alert('Войдите!');
+        return;
+    }
+    const key = 'clk_' + commentId + '_' + USER_UID;
+    const liked = localStorage.getItem(key) === '1';
+    const path = getPostPath(type);
+
+    const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/likes');
+    if (liked) {
+        ref.transaction(v => Math.max(0, (v || 0) - 1));
+        localStorage.removeItem(key);
+    } else {
+        ref.transaction(v => (v || 0) + 1);
+        localStorage.setItem(key, '1');
+    }
+};
+
+// ================================================================
+// ОТВЕТЫ НА КОММЕНТАРИИ (ВЛОЖЕННЫЕ)
+// ================================================================
+
+function loadReplies(postId, commentId, type) {
+    const path = getPostPath(type);
+    const container = document.getElementById('repliesContainer_' + commentId);
+    if (!container) return;
+
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies')
+        .orderByChild('timestamp')
+        .on('value', snap => {
+            container.innerHTML = '';
+            const data = snap.val() || {};
+            const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
+
+            if (!keys.length) {
+                container.innerHTML = '';
+                return;
+            }
+
+            keys.forEach(k => {
+                const r = data[k];
+                const letter = (r.author || '?').charAt(0).toUpperCase();
+                const canEdit = (r.author === USER || IS_ADMIN);
+                const isLiked = localStorage.getItem('rlk_' + k + '_' + USER_UID) === '1';
+                const likes = r.likes || 0;
+
+                const replyDiv = document.createElement('div');
+                replyDiv.className = 'reply-item';
+                replyDiv.innerHTML = `
+                    <span class="avatar-wrap" id="reply-avatar-${k}">
+                        <span class="letter">${letter}</span>
+                    </span>
+                    <div class="body">
+                        <span class="name">${esc(r.author || 'Аноним')}</span>
+                        <span class="time">${r.time || ''}${r.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
+                        <div class="text" id="reply-text-${k}">${esc(r.text || '')}</div>
+                        <button class="reply-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleReplyLike('${postId}','${commentId}','${k}','${type}')">
+                            👍 <span id="replyLikeCount_${k}">${likes}</span>
+                        </button>
+                    </div>
+                    ${canEdit ? `
+                    <div class="reply-actions">
+                        <button class="more-btn" onclick="toggleReplyMenu('${k}')">⋮</button>
+                        <div class="dropdown" id="replyMenu_${k}">
+                            <button class="edit-btn" onclick="editReply('${postId}','${commentId}','${k}','${type}')">✏️ Редактировать</button>
+                            <button class="del-btn" onclick="deleteReply('${postId}','${commentId}','${k}','${type}')">🗑 Удалить</button>
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+                container.appendChild(replyDiv);
+
+                if (r.authorUid) {
+                    const avatarEl = document.getElementById('reply-avatar-' + k);
+                    if (avatarEl) renderAvatar(r.authorUid, avatarEl, letter);
+                }
+            });
+        });
+}
+
+// ================================================================
+// ОТПРАВКА ОТВЕТА НА КОММЕНТАРИЙ
+// ================================================================
+
+window.showReplyInput = function(postId, commentId, type) {
+    const wrap = document.getElementById('replyInputWrap_' + commentId);
+    if (!wrap) return;
+    wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none';
+    if (wrap.style.display === 'flex') {
+        const input = document.getElementById('replyInput_' + commentId);
+        if (input) input.focus();
+    }
+};
+
+window.submitReply = function(postId, commentId, type) {
+    if (!USER) {
+        alert('Войдите!');
+        return;
+    }
+    const input = document.getElementById('replyInput_' + commentId);
+    const text = input.value.trim();
+    if (!text) return;
+
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies').push({
+        author: USER,
+        authorUid: USER_UID,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+    });
+    input.value = '';
+    document.getElementById('replyInputWrap_' + commentId).style.display = 'none';
+};
+
+// ================================================================
+// ЛАЙКИ НА ОТВЕТЫ
+// ================================================================
+
+window.toggleReplyLike = function(postId, commentId, replyId, type) {
+    if (!USER) {
+        alert('Войдите!');
+        return;
+    }
+    const key = 'rlk_' + replyId + '_' + USER_UID;
+    const liked = localStorage.getItem(key) === '1';
+    const path = getPostPath(type);
+
+    const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies/' + replyId + '/likes');
+    if (liked) {
+        ref.transaction(v => Math.max(0, (v || 0) - 1));
+        localStorage.removeItem(key);
+    } else {
+        ref.transaction(v => (v || 0) + 1);
+        localStorage.setItem(key, '1');
+    }
+};
+
+// ================================================================
+// РЕДАКТИРОВАНИЕ ОТВЕТА
+// ================================================================
+
+function editReply(postId, commentId, replyId, type) {
+    const textEl = document.getElementById('reply-text-' + replyId);
+    if (!textEl) return;
+
+    const menu = document.getElementById('replyMenu_' + replyId);
+    if (menu) menu.classList.remove('open');
+
+    const currentText = textEl.textContent;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentText;
+    input.className = 'edit-comment-input';
+
+    textEl.innerHTML = '';
+    textEl.appendChild(input);
+    input.focus();
+    input.select();
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            saveReplyEdit(postId, commentId, replyId, type, input.value.trim());
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        setTimeout(() => {
+            if (document.activeElement !== input) {
+                saveReplyEdit(postId, commentId, replyId, type, input.value.trim());
+            }
+        }, 200);
+    });
+}
+
+function saveReplyEdit(postId, commentId, replyId, type, newText) {
+    if (!newText) {
+        deleteReply(postId, commentId, replyId, type);
+        return;
+    }
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies/' + replyId).update({
+        text: newText,
+        edited: true
+    });
+}
+
+// ================================================================
+// УДАЛЕНИЕ ОТВЕТА
+// ================================================================
+
+function deleteReply(postId, commentId, replyId, type) {
+    if (!confirm('🗑 Удалить ответ?')) return;
+    const path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies/' + replyId).remove();
+}
+
+function toggleReplyMenu(replyId) {
+    const menu = document.getElementById('replyMenu_' + replyId);
+    if (!menu) return;
+    menu.classList.toggle('open');
 }
 
 // ================================================================
@@ -296,7 +524,7 @@ function loadFeed() {
 }
 
 // ================================================================
-// РЕНДЕР ПОСТА
+// РЕНДЕР ПОСТА (ОКОНЧАТЕЛЬНАЯ ВЕРСИЯ)
 // ================================================================
 
 function renderPost(p, type) {
@@ -363,7 +591,7 @@ function renderPost(p, type) {
         </div>
     `;
 
-    // ===== КОММЕНТАРИИ (БЕЗ ВТОРОЙ КНОПКИ) =====
+    // ===== КОММЕНТАРИИ (БЕЗ ВТОРОЙ КНОПКИ, СТРОКА ВВОДА ВСЕГДА ВИДНА) =====
     let commentsHtml = `
         <div class="comments-wrapper" id="commentsWrapper_${p.id}">
             <div class="comments" id="comments_${p.id}">
@@ -395,57 +623,6 @@ function renderPost(p, type) {
         ${previewHtml}
         ${hashtagsHtml}
         ${actionsHtml}
-        ${commentsHtml}
-    `;
-
-    if (p.authorUid) {
-        const avatarEl = document.getElementById('post-avatar-' + p.id);
-        if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
-    }
-
-    loadComments(p.id, type);
-    return div;
-}
-
-    // ===== КОММЕНТАРИИ =====
-    let commentsHtml = `
-        <div class="comments" id="comments_${p.id}">
-            <button class="comments-toggle" onclick="toggleComments('${p.id}', '${type}')" id="commentsToggle_${p.id}">
-                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
-            </button>
-            <div class="comments-body" id="commentsBody_${p.id}">
-                <div class="comments-list" id="commentsList_${p.id}">
-                    <div id="commentsContainer_${p.id}"></div>
-                </div>
-                <div class="comment-input-wrap">
-                    <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
-                    <button onclick="submitComment('${p.id}', '${type}')">→</button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    div.innerHTML = `
-        ${menuHtml}
-        ${marqueeHtml}
-        <div class="author">
-            ${avatarHtml}
-            <span class="name" onclick="viewUser('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
-            <span class="time">${p.time || ''}${p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
-        </div>
-        <div class="text">${textHtml}</div>
-        ${imgHtml}
-        ${buttonsHtml}
-        ${previewHtml}
-        ${hashtagsHtml}
-        <div class="stats">
-            <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
-                👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
-            </button>
-            <button onclick="toggleComments('${p.id}', '${type}')" id="commentToggle_${p.id}">
-                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
-            </button>
-        </div>
         ${commentsHtml}
     `;
 
