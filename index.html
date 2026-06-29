@@ -12,7 +12,7 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://metaimperiya.github.io/" />
     
-    <!-- ===== OPEN GRAPH (ПРЕВЬЮ) ===== -->
+    <!-- ===== OPEN GRAPH ===== -->
     <meta property="og:title" content="METAIMPERIYA — Социальная платформа" />
     <meta property="og:description" content="Общайся, создавай группы, делись постами и музыкой. Присоединяйся к METAIMPERIYA!" />
     <meta property="og:type" content="website" />
@@ -63,7 +63,7 @@
     <div class="topbar">
         <div class="left">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+            <span class="logo" onclick="goToFeed()">🏴‍☠️ METAIMPERIYA</span>
         </div>
         <div class="center">
             <div class="player-mini">
@@ -130,123 +130,18 @@
         <button class="tab" onclick="goToProfile()">👤 Профиль</button>
     </div>
 
-    <!-- ================================================================
-         САЙДБАР С КУЧЕЙ РАЗДЕЛОВ
-         ================================================================ -->
+    <!-- ===== САЙДБАР ===== -->
     <div class="sidebar" id="sidebar">
-        <div class="head">
-            <h3>📱 Меню</h3>
-            <button class="close" onclick="closeSidebar()">✕</button>
-        </div>
-
-        <!-- ===== ЮЗЕР ===== -->
+        <div class="head"><h3>📱 Меню</h3><button class="close" onclick="closeSidebar()">✕</button></div>
         <div class="user">
             <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
-            <div>
-                <div class="name" id="sName">Гость</div>
-                <div class="online-status">онлайн</div>
-            </div>
+            <div><div class="name" id="sName">Гость</div></div>
         </div>
-
-        <!-- ===== ГЛАВНЫЕ РАЗДЕЛЫ ===== -->
-        <div class="nav-item active" onclick="goToFeed();closeSidebar();">🏠 Главная</div>
+        <div class="nav-item active" onclick="goToFeed();closeSidebar();">📰 Лента</div>
+        <div class="nav-item" onclick="goToGroups();closeSidebar();">👥 Группы</div>
+        <div class="nav-item" onclick="goToPeople();closeSidebar();">👤 Люди</div>
         <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
-        <div class="nav-item" onclick="goToPeople();closeSidebar();">👥 Люди</div>
-        <div class="nav-item" onclick="goToGroups();closeSidebar();">💬 Сообщества</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== МУЛЬТИМЕДИА ===== -->
-        <div class="sidebar-title">🎵 Мультимедиа</div>
-        <div class="nav-item" onclick="closeSidebar();">📸 Фото</div>
-        <div class="nav-item" onclick="closeSidebar();">🎥 Видео</div>
-        <div class="nav-item" onclick="closeSidebar();">🎵 Музыка</div>
-        <div class="nav-item" onclick="closeSidebar();">📚 Книги</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ТЕХНОЛОГИИ ===== -->
-        <div class="sidebar-title">💻 Технологии</div>
-        <div class="nav-item" onclick="closeSidebar();">💻 Программирование</div>
-        <div class="nav-item" onclick="closeSidebar();">🌐 Сайты</div>
-        <div class="nav-item" onclick="closeSidebar();">🤖 AI / ChatGPT</div>
-        <div class="nav-item" onclick="closeSidebar();">🕶️ VR / AR</div>
-        <div class="nav-item" onclick="closeSidebar();">🔐 Безопасность</div>
-        <div class="nav-item" onclick="closeSidebar();">☁️ Cloud</div>
-        <div class="nav-item" onclick="closeSidebar();">🌐 Open Source</div>
-        <div class="nav-item" onclick="closeSidebar();">🧩 API / SDK</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== БИЗНЕС И ФИНАНСЫ ===== -->
-        <div class="sidebar-title">💰 Бизнес</div>
-        <div class="nav-item" onclick="closeSidebar();">💰 Бизнес</div>
-        <div class="nav-item" onclick="closeSidebar();">📈 Финансы</div>
-        <div class="nav-item" onclick="closeSidebar();">🪙 Криптовалюты</div>
-        <div class="nav-item" onclick="closeSidebar();">🛒 Маркетплейс</div>
-        <div class="nav-item" onclick="closeSidebar();">💼 Работа</div>
-        <div class="nav-item" onclick="closeSidebar();">📦 Проекты</div>
-        <div class="nav-item" onclick="closeSidebar();">🚀 Стартапы</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ЖИЗНЬ И ХОББИ ===== -->
-        <div class="sidebar-title">🌍 Жизнь</div>
-        <div class="nav-item" onclick="closeSidebar();">✈️ Путешествия</div>
-        <div class="nav-item" onclick="closeSidebar();">🍔 Еда</div>
-        <div class="nav-item" onclick="closeSidebar();">🏠 Недвижимость</div>
-        <div class="nav-item" onclick="closeSidebar();">⚽ Спорт</div>
-        <div class="nav-item" onclick="closeSidebar();">🎮 Игры</div>
-        <div class="nav-item" onclick="closeSidebar();">🎭 Аниме</div>
-        <div class="nav-item" onclick="closeSidebar();">🎬 Кино</div>
-        <div class="nav-item" onclick="closeSidebar();">📺 Сериалы</div>
-        <div class="nav-item" onclick="closeSidebar();">🎤 Блогеры</div>
-        <div class="nav-item" onclick="closeSidebar();">🎭 Мемы</div>
-        <div class="nav-item" onclick="closeSidebar();">👗 Мода</div>
-        <div class="nav-item" onclick="closeSidebar();">🚗 Автомобили</div>
-        <div class="nav-item" onclick="closeSidebar();">❤️ Волонтёрство</div>
-        <div class="nav-item" onclick="closeSidebar();">🐾 Животные</div>
-        <div class="nav-item" onclick="closeSidebar();">🎯 Хобби</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ОБЩЕНИЕ ===== -->
-        <div class="sidebar-title">💬 Общение</div>
-        <div class="nav-item" onclick="closeSidebar();">💖 Знакомства</div>
-        <div class="nav-item" onclick="closeSidebar();">🤝 Команда</div>
-        <div class="nav-item" onclick="closeSidebar();">🏳️‍🌈 LGBTQ+</div>
-        <div class="nav-item" onclick="closeSidebar();">🗣️ Языки</div>
-        <div class="nav-item" onclick="closeSidebar();">❓ Q&A</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== НОВОСТИ И МЕДИА ===== -->
-        <div class="sidebar-title">📰 Новости</div>
-        <div class="nav-item" onclick="closeSidebar();">📰 Новости</div>
-        <div class="nav-item" onclick="closeSidebar();">📡 Стримы</div>
-        <div class="nav-item" onclick="closeSidebar();">🎉 События</div>
-        <div class="nav-item" onclick="closeSidebar();">📻 Подкасты</div>
-        <div class="nav-item" onclick="closeSidebar();">🏆 Конкурсы</div>
-        <div class="nav-item" onclick="closeSidebar();">🎁 Акции и скидки</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ОСТАЛЬНОЕ ===== -->
-        <div class="sidebar-title">🔧 Другое</div>
-        <div class="nav-item" onclick="closeSidebar();">📄 Страницы</div>
-        <div class="nav-item" onclick="closeSidebar();">📝 Блог</div>
-        <div class="nav-item" onclick="closeSidebar();">🛍️ Покупки</div>
-        <div class="nav-item" onclick="closeSidebar();">📞 Услуги</div>
-        <div class="nav-item" onclick="closeSidebar();">🧑‍💼 Фриланс</div>
-        <div class="nav-item" onclick="closeSidebar();">🏛️ Организации</div>
-        <div class="nav-item" onclick="closeSidebar();">🏴‍☠️ METAIMPERIYA</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== КНОПКА СОЗДАНИЯ ===== -->
-        <div class="footer">
-            <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
-        </div>
+        <div class="footer"><button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button></div>
     </div>
 
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -350,34 +245,25 @@
         </div>
     </div>
 
-    <!-- ===== МОДАЛКА РЕДАКТИРОВАНИЯ ===== -->
+    <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА -->
     <div class="modal" id="editModal">
         <div class="box">
             <h3>✏️ Редактировать пост</h3>
             <div class="sub">Измените содержимое поста</div>
-            
             <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
             <textarea id="editText" placeholder="📝 Текст поста"></textarea>
             <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
-            
-            <!-- ===== ТУМБЛЕР РАЗМЕРА ФРЕЙМА ===== -->
             <div class="frame-size-toggle">
                 <span class="label">📐 Размер фрейма:</span>
                 <div class="btn-group">
-                    <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">
-                        📱 Обычный
-                    </button>
-                    <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">
-                        🖥️ Широкий
-                    </button>
+                    <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">📱 Обычный</button>
+                    <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">🖥️ Широкий</button>
                 </div>
             </div>
-            
             <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
             <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
             <div id="editButtonsContainer"></div>
             <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
-            
             <div class="btns" style="margin-top:6px;">
                 <button class="save" onclick="saveEdit()">💾 Сохранить</button>
                 <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
@@ -435,8 +321,8 @@
 <script src="js/friends.js"></script>
 <script src="js/groups.js"></script>
 <script src="js/chat.js"></script>
+<script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
 
 </body>
 </html>
-
