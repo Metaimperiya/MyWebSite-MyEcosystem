@@ -63,7 +63,7 @@
     <div class="topbar">
         <div class="left">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+            <span class="logo" onclick="goToFeed()">🏴‍☠️ METAIMPERIYA</span>
         </div>
         <div class="center">
             <div class="player-mini">
@@ -74,6 +74,9 @@
             </div>
         </div>
         <div class="right">
+            <button class="notif-btn" onclick="openNotifications()" title="Уведомления" style="background:none;border:none;font-size:1.2rem;cursor:pointer;position:relative;color:#555;margin-right:4px;">
+                🔔 <span id="notifBadge" style="display:none;background:#e74c3c;color:#fff;border-radius:50%;padding:0 5px;font-size:0.5rem;position:absolute;top:-4px;right:-4px;">0</span>
+            </button>
             <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
                 <span class="letter">?</span>
             </div>
@@ -411,6 +414,14 @@
                 <button class="cancel" onclick="closeAdminModal()">Отмена</button>
                 <button class="save" onclick="checkAdmin()">Войти</button>
             </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛКА УВЕДОМЛЕНИЙ -->
+    <div class="modal" id="notificationsModal">
+        <div class="box">
+            <h3>🔔 Уведомления <button onclick="closeNotifications()" style="float:right;background:none;border:none;font-size:1.2rem;cursor:pointer;">✕</button></h3>
+            <div id="notificationsList"></div>
         </div>
     </div>
 
