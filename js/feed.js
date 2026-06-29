@@ -1,4 +1,4 @@
-// ================================================================
+ // ================================================================
 // ЛЕНТА, ПОСТЫ, КОММЕНТАРИИ, ЛАЙКИ, РЕДАКТИРОВАНИЕ
 // ================================================================
 
@@ -524,7 +524,7 @@ function loadFeed() {
 }
 
 // ================================================================
-// РЕНДЕР ПОСТА (ОКОНЧАТЕЛЬНАЯ ВЕРСИЯ)
+// РЕНДЕР ПОСТА
 // ================================================================
 
 function renderPost(p, type) {
@@ -578,6 +578,63 @@ function renderPost(p, type) {
             </div>
         `;
     }
+
+    // ===== СТАТИСТИКА (ЛАЙК + КОММЕНТАРИИ) =====
+    let actionsHtml = `
+        <div class="stats">
+            <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
+                👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
+            </button>
+            <button onclick="toggleComments('${p.id}', '${type}')" id="commentToggle_${p.id}">
+                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
+            </button>
+        </div>
+    `;
+
+    // ===== КОММЕНТАРИИ (СТРОКА ВВОДА ВСЕГДА ВИДНА ПОД ПОСТОМ) =====
+    let commentsHtml = `
+        <div class="comments-wrapper" id="commentsWrapper_${p.id}">
+            <!-- ===== СТРОКА ВВОДА ВСЕГДА ПОД ПОСТОМ ===== -->
+            <div class="comment-input-wrap">
+                <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
+                <button onclick="submitComment('${p.id}', '${type}')">→</button>
+            </div>
+            <!-- ===== КОММЕНТАРИИ (СКРЫТЫ ПО УМОЛЧАНИЮ) ===== -->
+            <div class="comments" id="comments_${p.id}">
+                <div class="comments-body" id="commentsBody_${p.id}">
+                    <div class="comments-list" id="commentsList_${p.id}">
+                        <div id="commentsContainer_${p.id}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    div.innerHTML = `
+        ${menuHtml}
+        ${marqueeHtml}
+        <div class="author">
+            ${avatarHtml}
+            <span class="name" onclick="viewUser('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
+            <span class="time">${p.time || ''}${p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
+        </div>
+        <div class="text">${textHtml}</div>
+        ${imgHtml}
+        ${buttonsHtml}
+        ${previewHtml}
+        ${hashtagsHtml}
+        ${actionsHtml}
+        ${commentsHtml}
+    `;
+
+    if (p.authorUid) {
+        const avatarEl = document.getElementById('post-avatar-' + p.id);
+        if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
+    }
+
+    loadComments(p.id, type);
+    return div;
+}
 
     // ===== СТАТИСТИКА (ЛАЙК + КОММЕНТАРИИ) =====
     let actionsHtml = `
