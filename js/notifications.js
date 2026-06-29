@@ -13,7 +13,7 @@ function sendNotification(targetUid, data) {
 function loadNotifications() {
     if (!USER_UID) return;
     if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID').orderByChild('timestamp').limitToLast(20);
+    const ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
     notifUnsub = ref.on('value', snap => {
         const notifications = snap.val() || {};
         const keys = Object.keys(notifications).sort((a, b) => (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0));
