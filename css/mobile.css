@@ -42,7 +42,7 @@
         padding: 6px 8px 50px;
     }
     .post .link-preview iframe {
-        height: 120px;
+        height: 180px;
     }
     .group-list {
         grid-template-columns: 1fr 1fr;
@@ -51,12 +51,13 @@
         min-width: 130px;
         right: 0;
     }
-    .comments .comment .avatar-wrap {
-        width: 18px;
-        height: 18px;
+    .sidebar {
+        width: 280px;
+        left: -280px;
     }
-    .comments .comment .body {
-        font-size: 0.65rem;
+    .comment-item .avatar-wrap {
+        width: 24px;
+        height: 24px;
     }
     .profile-header .avatar-wrap {
         width: 56px;
@@ -64,47 +65,5 @@
     }
     .profile-header .avatar-wrap .letter {
         font-size: 1.5rem;
-    }
-}
-
-/* ================================================================
-   МЕНЮ НА ТЕЛЕФОНЕ
-   ================================================================ */
-@media (max-width: 480px) {
-    .sidebar {
-        width: 100%;
-        max-width: 300px;
-        left: -320px;
-    }
-    .sidebar.open {
-        left: 0;
-    }
-    .nav-item {
-        font-size: 0.75rem;
-        padding: 5px 10px;
-    }
-    .sidebar-title {
-        font-size: 0.55rem;
-    }
-}
-
-/* ================================================================
-   МЕНЮ НА ТЕЛЕФОНЕ
-   ================================================================ */
-@media (max-width: 480px) {
-    .sidebar {
-        width: 100%;
-        max-width: 300px;
-        left: -320px;
-    }
-    .sidebar.open {
-        left: 0;
-    }
-    .nav-item {
-        font-size: 0.75rem;
-        padding: 5px 10px;
-    }
-    .sidebar-title {
-        font-size: 0.55rem;
     }
 }
