@@ -1,45 +1,41 @@
 // ================================================================
-// СОСТОЯНИЕ, УТИЛИТЫ, НАВИГАЦИЯ
+// УТИЛИТЫ И ОСНОВНЫЕ ФУНКЦИИ
 // ================================================================
 
-let USER = null;
-let USER_UID = null;
-let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
-let CURRENT_ROOM = null;
-let chatUnsub = null;
-let VIEWING_USER = null;
-let avatarUrlCache = {};
-let pendingImage = null;
-let pendingImageFile = null;
-let EDITING_ID = null;
-let showStat = 'friends';
-let currentFrameSize = 'small';
-
-// ===== УТИЛИТЫ =====
 const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
 
-// ===== АВАТАРКИ =====
-function getUserAvatar(uid, callback) {
-    if (avatarUrlCache[uid]) {
-        callback(avatarUrlCache[uid]);
-        return;
+function cancelRequest(key) {
+    if (activeRequests.has(key)) {
+        const fn = activeRequests.get(key);
+        if (typeof fn === 'function') fn();
+        activeRequests.delete(key);
+        return true;
     }
-    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
-        const url = snap.val() || null;
-        avatarUrlCache[uid] = url;
-        callback(url);
-    });
+    return false;
 }
 
-function renderAvatar(uid, container, letter) {
-    if (!container) return;
-    getUserAvatar(uid, function(url) {
-        if (url) {
-            container.innerHTML = `<img src="${url}" />`;
-        } else {
-            container.innerHTML = `<span class="letter">${letter || '?'}</span>`;
+function safeFirebaseQuery(key, ref, callback) {
+    cancelRequest(key);
+    let cancelled = false;
+    const cancelFn = () => { cancelled = true; activeRequests.delete(key); };
+    activeRequests.set(key, cancelFn);
+    ref.once('value', snap => {
+        if (cancelled) return;
+        activeRequests.delete(key);
+        callback(snap);
+    }).catch(err => {
+        if (!cancelled) {
+            activeRequests.delete(key);
+            console.warn('Query error:', err);
         }
     });
+    return cancelFn;
+}
+
+function checkAdminAccess(uid) {
+    isAdmin = ADMIN_UIDS.includes(uid);
+    document.body.classList.toggle('admin-mode', isAdmin);
+    return isAdmin;
 }
 
 // ===== UI =====
@@ -55,7 +51,7 @@ function updateUI() {
         sName.textContent = USER;
         renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
         renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-        if (IS_ADMIN) dot.classList.add('active');
+        if (isAdmin) dot.classList.add('active');
         else dot.classList.remove('active');
     } else {
         topAvatar.innerHTML = `<span class="letter">?</span>`;
@@ -65,47 +61,6 @@ function updateUI() {
         dot.classList.remove('active');
     }
 }
-
-// ===== АВАТАРКА ПРОФИЛЯ =====
-window.uploadAvatar = function() {
-    if (!USER_UID) {
-        alert('Сначала войдите!');
-        return;
-    }
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Максимум 5 МБ');
-            return;
-        }
-        const ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
-        ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
-            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
-            db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
-            avatarUrlCache[USER_UID] = url;
-            updateUI();
-            loadProfile();
-            loadFeed();
-            alert('✅ Аватарка обновлена!');
-        });
-    };
-    input.click();
-};
-
-// ===== САЙДБАР =====
-window.toggleSidebar = function() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-};
-
-window.closeSidebar = function() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
-};
 
 // ===== НАВИГАЦИЯ =====
 function setActivePage(pageId) {
@@ -121,10 +76,7 @@ window.goToFeed = function() {
     if (!USER) { alert('Войдите!'); return; }
     setActivePage('feedPage');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
+    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
     CURRENT_ROOM = null;
     loadFeed();
 };
@@ -133,10 +85,7 @@ window.goToGroups = function() {
     if (!USER) { alert('Войдите!'); return; }
     setActivePage('groupsPage');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
+    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
     CURRENT_ROOM = null;
     loadGroups();
 };
@@ -145,71 +94,28 @@ window.goToPeople = function() {
     if (!USER) { alert('Войдите!'); return; }
     setActivePage('peoplePage');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
+    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
     CURRENT_ROOM = null;
     loadPeople();
 };
 
 window.goToProfile = function() {
     if (!USER) { alert('Войдите!'); return; }
-    VIEWING_USER = null;
+    viewingProfileUid = null;
     setActivePage('profilePage');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
+    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
     CURRENT_ROOM = null;
     loadProfile();
 };
 
-// ===== РАЗМЕР ФРЕЙМА =====
-function setFrameSize(size) {
-    currentFrameSize = size;
-    document.querySelectorAll('.frame-size-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    if (size === 'small') {
-        const btn = document.getElementById('frameSizeSmall');
-        if (btn) btn.classList.add('active');
-    } else {
-        const btn = document.getElementById('frameSizeLarge');
-        if (btn) btn.classList.add('active');
-    }
-}
+// ===== САЙДБАР =====
+window.toggleSidebar = function() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+};
 
-// ================================================================
-// ЛЮДИ
-// ================================================================
-
-function loadPeople() {
-    if (!USER_UID) {
-        document.getElementById('peopleList').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
-        return;
-    }
-    db.ref('sites/' + SITE + '/users').once('value', snap => {
-        const users = snap.val() || {};
-        const keys = Object.keys(users).filter(k => k !== USER_UID);
-        const el = document.getElementById('peopleList');
-        if (!keys.length) {
-            el.innerHTML = '<div style="text-align:center;padding:6px;color:#bbb;font-size:0.65rem;">Нет других пользователей</div>';
-            return;
-        }
-        el.innerHTML = keys.map(k => {
-            const u = users[k];
-            const name = u.name || 'Аноним';
-            const letter = name.charAt(0).toUpperCase();
-            return `<div class="people-item" onclick="viewUser('${k}')">
-                <span class="avatar-wrap" id="pava-${k}"><span class="letter">${letter}</span></span>
-                <div class="info"><div class="name">${esc(name)}</div><div class="status">Нажмите для просмотра</div></div>
-            </div>`;
-        }).join('');
-        keys.forEach(k => {
-            const el2 = document.getElementById('pava-' + k);
-            if (el2) renderAvatar(k, el2, '?');
-        });
-    });
-}
+window.closeSidebar = function() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+};
