@@ -1,7 +1,3 @@
-// ================================================================
-// АДМИН
-// ================================================================
-
 window.adminLogin = function() {
     document.getElementById('adminModal').classList.add('open');
     document.getElementById('adminPass').value = '';
