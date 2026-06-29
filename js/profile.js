@@ -23,7 +23,7 @@ function loadProfile() {
 function loadProfilePosts(uid) {
     const container = document.getElementById('profilePosts');
     container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">Загрузка...</div>';
-
+    
     db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', snap => {
         container.innerHTML = '';
         const data = snap.val() || {};
@@ -57,6 +57,86 @@ function showProfileActions(uid) {
     `;
 }
 
+function checkFriend(uid) {
+    if (!USER_UID) return false;
+    return localStorage.getItem('fr_' + USER_UID + '_' + uid) === '1';
+}
+
+window.toggleFriend = function(uid) {
+    if (!USER_UID) return;
+    const isFriend = checkFriend(uid);
+    if (isFriend) {
+        if (!confirm('Удалить из друзей?')) return;
+        localStorage.removeItem('fr_' + USER_UID + '_' + uid);
+        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).remove();
+        db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).remove();
+    } else {
+        localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
+        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
+        db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
+    }
+    loadProfile();
+    if (VIEWING_USER) showProfileActions(VIEWING_USER);
+};
+
+function loadFriends(uid) {
+    db.ref('sites/' + SITE + '/friends/' + uid).on('value', snap => {
+        const data = snap.val() || {};
+        const keys = Object.keys(data);
+        document.getElementById('friendsCount').textContent = keys.length;
+        const el = document.getElementById('friendList');
+        if (!keys.length) { el.innerHTML = '<span style="color:#bbb;font-size:0.55rem;">Нет друзей</span>'; return; }
+        let html = '';
+        let loaded = 0;
+        keys.forEach(k => {
+            db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
+                const u = usnap.val() || {};
+                const name = u.name || 'Аноним';
+                const letter = name.charAt(0).toUpperCase();
+                html += `<span class="friend-item" onclick="viewUser('${k}')">
+                    <span class="avatar-wrap" id="fava-${k}"><span class="letter">${letter}</span></span> ${esc(name)}
+                </span>`;
+                loaded++;
+                if (loaded === keys.length) {
+                    el.innerHTML = html;
+                    keys.forEach(k2 => {
+                        const el2 = document.getElementById('fava-' + k2);
+                        if (el2) renderAvatar(k2, el2, '?');
+                    });
+                }
+            });
+        });
+    });
+}
+
+function loadSubscribers(uid) {
+    if (!uid) return;
+    db.ref('sites/' + SITE + '/subscribers/' + uid).on('value', snap => {
+        const data = snap.val() || {};
+        document.getElementById('subscribersCount').textContent = Object.keys(data).length;
+    });
+}
+
+function loadSubscriptions(uid) {
+    if (!uid) return;
+    db.ref('sites/' + SITE + '/subscriptions/' + uid).on('value', snap => {
+        const data = snap.val() || {};
+        document.getElementById('subscriptionsCount').textContent = Object.keys(data).length;
+    });
+}
+
+window.toggleStat = function(type) {
+    showStat = type;
+    document.getElementById('friendsSection').style.display = type === 'friends' ? 'block' : 'none';
+};
+
+window.viewUser = function(uid) {
+    if (uid === USER_UID) { goToProfile(); return; }
+    VIEWING_USER = uid;
+    setActivePage('profilePage');
+    loadProfile();
+};
+
 window.openEditProfile = function() {
     document.getElementById('editName').value = USER || '';
     document.getElementById('editBio').value = '';
@@ -81,14 +161,26 @@ window.saveProfile = function() {
     loadFeed();
 };
 
-window.toggleStat = function(type) {
-    showStat = type;
-    document.getElementById('friendsSection').style.display = type === 'friends' ? 'block' : 'none';
-};
-
-window.viewUser = function(uid) {
-    if (uid === USER_UID) { goToProfile(); return; }
-    VIEWING_USER = uid;
-    setActivePage('profilePage');
-    loadProfile();
+window.uploadAvatar = function() {
+    if (!USER_UID) { alert('Сначала войдите!'); return; }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
+        const ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
+        ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
+            db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
+            if (!avatarCache) avatarCache = {};
+            avatarCache[USER_UID] = url;
+            updateUI();
+            loadProfile();
+            loadFeed();
+            alert('✅ Аватарка обновлена!');
+        });
+    };
+    input.click();
 };
