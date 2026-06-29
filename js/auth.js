@@ -1,5 +1,5 @@
 // ================================================================
-// АВТОРИЗАЦИЯ С АВАТАРКОЙ
+// АВТОРИЗАЦИЯ (С АВАТАРКОЙ ИЗ GOOGLE)
 // ================================================================
 
 auth.onAuthStateChanged(user => {
@@ -9,6 +9,8 @@ auth.onAuthStateChanged(user => {
         localStorage.setItem('dc_u_' + SITE, USER);
         
         const avatarUrl = user.photoURL || null;
+        if (!avatarCache) avatarCache = {};
+        avatarCache[USER_UID] = avatarUrl;
         
         db.ref('sites/' + SITE + '/users/' + USER_UID).update({
             name: USER,
