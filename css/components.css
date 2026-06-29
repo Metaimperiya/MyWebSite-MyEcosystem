@@ -1,15 +1,24 @@
 /* ================================================================
-   ФОРМА ПОСТА
+   ПОСТЫ
    ================================================================ */
+.post-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+}
+
 .post-form textarea {
     width: 100%;
     padding: 6px 10px;
     border: 1px solid #ddd;
     border-radius: 6px;
     resize: vertical;
-    min-height: 36px;
+    min-height: 40px;
     font-family: inherit;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     outline: none;
 }
 
@@ -25,12 +34,12 @@
 }
 
 .post-form .actions button {
-    padding: 3px 12px;
+    padding: 4px 14px;
     border: none;
-    border-radius: 16px;
+    border-radius: 20px;
     font-weight: 600;
     cursor: pointer;
-    font-size: 0.6rem;
+    font-size: 0.65rem;
 }
 
 .post-form .actions .submit {
@@ -45,9 +54,9 @@
 
 .post-form .file-label {
     background: #e4e6eb;
-    padding: 2px 10px;
-    border-radius: 16px;
-    font-size: 0.55rem;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 0.6rem;
     cursor: pointer;
     display: inline-block;
     margin-top: 3px;
@@ -61,9 +70,9 @@
 .post-form .preview-box {
     display: none;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     background: #f5f5f5;
-    padding: 3px 8px 3px 3px;
+    padding: 3px 10px 3px 3px;
     border-radius: 30px;
     margin-top: 4px;
     border: 1px solid #ddd;
@@ -74,8 +83,8 @@
 }
 
 .post-form .preview-box img {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     border-radius: 30px;
     object-fit: cover;
 }
@@ -85,40 +94,36 @@
     color: #c62828;
     border: none;
     border-radius: 30px;
-    padding: 2px 6px;
+    padding: 2px 8px;
     cursor: pointer;
-    font-size: 0.5rem;
+    font-size: 0.6rem;
 }
 
-/* ================================================================
-   ПОСТ
-   ================================================================ */
 .post {
     background: #fff;
     border-radius: 12px;
-    padding: 10px 12px;
+    padding: 12px 14px;
     margin-bottom: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     border: 1px solid #e8e8e8;
     position: relative;
 }
 
 .post .marquee {
     background: #f5f5f5;
-    padding: 3px 8px;
-    border-radius: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
     color: #e67e22;
     font-weight: 700;
     overflow: hidden;
     white-space: nowrap;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     border: 1px solid #eee;
-    font-size: 0.7rem;
 }
 
 .post .marquee span {
     display: inline-block;
-    animation: scroll 12s linear infinite;
+    animation: scroll 14s linear infinite;
     padding-left: 100%;
 }
 
@@ -135,8 +140,8 @@
 }
 
 .post .author .avatar-wrap {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     overflow: hidden;
     background: #1877f2;
@@ -154,53 +159,112 @@
 .post .author .avatar-wrap .letter {
     color: #fff;
     font-weight: 700;
-    font-size: 0.5rem;
+    font-size: 0.6rem;
 }
 
 .post .name {
     font-weight: 600;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: #1877f2;
     cursor: pointer;
 }
 
 .post .time {
     color: #999;
-    font-size: 0.45rem;
-    margin-left: 4px;
+    font-size: 0.5rem;
+    margin-left: 6px;
+}
+
+.post .post-menu {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+}
+
+.post .post-menu .dots {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.post .post-menu .dots:hover {
+    color: #222;
+}
+
+.post .post-menu .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 22px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 50;
+    min-width: 120px;
+    padding: 4px 0;
+}
+
+.post .post-menu .dropdown.open {
+    display: block;
+}
+
+.post .post-menu .dropdown button {
+    display: block;
+    width: 100%;
+    padding: 4px 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.post .post-menu .dropdown button:hover {
+    background: #f0f2f5;
+}
+
+.post .post-menu .dropdown .edit-btn {
+    color: #e67e22;
+}
+
+.post .post-menu .dropdown .del-btn {
+    color: #e74c3c;
 }
 
 .post .text {
     margin: 4px 0;
     word-break: break-word;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     line-height: 1.4;
     color: #333;
 }
 
 .post .post-img {
     max-width: 100%;
-    max-height: 200px;
-    border-radius: 6px;
+    max-height: 300px;
+    border-radius: 8px;
     margin: 4px 0;
     border: 1px solid #eee;
     cursor: pointer;
 }
 
 .post .link-preview {
-    margin: 4px 0;
+    margin: 6px 0 4px 0;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     background: #f5f5f5;
 }
 
-/* ===== РАЗМЕРЫ ФРЕЙМА (ТУМБЛЕР) ===== */
 .post .link-preview iframe {
+    width: 100%;
     border: none;
     display: block;
-    transition: height 0.3s ease;
-    width: 100%;
 }
 
 .post .link-preview iframe.small {
@@ -214,8 +278,8 @@
 .post .buttons-wrap {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    margin: 4px 0;
+    gap: 4px;
+    margin: 6px 0;
 }
 
 .post .buttons-wrap .btn-item {
@@ -223,12 +287,12 @@
     background: #1877f2;
     color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
+    border-radius: 8px;
+    padding: 8px 14px;
     text-align: center;
     text-decoration: none;
     font-weight: 700;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     transition: 0.2s;
     cursor: pointer;
 }
@@ -240,29 +304,29 @@
 .post .hashtags {
     display: flex;
     flex-wrap: wrap;
-    gap: 3px;
-    margin: 4px 0;
-    padding-top: 4px;
+    gap: 4px;
+    margin: 6px 0 4px 0;
+    padding-top: 6px;
     border-top: 1px solid #eee;
 }
 
 .post .hashtags .tag {
     color: #1877f2;
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     background: #e8f0fe;
-    padding: 1px 8px;
-    border-radius: 12px;
+    padding: 2px 10px;
+    border-radius: 16px;
     border: 1px solid #d0e4ff;
     cursor: pointer;
 }
 
 .post .stats {
     display: flex;
-    gap: 6px;
-    font-size: 0.55rem;
+    gap: 8px;
+    font-size: 0.6rem;
     color: #888;
     border-top: 1px solid #eee;
-    padding-top: 4px;
+    padding-top: 6px;
     margin-top: 4px;
     flex-wrap: wrap;
 }
@@ -274,10 +338,10 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 2px;
-    font-size: 0.55rem;
-    padding: 2px 4px;
-    border-radius: 12px;
+    gap: 3px;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 16px;
     transition: 0.2s;
 }
 
@@ -291,67 +355,88 @@
 }
 
 /* ================================================================
-   КОММЕНТАРИИ (НОВАЯ ЛОГИКА)
+   КОММЕНТАРИИ (КАК В FACEBOOK)
    ================================================================ */
 .comments {
-    margin-top: 4px;
+    margin-top: 6px;
     border-top: 1px solid #eee;
-    padding-top: 4px;
+    padding-top: 6px;
 }
 
-.comments .comments-toggle {
+.comments-toggle {
     background: none;
     border: none;
-    color: #888;
+    color: #65676b;
     cursor: pointer;
-    font-size: 14px;
-    padding: 2px 4px;
-    display: flex;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 20px;
+    transition: 0.2s;
+    display: inline-flex;
     align-items: center;
     gap: 4px;
-    transition: 0.2s;
 }
 
-.comments .comments-toggle:hover {
+.comments-toggle:hover {
+    background: #f0f2f5;
     color: #1877f2;
 }
 
-.comments .comments-toggle .count {
-    font-size: 12px;
-    font-weight: 600;
-    color: #888;
+.comments-toggle.active {
+    color: #1877f2;
 }
 
-.comments .comments-body {
+.comments-body {
     display: none;
     margin-top: 6px;
+    border-top: 1px solid #eee;
+    padding-top: 6px;
 }
 
-.comments .comments-body.open {
+.comments-body.open {
     display: block;
 }
 
-.comments .comments-list {
-    max-height: 200px;
+.comments-list {
+    max-height: 300px;
     overflow-y: auto;
+    padding-right: 4px;
     margin-bottom: 6px;
 }
 
-.comments .comment {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 4px 0;
-    border-bottom: 1px solid #f5f5f5;
+.comments-list::-webkit-scrollbar {
+    width: 4px;
 }
 
-.comments .comment:last-child {
+.comments-list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.comments-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.comments-list::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+.comment-item {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f5f5f5;
+    align-items: flex-start;
+}
+
+.comment-item:last-child {
     border-bottom: none;
 }
 
-.comments .comment .avatar-wrap {
-    width: 24px;
-    height: 24px;
+.comment-item .avatar-wrap {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     overflow: hidden;
     background: #1877f2;
@@ -361,235 +446,532 @@
     flex-shrink: 0;
 }
 
-.comments .comment .avatar-wrap img {
+.comment-item .avatar-wrap img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.comments .comment .avatar-wrap .letter {
+.comment-item .avatar-wrap .letter {
     color: #fff;
-    font-size: 0.5rem;
+    font-size: 0.7rem;
     font-weight: 700;
 }
 
-.comments .comment .body {
+.comment-item .body {
     flex: 1;
     font-size: 0.75rem;
     line-height: 1.3;
+    min-width: 0;
 }
 
-.comments .comment .body .name {
+.comment-item .body .name {
     font-weight: 600;
     color: #1877f2;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
 }
 
-.comments .comment .body .time {
+.comment-item .body .time {
     color: #999;
     font-size: 0.45rem;
     margin-left: 4px;
 }
 
-.comments .comment .body .text {
+.comment-item .body .text {
     color: #333;
     margin-top: 1px;
+    word-break: break-word;
     font-size: 0.75rem;
 }
 
-.comments .comment .comment-actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
+.comment-item .body .text .edit-comment-input {
+    width: 100%;
+    padding: 4px 10px;
+    border: 1px solid #1877f2;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    outline: none;
+    background: #fff;
+    color: #222;
+    margin: 2px 0;
 }
 
-.comments .comment .comment-actions .more-btn {
+.comment-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 4px;
+    position: relative;
+}
+
+.comment-actions .more-btn {
     background: none;
     border: none;
     color: #888;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     padding: 0 4px;
     line-height: 1;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
 }
 
-.comments .comment .comment-actions .more-btn:hover {
+.comment-actions .more-btn:hover {
+    background: #f0f2f5;
     color: #1877f2;
 }
 
-.comments .comment .comment-menu {
-    position: relative;
-    display: inline-block;
-}
-
-.comments .comment .comment-menu .dropdown {
+.comment-actions .dropdown {
     display: none;
     position: absolute;
     right: 0;
-    top: 20px;
+    top: 30px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.15);
     z-index: 60;
-    min-width: 120px;
+    min-width: 140px;
     padding: 4px 0;
 }
 
-.comments .comment .comment-menu .dropdown.open {
+.comment-actions .dropdown.open {
     display: block;
 }
 
-.comments .comment .comment-menu .dropdown button {
+.comment-actions .dropdown button {
     display: block;
     width: 100%;
-    padding: 4px 14px;
+    padding: 6px 14px;
     background: none;
     border: none;
     text-align: left;
     font-size: 0.7rem;
     cursor: pointer;
     color: #555;
+    transition: 0.15s;
 }
 
-.comments .comment .comment-menu .dropdown button:hover {
+.comment-actions .dropdown button:hover {
     background: #f0f2f5;
 }
 
-.comments .comment .comment-menu .dropdown .edit-btn {
+.comment-actions .dropdown .edit-btn {
     color: #e67e22;
 }
 
-.comments .comment .comment-menu .dropdown .del-btn {
+.comment-actions .dropdown .del-btn {
     color: #e74c3c;
 }
 
-.comments .input-wrap {
+.comment-input-wrap {
     display: flex;
     gap: 4px;
-    margin-top: 4px;
+    padding: 4px 0;
+    border-top: 1px solid #eee;
+    margin-top: 2px;
 }
 
-.comments .input-wrap input {
+.comment-input-wrap input {
+    flex: 1;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    outline: none;
+    background: #f0f2f5;
+    transition: 0.2s;
+}
+
+.comment-input-wrap input:focus {
+    border-color: #1877f2;
+    background: #fff;
+}
+
+.comment-input-wrap input::placeholder {
+    color: #999;
+}
+
+.comment-input-wrap button {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.comment-input-wrap button:hover {
+    background: #4a9eff;
+}
+
+.comment-input-wrap button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.show-more-btn {
+    background: none;
+    border: none;
+    color: #1877f2;
+    cursor: pointer;
+    font-size: 0.6rem;
+    padding: 4px 0;
+    width: 100%;
+    text-align: center;
+}
+
+.show-more-btn:hover {
+    text-decoration: underline;
+}
+
+.no-comments {
+    color: #bbb;
+    font-size: 0.6rem;
+    padding: 4px 0;
+    text-align: center;
+}
+
+/* ================================================================
+   ПРОФИЛЬ
+   ================================================================ */
+.profile-header {
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+    margin-bottom: 8px;
+}
+
+.profile-header .avatar-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 6px;
+    background: #1877f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.profile-header .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-header .avatar-wrap .letter {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.profile-header .name {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.profile-header .bio {
+    color: #888;
+    font-size: 0.7rem;
+    margin-top: 2px;
+}
+
+.profile-header .actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.profile-header .actions button {
+    padding: 3px 12px;
+    border: none;
+    border-radius: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.6rem;
+}
+
+.profile-header .actions .edit-btn {
+    background: #e4e6eb;
+    color: #555;
+}
+
+.profile-header .actions .avatar-btn {
+    background: #333;
+    color: #fff;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 4px 0;
+    font-size: 0.65rem;
+    color: #888;
+}
+
+.profile-stats span {
+    cursor: pointer;
+}
+
+.friends-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+}
+
+.friends-section h4 {
+    margin-bottom: 4px;
+    color: #555;
+    font-size: 0.75rem;
+}
+
+.friend-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.friend-item {
+    background: #f0f2f5;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.friend-item .avatar-wrap {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1877f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.friend-item .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.friend-item .avatar-wrap .letter {
+    color: #fff;
+    font-size: 0.4rem;
+    font-weight: 700;
+}
+
+/* ================================================================
+   ГРУППЫ
+   ================================================================ */
+.groups-page .group-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.groups-page .group-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.groups-page .group-card:hover {
+    transform: translateY(-2px);
+    border-color: #1877f2;
+}
+
+.groups-page .group-card .icon {
+    font-size: 1.5rem;
+}
+
+.groups-page .group-card .name {
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-top: 2px;
+}
+
+.groups-page .group-card .count {
+    color: #888;
+    font-size: 0.6rem;
+}
+
+/* ================================================================
+   ЛЮДИ
+   ================================================================ */
+.people-page .people-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.people-page .people-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: 8px 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.people-page .people-item .avatar-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1877f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.people-page .people-item .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.people-page .people-item .avatar-wrap .letter {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.7rem;
+}
+
+.people-page .people-item .info {
+    flex: 1;
+}
+
+.people-page .people-item .info .name {
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.people-page .people-item .info .status {
+    color: #888;
+    font-size: 0.6rem;
+}
+
+/* ================================================================
+   ЧАТ
+   ================================================================ */
+.chat-view {
+    display: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+    height: 60vh;
+    flex-direction: column;
+}
+
+.chat-view.active {
+    display: flex;
+}
+
+.chat-view .back {
+    background: none;
+    border: none;
+    color: #1877f2;
+    cursor: pointer;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+}
+
+.chat-view .messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 4px;
+}
+
+.chat-view .messages .msg {
+    padding: 4px 8px;
+    margin-bottom: 2px;
+    background: #f5f5f5;
+    border-radius: 6px;
+    font-size: 0.75rem;
+}
+
+.chat-view .messages .msg .author {
+    font-weight: 600;
+    font-size: 0.65rem;
+    color: #1877f2;
+}
+
+.chat-view .messages .msg .time {
+    color: #999;
+    font-size: 0.45rem;
+    margin-left: 4px;
+}
+
+.chat-view .input-wrap {
+    display: flex;
+    gap: 4px;
+}
+
+.chat-view .input-wrap input {
     flex: 1;
     padding: 4px 10px;
     border: 1px solid #ddd;
     border-radius: 16px;
-    font-size: 0.7rem;
     outline: none;
+    font-size: 0.75rem;
 }
 
-.comments .input-wrap input:focus {
+.chat-view .input-wrap input:focus {
     border-color: #1877f2;
 }
 
-.comments .input-wrap button {
+.chat-view .input-wrap button {
     background: #1877f2;
     color: #fff;
     border: none;
     border-radius: 16px;
-    padding: 3px 14px;
-    cursor: pointer;
+    padding: 0 14px;
     font-weight: 600;
-    font-size: 0.6rem;
-}
-
-.comments .input-wrap button:hover {
-    background: #4a9eff;
+    cursor: pointer;
+    font-size: 0.7rem;
 }
 
 /* ================================================================
-   КОММЕНТАРИИ - ТРИ ТОЧКИ
-   ================================================================ */
-.comment .comment-actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
-}
-
-.comment .comment-actions .more-btn {
-    background: none;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 0 4px;
-    line-height: 1;
-}
-
-.comment .comment-actions .more-btn:hover {
-    color: #1877f2;
-}
-
-.comment .comment-menu {
-    position: relative;
-    display: inline-block;
-}
-
-.comment .comment-menu .dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 20px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    z-index: 60;
-    min-width: 120px;
-    padding: 4px 0;
-}
-
-.comment .comment-menu .dropdown.open {
-    display: block;
-}
-
-.comment .comment-menu .dropdown button {
-    display: block;
-    width: 100%;
-    padding: 4px 14px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.7rem;
-    cursor: pointer;
-    color: #555;
-}
-
-.comment .comment-menu .dropdown button:hover {
-    background: #f0f2f5;
-}
-
-.comment .comment-menu .dropdown .edit-btn {
-    color: #e67e22;
-}
-
-.comment .comment-menu .dropdown .del-btn {
-    color: #e74c3c;
-}
-
-.comment .comment-menu .dropdown .edit-btn:hover,
-.comment .comment-menu .dropdown .del-btn:hover {
-    background: #f0f2f5;
-}
-
-.edit-comment-input {
-    width: 100%;
-    padding: 2px 8px;
-    border: 1px solid #1877f2;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    outline: none;
-}
-
-.edit-comment-input:focus {
-    border-color: #1877f2;
-}
-
-/* ================================================================
-   ТУМБЛЕР В МОДАЛКЕ РЕДАКТИРОВАНИЯ
+   ТУМБЛЕР РАЗМЕРА ФРЕЙМА
    ================================================================ */
 .frame-size-toggle {
     display: flex;
