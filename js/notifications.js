@@ -1,3 +1,7 @@
+// ================================================================
+// УВЕДОМЛЕНИЯ
+// ================================================================
+
 function sendNotification(targetUid, data) {
     if (!USER_UID || !targetUid || targetUid === USER_UID) return;
     const ref = db.ref('sites/' + SITE + '/notifications/' + targetUid).push();
@@ -75,4 +79,3 @@ function openNotifications() {
 function closeNotifications() {
     document.getElementById('notificationsModal').classList.remove('open');
 }
-
