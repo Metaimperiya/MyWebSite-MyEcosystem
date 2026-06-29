@@ -1,5 +1,5 @@
 // ================================================================
-// АВТОРИЗАЦИЯ (С АВАТАРКОЙ ИЗ GOOGLE)
+// АВТОРИЗАЦИЯ С АВАТАРКОЙ
 // ================================================================
 
 auth.onAuthStateChanged(user => {
@@ -8,10 +8,7 @@ auth.onAuthStateChanged(user => {
         USER = user.displayName || user.email || 'User';
         localStorage.setItem('dc_u_' + SITE, USER);
         
-        // ===== СОХРАНЯЕМ АВАТАРКУ ИЗ GOOGLE =====
         const avatarUrl = user.photoURL || null;
-        if (!avatarUrlCache) avatarUrlCache = {};
-        avatarUrlCache[USER_UID] = avatarUrl;
         
         db.ref('sites/' + SITE + '/users/' + USER_UID).update({
             name: USER,
@@ -37,7 +34,6 @@ auth.onAuthStateChanged(user => {
     } else {
         USER = null;
         USER_UID = null;
-        if (!avatarUrlCache) avatarUrlCache = {};
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
@@ -87,21 +83,12 @@ window.loginName = function() {
 
 window.logout = function() {
     if (!confirm('Выйти из профиля?')) return;
-    closeContextMenu();
-    closeProfileDropdown();
     if (notifUnsub) { notifUnsub(); notifUnsub = null; }
-    if (friendListeners) {
-        Object.values(friendListeners).forEach(unsubscribe => {
-            if (typeof unsubscribe === 'function') unsubscribe();
-        });
-        friendListeners = {};
-    }
     auth.signOut().then(() => {
         localStorage.removeItem('dc_u_' + SITE);
         USER = null;
         USER_UID = null;
         isAdmin = false;
-        document.body.classList.remove('admin-mode');
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
