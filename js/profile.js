@@ -184,3 +184,45 @@ window.uploadAvatar = function() {
     };
     input.click();
 };
+
+// ================================================================
+// КОНТЕКСТНОЕ МЕНЮ ПРОФИЛЯ
+// ================================================================
+
+function openProfileMenu(event) {
+    if (event) { event.stopPropagation(); event.preventDefault(); }
+    const menu = document.getElementById('contextMenu');
+    const overlay = document.getElementById('contextOverlay');
+    const avatar = document.getElementById('profileAvatar');
+    if (!menu || !avatar) return;
+    if (menu.classList.contains('open')) { closeContextMenu(); return; }
+    const rect = avatar.getBoundingClientRect();
+    const left = Math.max(10, rect.left + rect.width / 2 - 100);
+    const top = Math.min(rect.bottom + 10, window.innerHeight - 200);
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.classList.add('open');
+    overlay.classList.add('active');
+}
+
+function closeContextMenu() {
+    const menu = document.getElementById('contextMenu');
+    const overlay = document.getElementById('contextOverlay');
+    if (menu) menu.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+}
+
+function toggleProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    const overlay = document.getElementById('profileDropdownOverlay');
+    if (!dropdown) return;
+    dropdown.classList.toggle('open');
+    overlay.classList.toggle('active');
+}
+
+function closeProfileDropdown() {
+    const dropdown = document.getElementById('profileDropdown');
+    const overlay = document.getElementById('profileDropdownOverlay');
+    if (dropdown) dropdown.classList.remove('open');
+    if (overlay) overlay.classList.remove('active');
+}
