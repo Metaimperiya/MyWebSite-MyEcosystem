@@ -1,0 +1,62 @@
+{
+  "rules": {
+    "sites": {
+      "$site": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        "users": {
+          "$uid": {
+            ".read": "$uid === auth.uid || auth.token.admin === true",
+            ".write": "$uid === auth.uid || auth.token.admin === true"
+          }
+        },
+        "feed_posts": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        "comments": {
+          "$postId": {
+            "$commentId": {
+              ".write": "auth != null"
+            }
+          }
+        },
+        "friends": {
+          "$uid": {
+            "$friendId": {
+              ".write": "$uid === auth.uid"
+            }
+          }
+        },
+        "notifications": {
+          "$uid": {
+            ".read": "$uid === auth.uid",
+            ".write": "$uid === auth.uid"
+          }
+        },
+        "rooms": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        "room_users": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+    "rooms": {
+      "$room": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "dms": {
+      "$site": {
+        "$chatId": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    }
+  }
+}
