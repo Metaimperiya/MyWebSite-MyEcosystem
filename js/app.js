@@ -1,3 +1,7 @@
+// ================================================================
+// ОСНОВНЫЕ ФУНКЦИИ, УТИЛИТЫ, НАВИГАЦИЯ
+// ================================================================
+
 const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
 
 function cancelRequest(key) {
@@ -31,6 +35,32 @@ function checkAdminAccess(uid) {
     return isAdmin;
 }
 
+// ===== АВАТАРКИ =====
+function getUserAvatar(uid, callback) {
+    if (avatarUrlCache && avatarUrlCache[uid]) {
+        callback(avatarUrlCache[uid]);
+        return;
+    }
+    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
+        const url = snap.val() || null;
+        if (!avatarUrlCache) avatarUrlCache = {};
+        avatarUrlCache[uid] = url;
+        callback(url);
+    });
+}
+
+function renderAvatar(uid, container, letter) {
+    if (!container) return;
+    getUserAvatar(uid, function(url) {
+        if (url) {
+            container.innerHTML = `<img src="${url}" />`;
+        } else {
+            container.innerHTML = `<span class="letter">${letter || '?'}</span>`;
+        }
+    });
+}
+
+// ===== UI =====
 function updateUI() {
     const topAvatar = document.getElementById('topAvatar');
     const sAvatar = document.getElementById('sAvatar');
@@ -54,6 +84,7 @@ function updateUI() {
     }
 }
 
+// ===== НАВИГАЦИЯ =====
 function setActivePage(pageId) {
     document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
     if (pageId) document.getElementById(pageId).classList.add('active');
