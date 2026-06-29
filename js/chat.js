@@ -1,7 +1,3 @@
-// ================================================================
-// ЧАТ
-// ================================================================
-
 function loadChat(path) {
     if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
     const box = document.getElementById('chatMessages');
