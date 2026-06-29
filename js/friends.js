@@ -2,7 +2,6 @@
 // ДРУЗЬЯ, ПОДПИСКИ, УВЕДОМЛЕНИЯ
 // ================================================================
 
-// ===== ЛЮДИ =====
 function loadPeople() {
     if (!USER_UID) {
         document.getElementById('peopleList').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
@@ -32,23 +31,16 @@ function loadPeople() {
     });
 }
 
-// ================================================================
-// ДРУЗЬЯ — СИСТЕМА ЗАЯВОК
-// ================================================================
-
-// Проверка статуса дружбы
 function checkFriendStatus(uid) {
     if (!USER_UID) return 'none';
     return localStorage.getItem('fs_' + USER_UID + '_' + uid) || 'none';
 }
 
-// Обновление статуса дружбы в Firebase
 function updateFriendStatus(myUid, targetUid, status) {
     if (!myUid || !targetUid) return;
     const updates = {};
     const p1 = 'sites/' + SITE + '/friends/' + myUid + '/' + targetUid;
     const p2 = 'sites/' + SITE + '/friends/' + targetUid + '/' + myUid;
-    
     if (status === 'friend') {
         updates[p1] = 'friend';
         updates[p2] = 'friend';
@@ -64,8 +56,6 @@ function updateFriendStatus(myUid, targetUid, status) {
         updates['sites/' + SITE + '/followers/' + myUid + '/' + targetUid] = null;
     }
     db.ref().update(updates);
-    
-    // Сохраняем в localStorage
     if (status === 'friend') {
         localStorage.setItem('fs_' + myUid + '_' + targetUid, 'friend');
         localStorage.setItem('fs_' + targetUid + '_' + myUid, 'friend');
@@ -78,30 +68,22 @@ function updateFriendStatus(myUid, targetUid, status) {
     }
 }
 
-// ===== ОТПРАВКА ЗАПРОСА В ДРУЗЬЯ =====
 function sendFriendRequest(targetUid) {
     if (!USER_UID || targetUid === USER_UID) {
         alert('Нельзя добавить себя');
         return;
     }
-    
     db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', snap => {
         const status = snap.val();
-        
         if (status === 'friend') {
             alert('✅ Уже в друзьях');
             return;
         }
-        
         if (status === 'pending') {
             alert('⏳ Запрос уже отправлен');
             return;
         }
-        
-        // Отправляем запрос
         updateFriendStatus(USER_UID, targetUid, 'pending');
-        
-        // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ =====
         sendNotification(targetUid, {
             type: 'friend_request',
             from: USER_UID,
@@ -109,20 +91,15 @@ function sendFriendRequest(targetUid) {
             text: USER + ' отправил(а) запрос в друзья',
             timestamp: Date.now()
         });
-        
         alert('✅ Запрос в друзья отправлен!');
         if (viewingProfileUid) renderProfile(viewingProfileUid);
         loadPeople();
     });
 }
 
-// ===== ПРИНЯТЬ ЗАПРОС =====
 function acceptFriendRequest(targetUid) {
     if (!USER_UID) return;
-    
     updateFriendStatus(USER_UID, targetUid, 'friend');
-    
-    // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ О ПРИНЯТИИ =====
     sendNotification(targetUid, {
         type: 'friend_accepted',
         from: USER_UID,
@@ -130,40 +107,28 @@ function acceptFriendRequest(targetUid) {
         text: USER + ' принял(а) ваш запрос в друзья',
         timestamp: Date.now()
     });
-    
     alert('✅ Дружба подтверждена!');
     if (viewingProfileUid) renderProfile(viewingProfileUid);
     loadPeople();
     loadProfile();
 }
 
-// ===== ОТКЛОНИТЬ ЗАПРОС =====
 function declineFriendRequest(targetUid) {
     if (!USER_UID) return;
-    
     if (!confirm('Отклонить запрос в друзья?')) return;
-    
     updateFriendStatus(USER_UID, targetUid, 'none');
-    
     if (viewingProfileUid) renderProfile(viewingProfileUid);
     loadPeople();
 }
 
-// ===== УДАЛИТЬ ИЗ ДРУЗЕЙ =====
 function removeFriend(targetUid) {
     if (!USER_UID) return;
     if (!confirm('Удалить из друзей?')) return;
-    
     updateFriendStatus(USER_UID, targetUid, 'none');
-    
     if (viewingProfileUid) renderProfile(viewingProfileUid);
     loadPeople();
     loadProfile();
 }
-
-// ================================================================
-// ОТОБРАЖЕНИЕ ДРУЗЕЙ В ПРОФИЛЕ
-// ================================================================
 
 function loadFriends(uid) {
     db.ref('sites/' + SITE + '/friends/' + uid).on('value', snap => {
@@ -218,21 +183,15 @@ function loadSubscriptions(uid) {
     });
 }
 
-// ================================================================
-// ПОЛУЧЕНИЕ СТАТУСА ДРУЖБЫ ДЛЯ КНОПКИ
-// ================================================================
-
 function getFriendStatus(uid) {
     if (!USER_UID) return 'none';
     return localStorage.getItem('fs_' + USER_UID + '_' + uid) || 'none';
 }
 
-// Обновление кнопки в профиле
 function updateFriendButton(uid) {
     const status = getFriendStatus(uid);
     const btn = document.getElementById('friendActionBtn');
     if (!btn) return;
-    
     if (status === 'friend') {
         btn.textContent = '✅ В друзьях';
         btn.className = 'friend-btn friend';
