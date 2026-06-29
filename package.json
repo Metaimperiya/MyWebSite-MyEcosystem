@@ -1,0 +1,17 @@
+{
+  "name": "metaimperiya",
+  "version": "1.0.0",
+  "description": "METAIMPERIYA — Социальная платформа нового поколения",
+  "main": "index.html",
+  "scripts": {
+    "start": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["social", "network", "firebase", "metaimperiya"],
+  "author": "METAIMPERIYA",
+  "license": "MIT",
+  "devDependencies": {
+    "vercel": "^28.0.0"
+  }
+}
