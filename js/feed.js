@@ -82,7 +82,7 @@ function loadComments(postId, type) {
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ (С ЛАЙКАМИ И ОТВЕТАМИ)
+// РЕНДЕР КОММЕНТАРИЕВ
 // ================================================================
 
 function renderComments(postId, type) {
@@ -102,9 +102,7 @@ function renderComments(postId, type) {
     let html = '';
     commentsToShow.forEach(c => {
         const letter = (c.author || '?').charAt(0).toUpperCase();
-        const canEdit = (c.author === USER || IS_ADMIN);
-        const isLiked = localStorage.getItem('clk_' + c.id + '_' + USER_UID) === '1';
-        const likes = c.likes || 0;
+        const canEdit = (c.author === USER || isAdmin);
 
         html += `
             <div class="comment-item" data-id="${c.id}">
@@ -115,21 +113,6 @@ function renderComments(postId, type) {
                     <span class="name">${esc(c.author || 'Аноним')}</span>
                     <span class="time">${c.time || ''}${c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
                     <div class="text" id="comment-text-${c.id}">${esc(c.text || '')}</div>
-                    <div class="comment-actions-row">
-                        <button class="comment-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleCommentLike('${postId}','${c.id}','${type}')">
-                            👍 <span id="commentLikeCount_${c.id}">${likes}</span>
-                        </button>
-                        <button class="comment-reply-btn" onclick="showReplyInput('${postId}','${c.id}','${type}')">
-                            💬 Ответить
-                        </button>
-                    </div>
-                    <div class="replies" id="replies_${c.id}">
-                        <div id="repliesContainer_${c.id}"></div>
-                    </div>
-                    <div class="reply-input-wrap" id="replyInputWrap_${c.id}" style="display:none;">
-                        <input type="text" id="replyInput_${c.id}" placeholder="Написать ответ...">
-                        <button onclick="submitReply('${postId}','${c.id}','${type}')">→</button>
-                    </div>
                 </div>
                 ${canEdit ? `
                 <div class="comment-actions">
@@ -159,216 +142,7 @@ function renderComments(postId, type) {
         if (avatarEl && c.authorUid) {
             renderAvatar(c.authorUid, avatarEl, (c.author || '?').charAt(0).toUpperCase());
         }
-        loadReplies(postId, c.id, type);
     });
-}
-
-// ================================================================
-// ЛАЙКИ НА КОММЕНТАРИИ
-// ================================================================
-
-window.toggleCommentLike = function(postId, commentId, type) {
-    if (!USER) {
-        alert('Войдите!');
-        return;
-    }
-    const key = 'clk_' + commentId + '_' + USER_UID;
-    const liked = localStorage.getItem(key) === '1';
-    const path = getPostPath(type);
-
-    const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/likes');
-    if (liked) {
-        ref.transaction(v => Math.max(0, (v || 0) - 1));
-        localStorage.removeItem(key);
-    } else {
-        ref.transaction(v => (v || 0) + 1);
-        localStorage.setItem(key, '1');
-    }
-};
-
-// ================================================================
-// ОТВЕТЫ НА КОММЕНТАРИИ (ВЛОЖЕННЫЕ)
-// ================================================================
-
-function loadReplies(postId, commentId, type) {
-    const path = getPostPath(type);
-    const container = document.getElementById('repliesContainer_' + commentId);
-    if (!container) return;
-
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies')
-        .orderByChild('timestamp')
-        .on('value', snap => {
-            container.innerHTML = '';
-            const data = snap.val() || {};
-            const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
-
-            if (!keys.length) {
-                container.innerHTML = '';
-                return;
-            }
-
-            keys.forEach(k => {
-                const r = data[k];
-                const letter = (r.author || '?').charAt(0).toUpperCase();
-                const canEdit = (r.author === USER || IS_ADMIN);
-                const isLiked = localStorage.getItem('rlk_' + k + '_' + USER_UID) === '1';
-                const likes = r.likes || 0;
-
-                const replyDiv = document.createElement('div');
-                replyDiv.className = 'reply-item';
-                replyDiv.innerHTML = `
-                    <span class="avatar-wrap" id="reply-avatar-${k}">
-                        <span class="letter">${letter}</span>
-                    </span>
-                    <div class="body">
-                        <span class="name">${esc(r.author || 'Аноним')}</span>
-                        <span class="time">${r.time || ''}${r.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
-                        <div class="text" id="reply-text-${k}">${esc(r.text || '')}</div>
-                        <button class="reply-like-btn ${isLiked ? 'liked' : ''}" onclick="toggleReplyLike('${postId}','${commentId}','${k}','${type}')">
-                            👍 <span id="replyLikeCount_${k}">${likes}</span>
-                        </button>
-                    </div>
-                    ${canEdit ? `
-                    <div class="reply-actions">
-                        <button class="more-btn" onclick="toggleReplyMenu('${k}')">⋮</button>
-                        <div class="dropdown" id="replyMenu_${k}">
-                            <button class="edit-btn" onclick="editReply('${postId}','${commentId}','${k}','${type}')">✏️ Редактировать</button>
-                            <button class="del-btn" onclick="deleteReply('${postId}','${commentId}','${k}','${type}')">🗑 Удалить</button>
-                        </div>
-                    </div>
-                    ` : ''}
-                `;
-                container.appendChild(replyDiv);
-
-                if (r.authorUid) {
-                    const avatarEl = document.getElementById('reply-avatar-' + k);
-                    if (avatarEl) renderAvatar(r.authorUid, avatarEl, letter);
-                }
-            });
-        });
-}
-
-// ================================================================
-// ОТПРАВКА ОТВЕТА НА КОММЕНТАРИЙ
-// ================================================================
-
-window.showReplyInput = function(postId, commentId, type) {
-    const wrap = document.getElementById('replyInputWrap_' + commentId);
-    if (!wrap) return;
-    wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none';
-    if (wrap.style.display === 'flex') {
-        const input = document.getElementById('replyInput_' + commentId);
-        if (input) input.focus();
-    }
-};
-
-window.submitReply = function(postId, commentId, type) {
-    if (!USER) {
-        alert('Войдите!');
-        return;
-    }
-    const input = document.getElementById('replyInput_' + commentId);
-    const text = input.value.trim();
-    if (!text) return;
-
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies').push({
-        author: USER,
-        authorUid: USER_UID,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-    });
-    input.value = '';
-    document.getElementById('replyInputWrap_' + commentId).style.display = 'none';
-};
-
-// ================================================================
-// ЛАЙКИ НА ОТВЕТЫ
-// ================================================================
-
-window.toggleReplyLike = function(postId, commentId, replyId, type) {
-    if (!USER) {
-        alert('Войдите!');
-        return;
-    }
-    const key = 'rlk_' + replyId + '_' + USER_UID;
-    const liked = localStorage.getItem(key) === '1';
-    const path = getPostPath(type);
-
-    const ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies/' + replyId + '/likes');
-    if (liked) {
-        ref.transaction(v => Math.max(0, (v || 0) - 1));
-        localStorage.removeItem(key);
-    } else {
-        ref.transaction(v => (v || 0) + 1);
-        localStorage.setItem(key, '1');
-    }
-};
-
-// ================================================================
-// РЕДАКТИРОВАНИЕ ОТВЕТА
-// ================================================================
-
-function editReply(postId, commentId, replyId, type) {
-    const textEl = document.getElementById('reply-text-' + replyId);
-    if (!textEl) return;
-
-    const menu = document.getElementById('replyMenu_' + replyId);
-    if (menu) menu.classList.remove('open');
-
-    const currentText = textEl.textContent;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = currentText;
-    input.className = 'edit-comment-input';
-
-    textEl.innerHTML = '';
-    textEl.appendChild(input);
-    input.focus();
-    input.select();
-
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            saveReplyEdit(postId, commentId, replyId, type, input.value.trim());
-        }
-    });
-
-    input.addEventListener('blur', function() {
-        setTimeout(() => {
-            if (document.activeElement !== input) {
-                saveReplyEdit(postId, commentId, replyId, type, input.value.trim());
-            }
-        }, 200);
-    });
-}
-
-function saveReplyEdit(postId, commentId, replyId, type, newText) {
-    if (!newText) {
-        deleteReply(postId, commentId, replyId, type);
-        return;
-    }
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies/' + replyId).update({
-        text: newText,
-        edited: true
-    });
-}
-
-// ================================================================
-// УДАЛЕНИЕ ОТВЕТА
-// ================================================================
-
-function deleteReply(postId, commentId, replyId, type) {
-    if (!confirm('🗑 Удалить ответ?')) return;
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/replies/' + replyId).remove();
-}
-
-function toggleReplyMenu(replyId) {
-    const menu = document.getElementById('replyMenu_' + replyId);
-    if (!menu) return;
-    menu.classList.toggle('open');
 }
 
 // ================================================================
@@ -522,7 +296,7 @@ function loadFeed() {
 }
 
 // ================================================================
-// РЕНДЕР ПОСТА (ОКОНЧАТЕЛЬНАЯ ВЕРСИЯ — БЕЗ ДУБЛЕЙ)
+// РЕНДЕР ПОСТА
 // ================================================================
 
 function renderPost(p, type) {
@@ -565,7 +339,7 @@ function renderPost(p, type) {
     }
 
     let menuHtml = '';
-    if (p.author === USER || IS_ADMIN) {
+    if (p.author === USER || isAdmin) {
         menuHtml = `
             <div class="post-menu">
                 <button class="dots" onclick="togglePostMenu('${p.id}')">⋮</button>
@@ -589,7 +363,7 @@ function renderPost(p, type) {
         </div>
     `;
 
-    // ===== КОММЕНТАРИИ (СТРОКА ВВОДА ПОД ПОСТОМ, КОММЕНТАРИИ СКРЫТЫ) =====
+    // ===== КОММЕНТАРИИ =====
     let commentsHtml = `
         <div class="comments-wrapper" id="commentsWrapper_${p.id}">
             <div class="comment-input-wrap">
@@ -891,110 +665,3 @@ window.removeImage = function() {
     document.getElementById('previewBox').classList.remove('visible');
     document.getElementById('fileInput').value = '';
 };
-
-// ================================================================
-// ДРУЗЬЯ И ЛЮДИ
-// ================================================================
-
-function loadPeople() {
-    if (!USER_UID) {
-        document.getElementById('peopleList').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
-        return;
-    }
-    db.ref('sites/' + SITE + '/users').once('value', snap => {
-        const users = snap.val() || {};
-        const keys = Object.keys(users).filter(k => k !== USER_UID);
-        const el = document.getElementById('peopleList');
-        if (!keys.length) {
-            el.innerHTML = '<div style="text-align:center;padding:6px;color:#bbb;font-size:0.65rem;">Нет других пользователей</div>';
-            return;
-        }
-        el.innerHTML = keys.map(k => {
-            const u = users[k];
-            const name = u.name || 'Аноним';
-            const letter = name.charAt(0).toUpperCase();
-            return `<div class="people-item" onclick="viewUser('${k}')">
-                <span class="avatar-wrap" id="pava-${k}"><span class="letter">${letter}</span></span>
-                <div class="info"><div class="name">${esc(name)}</div><div class="status">Нажмите для просмотра</div></div>
-            </div>`;
-        }).join('');
-        keys.forEach(k => {
-            const el2 = document.getElementById('pava-' + k);
-            if (el2) renderAvatar(k, el2, '?');
-        });
-    });
-}
-
-// ===== ОСТАЛЬНЫЕ ФУНКЦИИ ДРУЗЕЙ =====
-
-function checkFriend(uid) {
-    if (!USER_UID) return false;
-    return localStorage.getItem('fr_' + USER_UID + '_' + uid) === '1';
-}
-
-window.toggleFriend = function(uid) {
-    if (!USER_UID) return;
-    const isFriend = checkFriend(uid);
-    if (isFriend) {
-        if (!confirm('Удалить из друзей?')) return;
-        localStorage.removeItem('fr_' + USER_UID + '_' + uid);
-        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).remove();
-        db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).remove();
-    } else {
-        localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
-        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
-        db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
-    }
-    loadProfile();
-    if (VIEWING_USER) showProfileActions(VIEWING_USER);
-};
-
-function loadFriends(uid) {
-    db.ref('sites/' + SITE + '/friends/' + uid).on('value', snap => {
-        const data = snap.val() || {};
-        const keys = Object.keys(data);
-        document.getElementById('friendsCount').textContent = keys.length;
-        const el = document.getElementById('friendList');
-        if (!keys.length) {
-            el.innerHTML = '<span style="color:#bbb;font-size:0.55rem;">Нет друзей</span>';
-            return;
-        }
-        let html = '';
-        let loaded = 0;
-        keys.forEach(k => {
-            db.ref('sites/' + SITE + '/users/' + k).once('value', usnap => {
-                const u = usnap.val() || {};
-                const name = u.name || 'Аноним';
-                const letter = name.charAt(0).toUpperCase();
-                html += `<span class="friend-item" onclick="viewUser('${k}')">
-                    <span class="avatar-wrap" id="fava-${k}"><span class="letter">${letter}</span></span> ${esc(name)}
-                </span>`;
-                loaded++;
-                if (loaded === keys.length) {
-                    el.innerHTML = html;
-                    keys.forEach(k2 => {
-                        const el2 = document.getElementById('fava-' + k2);
-                        if (el2) renderAvatar(k2, el2, '?');
-                    });
-                }
-            });
-        });
-    });
-}
-
-function loadSubscribers(uid) {
-    if (!uid) return;
-    db.ref('sites/' + SITE + '/subscribers/' + uid).on('value', snap => {
-        const data = snap.val() || {};
-        document.getElementById('subscribersCount').textContent = Object.keys(data).length;
-    });
-}
-
-function loadSubscriptions(uid) {
-    if (!uid) return;
-    db.ref('sites/' + SITE + '/subscriptions/' + uid).on('value', snap => {
-        const data = snap.val() || {};
-        document.getElementById('subscriptionsCount').textContent = Object.keys(data).length;
-    });
-}
-
