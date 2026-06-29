@@ -1,7 +1,3 @@
-// ================================================================
-// УТИЛИТЫ И ОСНОВНЫЕ ФУНКЦИИ
-// ================================================================
-
 const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
 
 function cancelRequest(key) {
@@ -24,10 +20,7 @@ function safeFirebaseQuery(key, ref, callback) {
         activeRequests.delete(key);
         callback(snap);
     }).catch(err => {
-        if (!cancelled) {
-            activeRequests.delete(key);
-            console.warn('Query error:', err);
-        }
+        if (!cancelled) { activeRequests.delete(key); console.warn('Query error:', err); }
     });
     return cancelFn;
 }
@@ -38,7 +31,6 @@ function checkAdminAccess(uid) {
     return isAdmin;
 }
 
-// ===== UI =====
 function updateUI() {
     const topAvatar = document.getElementById('topAvatar');
     const sAvatar = document.getElementById('sAvatar');
@@ -62,7 +54,6 @@ function updateUI() {
     }
 }
 
-// ===== НАВИГАЦИЯ =====
 function setActivePage(pageId) {
     document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
     if (pageId) document.getElementById(pageId).classList.add('active');
@@ -109,7 +100,6 @@ window.goToProfile = function() {
     loadProfile();
 };
 
-// ===== САЙДБАР =====
 window.toggleSidebar = function() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('show');
