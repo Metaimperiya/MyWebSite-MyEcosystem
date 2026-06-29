@@ -50,7 +50,6 @@ window.toggleFriend = function(uid) {
         localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
         db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
         db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
-        // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ =====
         sendNotification(uid, {
             type: 'friend_request',
             from: USER_UID,
@@ -150,7 +149,6 @@ function sendFriendRequest(targetUid) {
             return;
         }
         updateFriendStatus(USER_UID, targetUid, 'pending');
-        // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ =====
         sendNotification(targetUid, {
             type: 'friend_request',
             from: USER_UID,
@@ -164,7 +162,6 @@ function sendFriendRequest(targetUid) {
 function acceptFriendRequest(targetUid) {
     if (!USER_UID) return;
     updateFriendStatus(USER_UID, targetUid, 'friend');
-    // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ О ПРИНЯТИИ =====
     sendNotification(targetUid, {
         type: 'friend_accepted',
         from: USER_UID,
