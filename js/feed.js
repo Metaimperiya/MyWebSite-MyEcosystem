@@ -351,6 +351,62 @@ function renderPost(p, type) {
         `;
     }
 
+    // ===== СТАТИСТИКА (ЛАЙК + КОММЕНТАРИИ) =====
+    let actionsHtml = `
+        <div class="stats">
+            <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
+                👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
+            </button>
+            <button onclick="toggleComments('${p.id}', '${type}')" id="commentToggle_${p.id}">
+                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
+            </button>
+        </div>
+    `;
+
+    // ===== КОММЕНТАРИИ (БЕЗ ВТОРОЙ КНОПКИ) =====
+    let commentsHtml = `
+        <div class="comments-wrapper" id="commentsWrapper_${p.id}">
+            <div class="comments" id="comments_${p.id}">
+                <div class="comments-body" id="commentsBody_${p.id}">
+                    <div class="comments-list" id="commentsList_${p.id}">
+                        <div id="commentsContainer_${p.id}"></div>
+                    </div>
+                    <!-- ===== СТРОКА ВВОДА ВСЕГДА ВИДНА ===== -->
+                    <div class="comment-input-wrap">
+                        <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
+                        <button onclick="submitComment('${p.id}', '${type}')">→</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    div.innerHTML = `
+        ${menuHtml}
+        ${marqueeHtml}
+        <div class="author">
+            ${avatarHtml}
+            <span class="name" onclick="viewUser('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
+            <span class="time">${p.time || ''}${p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
+        </div>
+        <div class="text">${textHtml}</div>
+        ${imgHtml}
+        ${buttonsHtml}
+        ${previewHtml}
+        ${hashtagsHtml}
+        ${actionsHtml}
+        ${commentsHtml}
+    `;
+
+    if (p.authorUid) {
+        const avatarEl = document.getElementById('post-avatar-' + p.id);
+        if (avatarEl) renderAvatar(p.authorUid, avatarEl, letter);
+    }
+
+    loadComments(p.id, type);
+    return div;
+}
+
     // ===== КОММЕНТАРИИ =====
     let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
