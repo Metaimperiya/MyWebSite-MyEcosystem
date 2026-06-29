@@ -83,7 +83,9 @@ window.logout = function() {
     USER_UID = null;
     updateUI();
     document.getElementById('loginModal').classList.add('open');
-    closeSidebar();
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
     document.getElementById('chatView').classList.remove('active');
 };
