@@ -3,15 +3,25 @@ auth.onAuthStateChanged(user => {
         USER_UID = user.uid;
         USER = user.displayName || user.email || 'User';
         localStorage.setItem('dc_u_' + SITE, USER);
+        
+        // === СОХРАНЯЕМ АВАТАРКУ ИЗ GOOGLE ===
+        const avatarUrl = user.photoURL || null;
+        avatarCache = avatarUrl;
+        
         db.ref('sites/' + SITE + '/users/' + USER_UID).update({
-            name: USER, email: user.email || 'anon',
-            uid: USER_UID, lastLogin: Date.now(),
-            avatarUrl: user.photoURL || null
+            name: USER,
+            email: user.email || 'anon',
+            uid: USER_UID,
+            lastLogin: Date.now(),
+            avatarUrl: avatarUrl
         });
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
-            name: USER, email: user.email || 'anon',
-            uid: USER_UID, avatarUrl: user.photoURL || null
+            name: USER,
+            email: user.email || 'anon',
+            uid: USER_UID,
+            avatarUrl: avatarUrl
         });
+        
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
         loadFeed();
@@ -22,6 +32,7 @@ auth.onAuthStateChanged(user => {
     } else {
         USER = null;
         USER_UID = null;
+        avatarCache = null;
         document.getElementById('loginModal').classList.add('open');
         updateUI();
         loadSavedProfiles();
