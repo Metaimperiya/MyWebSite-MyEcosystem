@@ -1,26 +1,8 @@
 // ================================================================
-// ЛЕНТА, ПОСТЫ, КОММЕНТАРИИ, ЛАЙКИ, РЕДАКТИРОВАНИЕ
-// АДМИНКА ОСТАЕТСЯ! РЕДАКТИРОВАТЬ МОЖЕТ ТОЛЬКО АДМИН ИЛИ АВТОР
+// ЛЕНТА, ПОСТЫ, ЛАЙКИ, РЕДАКТИРОВАНИЕ
 // ================================================================
 
-// ===== РАЗМЕР ФРЕЙМА (ТУМБЛЕР ДЛЯ РЕДАКТИРОВАНИЯ) =====
-let currentFrameSize = 'small';
-
-function setFrameSize(size) {
-    currentFrameSize = size;
-    document.querySelectorAll('.frame-size-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    if (size === 'small') {
-        const btn = document.getElementById('frameSizeSmall');
-        if (btn) btn.classList.add('active');
-    } else {
-        const btn = document.getElementById('frameSizeLarge');
-        if (btn) btn.classList.add('active');
-    }
-}
-
-// ===== ЗАГРУЗКА ЛЕНТЫ =====
+// ===== ЛЕНТА =====
 function loadFeed() {
     if (!USER_UID) {
         document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
@@ -63,7 +45,7 @@ function renderPost(p, type) {
     let marqueeHtml = p.marquee ? `<div class="marquee"><span>${esc(p.marquee)}</span></div>` : '';
     let textHtml = esc(p.text || '');
     let imgHtml = p.img ? `<img src="${p.img}" class="post-img" onclick="window.open(this.src)">` : '';
-    
+
     let buttonsHtml = '';
     if (p.buttons && p.buttons.length > 0) {
         buttonsHtml = '<div class="buttons-wrap">';
@@ -75,7 +57,6 @@ function renderPost(p, type) {
         buttonsHtml += '</div>';
     }
 
-    // ===== ФРЕЙМ С РАЗМЕРОМ ИЗ ПОСТА =====
     let previewHtml = '';
     if (p.link) {
         const frameSize = p.frameSize || 'small';
@@ -85,11 +66,12 @@ function renderPost(p, type) {
     let hashtagsHtml = '';
     if (p.hashtags && p.hashtags.length > 0) {
         hashtagsHtml = '<div class="hashtags">';
-        p.hashtags.forEach(tag => { hashtagsHtml += `<span class="tag" onclick="searchByTag('${esc(tag)}')">${esc(tag)}</span>`; });
+        p.hashtags.forEach(tag => {
+            hashtagsHtml += `<span class="tag" onclick="searchByTag('${esc(tag)}')">${esc(tag)}</span>`;
+        });
         hashtagsHtml += '</div>';
     }
 
-    // ===== ТРИ ТОЧКИ =====
     let menuHtml = '';
     if (p.author === USER || IS_ADMIN) {
         menuHtml = `
@@ -103,28 +85,19 @@ function renderPost(p, type) {
         `;
     }
 
-    let actionsHtml = `
-        <div class="stats">
-            <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
-                👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
-            </button>
-            <button onclick="toggleComments('${p.id}', '${type}')" id="commentToggle_${p.id}">
-                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
-            </button>
-        </div>
-    `;
-
     let commentsHtml = `
         <div class="comments" id="comments_${p.id}">
-            <button class="toggle" onclick="toggleComments('${p.id}', '${type}')" id="commentsToggle_${p.id}">
-                💬 Показать
+            <button class="comments-toggle" onclick="toggleComments('${p.id}', '${type}')" id="commentsToggle_${p.id}">
+                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
             </button>
-            <div class="list" id="commentsList_${p.id}">
-                <div id="commentsContainer_${p.id}"></div>
-            </div>
-            <div class="input-wrap">
-                <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
-                <button onclick="submitComment('${p.id}', '${type}')">→</button>
+            <div class="comments-body" id="commentsBody_${p.id}">
+                <div class="comments-list" id="commentsList_${p.id}">
+                    <div id="commentsContainer_${p.id}"></div>
+                </div>
+                <div class="comment-input-wrap">
+                    <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
+                    <button onclick="submitComment('${p.id}', '${type}')">→</button>
+                </div>
             </div>
         </div>
     `;
@@ -142,8 +115,12 @@ function renderPost(p, type) {
         ${buttonsHtml}
         ${previewHtml}
         ${hashtagsHtml}
-        ${actionsHtml}
-        ${commentsHtml}
+        <div class="stats">
+            <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
+                👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
+            </button>
+            ${commentsHtml}
+        </div>
     `;
 
     if (p.authorUid) {
@@ -153,182 +130,6 @@ function renderPost(p, type) {
 
     loadComments(p.id, type);
     return div;
-}
-
-// ================================================================
-// КОММЕНТАРИИ (С РЕДАКТИРОВАНИЕМ И ТРЕМЯ ТОЧКАМИ)
-// ================================================================
-
-function loadComments(postId, type) {
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').orderByChild('timestamp').on('value', snap => {
-        const container = document.getElementById('commentsContainer_' + postId);
-        if (!container) return;
-        container.innerHTML = '';
-        const data = snap.val() || {};
-        const keys = Object.keys(data).sort((a, b) => (data[a].timestamp || 0) - (data[b].timestamp || 0));
-
-        const count = keys.length;
-        const countEl = document.getElementById('commentCount_' + postId);
-        if (countEl) countEl.textContent = count;
-        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(count);
-
-        if (!keys.length) {
-            container.innerHTML = '<div style="color:#bbb;font-size:0.55rem;padding:3px 0;">Нет комментариев</div>';
-            return;
-        }
-
-        keys.forEach(k => {
-            const c = data[k];
-            const div = document.createElement('div');
-            div.className = 'comment';
-            const letter = (c.author || '?').charAt(0).toUpperCase();
-            
-            const canEdit = (c.author === USER || IS_ADMIN);
-            
-            div.innerHTML = `
-                <span class="avatar-wrap" id="comment-avatar-${k}"><span class="letter">${letter}</span></span>
-                <div class="body">
-                    <span class="name">${esc(c.author || 'Аноним')}</span>
-                    <span class="time">${c.time || ''}${c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : ''}</span>
-                    <div class="text" id="comment-text-${k}">${esc(c.text || '')}</div>
-                </div>
-                ${canEdit ? `
-                <div class="comment-actions">
-                    <div class="comment-menu">
-                        <button class="more-btn" onclick="toggleCommentMenu('${k}')">⋮</button>
-                        <div class="dropdown" id="commentMenu_${k}">
-                            <button class="edit-btn" onclick="editComment('${postId}','${k}','${type}')">✏️ Редактировать</button>
-                            <button class="del-btn" onclick="deleteComment('${postId}','${k}','${type}')">🗑 Удалить</button>
-                        </div>
-                    </div>
-                </div>
-                ` : ''}
-            `;
-            container.appendChild(div);
-            
-            if (c.authorUid) {
-                const avatarEl = document.getElementById('comment-avatar-' + k);
-                if (avatarEl) renderAvatar(c.authorUid, avatarEl, letter);
-            }
-        });
-    });
-}
-
-// ===== ТОГГЛ МЕНЮ КОММЕНТАРИЯ =====
-function toggleCommentMenu(commentId) {
-    const menu = document.getElementById('commentMenu_' + commentId);
-    if (!menu) return;
-    document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => {
-        if (el.id !== 'commentMenu_' + commentId) el.classList.remove('open');
-    });
-    menu.classList.toggle('open');
-}
-
-// ===== ЗАКРЫТИЕ МЕНЮ ПРИ КЛИКЕ ВНЕ =====
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.comment-menu')) {
-        document.querySelectorAll('.comment-menu .dropdown.open').forEach(el => el.classList.remove('open'));
-    }
-});
-
-// ===== ОТКРЫТЬ/ЗАКРЫТЬ КОММЕНТАРИИ =====
-window.toggleComments = function(postId, type) {
-    const list = document.getElementById('commentsList_' + postId);
-    const toggle = document.getElementById('commentsToggle_' + postId);
-    if (list) {
-        list.classList.toggle('open');
-        if (toggle) {
-            toggle.textContent = list.classList.contains('open') ? '▲ Скрыть' : '💬 Показать';
-        }
-    }
-};
-
-// ===== ОТПРАВИТЬ КОММЕНТАРИЙ =====
-window.submitComment = function(postId, type) {
-    if (!USER) { alert('Войдите!'); return; }
-    const input = document.getElementById('commentInput_' + postId);
-    const text = input.value.trim();
-    if (!text) return;
-
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
-        author: USER,
-        authorUid: USER_UID,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-    });
-    input.value = '';
-    
-    const list = document.getElementById('commentsList_' + postId);
-    const toggle = document.getElementById('commentsToggle_' + postId);
-    if (list) {
-        list.classList.add('open');
-        if (toggle) {
-            toggle.textContent = '▲ Скрыть';
-        }
-    }
-};
-
-// ===== УДАЛИТЬ КОММЕНТАРИЙ =====
-window.deleteComment = function(postId, commentId, type) {
-    if (!confirm('Удалить комментарий?')) return;
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
-    const menu = document.getElementById('commentMenu_' + commentId);
-    if (menu) menu.classList.remove('open');
-};
-
-// ================================================================
-// РЕДАКТИРОВАНИЕ КОММЕНТАРИЕВ
-// ================================================================
-
-function editComment(postId, commentId, type) {
-    const path = getPostPath(type);
-    const textEl = document.getElementById('comment-text-' + commentId);
-    if (!textEl) return;
-    
-    const menu = document.getElementById('commentMenu_' + commentId);
-    if (menu) menu.classList.remove('open');
-    
-    const currentText = textEl.textContent;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = currentText;
-    input.className = 'edit-comment-input';
-    input.style.cssText = 'width:100%;padding:2px 8px;border:1px solid #1877f2;border-radius:4px;font-size:0.7rem;outline:none;background:#fff;color:#222;';
-    
-    textEl.innerHTML = '';
-    textEl.appendChild(input);
-    input.focus();
-    input.select();
-    
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            saveCommentEdit(postId, commentId, type, input.value.trim());
-        }
-    });
-    
-    input.addEventListener('blur', function() {
-        setTimeout(() => {
-            if (document.activeElement !== input) {
-                saveCommentEdit(postId, commentId, type, input.value.trim());
-            }
-        }, 200);
-    });
-}
-
-function saveCommentEdit(postId, commentId, type, newText) {
-    if (!newText) {
-        deleteComment(postId, commentId, type);
-        return;
-    }
-    const path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
-        text: newText,
-        edited: true
-    });
 }
 
 // ================================================================
@@ -352,7 +153,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// УДАЛИТЬ ПОСТ (ТОЛЬКО АДМИН ИЛИ АВТОР)
+// УДАЛИТЬ ПОСТ
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -364,7 +165,7 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ ПОСТА (ТОЛЬКО АДМИН ИЛИ АВТОР)
+// РЕДАКТИРОВАНИЕ ПОСТА
 // ================================================================
 
 window.openEdit = function(id, type) {
@@ -384,7 +185,6 @@ window.openEdit = function(id, type) {
         document.getElementById('editLink').value = p.link || '';
         document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
 
-        // ===== ВОССТАНАВЛИВАЕМ РАЗМЕР ФРЕЙМА ИЗ ПОСТА =====
         const frameSize = p.frameSize || 'small';
         setFrameSize(frameSize);
 
@@ -442,7 +242,7 @@ window.saveEdit = function() {
         link: link || null,
         hashtags: hashtags,
         buttons: buttons,
-        frameSize: currentFrameSize, // СОХРАНЯЕМ РАЗМЕР ФРЕЙМА В ПОСТ
+        frameSize: currentFrameSize,
         edited: true,
         editedAt: Date.now()
     };
@@ -466,10 +266,7 @@ window.closeEdit = function() {
     EDITING_ID = null;
 };
 
-// ================================================================
-// МЕНЮ ПОСТА (ТРИ ТОЧКИ ВЕРТИКАЛЬНЫЕ)
-// ================================================================
-
+// ===== МЕНЮ ПОСТА =====
 window.togglePostMenu = function(id) {
     const menu = document.getElementById('menu_' + id);
     if (menu) {
@@ -507,7 +304,10 @@ window.searchByTag = function(tag) {
 window.submitPost = function() {
     if (!USER) { alert('Войдите!'); return; }
     const text = document.getElementById('postInput').value.trim();
-    if (!text && !pendingImageFile) { alert('Введите текст или добавьте фото'); return; }
+    if (!text && !pendingImageFile) {
+        alert('Введите текст или добавьте фото');
+        return;
+    }
 
     const hashtags = extractHashtags(text);
     const postData = {
@@ -522,7 +322,7 @@ window.submitPost = function() {
         marquee: null,
         link: null,
         buttons: [],
-        frameSize: 'small', // ПО УМОЛЧАНИЮ МАЛЕНЬКИЙ ФРЕЙМ
+        frameSize: 'small',
         edited: false
     };
 
@@ -554,8 +354,16 @@ function clearPostForm() {
 document.getElementById('fileInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) { alert('Только изображения!'); this.value = ''; return; }
-    if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); this.value = ''; return; }
+    if (!file.type.startsWith('image/')) {
+        alert('Только изображения!');
+        this.value = '';
+        return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Максимум 5 МБ');
+        this.value = '';
+        return;
+    }
 
     pendingImageFile = file;
     const reader = new FileReader();
