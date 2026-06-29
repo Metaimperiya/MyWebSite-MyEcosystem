@@ -1,24 +1,16 @@
-// ================================================================
-// АВТОРИЗАЦИЯ
-// ================================================================
-
 auth.onAuthStateChanged(user => {
     if (user) {
         USER_UID = user.uid;
         USER = user.displayName || user.email || 'User';
         localStorage.setItem('dc_u_' + SITE, USER);
         db.ref('sites/' + SITE + '/users/' + USER_UID).update({
-            name: USER,
-            email: user.email || 'anon',
-            uid: USER_UID,
-            lastLogin: Date.now(),
+            name: USER, email: user.email || 'anon',
+            uid: USER_UID, lastLogin: Date.now(),
             avatarUrl: user.photoURL || null
         });
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
-            name: USER,
-            email: user.email || 'anon',
-            uid: USER_UID,
-            avatarUrl: user.photoURL || null
+            name: USER, email: user.email || 'anon',
+            uid: USER_UID, avatarUrl: user.photoURL || null
         });
         document.getElementById('loginModal').classList.remove('open');
         updateUI();
@@ -38,11 +30,8 @@ auth.onAuthStateChanged(user => {
 
 document.getElementById('googleBtn').addEventListener('click', function() {
     auth.signInWithPopup(provider).catch(err => {
-        if (err.code === 'auth/popup-blocked') {
-            auth.signInWithRedirect(provider);
-        } else {
-            alert('Ошибка входа: ' + err.message);
-        }
+        if (err.code === 'auth/popup-blocked') auth.signInWithRedirect(provider);
+        else alert('Ошибка входа: ' + err.message);
     });
 });
 
@@ -57,12 +46,7 @@ window.loginName = function() {
         USER = n.slice(0, 24);
         USER_UID = 'anon_' + Date.now();
         localStorage.setItem('dc_u_' + SITE, USER);
-        const data = {
-            name: USER,
-            email: 'anon_' + Date.now() + '@anon.com',
-            uid: USER_UID,
-            lastLogin: Date.now()
-        };
+        const data = { name: USER, email: 'anon_' + Date.now() + '@anon.com', uid: USER_UID, lastLogin: Date.now() };
         db.ref('sites/' + SITE + '/users/' + USER_UID).update(data);
         db.ref('sites/' + SITE + '/all_users/' + USER_UID).set(data);
         saveProfileToList(USER_UID, USER, data.email);
@@ -107,13 +91,7 @@ function loginWithSavedProfile(uid) {
         USER = profile.name;
         USER_UID = uid;
         localStorage.setItem('dc_u_' + SITE, USER);
-        const data = {
-            name: profile.name,
-            email: profile.email || 'anon',
-            uid: uid,
-            lastLogin: Date.now(),
-            avatarUrl: profile.avatarUrl || null
-        };
+        const data = { name: profile.name, email: profile.email || 'anon', uid: uid, lastLogin: Date.now(), avatarUrl: profile.avatarUrl || null };
         db.ref('sites/' + SITE + '/users/' + uid).update(data);
         db.ref('sites/' + SITE + '/all_users/' + uid).set(data);
         profile.lastUsed = Date.now();
@@ -129,23 +107,14 @@ function loginWithSavedProfile(uid) {
 }
 
 function loadSavedProfiles() {
-    try {
-        SAVED_PROFILES = JSON.parse(localStorage.getItem('dc_profiles_' + SITE) || '[]');
-    } catch(e) {
-        SAVED_PROFILES = [];
-    }
+    try { SAVED_PROFILES = JSON.parse(localStorage.getItem('dc_profiles_' + SITE) || '[]'); }
+    catch(e) { SAVED_PROFILES = []; }
 }
 
 function saveProfileToList(uid, name, email, avatarUrl) {
     const existing = SAVED_PROFILES.find(p => p.uid === uid);
     if (!existing) {
-        SAVED_PROFILES.push({
-            uid: uid,
-            name: name,
-            email: email || 'anon',
-            avatarUrl: avatarUrl || null,
-            lastUsed: Date.now()
-        });
+        SAVED_PROFILES.push({ uid, name, email: email || 'anon', avatarUrl: avatarUrl || null, lastUsed: Date.now() });
     } else {
         existing.name = name;
         existing.email = email || 'anon';
