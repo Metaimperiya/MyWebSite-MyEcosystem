@@ -1,3 +1,7 @@
+// ================================================================
+// FIREBASE — НАСТРОЙКА
+// ================================================================
+
 const FB_CONFIG = {
     apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
     authDomain: "myecosystem-e6414.firebaseapp.com",
@@ -15,24 +19,3 @@ const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
-
-const ADMIN_UIDS = [
-    "ayXehcol9FgAQU6tZuup7aSaRoV2",
-    "pWB0nGVvVXc4je6466ss7IwBm9G2",
-    "ANR62p3qcjOe2ALsdVvJHUNCCV42"
-];
-
-let isAdmin = false;
-let USER = null;
-let USER_UID = null;
-let SAVED_PROFILES = [];
-let avatarCache = null;
-let chatUnsub = null;
-let notifUnsub = null;
-let currentTab = 'feed';
-let viewingProfileUid = null;
-let activeStatToggle = null;
-let profilePrivacy = { hideFriends: false };
-let CURRENT_ROOM = null;
-let friendListeners = {};
-let activeRequests = new Map();
