@@ -386,8 +386,11 @@ function renderPost(p, type) {
             <button class="${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', '${type}')">
                 👍 <span id="likeCount_${p.id}">${p.likes || 0}</span>
             </button>
-            ${commentsHtml}
+            <button onclick="toggleComments('${p.id}', '${type}')" id="commentToggle_${p.id}">
+                💬 <span id="commentCount_${p.id}">${p.commentCount || 0}</span>
+            </button>
         </div>
+        ${commentsHtml}
     `;
 
     if (p.authorUid) {
