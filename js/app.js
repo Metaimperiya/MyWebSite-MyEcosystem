@@ -1,139 +1,182 @@
-function esc(s) {
-    return s ? String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
-}
+// ================================================================
+// СОСТОЯНИЕ, УТИЛИТЫ, НАВИГАЦИЯ
+// ================================================================
 
-function cancelRequest(key) {
-    if (activeRequests.has(key)) {
-        const fn = activeRequests.get(key);
-        if (typeof fn === 'function') fn();
-        activeRequests.delete(key);
-        return true;
-    }
-    return false;
-}
+let USER = null;
+let USER_UID = null;
+let IS_ADMIN = localStorage.getItem('dc_admin_' + SITE) === '1';
+let CURRENT_ROOM = null;
+let chatUnsub = null;
+let VIEWING_USER = null;
+let avatarUrlCache = {};
+let pendingImage = null;
+let pendingImageFile = null;
+let EDITING_ID = null;
+let showStat = 'friends';
+let currentFrameSize = 'small';
 
-function safeFirebaseQuery(key, ref, callback) {
-    cancelRequest(key);
-    let cancelled = false;
-    const cancelFn = () => { cancelled = true; activeRequests.delete(key); };
-    activeRequests.set(key, cancelFn);
-    ref.once('value', snap => {
-        if (cancelled) return;
-        activeRequests.delete(key);
-        callback(snap);
-    }).catch(err => {
-        if (!cancelled) {
-            activeRequests.delete(key);
-            console.warn('Query error:', err);
-        }
-    });
-    return cancelFn;
-}
+// ===== УТИЛИТЫ =====
+const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
 
-function checkAdminAccess(uid) {
-    isAdmin = ADMIN_UIDS.includes(uid);
-    document.body.classList.toggle('admin-mode', isAdmin);
-    return isAdmin;
-}
-
-let darkTheme = localStorage.getItem('dc_theme_'+SITE) === 'dark';
-function toggleTheme() {
-    darkTheme = !darkTheme;
-    document.body.classList.toggle('dark', darkTheme);
-    localStorage.setItem('dc_theme_'+SITE, darkTheme ? 'dark' : 'light');
-    const btn = document.querySelector('.theme-toggle');
-    if (btn) btn.textContent = darkTheme ? '☀️' : '🌙';
-}
-if (darkTheme) {
-    document.body.classList.add('dark');
-    const btn = document.querySelector('.theme-toggle');
-    if (btn) btn.textContent = '☀️';
-}
-
-function updateUI() {
-    const avatar = document.getElementById('headerAvatar');
-    if (!avatar) return;
-    if (USER && USER_UID) {
-        if (avatarCache === 'default' || !avatarCache) {
-            avatar.innerHTML = `<span>${USER.charAt(0).toUpperCase()}</span>`;
-        } else if (avatarCache && avatarCache !== 'default') {
-            avatar.innerHTML = `<img src="${avatarCache}">`;
-        }
-        if (!avatarCache) {
-            safeFirebaseQuery('avatar', db.ref('sites/'+SITE+'/users/'+USER_UID+'/avatarUrl'), snap => {
-                const url = snap.val();
-                avatarCache = url || 'default';
-                updateUI();
-            });
-        }
-    } else {
-        avatar.innerHTML = '<span>?</span>';
-    }
-}
-
-function navigateToFeed() {
-    viewingProfileUid = null;
-    activeStatToggle = null;
-    closeProfileDropdown();
-    document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
-    document.getElementById('feedPage').classList.remove('hidden');
-    document.getElementById('feedPage').classList.add('active');
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    const tabs = document.querySelectorAll('.tab');
-    if (tabs.length > 0) tabs[0].classList.add('active');
-    currentTab = 'feed';
-    loadFeed();
-}
-
-function showTab(tab) {
-    if (viewingProfileUid) {
-        navigateToFeed();
-        setTimeout(() => showTabInternal(tab), 100);
+// ===== АВАТАРКИ =====
+function getUserAvatar(uid, callback) {
+    if (avatarUrlCache[uid]) {
+        callback(avatarUrlCache[uid]);
         return;
     }
-    showTabInternal(tab);
+    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
+        const url = snap.val() || null;
+        avatarUrlCache[uid] = url;
+        callback(url);
+    });
 }
 
-function showTabInternal(tab) {
-    currentTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => {
-        const txt = t.textContent.trim();
-        if ((tab === 'feed' && txt.includes('Лента')) ||
-            (tab === 'groups' && txt.includes('Группы')) ||
-            (tab === 'people' && txt.includes('Люди'))) {
-            t.classList.add('active');
+function renderAvatar(uid, container, letter) {
+    if (!container) return;
+    getUserAvatar(uid, function(url) {
+        if (url) {
+            container.innerHTML = `<img src="${url}" />`;
+        } else {
+            container.innerHTML = `<span class="letter">${letter || '?'}</span>`;
         }
     });
-    document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
-    const pageMap = { feed:'feedPage', groups:'groupsPage', people:'peoplePage' };
-    const page = document.getElementById(pageMap[tab]);
-    if (page) { page.classList.remove('hidden'); page.classList.add('active'); }
-    viewingProfileUid = null;
-    activeStatToggle = null;
-    closeProfileDropdown();
-    if (tab === 'feed') loadFeed();
-    if (tab === 'groups') loadRooms();
-    if (tab === 'people') loadPeople();
 }
 
-function navigateToProfile(uid) {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    if (!uid) return;
-    viewingProfileUid = uid;
-    activeStatToggle = null;
-    closeProfileDropdown();
-    document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
-    document.getElementById('profilePage').classList.remove('hidden');
-    document.getElementById('profilePage').classList.add('active');
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    renderProfile(uid);
+// ===== UI =====
+function updateUI() {
+    const topAvatar = document.getElementById('topAvatar');
+    const sAvatar = document.getElementById('sAvatar');
+    const name = document.getElementById('topName');
+    const sName = document.getElementById('sName');
+    const dot = document.getElementById('adminDot');
+
+    if (USER && USER_UID) {
+        name.textContent = USER;
+        sName.textContent = USER;
+        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
+        if (IS_ADMIN) dot.classList.add('active');
+        else dot.classList.remove('active');
+    } else {
+        topAvatar.innerHTML = `<span class="letter">?</span>`;
+        sAvatar.innerHTML = `<span class="letter">?</span>`;
+        name.textContent = 'Гость';
+        sName.textContent = 'Гость';
+        dot.classList.remove('active');
+    }
 }
 
-function loadData() {
-    if (!USER_UID) return;
-    loadPeople();
-    loadRooms();
+// ===== АВАТАРКА ПРОФИЛЯ =====
+window.uploadAvatar = function() {
+    if (!USER_UID) {
+        alert('Сначала войдите!');
+        return;
+    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Максимум 5 МБ');
+            return;
+        }
+        const ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
+        ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
+            db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
+            avatarUrlCache[USER_UID] = url;
+            updateUI();
+            loadProfile();
+            loadFeed();
+            alert('✅ Аватарка обновлена!');
+        });
+    };
+    input.click();
+};
+
+// ===== САЙДБАР =====
+window.toggleSidebar = function() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+};
+
+window.closeSidebar = function() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+};
+
+// ===== НАВИГАЦИЯ =====
+function setActivePage(pageId) {
+    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+    if (pageId) document.getElementById(pageId).classList.add('active');
+    document.querySelectorAll('.tab-bar .tab').forEach(el => el.classList.remove('active'));
+    const map = { feedPage: 0, groupsPage: 1, peoplePage: 2, profilePage: 3 };
+    const tabs = document.querySelectorAll('.tab-bar .tab');
+    if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
+}
+
+window.goToFeed = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    setActivePage('feedPage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
     loadFeed();
-    loadNotifications();
+};
+
+window.goToGroups = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    setActivePage('groupsPage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    loadGroups();
+};
+
+window.goToPeople = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    setActivePage('peoplePage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    loadPeople();
+};
+
+window.goToProfile = function() {
+    if (!USER) { alert('Войдите!'); return; }
+    VIEWING_USER = null;
+    setActivePage('profilePage');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    loadProfile();
+};
+
+// ===== РАЗМЕР ФРЕЙМА =====
+function setFrameSize(size) {
+    currentFrameSize = size;
+    document.querySelectorAll('.frame-size-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (size === 'small') {
+        const btn = document.getElementById('frameSizeSmall');
+        if (btn) btn.classList.add('active');
+    } else {
+        const btn = document.getElementById('frameSizeLarge');
+        if (btn) btn.classList.add('active');
+    }
 }
