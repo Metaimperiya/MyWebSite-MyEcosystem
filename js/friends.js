@@ -1,7 +1,8 @@
 // ================================================================
-// ДРУЗЬЯ И ЛЮДИ
+// ДРУЗЬЯ, ПОДПИСКИ, УВЕДОМЛЕНИЯ
 // ================================================================
 
+// ===== ЛЮДИ =====
 function loadPeople() {
     if (!USER_UID) {
         document.getElementById('peopleList').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
@@ -31,8 +32,7 @@ function loadPeople() {
     });
 }
 
-// ===== ДРУЗЬЯ =====
-
+// ===== ДРУЗЬЯ (БАЗОВЫЕ ФУНКЦИИ) =====
 function checkFriend(uid) {
     if (!USER_UID) return false;
     return localStorage.getItem('fr_' + USER_UID + '_' + uid) === '1';
@@ -50,6 +50,13 @@ window.toggleFriend = function(uid) {
         localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
         db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
         db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
+        // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ =====
+        sendNotification(uid, {
+            type: 'friend_request',
+            from: USER_UID,
+            text: USER + ' отправил(а) запрос в друзья',
+            timestamp: Date.now()
+        });
     }
     loadProfile();
     if (VIEWING_USER) showProfileActions(VIEWING_USER);
@@ -61,10 +68,7 @@ function loadFriends(uid) {
         const keys = Object.keys(data);
         document.getElementById('friendsCount').textContent = keys.length;
         const el = document.getElementById('friendList');
-        if (!keys.length) {
-            el.innerHTML = '<span style="color:#bbb;font-size:0.55rem;">Нет друзей</span>';
-            return;
-        }
+        if (!keys.length) { el.innerHTML = '<span style="color:#bbb;font-size:0.55rem;">Нет друзей</span>'; return; }
         let html = '';
         let loaded = 0;
         keys.forEach(k => {
@@ -104,7 +108,9 @@ function loadSubscriptions(uid) {
     });
 }
 
-// ===== ПРОДВИНУТЫЕ ФУНКЦИИ ДРУЗЕЙ (из запасного варианта) =====
+// ================================================================
+// ПРОДВИНУТАЯ ЛОГИКА ДРУЗЕЙ (С УВЕДОМЛЕНИЯМИ)
+// ================================================================
 
 function updateFriendStatus(myUid, targetUid, status) {
     if (!myUid || !targetUid) return;
@@ -144,6 +150,7 @@ function sendFriendRequest(targetUid) {
             return;
         }
         updateFriendStatus(USER_UID, targetUid, 'pending');
+        // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ =====
         sendNotification(targetUid, {
             type: 'friend_request',
             from: USER_UID,
@@ -157,6 +164,7 @@ function sendFriendRequest(targetUid) {
 function acceptFriendRequest(targetUid) {
     if (!USER_UID) return;
     updateFriendStatus(USER_UID, targetUid, 'friend');
+    // ===== ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ О ПРИНЯТИИ =====
     sendNotification(targetUid, {
         type: 'friend_accepted',
         from: USER_UID,
@@ -181,4 +189,33 @@ function declineFriendRequest(targetUid) {
     updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
     db.ref().update(updates);
     if (viewingProfileUid) renderProfile(viewingProfileUid);
+}
+
+function listenFriendStatus(targetUid) {
+    if (!USER_UID || !targetUid) return;
+    if (friendListeners[targetUid]) { friendListeners[targetUid](); delete friendListeners[targetUid]; }
+    const ref = db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid);
+    const handler = snap => { updateFriendButton(targetUid, snap.val() || 'none'); };
+    ref.on('value', handler);
+    friendListeners[targetUid] = () => { ref.off('value', handler); delete friendListeners[targetUid]; };
+}
+
+function updateFriendButton(uid, status) {
+    const btn = document.getElementById('friend-btn-' + uid);
+    if (!btn) return;
+    btn.className = 'btn-action btn-friend';
+    btn.disabled = false;
+    if (status === 'friend') {
+        btn.innerHTML = `<span class="icon">✓</span> В друзьях`;
+        btn.classList.add('friend');
+        btn.onclick = (e) => { e.stopPropagation(); removeFriend(uid); };
+    } else if (status === 'pending') {
+        btn.innerHTML = `<span class="icon">⏳</span> Запрос`;
+        btn.classList.add('pending');
+        btn.onclick = (e) => { e.stopPropagation(); sendFriendRequest(uid); };
+    } else {
+        btn.innerHTML = `<span class="icon">➕</span> Добавить`;
+        btn.classList.add('add');
+        btn.onclick = (e) => { e.stopPropagation(); sendFriendRequest(uid); };
+    }
 }
