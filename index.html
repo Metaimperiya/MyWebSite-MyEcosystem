@@ -603,59 +603,64 @@
         .post .stats button.liked { color: #1877f2; }
 
         /* ================================================================
-           КОММЕНТАРИИ
-           ================================================================ */
-        .comments { margin-top: 6px; border-top: 1px solid #eee; padding-top: 6px; }
-        .comments .toggle { background: none; border: none; color: #1877f2; cursor: pointer; font-size: 0.65rem; }
-        .comments .list { display: none; }
-        .comments .list.open { display: block; }
-        .comments .comment {
-            display: flex; gap: 6px; margin-bottom: 3px; padding: 4px 0; border-bottom: 1px solid #f5f5f5;
-        }
-        .comments .comment .avatar-wrap { width: 20px; height: 20px; border-radius: 50%; overflow: hidden; background: #1877f2; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .comments .comment .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
-        .comments .comment .avatar-wrap .letter { color: #fff; font-size: 0.45rem; font-weight: 700; }
-        .comments .comment .body { flex: 1; font-size: 0.7rem; line-height: 1.3; }
-        .comments .comment .body .name { font-weight: 600; color: #1877f2; }
-        .comments .comment .body .time { color: #999; font-size: 0.45rem; margin-left: 4px; }
-        .comments .comment .body .text { color: #333; margin-top: 1px; }
-        
-        .comments .comment .comment-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-        .comments .comment .comment-actions .more-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 14px; padding: 0 4px; line-height: 1; }
-        .comments .comment .comment-actions .more-btn:hover { color: #1877f2; }
-        .comments .comment .comment-menu { position: relative; display: inline-block; }
-        .comments .comment .comment-menu .dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 20px;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-            z-index: 60;
-            min-width: 120px;
-            padding: 4px 0;
-        }
-        .comments .comment .comment-menu .dropdown.open { display: block; }
-        .comments .comment .comment-menu .dropdown button {
-            display: block; width: 100%; padding: 4px 14px; background: none; border: none; text-align: left; font-size: 0.7rem; cursor: pointer; color: #555;
-        }
-        .comments .comment .comment-menu .dropdown button:hover { background: #f0f2f5; }
-        .comments .comment .comment-menu .dropdown .edit-btn { color: #e67e22; }
-        .comments .comment .comment-menu .dropdown .del-btn { color: #e74c3c; }
+   КОММЕНТАРИИ — СКРОЛЛ
+   ================================================================ */
+.comments .list {
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
 
-        .comments .input-wrap { display: flex; gap: 4px; margin-top: 4px; }
-        .comments .input-wrap input {
-            flex: 1; padding: 4px 10px; border: 1px solid #ddd;
-            border-radius: 16px; font-size: 0.65rem; outline: none;
-        }
-        .comments .input-wrap input:focus { border-color: #1877f2; }
-        .comments .input-wrap button {
-            background: #1877f2; color: #fff; border: none;
-            border-radius: 16px; padding: 3px 12px; cursor: pointer;
-            font-weight: 600; font-size: 0.6rem;
-        }
+.comments .list.open {
+    display: block;
+}
+
+.comments .list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.comments .list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.comments .list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.comments .list::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+/* Поле ввода всегда видно */
+.comments .input-wrap {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    padding: 4px 0;
+    border-top: 1px solid #eee;
+}
+
+/* Кнопка "Показать ещё" */
+.show-more-comments {
+    background: none;
+    border: none;
+    color: #1877f2;
+    cursor: pointer;
+    font-size: 0.6rem;
+    padding: 4px 0;
+    width: 100%;
+    text-align: center;
+}
+
+.show-more-comments:hover {
+    text-decoration: underline;
+}
 
         /* ================================================================
            ПРОФИЛЬ
