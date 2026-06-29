@@ -37,14 +37,14 @@ function checkAdminAccess(uid) {
 
 // ===== АВАТАРКИ =====
 function getUserAvatar(uid, callback) {
-    if (avatarUrlCache && avatarUrlCache[uid]) {
-        callback(avatarUrlCache[uid]);
+    if (avatarCache && avatarCache[uid]) {
+        callback(avatarCache[uid]);
         return;
     }
     db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
         const url = snap.val() || null;
-        if (!avatarUrlCache) avatarUrlCache = {};
-        avatarUrlCache[uid] = url;
+        if (!avatarCache) avatarCache = {};
+        avatarCache[uid] = url;
         callback(url);
     });
 }
@@ -140,3 +140,18 @@ window.closeSidebar = function() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('overlay').classList.remove('show');
 };
+
+// ===== РАЗМЕР ФРЕЙМА =====
+function setFrameSize(size) {
+    currentFrameSize = size;
+    document.querySelectorAll('.frame-size-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    if (size === 'small') {
+        const btn = document.getElementById('frameSizeSmall');
+        if (btn) btn.classList.add('active');
+    } else {
+        const btn = document.getElementById('frameSizeLarge');
+        if (btn) btn.classList.add('active');
+    }
+}
