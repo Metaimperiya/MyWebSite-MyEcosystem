@@ -1,68 +1,82 @@
 /* ================================================================
    МОБИЛЬНЫЙ АДАПТИВ
    ================================================================ */
+
 @media (max-width: 480px) {
     .topbar {
         padding: 6px 8px;
     }
+    
     .topbar .left .logo {
         font-size: 0.75rem;
     }
+    
     .topbar .left .menu-btn {
         font-size: 1rem;
     }
-    .topbar .right .name {
+    
+    .topbar .right .username {
         display: none;
     }
+    
     .topbar .right .avatar-wrap {
         width: 24px;
         height: 24px;
     }
+    
     .player-mini {
         max-width: 150px;
         padding: 2px 6px;
     }
-    .player-mini .track-name-mini {
+    
+    .player-mini .track-name {
         max-width: 40px;
         font-size: 0.5rem;
     }
-    .player-mini .play-btn-mini {
+    
+    .player-mini .play-btn {
         width: 18px;
         height: 18px;
         font-size: 7px;
     }
-    .player-mini .track-time {
-        font-size: 0.4rem;
-    }
+    
     .tab-bar .tab {
         font-size: 0.55rem;
         padding: 4px 8px;
     }
+    
     .container {
         padding: 6px 8px 50px;
     }
+    
     .post .link-preview iframe {
         height: 180px;
     }
+    
     .group-list {
         grid-template-columns: 1fr 1fr;
     }
+    
     .playlist-dropdown {
         min-width: 130px;
         right: 0;
     }
+    
     .sidebar {
         width: 280px;
         left: -280px;
     }
+    
     .comment-item .avatar-wrap {
         width: 24px;
         height: 24px;
     }
+    
     .profile-header .avatar-wrap {
         width: 56px;
         height: 56px;
     }
+    
     .profile-header .avatar-wrap .letter {
         font-size: 1.5rem;
     }
