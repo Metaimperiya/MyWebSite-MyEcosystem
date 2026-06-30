@@ -658,3 +658,91 @@ window.searchByTag = function(tag) {
         input.focus();
     }
 };
+
+// ================================================================
+// ДОПОЛНИТЕЛЬНЫЙ ФУНКЦИОНАЛ ДЛЯ КОММЕНТАРИЕВ
+// ================================================================
+
+// ================================================================
+// 19. ЛАЙК КОММЕНТАРИЯ — РАБОТАЕТ ЧЕРЕЗ ТРАНЗАКЦИЮ
+// ================================================================
+
+window.toggleLikeComment = function(postId, commentId) {
+    if (!USER) {
+        alert('Войдите!');
+        return;
+    }
+
+    var ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/comments/' + commentId + '/likes');
+    ref.transaction(function(likes) {
+        return (likes || 0) + 1;
+    });
+
+    // Обновляем счётчик на странице
+    var countEl = document.getElementById('commentLikeCount_' + commentId);
+    if (countEl) {
+        var current = parseInt(countEl.textContent) || 0;
+        countEl.textContent = current + 1;
+    }
+};
+
+// ================================================================
+// 20. ОБНОВЛЁННЫЙ РЕНДЕР КОММЕНТАРИЕВ — С ЛАЙКАМИ
+// ================================================================
+
+// Эту функцию нужно ЗАМЕНИТЬ (она уже есть в твоём файле, просто обновляем)
+// Найди функцию renderComments и замени её на эту:
+
+function renderComments(postId, type) {
+    var state = getCommentState(postId);
+    var container = document.getElementById('commentsContainer_' + postId);
+    if (!container) return;
+
+    if (!state.allComments.length) {
+        container.innerHTML = '<div class="no-comments">Нет комментариев</div>';
+        return;
+    }
+
+    // ✅ БЕЗ "ПОКАЗАТЬ ЕЩЁ" — грузим все
+    var html = '';
+    state.allComments.forEach(function(c) {
+        var letter = (c.author || '?').charAt(0).toUpperCase();
+        var canEdit = (c.author === USER || isAdmin);
+        var likes = c.likes || 0;
+
+        html += '<div class="comment-item" data-id="' + c.id + '">';
+        html += '<span class="avatar-wrap" id="comment-avatar-' + c.id + '"><span class="letter">' + letter + '</span></span>';
+        html += '<div class="body">';
+        html += '<span class="name">' + esc(c.author || 'Аноним') + '</span>';
+        html += '<span class="time">' + (c.time || '') + (c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>';
+        html += '<div class="text" id="comment-text-' + c.id + '">' + esc(c.text || '') + '</div>';
+
+        // ✅ КНОПКА ЛАЙКА ДЛЯ КОММЕНТАРИЯ
+        html += '<div class="comment-actions-row">';
+        html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
+        html += '</div>';
+
+        html += '</div>'; // .body
+
+        if (canEdit) {
+            html += '<div class="comment-actions">';
+            html += '<button class="more-btn" onclick="toggleCommentMenu(\'' + c.id + '\')">⋮</button>';
+            html += '<div class="dropdown" id="commentMenu_' + c.id + '">';
+            html += '<button class="edit-btn" onclick="editComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">✏️ Редактировать</button>';
+            html += '<button class="del-btn" onclick="deleteComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">🗑 Удалить</button>';
+            html += '</div>';
+            html += '</div>';
+        }
+
+        html += '</div>'; // .comment-item
+    });
+
+    container.innerHTML = html;
+
+    state.allComments.forEach(function(c) {
+        var avatarEl = document.getElementById('comment-avatar-' + c.id);
+        if (avatarEl && c.authorUid) {
+            renderAvatar(c.authorUid, avatarEl, (c.author || '?').charAt(0).toUpperCase());
+        }
+    });
+}
