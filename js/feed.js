@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ
+// ЛЕНТА И ПОСТЫ (ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ)
 // ================================================================
 
 const COMMENTS_LIMIT = 5;
@@ -21,7 +21,9 @@ function getCommentState(postId) {
     return commentStates[postId];
 }
 
-// ===== ЗАГРУЗКА ЛЕНТЫ =====
+// ================================================================
+// ЗАГРУЗКА ЛЕНТЫ
+// ================================================================
 
 function loadFeed() {
     if (!USER_UID) {
@@ -50,7 +52,9 @@ function loadFeed() {
     });
 }
 
-// ===== ОТПРАВКА ПОСТА =====
+// ================================================================
+// ОТПРАВКА ПОСТА — ИСПРАВЛЕННАЯ ВЕРСИЯ!
+// ================================================================
 
 window.submitPost = function() {
     if (!USER) {
@@ -59,16 +63,20 @@ window.submitPost = function() {
     }
     
     var text = document.getElementById('postInput').value.trim();
+    
+    // ✅ ЕСЛИ НЕТ ТЕКСТА И НЕТ КАРТИНКИ — НЕ ОТПРАВЛЯЕМ
     if (!text && !pendingImageFile) {
         alert('Введите текст или добавьте фото');
         return;
     }
     
+    // ✅ ЕСЛИ ЕСТЬ ТЕКСТ ИЛИ КАРТИНКА — ОТПРАВЛЯЕМ
     var hashtags = extractHashtags(text);
+    
     var postData = {
         author: USER,
         authorUid: USER_UID,
-        text: text || '📷',
+        text: text || '📷',  // Если нет текста, ставим иконку фото
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now(),
         likes: 0,
@@ -81,9 +89,11 @@ window.submitPost = function() {
         edited: false
     };
     
+    // Если есть ссылка в тексте — сохраняем
     var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
     if (linkMatch) postData.link = linkMatch[1];
     
+    // ✅ ЕСТЬ КАРТИНКА — загружаем как base64
     if (pendingImageFile) {
         var reader = new FileReader();
         reader.onload = function(e) {
@@ -93,10 +103,15 @@ window.submitPost = function() {
         };
         reader.readAsDataURL(pendingImageFile);
     } else {
+        // ✅ НЕТ КАРТИНКИ — просто отправляем текст
         db.ref('sites/' + SITE + '/feed_posts').push(postData);
         clearPostForm();
     }
 };
+
+// ================================================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ================================================================
 
 function extractHashtags(text) {
     if (!text) return [];
@@ -119,7 +134,9 @@ window.removeImage = function() {
     document.getElementById('fileInput').value = '';
 };
 
-// ===== ЗАГРУЗКА КАРТИНКИ =====
+// ================================================================
+// ЗАГРУЗКА КАРТИНКИ В ПОСТ
+// ================================================================
 
 document.getElementById('fileInput').addEventListener('change', function(e) {
     var file = e.target.files[0];
@@ -146,7 +163,9 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     reader.readAsDataURL(file);
 });
 
-// ===== РЕНДЕР ПОСТА =====
+// ================================================================
+// РЕНДЕР ПОСТА
+// ================================================================
 
 function renderPost(p, type) {
     var div = document.createElement('div');
@@ -207,7 +226,9 @@ function renderPost(p, type) {
     return div;
 }
 
-// ===== ЛАЙКИ =====
+// ================================================================
+// ЛАЙКИ
+// ================================================================
 
 window.toggleLike = function(postId, type) {
     if (!USER) {
@@ -229,7 +250,9 @@ window.toggleLike = function(postId, type) {
     }
 };
 
-// ===== КОММЕНТАРИИ =====
+// ================================================================
+// КОММЕНТАРИИ
+// ================================================================
 
 window.toggleComments = function(postId, type) {
     var state = getCommentState(postId);
@@ -420,7 +443,9 @@ function saveCommentEdit(postId, commentId, type, newText) {
     });
 }
 
-// ===== УДАЛЕНИЕ ПОСТА =====
+// ================================================================
+// УДАЛЕНИЕ ПОСТА
+// ================================================================
 
 window.deletePost = function(id, type) {
     if (!confirm('🗑 Удалить пост?')) return;
@@ -430,7 +455,9 @@ window.deletePost = function(id, type) {
     if (menu) menu.classList.remove('open');
 };
 
-// ===== РЕДАКТИРОВАНИЕ ПОСТА =====
+// ================================================================
+// РЕДАКТИРОВАНИЕ ПОСТА
+// ================================================================
 
 window.openEdit = function(id, type) {
     EDITING_ID = { id: id, type: type };
@@ -465,7 +492,7 @@ window.addEditBtn = function(label, url) {
     url = url || '';
     var container = document.getElementById('editButtonsContainer');
     var div = document.createElement('div');
-    div.className = 'btn-group';
+    div.className = 'btn-group-edit';
     div.innerHTML = '<input class="btn-label-input" placeholder="Текст кнопки" value="' + esc(label) + '"><input class="btn-url-input" placeholder="Ссылка" value="' + esc(url) + '"><button class="btn-remove" onclick="removeEditBtn(this)">✕</button>';
     container.appendChild(div);
 };
@@ -493,7 +520,7 @@ window.saveEdit = function() {
     var hashtags = hashtagsRaw ? hashtagsRaw.split(/\s+/).filter(function(t) { return t.startsWith('#'); }) : [];
     
     var buttons = [];
-    document.querySelectorAll('#editButtonsContainer .btn-group').forEach(function(g) {
+    document.querySelectorAll('#editButtonsContainer .btn-group-edit').forEach(function(g) {
         var label = g.querySelector('.btn-label-input').value.trim();
         var url = g.querySelector('.btn-url-input').value.trim();
         if (url) buttons.push({ label: label || '🔗 Перейти', url: url });
@@ -530,7 +557,9 @@ window.closeEdit = function() {
     EDITING_ID = null;
 };
 
-// ===== МЕНЮ ПОСТА =====
+// ================================================================
+// МЕНЮ ПОСТА
+// ================================================================
 
 window.togglePostMenu = function(id) {
     var menu = document.getElementById('menu_' + id);
