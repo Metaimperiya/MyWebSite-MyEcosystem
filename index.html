@@ -20,8 +20,8 @@
 
 <div class="app" id="app">
     
-    <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
-    <header class="topbar">
+    <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ (СКРЫВАЕТСЯ) ===== -->
+    <header class="topbar" id="topbar">
         <div class="left">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
             <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
@@ -194,10 +194,10 @@
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
     <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
-    <div class="container">
+    <div class="container" id="mainContainer">
 
-        <!-- ===== РУЧКА ПЛЕЕРА (ВСЕГДА ВИДНА) ===== -->
-        <div class="player-handle" id="playerHandle" onclick="toggleDrawer()">
+        <!-- ===== РУЧКА ПЛЕЕРА (СКРЫВАЕТСЯ ВМЕСТЕ С ШАПКОЙ) ===== -->
+        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
@@ -420,6 +420,108 @@
 <script src="js/chat.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
+
+<!-- ===== АВТО-СКРЫТИЕ ШАПКИ И ПЛЕЕРА ===== -->
+<script>
+(function() {
+    var lastScrollY = 0;
+    var topbar = document.getElementById('topbar');
+    var playerHandle = document.getElementById('playerHandle');
+    var playerDrawer = document.getElementById('playerDrawer');
+    var isPlayerOpen = false;
+    var ticking = false;
+
+    // Проверяем, открыт ли плеер
+    function checkPlayerState() {
+        if (playerDrawer) {
+            isPlayerOpen = playerDrawer.classList.contains('open');
+        }
+    }
+
+    function updateHeader() {
+        var currentScrollY = window.scrollY;
+
+        // Если плеер открыт — не скрываем
+        checkPlayerState();
+        if (isPlayerOpen) {
+            showAll();
+            lastScrollY = currentScrollY;
+            return;
+        }
+
+        // Если скролл вверх — показываем всё
+        if (currentScrollY < lastScrollY || currentScrollY < 10) {
+            showAll();
+        } 
+        // Если скролл вниз и проскроллили больше 50px — скрываем
+        else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            hideAll();
+        }
+
+        lastScrollY = currentScrollY;
+    }
+
+    function showAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(0)';
+            topbar.style.opacity = '1';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(0)';
+            playerHandle.style.opacity = '1';
+        }
+    }
+
+    function hideAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(-100%)';
+            topbar.style.opacity = '0';
+            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(-100%)';
+            playerHandle.style.opacity = '0';
+            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+    }
+
+    // Слушаем скролл
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateHeader();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Следим за открытием плеера через MutationObserver
+    if (playerDrawer) {
+        var observer = new MutationObserver(function() {
+            checkPlayerState();
+            if (isPlayerOpen) {
+                showAll();
+            }
+        });
+        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // При клике на ручку — показываем всё
+    if (playerHandle) {
+        playerHandle.addEventListener('click', function() {
+            setTimeout(function() {
+                checkPlayerState();
+                if (isPlayerOpen) {
+                    showAll();
+                }
+            }, 100);
+        });
+    }
+
+    console.log('✅ Авто-скрытие шапки и плеера включено!');
+})();
+</script>
 
 </body>
 </html>
