@@ -936,3 +936,220 @@ body {
     color: #1877f2;
     background: #1a2a4a;
 }
+
+/* ================================================================
+   МИНИ-ПЛЕЕР В ШАПКЕ
+   ================================================================ */
+
+.player-mini {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f0f2f5;
+    padding: 3px 8px;
+    border-radius: 16px;
+    max-width: 220px;
+    cursor: pointer;
+}
+
+.player-mini .play-btn {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.player-mini .play-btn:hover {
+    background: #4a9eff;
+}
+
+.player-mini .track-name {
+    font-weight: 500;
+    font-size: 0.6rem;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+}
+
+.player-mini .track-time {
+    font-size: 0.5rem;
+    color: #888;
+}
+
+/* ================================================================
+   ВЫДВИЖНОЙ ПЛЕЕР (СВЕРХУ — КАК WINAMP)
+   ================================================================ */
+
+.player-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #1a1a2e;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 999;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 80vh;
+    overflow: hidden;
+    padding-top: 44px;
+}
+
+.player-drawer.open {
+    transform: translateY(0);
+}
+
+/* Ручка для перетаскивания — ВНИЗУ плеера */
+.player-handle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0 4px 0;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+}
+
+.player-handle:active {
+    cursor: grabbing;
+}
+
+.handle-bar {
+    width: 40px;
+    height: 4px;
+    background: #4a4a6a;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.player-handle:hover .handle-bar {
+    background: #6a6a8a;
+}
+
+/* Контент плеера */
+.player-content {
+    padding: 0 16px 16px 16px;
+}
+
+.player-content .player-track-info {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.player-content .player-track-name {
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.player-content .player-artist {
+    color: #888;
+    font-size: 0.7rem;
+    margin-top: 1px;
+}
+
+.player-content .player-progress {
+    margin-bottom: 8px;
+}
+
+.player-content .player-progress-bar {
+    width: 100%;
+    height: 3px;
+    background: #2a2a4a;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+}
+
+.player-content .player-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1877f2, #4a9eff);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.1s;
+}
+
+.player-content .player-time {
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 0.55rem;
+    margin-top: 2px;
+}
+
+.player-content .player-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.player-content .player-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.player-content .player-btn:hover {
+    color: #fff;
+    background: #2a2a4a;
+}
+
+.player-content .player-btn.play-large {
+    font-size: 1.8rem;
+    color: #1877f2;
+    padding: 0 2px;
+}
+
+.player-content .player-btn.play-large:hover {
+    color: #4a9eff;
+    background: none;
+}
+
+.player-content .player-playlist {
+    border-top: 1px solid #2a2a4a;
+    padding-top: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.player-content .player-playlist .playlist-item {
+    color: #888;
+    font-size: 0.65rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.player-content .player-playlist .playlist-item:hover {
+    background: #2a2a4a;
+    color: #fff;
+}
+
+.player-content .player-playlist .playlist-item.active {
+    color: #1877f2;
+    background: #1a2a4a;
+}
