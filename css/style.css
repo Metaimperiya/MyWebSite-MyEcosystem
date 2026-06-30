@@ -1054,3 +1054,35 @@ body {
     height: 100%;
     display: block;
 }
+
+/* ================================================================
+   АВТО-СКРЫТИЕ ШАПКИ И ПЛЕЕРА
+   ================================================================ */
+
+.topbar {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateY(0);
+    opacity: 1;
+    will-change: transform, opacity;
+}
+
+.player-handle {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateY(0);
+    opacity: 1;
+    will-change: transform, opacity;
+}
+
+/* Когда скрыты (JS добавляет класс hidden) */
+.topbar.hidden,
+.player-handle.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+@media (max-width: 480px) {
+    .topbar,
+    .player-handle {
+        transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+}
