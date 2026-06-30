@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>METAIMPERIYA — Социальная платформа</title>
     
-    <!-- SEO -->
     <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
     <meta name="theme-color" content="#1877f2">
     
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/mobile.css">
@@ -31,11 +28,7 @@
             <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
         </div>
         <div class="center">
-            <div class="player-mini">
-                <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
-                <span class="track-name" id="trackName">Capitulation</span>
-                <span class="track-time" id="currentTime">0:00</span>
-            </div>
+            <!-- МИНИ-ПЛЕЕР УБРАН! -->
         </div>
         <div class="right">
             <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
@@ -60,7 +53,7 @@
         <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
     </div>
 
-    <!-- ===== САЙДБАР (АККОРДЕОН) ===== -->
+    <!-- ===== САЙДБАР ===== -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h3>📱 Меню</h3>
@@ -74,7 +67,6 @@
             </div>
         </div>
 
-        <!-- ===== ГЛАВНЫЕ РАЗДЕЛЫ ===== -->
         <div class="sidebar-nav main-nav">
             <div class="nav-item active" onclick="goToFeed();closeSidebar()">🏠 Главная</div>
             <div class="nav-item" onclick="goToProfile();closeSidebar()">👤 Профиль</div>
@@ -82,10 +74,7 @@
             <div class="nav-item" onclick="goToGroups();closeSidebar()">💬 Сообщества</div>
         </div>
 
-        <!-- ===== АККОРДЕОН ===== -->
         <div class="accordion">
-
-            <!-- Мультимедиа -->
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-icon">🎵</span>
@@ -99,8 +88,6 @@
                     <div class="nav-item" onclick="closeSidebar()">📚 Книги</div>
                 </div>
             </div>
-
-            <!-- Технологии -->
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-icon">💻</span>
@@ -118,8 +105,6 @@
                     <div class="nav-item" onclick="closeSidebar()">🧩 API / SDK</div>
                 </div>
             </div>
-
-            <!-- Бизнес -->
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-icon">💰</span>
@@ -136,8 +121,6 @@
                     <div class="nav-item" onclick="closeSidebar()">🚀 Стартапы</div>
                 </div>
             </div>
-
-            <!-- Жизнь -->
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-icon">🌍</span>
@@ -162,8 +145,6 @@
                     <div class="nav-item" onclick="closeSidebar()">🎯 Хобби</div>
                 </div>
             </div>
-
-            <!-- Общение -->
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-icon">💬</span>
@@ -178,8 +159,6 @@
                     <div class="nav-item" onclick="closeSidebar()">❓ Q&A</div>
                 </div>
             </div>
-
-            <!-- Новости -->
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-icon">📰</span>
@@ -195,8 +174,6 @@
                     <div class="nav-item" onclick="closeSidebar()">🎁 Акции и скидки</div>
                 </div>
             </div>
-
-            <!-- Другое -->
             <div class="accordion-item">
                 <div class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-icon">🔧</span>
@@ -213,7 +190,6 @@
                     <div class="nav-item" onclick="closeSidebar()">🏴‍☠️ METAIMPERIYA</div>
                 </div>
             </div>
-
         </div>
 
         <div class="sidebar-footer">
@@ -226,16 +202,14 @@
     <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <div class="container">
 
-        <!-- ===== ВЫДВИЖНОЙ WINAMP-ПЛЕЕР ===== -->
+        <!-- ===== ВЫДВИЖНОЙ ПЛЕЕР (ТОРЧИТ ИЗ-ПОД ШАПКИ) ===== -->
         <div class="player-drawer" id="playerDrawer">
-            <!-- КНОПКА ДЛЯ ВЫДВИЖЕНИЯ (ручка) -->
             <div class="player-handle" id="playerHandle" onclick="toggleDrawer()">
                 <div class="handle-bar"></div>
                 <div class="handle-label">🎵 ПЛЕЕР</div>
             </div>
             
             <div class="player-content">
-                <!-- Эквалайзер -->
                 <div class="equalizer">
                     <div class="eq-bar" style="height:15px;animation-delay:0s"></div>
                     <div class="eq-bar" style="height:25px;animation-delay:0.1s"></div>
@@ -248,13 +222,11 @@
                     <div class="eq-bar" style="height:15px;animation-delay:0.8s"></div>
                 </div>
 
-                <!-- Информация о треке с бегущей строкой -->
                 <div class="player-track-info">
                     <div class="player-track-name marquee-text" id="drawerTrackName">Capitulation</div>
                     <div class="player-artist">METAIMPERIYA</div>
                 </div>
 
-                <!-- Прогресс -->
                 <div class="player-progress">
                     <div class="player-progress-bar" id="drawerProgressBar">
                         <div class="player-progress-fill" id="drawerProgressFill" style="width:0%"></div>
@@ -265,7 +237,6 @@
                     </div>
                 </div>
 
-                <!-- Кнопки управления -->
                 <div class="player-controls">
                     <button class="player-btn" onclick="playPrev()">⏮</button>
                     <button class="player-btn play-large" id="drawerPlayBtn" onclick="togglePlay()">▶</button>
@@ -274,7 +245,6 @@
                     <button class="player-btn" onclick="downloadCurrentTrack()">⬇️</button>
                 </div>
 
-                <!-- Список песен -->
                 <div class="player-playlist" id="drawerPlaylist" style="display:none;">
                     <div class="playlist-item active" onclick="playTrack(0)">01 Capitulation</div>
                     <div class="playlist-item" onclick="playTrack(1)">02 Clean Victory</div>
@@ -310,7 +280,6 @@
             <div id="feed"></div>
         </div>
 
-        <!-- ГРУППЫ -->
         <div class="page" id="page-groups">
             <div class="card">
                 <h3>👥 Группы</h3>
@@ -318,7 +287,6 @@
             </div>
         </div>
 
-        <!-- ЛЮДИ -->
         <div class="page" id="page-people">
             <div class="card">
                 <h3>👤 Все пользователи</h3>
@@ -326,7 +294,6 @@
             </div>
         </div>
 
-        <!-- ПРОФИЛЬ -->
         <div class="page" id="page-profile">
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()">
@@ -352,7 +319,6 @@
             <div id="profilePosts"></div>
         </div>
 
-        <!-- ЧАТ -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
@@ -366,7 +332,6 @@
 
     <!-- ===== МОДАЛКИ ===== -->
     
-    <!-- Вход -->
     <div class="modal" id="loginModal">
         <div class="modal-box">
             <h3>👤 Вход</h3>
@@ -382,7 +347,6 @@
         </div>
     </div>
 
-    <!-- Редактирование профиля -->
     <div class="modal" id="editProfileModal">
         <div class="modal-box">
             <h3>✏️ Редактировать профиль</h3>
@@ -395,7 +359,6 @@
         </div>
     </div>
 
-    <!-- Редактирование поста -->
     <div class="modal" id="editModal">
         <div class="modal-box">
             <h3>✏️ Редактировать пост</h3>
@@ -421,7 +384,6 @@
         </div>
     </div>
 
-    <!-- Создание группы -->
     <div class="modal" id="createRoomModal">
         <div class="modal-box">
             <h3>📝 Новая группа</h3>
@@ -433,7 +395,6 @@
         </div>
     </div>
 
-    <!-- Админ -->
     <div class="modal" id="adminModal">
         <div class="modal-box">
             <h3>🏴‍☠️ Админ</h3>
@@ -445,7 +406,6 @@
         </div>
     </div>
 
-    <!-- Уведомления -->
     <div class="modal" id="notificationsModal">
         <div class="modal-box">
             <h3>🔔 Уведомления <button class="close-btn" onclick="closeNotifications()">✕</button></h3>
@@ -453,12 +413,10 @@
         </div>
     </div>
 
-    <!-- Админ-точка -->
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
 </div>
 
-<!-- ===== JAVASCRIPT ===== -->
 <script src="js/firebase.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/player.js"></script>
