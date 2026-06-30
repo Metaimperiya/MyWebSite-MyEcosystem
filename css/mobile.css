@@ -8,7 +8,7 @@
     }
     
     .topbar .left .logo {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
     }
     
     .topbar .left .menu-btn {
@@ -24,14 +24,30 @@
         height: 24px;
     }
     
+    /* Колокольчик еще меньше на мобилке */
+    .notif-btn {
+        font-size: 0.8rem;
+        width: 24px;
+        height: 24px;
+    }
+    
+    #notifBadge {
+        font-size: 0.4rem;
+        min-width: 14px;
+        height: 14px;
+        line-height: 14px;
+        top: -3px;
+        right: -3px;
+    }
+    
     .player-mini {
-        max-width: 150px;
+        max-width: 130px;
         padding: 2px 6px;
     }
     
     .player-mini .track-name {
-        max-width: 40px;
-        font-size: 0.5rem;
+        max-width: 35px;
+        font-size: 0.45rem;
     }
     
     .player-mini .play-btn {
@@ -40,31 +56,39 @@
         font-size: 7px;
     }
     
+    .player-mini .playlist-btn {
+        font-size: 0.6rem;
+    }
+    
     .tab-bar .tab {
-        font-size: 0.55rem;
-        padding: 4px 8px;
+        font-size: 0.5rem;
+        padding: 4px 6px;
     }
     
     .container {
-        padding: 6px 8px 50px;
+        padding: 6px 6px 50px;
     }
     
     .post .link-preview iframe {
-        height: 180px;
+        height: 160px;
     }
     
     .group-list {
         grid-template-columns: 1fr 1fr;
+        gap: 4px;
     }
     
     .playlist-dropdown {
-        min-width: 130px;
+        min-width: 120px;
         right: 0;
+        top: 44px;
     }
     
     .sidebar {
-        width: 280px;
-        left: -280px;
+        width: 260px;
+        left: -260px;
+        top: 44px;
+        height: calc(100% - 44px);
     }
     
     .comment-item .avatar-wrap {
