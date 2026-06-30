@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ (обновлённая версия)
+// ЛЕНТА И ПОСТЫ (ЧИСТОВАЯ ВЕРСИЯ)
 // ================================================================
 
 // ================================================================
@@ -55,7 +55,7 @@ function loadFeed() {
 }
 
 // ================================================================
-// 3. ОТПРАВКА ПОСТА - ИСПРАВЛЕННАЯ
+// 3. ОТПРАВКА ПОСТА
 // ================================================================
 
 window.submitPost = function() {
@@ -66,7 +66,6 @@ window.submitPost = function() {
 
     var text = document.getElementById('postInput').value.trim();
 
-    // Если нет ни текста, ни фото — блокируем
     if (!text && !pendingImageFile) {
         alert('Введите текст или добавьте фото');
         return;
@@ -77,7 +76,7 @@ window.submitPost = function() {
     var postData = {
         author: USER,
         authorUid: USER_UID,
-        text: text || '📷',          // если текста нет — иконка
+        text: text || '📷',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now(),
         likes: 0,
@@ -88,14 +87,12 @@ window.submitPost = function() {
         buttons: [],
         frameSize: 'small',
         edited: false,
-        img: null                    // по умолчанию null
+        img: null
     };
 
-    // Ссылка, если есть
     var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
     if (linkMatch) postData.link = linkMatch[1];
 
-    // Если есть фото — отправляем с фото
     if (pendingImageFile) {
         var reader = new FileReader();
         reader.onload = function(e) {
@@ -105,7 +102,6 @@ window.submitPost = function() {
         };
         reader.readAsDataURL(pendingImageFile);
     } else {
-        // Фото нет — отправляем только текст
         db.ref('sites/' + SITE + '/feed_posts').push(postData);
         clearPostForm();
     }
@@ -166,7 +162,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// 6. РЕНДЕР ПОСТА — СТРОКА ВВОДА ВНИЗУ, БЕЗ FIXED
+// 6. РЕНДЕР ПОСТА — СТРОКА ВВОДА ВНИЗУ
 // ================================================================
 
 function renderPost(p, type) {
@@ -215,18 +211,13 @@ function renderPost(p, type) {
 
     var actionsHtml = '<div class="stats"><button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button><button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button></div>';
 
-    // ===== КОММЕНТАРИИ — СТРОКА ВВОДА ВНИЗУ =====
-    // 👇 comments-wrapper скрыт по умолчанию (display: none)
-    // 👇 строка ввода идёт ПОСЛЕ списка — браузер сам сдвинет её вниз при открытии
     var commentsHtml = `
         <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;">
             <div class="comments" id="comments_${p.id}">
                 <div class="comments-body" id="commentsBody_${p.id}">
-                    <!-- СПИСОК КОММЕНТАРИЕВ -->
                     <div class="comments-list" id="commentsList_${p.id}">
                         <div id="commentsContainer_${p.id}"></div>
                     </div>
-                    <!-- СТРОКА ВВОДА — ВНИЗУ, В ПОТОКЕ -->
                     <div class="comment-input-wrap" id="commentInputWrap_${p.id}">
                         <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
                         <button onclick="submitComment('${p.id}', '${type}')">→</button>
@@ -248,7 +239,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// 7. ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ — ПРОСТО display: none/block
+// 7. ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ
 // ================================================================
 
 window.toggleComments = function(postId, type) {
@@ -273,7 +264,7 @@ window.toggleComments = function(postId, type) {
 };
 
 // ================================================================
-// 8. ЗАГРУЗКА КОММЕНТАРИЕВ — БЕЗ ЛИМИТОВ
+// 8. ЗАГРУЗКА КОММЕНТАРИЕВ
 // ================================================================
 
 function loadComments(postId, type) {
@@ -289,7 +280,6 @@ function loadComments(postId, type) {
             return (data[a].timestamp || 0) - (data[b].timestamp || 0);
         });
 
-        // ✅ Загружаем ВСЕ комментарии, без лимитов
         state.allComments = keys.map(function(k) {
             return { id: k, ...data[k] };
         });
@@ -316,7 +306,6 @@ function renderComments(postId, type) {
         return;
     }
 
-    // ✅ БЕЗ "ПОКАЗАТЬ ЕЩЁ" — грузим все
     var html = '';
     state.allComments.forEach(function(c) {
         var letter = (c.author || '?').charAt(0).toUpperCase();
@@ -329,13 +318,10 @@ function renderComments(postId, type) {
         html += '<span class="name">' + esc(c.author || 'Аноним') + '</span>';
         html += '<span class="time">' + (c.time || '') + (c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>';
         html += '<div class="text" id="comment-text-' + c.id + '">' + esc(c.text || '') + '</div>';
-
-        // ✅ КНОПКА ЛАЙКА ДЛЯ КОММЕНТАРИЯ
         html += '<div class="comment-actions-row">';
         html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
         html += '</div>';
-
-        html += '</div>'; // .body
+        html += '</div>';
 
         if (canEdit) {
             html += '<div class="comment-actions">';
@@ -347,7 +333,7 @@ function renderComments(postId, type) {
             html += '</div>';
         }
 
-        html += '</div>'; // .comment-item
+        html += '</div>';
     });
 
     container.innerHTML = html;
@@ -361,7 +347,7 @@ function renderComments(postId, type) {
 }
 
 // ================================================================
-// 10. ЛАЙК КОММЕНТАРИЯ — НОВАЯ ФУНКЦИЯ
+// 10. ЛАЙК КОММЕНТАРИЯ
 // ================================================================
 
 window.toggleLikeComment = function(postId, commentId) {
@@ -375,7 +361,6 @@ window.toggleLikeComment = function(postId, commentId) {
         return (likes || 0) + 1;
     });
 
-    // Обновляем счётчик на странице
     var countEl = document.getElementById('commentLikeCount_' + commentId);
     if (countEl) {
         var current = parseInt(countEl.textContent) || 0;
@@ -446,7 +431,7 @@ window.deleteComment = function(postId, commentId, type) {
 };
 
 // ================================================================
-// 14. МЕНЮ КОММЕНТАРИЯ (три точки)
+// 14. МЕНЮ КОММЕНТАРИЯ
 // ================================================================
 
 window.toggleCommentMenu = function(commentId) {
@@ -630,7 +615,7 @@ window.closeEdit = function() {
 };
 
 // ================================================================
-// 18. МЕНЮ ПОСТА (три точки)
+// 18. МЕНЮ ПОСТА
 // ================================================================
 
 window.togglePostMenu = function(id) {
@@ -658,91 +643,3 @@ window.searchByTag = function(tag) {
         input.focus();
     }
 };
-
-// ================================================================
-// ДОПОЛНИТЕЛЬНЫЙ ФУНКЦИОНАЛ ДЛЯ КОММЕНТАРИЕВ
-// ================================================================
-
-// ================================================================
-// 19. ЛАЙК КОММЕНТАРИЯ — РАБОТАЕТ ЧЕРЕЗ ТРАНЗАКЦИЮ
-// ================================================================
-
-window.toggleLikeComment = function(postId, commentId) {
-    if (!USER) {
-        alert('Войдите!');
-        return;
-    }
-
-    var ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/comments/' + commentId + '/likes');
-    ref.transaction(function(likes) {
-        return (likes || 0) + 1;
-    });
-
-    // Обновляем счётчик на странице
-    var countEl = document.getElementById('commentLikeCount_' + commentId);
-    if (countEl) {
-        var current = parseInt(countEl.textContent) || 0;
-        countEl.textContent = current + 1;
-    }
-};
-
-// ================================================================
-// 20. ОБНОВЛЁННЫЙ РЕНДЕР КОММЕНТАРИЕВ — С ЛАЙКАМИ
-// ================================================================
-
-// Эту функцию нужно ЗАМЕНИТЬ (она уже есть в твоём файле, просто обновляем)
-// Найди функцию renderComments и замени её на эту:
-
-function renderComments(postId, type) {
-    var state = getCommentState(postId);
-    var container = document.getElementById('commentsContainer_' + postId);
-    if (!container) return;
-
-    if (!state.allComments.length) {
-        container.innerHTML = '<div class="no-comments">Нет комментариев</div>';
-        return;
-    }
-
-    // ✅ БЕЗ "ПОКАЗАТЬ ЕЩЁ" — грузим все
-    var html = '';
-    state.allComments.forEach(function(c) {
-        var letter = (c.author || '?').charAt(0).toUpperCase();
-        var canEdit = (c.author === USER || isAdmin);
-        var likes = c.likes || 0;
-
-        html += '<div class="comment-item" data-id="' + c.id + '">';
-        html += '<span class="avatar-wrap" id="comment-avatar-' + c.id + '"><span class="letter">' + letter + '</span></span>';
-        html += '<div class="body">';
-        html += '<span class="name">' + esc(c.author || 'Аноним') + '</span>';
-        html += '<span class="time">' + (c.time || '') + (c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>';
-        html += '<div class="text" id="comment-text-' + c.id + '">' + esc(c.text || '') + '</div>';
-
-        // ✅ КНОПКА ЛАЙКА ДЛЯ КОММЕНТАРИЯ
-        html += '<div class="comment-actions-row">';
-        html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
-        html += '</div>';
-
-        html += '</div>'; // .body
-
-        if (canEdit) {
-            html += '<div class="comment-actions">';
-            html += '<button class="more-btn" onclick="toggleCommentMenu(\'' + c.id + '\')">⋮</button>';
-            html += '<div class="dropdown" id="commentMenu_' + c.id + '">';
-            html += '<button class="edit-btn" onclick="editComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">✏️ Редактировать</button>';
-            html += '<button class="del-btn" onclick="deleteComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">🗑 Удалить</button>';
-            html += '</div>';
-            html += '</div>';
-        }
-
-        html += '</div>'; // .comment-item
-    });
-
-    container.innerHTML = html;
-
-    state.allComments.forEach(function(c) {
-        var avatarEl = document.getElementById('comment-avatar-' + c.id);
-        if (avatarEl && c.authorUid) {
-            renderAvatar(c.authorUid, avatarEl, (c.author || '?').charAt(0).toUpperCase());
-        }
-    });
-}
