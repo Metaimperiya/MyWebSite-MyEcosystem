@@ -1,5 +1,5 @@
 // ================================================================
-// ПЛЕЕР
+// МУЗЫКАЛЬНЫЙ ПЛЕЕР
 // ================================================================
 
 const PLAYLIST = [
@@ -14,20 +14,23 @@ const PLAYLIST = [
     { name: 'You Can\'t See Me', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/you_cant_see_me.mp3' }
 ];
 
-let currentTrack = 0, isPlaying = false, audio = null;
+let currentTrack = 0;
+let isPlaying = false;
+let audio = null;
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
 
 function initAudio() {
     if (!audio) {
         audio = new Audio(PLAYLIST[currentTrack].url);
         audio.crossOrigin = 'anonymous';
         audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('ended', () => {
+        audio.addEventListener('ended', function() {
             currentTrack = (currentTrack + 1) % PLAYLIST.length;
             audio.src = PLAYLIST[currentTrack].url;
-            audio.play().catch(() => {});
+            audio.play().catch(function() {});
             document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
             updatePlaylistActive();
-            updateProgress();
         });
     }
     document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
@@ -39,49 +42,52 @@ function updateProgress() {
     document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
 }
 
-function formatTime(seconds) {
-    if (!seconds || isNaN(seconds)) return '0:00';
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return min + ':' + (sec < 10 ? '0' : '') + sec;
-}
+// ===== УПРАВЛЕНИЕ =====
 
-function togglePlaylist() {
-    document.getElementById('playlistDropdown').classList.toggle('open');
-}
-
-function playTrack(index) {
-    if (index === currentTrack && isPlaying) { playMusic(); return; }
-    currentTrack = index;
-    if (audio) {
-        audio.src = PLAYLIST[currentTrack].url;
-        if (isPlaying) audio.play().catch(() => {});
-    } else {
-        initAudio();
-        playMusic();
-    }
-    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
-    updatePlaylistActive();
-}
-
-function updatePlaylistActive() {
-    document.querySelectorAll('.playlist-item').forEach((el, i) => {
-        el.classList.toggle('active', i === currentTrack);
-    });
-}
-
-window.playMusic = function() {
+window.togglePlay = function() {
     initAudio();
     if (!audio) return;
+    
     if (isPlaying) {
         audio.pause();
         isPlaying = false;
         document.getElementById('playBtn').textContent = '▶';
     } else {
-        audio.play().catch(e => console.log('Ошибка:', e));
+        audio.play().catch(function(e) { console.log('Ошибка:', e); });
         isPlaying = true;
         document.getElementById('playBtn').textContent = '⏸';
     }
 };
 
+window.togglePlaylist = function() {
+    document.getElementById('playlistDropdown').classList.toggle('open');
+};
+
+window.playTrack = function(index) {
+    if (index === currentTrack && isPlaying) {
+        togglePlay();
+        return;
+    }
+    
+    currentTrack = index;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (isPlaying) audio.play().catch(function() {});
+    } else {
+        initAudio();
+        togglePlay();
+    }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+};
+
+function updatePlaylistActive() {
+    var items = document.querySelectorAll('.playlist-item');
+    items.forEach(function(el, i) {
+        if (i === currentTrack) el.classList.add('active');
+        else el.classList.remove('active');
+    });
+}
+
+// Запускаем
 initAudio();
