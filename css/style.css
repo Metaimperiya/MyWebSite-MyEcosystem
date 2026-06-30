@@ -791,19 +791,20 @@ body {
    ================================================================ */
 
 .player-drawer {
-    position: fixed;
-    top: 0;
+    position: sticky;
+    top: 48px;
     left: 0;
     right: 0;
     background: #1a1a2e;
     border-radius: 0 0 16px 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    z-index: 50;
     transform: translateY(-100%);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 80vh;
+    margin: 0 -8px;
+    padding: 0 8px;
     overflow: hidden;
-    padding-top: 56px;
+    max-height: 80vh;
 }
 
 .player-drawer.open {
@@ -820,10 +821,6 @@ body {
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
-    position: absolute;
-    bottom: 8px;
-    left: 0;
-    right: 0;
 }
 
 .player-handle:active {
@@ -844,28 +841,28 @@ body {
 
 /* Контент плеера */
 .player-content {
-    padding: 0 16px 16px 16px;
+    padding: 0 8px 16px 8px;
 }
 
 .player-content .player-track-info {
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .player-content .player-track-name {
     color: #fff;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 700;
 }
 
 .player-content .player-artist {
     color: #888;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     margin-top: 1px;
 }
 
 .player-content .player-progress {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .player-content .player-progress-bar {
@@ -889,7 +886,7 @@ body {
     display: flex;
     justify-content: space-between;
     color: #666;
-    font-size: 0.55rem;
+    font-size: 0.5rem;
     margin-top: 2px;
 }
 
@@ -898,14 +895,14 @@ body {
     justify-content: center;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .player-content .player-btn {
     background: none;
     border: none;
     color: #888;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 50%;
@@ -918,7 +915,7 @@ body {
 }
 
 .player-content .player-btn.play-large {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: #1877f2;
     padding: 0 2px;
 }
@@ -930,15 +927,15 @@ body {
 
 .player-content .player-playlist {
     border-top: 1px solid #2a2a4a;
-    padding-top: 8px;
-    max-height: 150px;
+    padding-top: 6px;
+    max-height: 120px;
     overflow-y: auto;
 }
 
 .player-content .player-playlist .playlist-item {
     color: #888;
-    font-size: 0.65rem;
-    padding: 3px 8px;
+    font-size: 0.6rem;
+    padding: 2px 8px;
     border-radius: 4px;
     cursor: pointer;
     transition: 0.15s;
