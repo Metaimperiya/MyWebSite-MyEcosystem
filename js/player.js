@@ -551,3 +551,24 @@ window.addEventListener('resize', function() {
 document.addEventListener('DOMContentLoaded', function() {
     initAudio();
 });
+
+// ================================================================
+// КЛИК ПО ПРОГРЕСС-БАРУ (ПЕРЕМОТКА)
+// ================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    var progressBar = document.getElementById('drawerProgressBar');
+    if (!progressBar) return;
+    
+    progressBar.addEventListener('click', function(e) {
+        if (!audio || !audio.duration) return;
+        
+        var rect = this.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var percent = x / rect.width;
+        var newTime = percent * audio.duration;
+        
+        audio.currentTime = newTime;
+        updateDrawerProgress();
+    });
+});
