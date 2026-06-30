@@ -120,7 +120,6 @@ body {
     padding: 0 2px;
 }
 
-/* ===== КОЛОКОЛЬЧИК ===== */
 .notif-btn {
     background: none;
     border: none;
@@ -161,7 +160,6 @@ body {
     border: 2px solid #fff;
 }
 
-/* ===== ТРИ ТОЧКИ ===== */
 .menu-dots {
     background: none;
     border: none;
@@ -543,28 +541,6 @@ body {
 }
 
 /* ================================================================
-   АДМИН ДОТ
-   ================================================================ */
-
-.admin-dot {
-    position: fixed;
-    bottom: 8px;
-    right: 8px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: 2px solid #ddd;
-    cursor: pointer;
-    background: #f0f0f0;
-    z-index: 99;
-}
-
-.admin-dot.active {
-    background: #e67e22;
-    border-color: #e67e22;
-}
-
-/* ================================================================
    ЧАТ
    ================================================================ */
 
@@ -738,7 +714,7 @@ body {
 }
 
 /* ================================================================
-   ВЫДВИЖНОЙ ПЛЕЕР
+   ВЫДВИЖНОЙ ПЛЕЕР — ТЕПЕРЬ БЕЗ ПРОМЕЖУТКА!
    ================================================================ */
 
 .player-drawer {
@@ -750,16 +726,18 @@ body {
     border-radius: 0 0 16px 16px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     z-index: 50;
-    transform: translateY(calc(-100% + 44px));
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 0;
+    overflow: hidden;
     margin: 0 -8px;
     padding: 0 8px 0 8px;
-    overflow: hidden;
-    max-height: 80vh;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    opacity: 0;
 }
 
 .player-drawer.open {
-    transform: translateY(0);
+    max-height: 80vh;
+    opacity: 1;
+    padding-bottom: 12px;
 }
 
 .player-handle {
@@ -1023,4 +1001,22 @@ body {
     border-bottom: 1px solid #eee;
     padding-bottom: 4px;
     margin-bottom: 4px;
+}
+
+.admin-dot {
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    background: #f0f0f0;
+    z-index: 99;
+}
+
+.admin-dot.active {
+    background: #e67e22;
+    border-color: #e67e22;
 }
