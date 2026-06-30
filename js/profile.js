@@ -188,3 +188,28 @@ window.uploadAvatar = function() {
     };
     input.click();
 };
+
+// ================================================================
+// ОБНОВЛЕНИЕ КНОПКИ ДРУЗЕЙ В ПРОФИЛЕ
+// ================================================================
+
+function showProfileActions(uid) {
+    var actions = document.getElementById('profileActions');
+    if (!uid || uid === USER_UID) {
+        actions.innerHTML = '<button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button><button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>';
+        return;
+    }
+
+    // Определяем статус отношений
+    var status = getFriendStatus(USER_UID, uid);
+
+    if (status === 'friend') {
+        actions.innerHTML = '<button class="friend-btn friend" onclick="removeFriend(\'' + uid + '\')">✅ В друзьях</button>';
+    } else if (status === 'pending_sent') {
+        actions.innerHTML = '<button class="friend-btn pending" onclick="cancelFriendRequest(\'' + uid + '\')">⏳ Запрос отправлен</button>';
+    } else if (status === 'pending_received') {
+        actions.innerHTML = '<button class="friend-btn received" onclick="acceptFriendRequest(\'' + uid + '\')">📩 Принять заявку</button>';
+    } else {
+        actions.innerHTML = '<button class="friend-btn add" onclick="sendFriendRequest(\'' + uid + '\')">➕ Добавить в друзья</button>';
+    }
+}
