@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>METAIMPERIYA — Социальная платформа</title>
     
     <!-- SEO -->
@@ -31,8 +31,7 @@
             <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
         </div>
         <div class="center">
-            <!-- ===== МИНИ-ПЛЕЕР (ВМЕСТО ТАБОВ) ===== -->
-            <div class="player-mini" onclick="toggleFullPlayer()">
+            <div class="player-mini" onclick="toggleDrawer()">
                 <button class="play-btn" id="playBtn" onclick="event.stopPropagation();togglePlay()">▶</button>
                 <span class="track-name" id="trackName">Capitulation</span>
                 <span class="track-time" id="currentTime">0:00</span>
@@ -48,7 +47,7 @@
         </div>
     </header>
 
-    <!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК (ТРИ ТОЧКИ) ===== -->
+    <!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== -->
     <div class="settings-dropdown" id="settingsDropdown">
         <div class="settings-item" onclick="goToProfile();closeSettingsMenu()">👤 Профиль</div>
         <div class="settings-item" onclick="goToPeople();closeSettingsMenu()">👥 Люди</div>
@@ -59,51 +58,6 @@
         <div class="settings-item" onclick="closeSettingsMenu()">❓ Помощь</div>
         <div class="settings-divider"></div>
         <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
-    </div>
-
-    <!-- ===== ПОЛНЫЙ ПЛЕЕР (КАК WINAMP) ===== -->
-    <div class="full-player" id="fullPlayer">
-        <div class="player-overlay" onclick="toggleFullPlayer()"></div>
-        <div class="player-window">
-            <div class="player-header">
-                <span>🎵 METAIMPERIYA PLAYER</span>
-                <button class="player-close" onclick="toggleFullPlayer()">✕</button>
-            </div>
-            <div class="player-content">
-                <div class="player-cover" id="playerCover">
-                    <img src="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-512x512.png" alt="Cover">
-                </div>
-                <div class="player-track-info">
-                    <div class="player-track-name" id="fullTrackName">Capitulation</div>
-                    <div class="player-artist">METAIMPERIYA</div>
-                </div>
-                <div class="player-progress">
-                    <div class="player-progress-bar" id="progressBar">
-                        <div class="player-progress-fill" id="progressFill" style="width:0%"></div>
-                    </div>
-                    <div class="player-time">
-                        <span id="currentTimeFull">0:00</span>
-                        <span id="totalTimeFull">0:00</span>
-                    </div>
-                </div>
-                <div class="player-controls">
-                    <button class="player-btn" onclick="playPrev()">⏮</button>
-                    <button class="player-btn play-large" id="playBtnFull" onclick="togglePlay()">▶</button>
-                    <button class="player-btn" onclick="playNext()">⏭</button>
-                </div>
-                <div class="player-playlist" id="fullPlaylist">
-                    <div class="playlist-item active" onclick="playTrack(0)">01 Capitulation</div>
-                    <div class="playlist-item" onclick="playTrack(1)">02 Clean Victory</div>
-                    <div class="playlist-item" onclick="playTrack(2)">03 Covenant of Change</div>
-                    <div class="playlist-item" onclick="playTrack(3)">04 Dreams in the Wind</div>
-                    <div class="playlist-item" onclick="playTrack(4)">05 Memory Like Dust</div>
-                    <div class="playlist-item" onclick="playTrack(5)">06 Nobody</div>
-                    <div class="playlist-item" onclick="playTrack(6)">07 Touch of Choice</div>
-                    <div class="playlist-item" onclick="playTrack(7)">08 You Are Not in the Game</div>
-                    <div class="playlist-item" onclick="playTrack(8)">09 You Can't See Me</div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- ================================================================
@@ -287,6 +241,45 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- ===== ВЫДВИЖНОЙ ПЛЕЕР (СНИЗУ) ===== -->
+    <div class="player-drawer" id="playerDrawer">
+        <div class="player-handle" id="playerHandle">
+            <div class="handle-bar"></div>
+        </div>
+        <div class="player-content">
+            <div class="player-track-info">
+                <div class="player-track-name" id="drawerTrackName">Capitulation</div>
+                <div class="player-artist">METAIMPERIYA</div>
+            </div>
+            <div class="player-progress">
+                <div class="player-progress-bar" id="drawerProgressBar">
+                    <div class="player-progress-fill" id="drawerProgressFill" style="width:0%"></div>
+                </div>
+                <div class="player-time">
+                    <span id="drawerCurrentTime">0:00</span>
+                    <span id="drawerTotalTime">0:00</span>
+                </div>
+            </div>
+            <div class="player-controls">
+                <button class="player-btn" onclick="playPrev()">⏮</button>
+                <button class="player-btn play-large" id="drawerPlayBtn" onclick="togglePlay()">▶</button>
+                <button class="player-btn" onclick="playNext()">⏭</button>
+                <button class="player-btn" onclick="toggleDrawerPlaylist()">📋</button>
+            </div>
+            <div class="player-playlist" id="drawerPlaylist" style="display:none;">
+                <div class="playlist-item active" onclick="playTrack(0)">01 Capitulation</div>
+                <div class="playlist-item" onclick="playTrack(1)">02 Clean Victory</div>
+                <div class="playlist-item" onclick="playTrack(2)">03 Covenant of Change</div>
+                <div class="playlist-item" onclick="playTrack(3)">04 Dreams in the Wind</div>
+                <div class="playlist-item" onclick="playTrack(4)">05 Memory Like Dust</div>
+                <div class="playlist-item" onclick="playTrack(5)">06 Nobody</div>
+                <div class="playlist-item" onclick="playTrack(6)">07 Touch of Choice</div>
+                <div class="playlist-item" onclick="playTrack(7)">08 You Are Not in the Game</div>
+                <div class="playlist-item" onclick="playTrack(8)">09 You Can't See Me</div>
+            </div>
+        </div>
     </div>
 
     <!-- ===== МОДАЛКИ ===== -->
