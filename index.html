@@ -197,7 +197,7 @@
     <div class="container">
 
         <!-- ===== РУЧКА ПЛЕЕРА (ВСЕГДА ВИДНА) ===== -->
-        <div class="player-handle" id="playerHandle" onclick="toggleDrawer()">
+        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer(); else console.log('Загрузка...')">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
