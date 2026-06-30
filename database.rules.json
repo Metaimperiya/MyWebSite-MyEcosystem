@@ -10,6 +10,10 @@
             ".write": "$uid === auth.uid || auth.token.admin === true"
           }
         },
+        "all_users": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
         "feed_posts": {
           ".read": "auth != null",
           ".write": "auth != null"
@@ -26,6 +30,18 @@
             "$friendId": {
               ".write": "$uid === auth.uid"
             }
+          }
+        },
+        "subscribers": {
+          "$uid": {
+            ".read": "$uid === auth.uid",
+            ".write": "$uid === auth.uid"
+          }
+        },
+        "subscriptions": {
+          "$uid": {
+            ".read": "$uid === auth.uid",
+            ".write": "$uid === auth.uid"
           }
         },
         "notifications": {
