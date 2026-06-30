@@ -134,6 +134,28 @@ window.closeSidebar = function() {
     document.getElementById('overlay').classList.remove('show');
 };
 
+// ================================================================
+// АККОРДЕОН В САЙДБАРЕ (НОВАЯ ФУНКЦИЯ)
+// ================================================================
+
+window.toggleAccordion = function(header) {
+    var item = header.parentElement;
+    var body = item.querySelector('.accordion-body');
+    var arrow = header.querySelector('.accordion-arrow');
+    
+    if (body.style.maxHeight) {
+        // Закрываем
+        body.style.maxHeight = null;
+        body.style.padding = '0 16px';
+        if (arrow) arrow.textContent = '▾';
+    } else {
+        // Открываем
+        body.style.maxHeight = body.scrollHeight + 'px';
+        body.style.padding = '6px 16px 10px 16px';
+        if (arrow) arrow.textContent = '▴';
+    }
+};
+
 // ===== РАЗМЕР ФРЕЙМА =====
 
 window.setFrameSize = function(size) {
