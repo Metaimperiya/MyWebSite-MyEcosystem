@@ -21,6 +21,15 @@ let drawerOpen = false;
 let isDragging = false;
 let drawerStartY = 0;
 
+// ===== ФОРМАТИРОВАНИЕ ВРЕМЕНИ =====
+function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    var min = Math.floor(seconds / 60);
+    var sec = Math.floor(seconds % 60);
+    return min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
 function initAudio() {
     if (!audio) {
         audio = new Audio(PLAYLIST[currentTrack].url);
