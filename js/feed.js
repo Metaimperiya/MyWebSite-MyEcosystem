@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ (ПОЛНОСТЬЮ РАБОЧАЯ ВЕРСИЯ)
+// ЛЕНТА И ПОСТЫ (ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ)
 // ================================================================
 
 const COMMENTS_LIMIT = 5;
@@ -53,7 +53,7 @@ function loadFeed() {
 }
 
 // ================================================================
-// ОТПРАВКА ПОСТА — ИСПРАВЛЕННАЯ ВЕРСИЯ!
+// ОТПРАВКА ПОСТА
 // ================================================================
 
 window.submitPost = function() {
@@ -64,19 +64,17 @@ window.submitPost = function() {
     
     var text = document.getElementById('postInput').value.trim();
     
-    // ✅ ЕСЛИ НЕТ ТЕКСТА И НЕТ КАРТИНКИ — НЕ ОТПРАВЛЯЕМ
     if (!text && !pendingImageFile) {
         alert('Введите текст или добавьте фото');
         return;
     }
     
-    // ✅ ЕСЛИ ЕСТЬ ТЕКСТ ИЛИ КАРТИНКА — ОТПРАВЛЯЕМ
     var hashtags = extractHashtags(text);
     
     var postData = {
         author: USER,
         authorUid: USER_UID,
-        text: text || '📷',  // Если нет текста, ставим иконку фото
+        text: text || '📷',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now(),
         likes: 0,
@@ -89,11 +87,9 @@ window.submitPost = function() {
         edited: false
     };
     
-    // Если есть ссылка в тексте — сохраняем
     var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
     if (linkMatch) postData.link = linkMatch[1];
     
-    // ✅ ЕСТЬ КАРТИНКА — загружаем как base64
     if (pendingImageFile) {
         var reader = new FileReader();
         reader.onload = function(e) {
@@ -103,7 +99,6 @@ window.submitPost = function() {
         };
         reader.readAsDataURL(pendingImageFile);
     } else {
-        // ✅ НЕТ КАРТИНКИ — просто отправляем текст
         db.ref('sites/' + SITE + '/feed_posts').push(postData);
         clearPostForm();
     }
@@ -213,7 +208,22 @@ function renderPost(p, type) {
     
     var actionsHtml = '<div class="stats"><button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button><button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button></div>';
     
-    var commentsHtml = '<div class="comments-wrapper" id="commentsWrapper_' + p.id + '"><div class="comment-input-wrap"><input type="text" id="commentInput_' + p.id + '" placeholder="Написать комментарий..."><button onclick="submitComment(\'' + p.id + '\', \'' + type + '\')">→</button></div><div class="comments" id="comments_' + p.id + '"><div class="comments-body" id="commentsBody_' + p.id + '"><div class="comments-list" id="commentsList_' + p.id + '"><div id="commentsContainer_' + p.id + '"></div></div></div></div></div>';
+    // Строка ввода ВНИЗУ, под комментариями
+    var commentsHtml = `
+        <div class="comments-wrapper" id="commentsWrapper_${p.id}">
+            <div class="comments" id="comments_${p.id}">
+                <div class="comments-body" id="commentsBody_${p.id}">
+                    <div class="comments-list" id="commentsList_${p.id}">
+                        <div id="commentsContainer_${p.id}"></div>
+                    </div>
+                    <div class="comment-input-wrap" id="commentInputWrap_${p.id}">
+                        <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
+                        <button onclick="submitComment('${p.id}', '${type}')">→</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
     
     div.innerHTML = menuHtml + marqueeHtml + '<div class="author">' + avatarHtml + '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span><span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span></div><div class="text">' + textHtml + '</div>' + imgHtml + buttonsHtml + previewHtml + hashtagsHtml + actionsHtml + commentsHtml;
     
@@ -251,7 +261,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// КОММЕНТАРИИ
+// ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ (С АВТО-ПРОКРУТКОЙ)
 // ================================================================
 
 window.toggleComments = function(postId, type) {
@@ -267,10 +277,17 @@ window.toggleComments = function(postId, type) {
         loadComments(postId, type);
         setTimeout(function() {
             var input = document.getElementById('commentInput_' + postId);
-            if (input) input.focus();
-        }, 300);
+            if (input) {
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 400);
     }
 };
+
+// ================================================================
+// ЗАГРУЗКА КОММЕНТАРИЕВ
+// ================================================================
 
 function loadComments(postId, type) {
     var path = getPostPath(type);
@@ -296,6 +313,10 @@ function loadComments(postId, type) {
         renderComments(postId, type);
     });
 }
+
+// ================================================================
+// РЕНДЕР КОММЕНТАРИЕВ
+// ================================================================
 
 function renderComments(postId, type) {
     var state = getCommentState(postId);
@@ -345,6 +366,10 @@ window.showAllComments = function(postId, type) {
     renderComments(postId, type);
 };
 
+// ================================================================
+// ОТПРАВКА КОММЕНТАРИЯ
+// ================================================================
+
 window.submitComment = function(postId, type) {
     if (!USER) {
         alert('Войдите!');
@@ -373,6 +398,10 @@ window.submitComment = function(postId, type) {
     }
 };
 
+// ================================================================
+// УДАЛЕНИЕ КОММЕНТАРИЯ
+// ================================================================
+
 window.deleteComment = function(postId, commentId, type) {
     if (!confirm('🗑 Удалить комментарий?')) return;
     var path = getPostPath(type);
@@ -380,6 +409,10 @@ window.deleteComment = function(postId, commentId, type) {
     var menu = document.getElementById('commentMenu_' + commentId);
     if (menu) menu.classList.remove('open');
 };
+
+// ================================================================
+// МЕНЮ КОММЕНТАРИЯ
+// ================================================================
 
 window.toggleCommentMenu = function(commentId) {
     var menu = document.getElementById('commentMenu_' + commentId);
@@ -397,6 +430,10 @@ document.addEventListener('click', function(e) {
         });
     }
 });
+
+// ================================================================
+// РЕДАКТИРОВАНИЕ КОММЕНТАРИЯ
+// ================================================================
 
 function editComment(postId, commentId, type) {
     var textEl = document.getElementById('comment-text-' + commentId);
