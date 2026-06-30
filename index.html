@@ -197,7 +197,7 @@
     <div class="container">
 
         <!-- ===== РУЧКА ПЛЕЕРА (ВСЕГДА ВИДНА) ===== -->
-        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer(); else console.log('Загрузка...')">
+        <div class="player-handle" id="playerHandle">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
@@ -420,6 +420,24 @@
 <script src="js/chat.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var handle = document.getElementById('playerHandle');
+        if (handle) {
+            handle.addEventListener('click', function() {
+                if (window.toggleDrawer) {
+                    window.toggleDrawer();
+                } else {
+                    console.log('Плеер загружается...');
+                    setTimeout(function() {
+                        if (window.toggleDrawer) window.toggleDrawer();
+                    }, 300);
+                }
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
