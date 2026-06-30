@@ -1,9 +1,12 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ (ПОЛНАЯ РАБОЧАЯ ВЕРСИЯ)
+// ЛЕНТА И ПОСТЫ - ПОЛНАЯ ПЕРЕПИСАННАЯ ВЕРСИЯ
 // ================================================================
 
-const COMMENTS_LIMIT = 5;
-var commentStates = {};
+// ================================================================
+// 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ================================================================
+
+var commentStates = {}; // Хранит состояние комментариев для каждого поста
 
 function getPostPath(type) {
     if (type === 'group') return 'group_posts/' + currentGroup;
@@ -14,15 +17,14 @@ function getCommentState(postId) {
     if (!commentStates[postId]) {
         commentStates[postId] = {
             open: false,
-            allComments: [],
-            showAll: false
+            allComments: []
         };
     }
     return commentStates[postId];
 }
 
 // ================================================================
-// ЗАГРУЗКА ЛЕНТЫ
+// 2. ЗАГРУЗКА ЛЕНТЫ
 // ================================================================
 
 function loadFeed() {
@@ -53,7 +55,7 @@ function loadFeed() {
 }
 
 // ================================================================
-// ОТПРАВКА ПОСТА
+// 3. ОТПРАВКА ПОСТА - НОВАЯ ЛОГИКА
 // ================================================================
 
 window.submitPost = function() {
@@ -64,17 +66,18 @@ window.submitPost = function() {
     
     var text = document.getElementById('postInput').value.trim();
     
+    // Если нет ни текста, ни картинки - не отправляем
     if (!text && !pendingImageFile) {
         alert('Введите текст или добавьте фото');
         return;
     }
     
+    // Собираем данные поста
     var hashtags = extractHashtags(text);
-    
     var postData = {
         author: USER,
         authorUid: USER_UID,
-        text: text || '📷',
+        text: text || '📷',  // Если нет текста - ставим иконку
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now(),
         likes: 0,
@@ -84,12 +87,15 @@ window.submitPost = function() {
         link: null,
         buttons: [],
         frameSize: 'small',
-        edited: false
+        edited: false,
+        img: null  // По умолчанию img = null
     };
     
+    // Если есть ссылка в тексте - сохраняем
     var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
     if (linkMatch) postData.link = linkMatch[1];
     
+    // Если есть картинка - загружаем как base64
     if (pendingImageFile) {
         var reader = new FileReader();
         reader.onload = function(e) {
@@ -99,13 +105,14 @@ window.submitPost = function() {
         };
         reader.readAsDataURL(pendingImageFile);
     } else {
+        // Нет картинки - отправляем с img = null
         db.ref('sites/' + SITE + '/feed_posts').push(postData);
         clearPostForm();
     }
 };
 
 // ================================================================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 // ================================================================
 
 function extractHashtags(text) {
@@ -130,7 +137,7 @@ window.removeImage = function() {
 };
 
 // ================================================================
-// ЗАГРУЗКА КАРТИНКИ В ПОСТ
+// 5. ЗАГРУЗКА КАРТИНКИ В ПОСТ
 // ================================================================
 
 document.getElementById('fileInput').addEventListener('change', function(e) {
@@ -159,7 +166,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// РЕНДЕР ПОСТА
+// 6. РЕНДЕР ПОСТА - СТРОКА ВВОДА ВНИЗУ, БЕЗ FIXED
 // ================================================================
 
 function renderPost(p, type) {
@@ -208,14 +215,19 @@ function renderPost(p, type) {
     
     var actionsHtml = '<div class="stats"><button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button><button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button></div>';
     
-    // Строка ввода ВНИЗУ, под комментариями
+    // ===== КОММЕНТАРИИ - СТРОКА ВВОДА ВНИЗУ, ОБЫЧНЫЙ БЛОК =====
+    // comments-wrapper по умолчанию скрыт (display: none)
+    // При нажатии на 💬 он становится display: block
+    // Строка ввода находится ПОСЛЕ списка комментариев - браузер сам сдвигает её вниз
     var commentsHtml = `
-        <div class="comments-wrapper" id="commentsWrapper_${p.id}">
+        <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;">
             <div class="comments" id="comments_${p.id}">
                 <div class="comments-body" id="commentsBody_${p.id}">
+                    <!-- СНАЧАЛА СПИСОК КОММЕНТАРИЕВ -->
                     <div class="comments-list" id="commentsList_${p.id}">
                         <div id="commentsContainer_${p.id}"></div>
                     </div>
+                    <!-- ПОТОМ СТРОКА ВВОДА - БУДЕТ ВНИЗУ ЕСТЕСТВЕННЫМ ПУТЕМ -->
                     <div class="comment-input-wrap" id="commentInputWrap_${p.id}">
                         <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
                         <button onclick="submitComment('${p.id}', '${type}')">→</button>
@@ -237,7 +249,147 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// ЛАЙКИ
+// 7. ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ - ПРОСТО ТОГГЛ display
+// ================================================================
+
+window.toggleComments = function(postId, type) {
+    var state = getCommentState(postId);
+    state.open = !state.open;
+    
+    var wrapper = document.getElementById('commentsWrapper_' + postId);
+    if (wrapper) {
+        // Просто переключаем display: none/block - браузер сам всё сдвинет
+        wrapper.style.display = state.open ? 'block' : 'none';
+    }
+    
+    if (state.open) {
+        loadComments(postId, type);
+        setTimeout(function() {
+            var input = document.getElementById('commentInput_' + postId);
+            if (input) {
+                input.focus();
+                // Плавно прокручиваем к полю ввода
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 400);
+    }
+};
+
+// ================================================================
+// 8. ЗАГРУЗКА КОММЕНТАРИЕВ - БЕЗ ЛИМИТОВ
+// ================================================================
+
+function loadComments(postId, type) {
+    var path = getPostPath(type);
+    var state = getCommentState(postId);
+    
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').orderByChild('timestamp').on('value', function(snap) {
+        var container = document.getElementById('commentsContainer_' + postId);
+        if (!container) return;
+        
+        var data = snap.val() || {};
+        var keys = Object.keys(data).sort(function(a, b) {
+            return (data[a].timestamp || 0) - (data[b].timestamp || 0);
+        });
+        
+        // Загружаем ВСЕ комментарии, без ограничений
+        state.allComments = keys.map(function(k) {
+            return { id: k, ...data[k] };
+        });
+        
+        var countEl = document.getElementById('commentCount_' + postId);
+        if (countEl) countEl.textContent = state.allComments.length;
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(state.allComments.length);
+        
+        renderComments(postId, type);
+    });
+}
+
+// ================================================================
+// 9. РЕНДЕР КОММЕНТАРИЕВ - С ЛАЙКАМИ
+// ================================================================
+
+function renderComments(postId, type) {
+    var state = getCommentState(postId);
+    var container = document.getElementById('commentsContainer_' + postId);
+    if (!container) return;
+    
+    if (!state.allComments.length) {
+        container.innerHTML = '<div class="no-comments">Нет комментариев</div>';
+        return;
+    }
+    
+    // Рендерим ВСЕ комментарии, без кнопки "Показать ещё"
+    var html = '';
+    state.allComments.forEach(function(c) {
+        var letter = (c.author || '?').charAt(0).toUpperCase();
+        var canEdit = (c.author === USER || isAdmin);
+        var likes = c.likes || 0;
+        
+        html += '<div class="comment-item" data-id="' + c.id + '">';
+        html += '<span class="avatar-wrap" id="comment-avatar-' + c.id + '"><span class="letter">' + letter + '</span></span>';
+        html += '<div class="body">';
+        html += '<span class="name">' + esc(c.author || 'Аноним') + '</span>';
+        html += '<span class="time">' + (c.time || '') + (c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>';
+        html += '<div class="text" id="comment-text-' + c.id + '">' + esc(c.text || '') + '</div>';
+        
+        // ===== КНОПКА ЛАЙКА ДЛЯ КОММЕНТАРИЯ =====
+        html += '<div class="comment-actions-row">';
+        html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
+        html += '</div>';
+        
+        html += '</div>'; // .body
+        
+        // Меню (три точки) для редактирования/удаления
+        if (canEdit) {
+            html += '<div class="comment-actions">';
+            html += '<button class="more-btn" onclick="toggleCommentMenu(\'' + c.id + '\')">⋮</button>';
+            html += '<div class="dropdown" id="commentMenu_' + c.id + '">';
+            html += '<button class="edit-btn" onclick="editComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">✏️ Редактировать</button>';
+            html += '<button class="del-btn" onclick="deleteComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">🗑 Удалить</button>';
+            html += '</div>';
+            html += '</div>';
+        }
+        
+        html += '</div>'; // .comment-item
+    });
+    
+    container.innerHTML = html;
+    
+    // Загружаем аватарки для комментариев
+    state.allComments.forEach(function(c) {
+        var avatarEl = document.getElementById('comment-avatar-' + c.id);
+        if (avatarEl && c.authorUid) {
+            renderAvatar(c.authorUid, avatarEl, (c.author || '?').charAt(0).toUpperCase());
+        }
+    });
+}
+
+// ================================================================
+// 10. ЛАЙК КОММЕНТАРИЯ - НОВАЯ ФУНКЦИЯ
+// ================================================================
+
+window.toggleLikeComment = function(postId, commentId) {
+    if (!USER) {
+        alert('Войдите!');
+        return;
+    }
+    
+    var ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/comments/' + commentId + '/likes');
+    ref.transaction(function(likes) {
+        return (likes || 0) + 1;
+    });
+    
+    // Обновляем счетчик на странице
+    var countEl = document.getElementById('commentLikeCount_' + commentId);
+    if (countEl) {
+        var current = parseInt(countEl.textContent) || 0;
+        countEl.textContent = current + 1;
+    }
+};
+
+// ================================================================
+// 11. ЛАЙК ПОСТА
 // ================================================================
 
 window.toggleLike = function(postId, type) {
@@ -261,113 +413,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ (С АВТО-ПРОКРУТКОЙ)
-// ================================================================
-
-window.toggleComments = function(postId, type) {
-    var state = getCommentState(postId);
-    state.open = !state.open;
-    
-    var body = document.getElementById('commentsBody_' + postId);
-    if (body) {
-        body.classList.toggle('open', state.open);
-    }
-    
-    if (state.open) {
-        loadComments(postId, type);
-        setTimeout(function() {
-            var input = document.getElementById('commentInput_' + postId);
-            if (input) {
-                input.focus();
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }, 400);
-    }
-};
-
-// ================================================================
-// ЗАГРУЗКА КОММЕНТАРИЕВ
-// ================================================================
-
-function loadComments(postId, type) {
-    var path = getPostPath(type);
-    var state = getCommentState(postId);
-    
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').orderByChild('timestamp').on('value', function(snap) {
-        var container = document.getElementById('commentsContainer_' + postId);
-        if (!container) return;
-        
-        var data = snap.val() || {};
-        var keys = Object.keys(data).sort(function(a, b) {
-            return (data[a].timestamp || 0) - (data[b].timestamp || 0);
-        });
-        
-        state.allComments = keys.map(function(k) {
-            return { id: k, ...data[k] };
-        });
-        
-        var countEl = document.getElementById('commentCount_' + postId);
-        if (countEl) countEl.textContent = state.allComments.length;
-        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(state.allComments.length);
-        
-        renderComments(postId, type);
-    });
-}
-
-// ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ
-// ================================================================
-
-function renderComments(postId, type) {
-    var state = getCommentState(postId);
-    var container = document.getElementById('commentsContainer_' + postId);
-    if (!container) return;
-    
-    if (!state.allComments.length) {
-        container.innerHTML = '<div class="no-comments">Нет комментариев</div>';
-        return;
-    }
-    
-    var showAll = state.showAll || false;
-    var commentsToShow = showAll ? state.allComments : state.allComments.slice(0, COMMENTS_LIMIT);
-    var hasMore = !showAll && state.allComments.length > COMMENTS_LIMIT;
-    
-    var html = '';
-    commentsToShow.forEach(function(c) {
-        var letter = (c.author || '?').charAt(0).toUpperCase();
-        var canEdit = (c.author === USER || isAdmin);
-        
-        html += '<div class="comment-item" data-id="' + c.id + '"><span class="avatar-wrap" id="comment-avatar-' + c.id + '"><span class="letter">' + letter + '</span></span><div class="body"><span class="name">' + esc(c.author || 'Аноним') + '</span><span class="time">' + (c.time || '') + (c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span><div class="text" id="comment-text-' + c.id + '">' + esc(c.text || '') + '</div></div>';
-        
-        if (canEdit) {
-            html += '<div class="comment-actions"><button class="more-btn" onclick="toggleCommentMenu(\'' + c.id + '\')">⋮</button><div class="dropdown" id="commentMenu_' + c.id + '"><button class="edit-btn" onclick="editComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">✏️ Редактировать</button><button class="del-btn" onclick="deleteComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">🗑 Удалить</button></div></div>';
-        }
-        
-        html += '</div>';
-    });
-    
-    if (hasMore) {
-        html += '<button class="show-more-btn" onclick="showAllComments(\'' + postId + '\',\'' + type + '\')">📥 Показать ещё (' + (state.allComments.length - COMMENTS_LIMIT) + ')</button>';
-    }
-    
-    container.innerHTML = html;
-    
-    commentsToShow.forEach(function(c) {
-        var avatarEl = document.getElementById('comment-avatar-' + c.id);
-        if (avatarEl && c.authorUid) {
-            renderAvatar(c.authorUid, avatarEl, (c.author || '?').charAt(0).toUpperCase());
-        }
-    });
-}
-
-window.showAllComments = function(postId, type) {
-    var state = getCommentState(postId);
-    state.showAll = true;
-    renderComments(postId, type);
-};
-
-// ================================================================
-// ОТПРАВКА КОММЕНТАРИЯ
+// 12. ОТПРАВКА КОММЕНТАРИЯ
 // ================================================================
 
 window.submitComment = function(postId, type) {
@@ -386,20 +432,14 @@ window.submitComment = function(postId, type) {
         authorUid: USER_UID,
         text: text,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        likes: 0
     });
     input.value = '';
-    
-    var state = getCommentState(postId);
-    if (!state.open) {
-        state.open = true;
-        var body = document.getElementById('commentsBody_' + postId);
-        if (body) body.classList.add('open');
-    }
 };
 
 // ================================================================
-// УДАЛЕНИЕ КОММЕНТАРИЯ
+// 13. УДАЛЕНИЕ КОММЕНТАРИЯ
 // ================================================================
 
 window.deleteComment = function(postId, commentId, type) {
@@ -411,7 +451,7 @@ window.deleteComment = function(postId, commentId, type) {
 };
 
 // ================================================================
-// МЕНЮ КОММЕНТАРИЯ
+// 14. МЕНЮ КОММЕНТАРИЯ
 // ================================================================
 
 window.toggleCommentMenu = function(commentId) {
@@ -432,7 +472,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ КОММЕНТАРИЯ
+// 15. РЕДАКТИРОВАНИЕ КОММЕНТАРИЯ
 // ================================================================
 
 function editComment(postId, commentId, type) {
@@ -481,7 +521,7 @@ function saveCommentEdit(postId, commentId, type, newText) {
 }
 
 // ================================================================
-// УДАЛЕНИЕ ПОСТА
+// 16. УДАЛЕНИЕ ПОСТА
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -493,7 +533,7 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ ПОСТА
+// 17. РЕДАКТИРОВАНИЕ ПОСТА
 // ================================================================
 
 window.openEdit = function(id, type) {
@@ -595,7 +635,7 @@ window.closeEdit = function() {
 };
 
 // ================================================================
-// МЕНЮ ПОСТА
+// 18. МЕНЮ ПОСТА
 // ================================================================
 
 window.togglePostMenu = function(id) {
