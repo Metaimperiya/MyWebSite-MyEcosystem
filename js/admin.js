@@ -1,3 +1,7 @@
+// ================================================================
+// АДМИН-ПАНЕЛЬ
+// ================================================================
+
 window.adminLogin = function() {
     document.getElementById('adminModal').classList.add('open');
     document.getElementById('adminPass').value = '';
@@ -23,34 +27,46 @@ window.checkAdmin = function() {
 function adminDeleteUser(uid) {
     if (!isAdmin || !uid || uid === USER_UID) return;
     if (!confirm('Удалить пользователя? Это необратимо!')) return;
-    const updates = {};
-    ['users', 'all_users', 'friends', 'followers', 'notifications'].forEach(p => {
+    
+    var updates = {};
+    ['users', 'all_users', 'friends', 'subscribers', 'notifications'].forEach(function(p) {
         updates['sites/' + SITE + '/' + p + '/' + uid] = null;
     });
-    db.ref().update(updates).then(() => {
+    
+    db.ref().update(updates).then(function() {
         loadPeople();
         alert('✅ Пользователь удален');
-    }).catch(err => { console.error(err); alert('Ошибка удаления'); });
+    }).catch(function(err) {
+        console.error(err);
+        alert('Ошибка удаления');
+    });
 }
 
 function adminDeleteAllUsers() {
     if (!isAdmin) return;
     if (!confirm('Удалить ВСЕХ пользователей, кроме админов? Это НЕОБРАТИМО!')) return;
-    db.ref('sites/' + SITE + '/all_users').once('value', snap => {
-        const users = snap.val() || {};
-        const updates = {};
-        Object.keys(users).forEach(uid => {
+    
+    db.ref('sites/' + SITE + '/all_users').once('value', function(snap) {
+        var users = snap.val() || {};
+        var updates = {};
+        
+        Object.keys(users).forEach(function(uid) {
             if (!ADMIN_UIDS.includes(uid) && uid !== USER_UID) {
-                ['users', 'all_users', 'friends', 'followers', 'notifications'].forEach(p => {
+                ['users', 'all_users', 'friends', 'subscribers', 'notifications'].forEach(function(p) {
                     updates['sites/' + SITE + '/' + p + '/' + uid] = null;
                 });
             }
         });
+        
         updates['sites/' + SITE + '/room_users'] = null;
-        db.ref().update(updates).then(() => {
+        
+        db.ref().update(updates).then(function() {
             loadPeople();
             alert('✅ Все пользователи удалены');
-        }).catch(err => { console.error(err); alert('Ошибка удаления'); });
+        }).catch(function(err) {
+            console.error(err);
+            alert('Ошибка удаления');
+        });
     });
 }
 
@@ -72,12 +88,12 @@ function adminClearNotifications() {
 
 function adminExportData() {
     if (!isAdmin) return;
-    db.ref('sites/' + SITE).once('value', snap => {
-        const data = snap.val();
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+    db.ref('sites/' + SITE).once('value', function(snap) {
+        var data = snap.val();
+        var json = JSON.stringify(data, null, 2);
+        var blob = new Blob([json], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
         a.href = url;
         a.download = 'metaimperiya_export_' + Date.now() + '.json';
         a.click();
