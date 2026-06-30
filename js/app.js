@@ -1,66 +1,9 @@
 // ================================================================
-// ОСНОВНЫЕ ФУНКЦИИ, УТИЛИТЫ, НАВИГАЦИЯ
+// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
-const esc = s => s ? String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])) : '';
+// ===== ОБНОВЛЕНИЕ UI =====
 
-function cancelRequest(key) {
-    if (activeRequests.has(key)) {
-        const fn = activeRequests.get(key);
-        if (typeof fn === 'function') fn();
-        activeRequests.delete(key);
-        return true;
-    }
-    return false;
-}
-
-function safeFirebaseQuery(key, ref, callback) {
-    cancelRequest(key);
-    let cancelled = false;
-    const cancelFn = () => { cancelled = true; activeRequests.delete(key); };
-    activeRequests.set(key, cancelFn);
-    ref.once('value', snap => {
-        if (cancelled) return;
-        activeRequests.delete(key);
-        callback(snap);
-    }).catch(err => {
-        if (!cancelled) { activeRequests.delete(key); console.warn('Query error:', err); }
-    });
-    return cancelFn;
-}
-
-function checkAdminAccess(uid) {
-    isAdmin = ADMIN_UIDS.includes(uid);
-    document.body.classList.toggle('admin-mode', isAdmin);
-    return isAdmin;
-}
-
-// ===== АВАТАРКИ =====
-function getUserAvatar(uid, callback) {
-    if (avatarCache && avatarCache[uid]) {
-        callback(avatarCache[uid]);
-        return;
-    }
-    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', snap => {
-        const url = snap.val() || null;
-        if (!avatarCache) avatarCache = {};
-        avatarCache[uid] = url;
-        callback(url);
-    });
-}
-
-function renderAvatar(uid, container, letter) {
-    if (!container) return;
-    getUserAvatar(uid, function(url) {
-        if (url) {
-            container.innerHTML = `<img src="${url}" />`;
-        } else {
-            container.innerHTML = `<span class="letter">${letter || '?'}</span>`;
-        }
-    });
-}
-
-// ===== UI =====
 function updateUI() {
     const topAvatar = document.getElementById('topAvatar');
     const sAvatar = document.getElementById('sAvatar');
@@ -76,60 +19,110 @@ function updateUI() {
         if (isAdmin) dot.classList.add('active');
         else dot.classList.remove('active');
     } else {
-        topAvatar.innerHTML = `<span class="letter">?</span>`;
-        sAvatar.innerHTML = `<span class="letter">?</span>`;
+        topAvatar.innerHTML = '<span class="letter">?</span>';
+        sAvatar.innerHTML = '<span class="letter">?</span>';
         name.textContent = 'Гость';
         sName.textContent = 'Гость';
         dot.classList.remove('active');
     }
 }
 
-// ===== НАВИГАЦИЯ =====
+// ===== АВАТАРКИ =====
+
+function getUserAvatar(uid, callback) {
+    if (avatarCache && avatarCache[uid]) {
+        callback(avatarCache[uid]);
+        return;
+    }
+    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', function(snap) {
+        const url = snap.val() || null;
+        if (!avatarCache) avatarCache = {};
+        avatarCache[uid] = url;
+        callback(url);
+    });
+}
+
+function renderAvatar(uid, container, letter) {
+    if (!container) return;
+    getUserAvatar(uid, function(url) {
+        if (url) {
+            container.innerHTML = '<img src="' + url + '" />';
+        } else {
+            container.innerHTML = '<span class="letter">' + (letter || '?') + '</span>';
+        }
+    });
+}
+
+// ===== НАВИГАЦИЯ ПО СТРАНИЦАМ =====
+
 function setActivePage(pageId) {
-    document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-    if (pageId) document.getElementById(pageId).classList.add('active');
-    document.querySelectorAll('.tab-bar .tab').forEach(el => el.classList.remove('active'));
-    const map = { feedPage: 0, groupsPage: 1, peoplePage: 2, profilePage: 3 };
-    const tabs = document.querySelectorAll('.tab-bar .tab');
+    document.querySelectorAll('.page').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    if (pageId) {
+        var el = document.getElementById('page-' + pageId);
+        if (el) el.classList.add('active');
+    }
+    
+    document.querySelectorAll('.tab-bar .tab').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    
+    var tabs = document.querySelectorAll('.tab-bar .tab');
+    var map = { feed: 0, groups: 1, people: 2, profile: 3 };
     if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
 }
 
 window.goToFeed = function() {
     if (!USER) { alert('Войдите!'); return; }
-    setActivePage('feedPage');
+    setActivePage('feed');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
     CURRENT_ROOM = null;
     loadFeed();
 };
 
 window.goToGroups = function() {
     if (!USER) { alert('Войдите!'); return; }
-    setActivePage('groupsPage');
+    setActivePage('groups');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
     CURRENT_ROOM = null;
     loadGroups();
 };
 
 window.goToPeople = function() {
     if (!USER) { alert('Войдите!'); return; }
-    setActivePage('peoplePage');
+    setActivePage('people');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
     CURRENT_ROOM = null;
     loadPeople();
 };
 
 window.goToProfile = function() {
     if (!USER) { alert('Войдите!'); return; }
-    viewingProfileUid = null;
-    setActivePage('profilePage');
+    VIEWING_USER = null;
+    setActivePage('profile');
     document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) { if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value'); chatUnsub = null; }
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
     CURRENT_ROOM = null;
     loadProfile();
 };
+
+// ===== САЙДБАР =====
 
 window.toggleSidebar = function() {
     document.getElementById('sidebar').classList.toggle('open');
@@ -142,16 +135,17 @@ window.closeSidebar = function() {
 };
 
 // ===== РАЗМЕР ФРЕЙМА =====
-function setFrameSize(size) {
+
+window.setFrameSize = function(size) {
     currentFrameSize = size;
-    document.querySelectorAll('.frame-size-btn').forEach(btn => {
+    document.querySelectorAll('.frame-size-btn').forEach(function(btn) {
         btn.classList.remove('active');
     });
     if (size === 'small') {
-        const btn = document.getElementById('frameSizeSmall');
+        var btn = document.getElementById('frameSizeSmall');
         if (btn) btn.classList.add('active');
     } else {
-        const btn = document.getElementById('frameSizeLarge');
-        if (btn) btn.classList.add('active');
+        var btn2 = document.getElementById('frameSizeLarge');
+        if (btn2) btn2.classList.add('active');
     }
-}
+};
