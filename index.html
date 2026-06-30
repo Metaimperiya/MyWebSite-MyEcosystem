@@ -196,7 +196,7 @@
     <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <div class="container">
 
-        <!-- ===== РУЧКА ПЛЕЕРА (ВСЕГДА ВИДНА) ===== -->
+        <!-- ===== РУЧКА ПЛЕЕРА ===== -->
         <div class="player-handle" id="playerHandle">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
@@ -255,7 +255,7 @@
             </div>
         </div>
 
-        <!-- ===== ЛЕНТА ===== -->
+        <!-- ЛЕНТА -->
         <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
@@ -401,7 +401,7 @@
 
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
-    <!-- ===== ВИЗУАЛИЗАЦИЯ НА ВЕСЬ ЭКРАН ===== -->
+    <!-- ===== ВИЗУАЛИЗАЦИЯ ===== -->
     <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
         <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
         <canvas id="visualizerCanvas"></canvas>
@@ -409,6 +409,7 @@
 
 </div>
 
+<!-- ===== ПОДКЛЮЧЕНИЕ СКРИПТОВ ===== -->
 <script src="js/firebase.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/player.js"></script>
@@ -421,20 +422,32 @@
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
 
+<!-- ===== ВСТРОЕННЫЙ JS ДЛЯ РУЧКИ (ГАРАНТИРОВАННО РАБОТАЕТ) ===== -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ DOM загружен, ищем ручку...');
         var handle = document.getElementById('playerHandle');
         if (handle) {
-            handle.addEventListener('click', function() {
-                if (window.toggleDrawer) {
+            console.log('✅ Ручка найдена, вешаем клик...');
+            handle.addEventListener('click', function(e) {
+                console.log('🖱️ Клик по ручке!');
+                if (typeof window.toggleDrawer === 'function') {
+                    console.log('✅ toggleDrawer найдена, вызываем...');
                     window.toggleDrawer();
                 } else {
-                    console.log('Плеер загружается...');
+                    console.warn('⚠️ toggleDrawer не найдена, пробуем через 300ms...');
                     setTimeout(function() {
-                        if (window.toggleDrawer) window.toggleDrawer();
+                        if (typeof window.toggleDrawer === 'function') {
+                            window.toggleDrawer();
+                        } else {
+                            console.error('❌ toggleDrawer так и не появилась!');
+                            alert('Ошибка: плеер не загружен. Обновите страницу.');
+                        }
                     }, 300);
                 }
             });
+        } else {
+            console.error('❌ Ручка не найдена!');
         }
     });
 </script>
