@@ -294,3 +294,18 @@ document.addEventListener('click', function(e) {
 // ================================================================
 
 initAudio();
+
+// ================================================================
+// СКАЧИВАНИЕ ТРЕКА
+// ================================================================
+
+window.downloadCurrentTrack = function() {
+    if (!PLAYLIST[currentTrack]) return;
+    var track = PLAYLIST[currentTrack];
+    var link = document.createElement('a');
+    link.href = track.url;
+    link.download = track.name + '.mp3';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
