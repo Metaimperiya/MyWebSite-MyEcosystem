@@ -995,3 +995,85 @@ body {
     color: #1877f2;
     background: #1a2a4a;
 }
+
+/* ================================================================
+   АККОРДЕОН В САЙДБАРЕ
+   ================================================================ */
+
+.accordion {
+    padding: 4px 0;
+}
+
+.accordion-item {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.accordion-item:last-child {
+    border-bottom: none;
+}
+
+.accordion-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #333;
+    transition: 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.accordion-header:hover {
+    background: #f0f2f5;
+}
+
+.accordion-icon {
+    margin-right: 10px;
+    font-size: 1rem;
+}
+
+.accordion-title {
+    flex: 1;
+    font-weight: 600;
+}
+
+.accordion-arrow {
+    color: #888;
+    font-size: 0.7rem;
+    transition: transform 0.3s;
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 16px;
+    background: #fafafa;
+}
+
+.accordion-body .nav-item {
+    padding: 6px 16px;
+    border-left: 3px solid transparent;
+    font-size: 0.75rem;
+    color: #555;
+    cursor: pointer;
+    transition: 0.15s;
+    border-radius: 0;
+}
+
+.accordion-body .nav-item:hover {
+    background: #f0f2f5;
+    color: #1877f2;
+}
+
+.accordion-body .nav-item:last-child {
+    border-bottom: none;
+}
+
+/* Главные разделы (всегда видны) */
+.main-nav {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+}
