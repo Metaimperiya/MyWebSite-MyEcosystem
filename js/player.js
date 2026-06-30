@@ -38,7 +38,6 @@ function initAudio() {
         });
     }
     
-    // Проверяем, что элементы существуют
     var trackName = document.getElementById('trackName');
     var drawerTrackName = document.getElementById('drawerTrackName');
     if (trackName) trackName.textContent = PLAYLIST[currentTrack].name;
@@ -159,7 +158,7 @@ function updatePlaylistActive() {
 }
 
 // ================================================================
-// 5. ВЫДВИЖНОЙ ПЛЕЕР (СВЕРХУ)
+// 5. ВЫДВИЖНОЙ ПЛЕЕР
 // ================================================================
 
 window.toggleDrawer = function() {
@@ -180,7 +179,22 @@ window.toggleDrawerPlaylist = function() {
 };
 
 // ================================================================
-// 6. ПЕРЕТАСКИВАНИЕ ПЛЕЕРА
+// 6. СКАЧИВАНИЕ ТРЕКА
+// ================================================================
+
+window.downloadCurrentTrack = function() {
+    if (!PLAYLIST[currentTrack]) return;
+    var track = PLAYLIST[currentTrack];
+    var link = document.createElement('a');
+    link.href = track.url;
+    link.download = track.name + '.mp3';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+// ================================================================
+// 7. ПЕРЕТАСКИВАНИЕ ПЛЕЕРА (через ручку)
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -188,6 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var drawer = document.getElementById('playerDrawer');
 
     if (handle && drawer) {
+        // Перетаскивание мышкой
         handle.addEventListener('mousedown', function(e) {
             isDragging = true;
             drawerStartY = e.clientY;
@@ -265,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ================================================================
-// 7. МЕНЮ НАСТРОЕК (ТРИ ТОЧКИ)
+// 8. МЕНЮ НАСТРОЕК (ТРИ ТОЧКИ)
 // ================================================================
 
 window.toggleSettingsMenu = function() {
@@ -290,22 +305,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ================================================================
-// 8. ЗАПУСК
+// 9. ЗАПУСК
 // ================================================================
 
 initAudio();
-
-// ================================================================
-// СКАЧИВАНИЕ ТРЕКА
-// ================================================================
-
-window.downloadCurrentTrack = function() {
-    if (!PLAYLIST[currentTrack]) return;
-    var track = PLAYLIST[currentTrack];
-    var link = document.createElement('a');
-    link.href = track.url;
-    link.download = track.name + '.mp3';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-};
