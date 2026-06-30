@@ -1,151 +1,290 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METAIMPERIYA</title>
-    <style>
-        .player-handle {
-            background: #1a1a2e;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            color: white;
-            border-radius: 0 0 12px 12px;
-            margin: 0 -8px;
-            position: sticky;
-            top: 48px;
-            z-index: 51;
-        }
-        .player-drawer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-            background: #1a1a2e;
-            margin: 0 -8px;
-            padding: 0 8px;
-            border-radius: 0 0 16px 16px;
-        }
-        .player-drawer.open {
-            max-height: 500px;
-            padding-bottom: 12px;
-        }
-        .handle-bar {
-            width: 50px;
-            height: 4px;
-            background: #4a4a6a;
-            margin: 0 auto 4px;
-            border-radius: 4px;
-        }
-        .handle-label {
-            color: #666;
-            font-size: 0.45rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .player-content {
-            padding: 0 8px 12px;
-        }
-        .player-track-name {
-            color: #fff;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
+// ================================================================
+// МУЗЫКАЛЬНЫЙ ПЛЕЕР
+// ================================================================
 
-<div style="max-width:480px;margin:0 auto;background:#f0f2f5;min-height:100vh;">
+const PLAYLIST = [
+    { name: 'Capitulation', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/capitulation.mp3' },
+    { name: 'Clean Victory', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/clean_victory.mp3' },
+    { name: 'Covenant of Change', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/covenant_of_change.mp3' },
+    { name: 'Dreams in the Wind', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/dreams_in_the_wind.mp3' },
+    { name: 'Memory Like Dust', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/memory_like_dust_path_like_fire.mp3' },
+    { name: 'Nobody', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/nobody.mp3' },
+    { name: 'Touch of Choice', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/touch_of_choice.mp3' },
+    { name: 'You Are Not in the Game', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/you_are_not_in_the_game.mp3' },
+    { name: 'You Can\'t See Me', url: 'https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/you_cant_see_me.mp3' }
+];
 
-    <div style="background:#fff;padding:8px 12px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;position:sticky;top:0;z-index:100;">
-        <span style="font-weight:700;color:#1877f2;">METAIMPERIYA 🏴‍☠️</span>
-        <span>👤 Гость</span>
-    </div>
+let currentTrack = 0;
+let isPlaying = false;
+let audio = null;
+let drawerOpen = false;
+let audioContext = null;
+let analyser = null;
+let dataArray = null;
+let eqAnimationId = null;
+let eqBars = [];
 
-    <!-- РУЧКА -->
-    <div class="player-handle" id="playerHandle">
-        <div class="handle-bar"></div>
-        <div class="handle-label">🎵 ПЛЕЕР</div>
-    </div>
+function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    var min = Math.floor(seconds / 60);
+    var sec = Math.floor(seconds % 60);
+    return min + ':' + (sec < 10 ? '0' : '') + sec;
+}
 
-    <!-- ПЛЕЕР -->
-    <div class="player-drawer" id="playerDrawer">
-        <div class="player-content">
-            <div class="player-track-name" id="drawerTrackName">Capitulation</div>
-            <div style="color:#888;font-size:0.6rem;text-align:center;">METAIMPERIYA</div>
-            <div style="text-align:center;padding:8px 0;">
-                <button onclick="togglePlay()" style="background:#1877f2;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:1.2rem;cursor:pointer;">▶</button>
-            </div>
-        </div>
-    </div>
-
-    <div style="padding:20px;text-align:center;color:#888;">
-        <p>Нажми на ручку "🎵 ПЛЕЕР" — откроется плеер</p>
-        <p style="font-size:0.7rem;margin-top:10px;">Если не работает — обнови страницу</p>
-    </div>
-
-</div>
-
-<script>
-    // ===== ПРОСТОЙ ПЛЕЕР (ВСТРОЕННЫЙ) =====
-    const PLAYLIST = [
-        { name: 'Capitulation' }
-    ];
-    let currentTrack = 0;
-    let isPlaying = false;
-    let audio = null;
-    let drawerOpen = false;
-
-    function initAudio() {
-        if (!audio) {
-            audio = new Audio('https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/music/capitulation.mp3');
-            audio.crossOrigin = 'anonymous';
-            audio.addEventListener('ended', function() {
-                isPlaying = false;
-                document.querySelector('#drawerPlayBtn')?.textContent = '▶';
-            });
-        }
-        var nameEl = document.getElementById('drawerTrackName');
-        if (nameEl) nameEl.textContent = PLAYLIST[currentTrack].name;
+function initAudio() {
+    if (!audio) {
+        audio = new Audio(PLAYLIST[currentTrack].url);
+        audio.crossOrigin = 'anonymous';
+        audio.addEventListener('timeupdate', function() {
+            updateDrawerProgress();
+        });
+        audio.addEventListener('ended', function() {
+            playNext();
+        });
     }
+    var drawerTrackName = document.getElementById('drawerTrackName');
+    if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+}
 
-    window.toggleDrawer = function() {
-        var drawer = document.getElementById('playerDrawer');
-        if (!drawer) return;
-        drawer.classList.toggle('open');
-        drawerOpen = drawer.classList.contains('open');
-        if (drawerOpen) {
-            initAudio();
+function updateDrawerProgress() {
+    if (!audio) return;
+    var current = document.getElementById('drawerCurrentTime');
+    var total = document.getElementById('drawerTotalTime');
+    var fill = document.getElementById('drawerProgressFill');
+    if (current) current.textContent = formatTime(audio.currentTime);
+    if (total) total.textContent = formatTime(audio.duration || 0);
+    if (fill) {
+        var percent = audio.duration ? (audio.currentTime / audio.duration * 100) : 0;
+        fill.style.width = percent + '%';
+    }
+}
+
+function updatePlaylistActive() {
+    var items = document.querySelectorAll('.playlist-item');
+    items.forEach(function(el, i) {
+        if (i === currentTrack) el.classList.add('active');
+        else el.classList.remove('active');
+    });
+}
+
+function initEqualizer() {
+    if (!audio) return;
+    if (audioContext) return;
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 128;
+        var source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        eqBars = document.querySelectorAll('.eq-bar');
+        updateEqualizer();
+    } catch(e) {
+        console.log('Эквалайзер не поддерживается:', e);
+    }
+}
+
+function updateEqualizer() {
+    if (!analyser || !eqBars || !eqBars.length) {
+        eqAnimationId = requestAnimationFrame(updateEqualizer);
+        return;
+    }
+    analyser.getByteFrequencyData(dataArray);
+    var step = Math.floor(dataArray.length / eqBars.length);
+    var maxHeight = 40;
+    for (var i = 0; i < eqBars.length; i++) {
+        var value = 0;
+        for (var j = 0; j < step; j++) {
+            value += dataArray[i * step + j] || 0;
         }
-    };
+        value = value / step;
+        var percent = (value / 255) * 100;
+        var height = Math.max(3, (percent / 100) * maxHeight);
+        eqBars[i].style.height = height + 'px';
+    }
+    eqAnimationId = requestAnimationFrame(updateEqualizer);
+}
 
-    window.togglePlay = function() {
+// ===== УПРАВЛЕНИЕ =====
+window.toggleDrawer = function() {
+    var drawer = document.getElementById('playerDrawer');
+    if (!drawer) return;
+    drawer.classList.toggle('open');
+    drawerOpen = drawer.classList.contains('open');
+    if (drawerOpen) {
         initAudio();
-        if (!audio) return;
-        if (isPlaying) {
-            audio.pause();
-            isPlaying = false;
-            var btn = document.querySelector('#drawerPlayBtn');
-            if (btn) btn.textContent = '▶';
-        } else {
-            audio.play().catch(function(e) { console.log('Ошибка:', e); });
-            isPlaying = true;
-            var btn = document.querySelector('#drawerPlayBtn');
-            if (btn) btn.textContent = '⏸';
-        }
-    };
+    }
+};
 
-    // ===== КЛИК ПО РУЧКЕ =====
-    document.addEventListener('DOMContentLoaded', function() {
-        var handle = document.getElementById('playerHandle');
-        if (handle) {
-            handle.addEventListener('click', function() {
-                window.toggleDrawer();
+window.togglePlay = function() {
+    initAudio();
+    if (!audio) return;
+    if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+        if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
+        if (eqAnimationId) {
+            cancelAnimationFrame(eqAnimationId);
+            eqAnimationId = null;
+        }
+        if (eqBars && eqBars.length) {
+            eqBars.forEach(function(bar) {
+                bar.style.height = '3px';
             });
         }
-        console.log('✅ Плеер загружен!');
-    });
-</script>
+    } else {
+        if (!audioContext) {
+            initEqualizer();
+        }
+        audio.play().then(function() {
+            isPlaying = true;
+            var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+            if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+            if (!eqAnimationId) {
+                updateEqualizer();
+            }
+        }).catch(function(e) {
+            console.log('Ошибка воспроизведения:', e);
+        });
+    }
+};
 
-</body>
-</html>
+window.playTrack = function(index) {
+    if (index === currentTrack && isPlaying) {
+        togglePlay();
+        return;
+    }
+    currentTrack = index;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (audioContext) {
+            audioContext.close();
+            audioContext = null;
+            analyser = null;
+            if (eqAnimationId) {
+                cancelAnimationFrame(eqAnimationId);
+                eqAnimationId = null;
+            }
+            if (eqBars && eqBars.length) {
+                eqBars.forEach(function(bar) {
+                    bar.style.height = '3px';
+                });
+            }
+        }
+        if (isPlaying) {
+            audio.play().then(function() {
+                isPlaying = true;
+                var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+            }).catch(function(e) {
+                console.log('Ошибка:', e);
+            });
+        }
+    } else {
+        initAudio();
+        togglePlay();
+    }
+    var drawerTrackName = document.getElementById('drawerTrackName');
+    if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+    updateDrawerProgress();
+};
+
+window.playNext = function() {
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+        if (eqAnimationId) {
+            cancelAnimationFrame(eqAnimationId);
+            eqAnimationId = null;
+        }
+        if (eqBars && eqBars.length) {
+            eqBars.forEach(function(bar) {
+                bar.style.height = '3px';
+            });
+        }
+    }
+    currentTrack = (currentTrack + 1) % PLAYLIST.length;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (isPlaying) {
+            audio.play().catch(function(e) { console.log('Ошибка:', e); });
+        }
+    }
+    var drawerTrackName = document.getElementById('drawerTrackName');
+    if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+    updateDrawerProgress();
+};
+
+window.playPrev = function() {
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+        if (eqAnimationId) {
+            cancelAnimationFrame(eqAnimationId);
+            eqAnimationId = null;
+        }
+        if (eqBars && eqBars.length) {
+            eqBars.forEach(function(bar) {
+                bar.style.height = '3px';
+            });
+        }
+    }
+    currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (isPlaying) {
+            audio.play().catch(function(e) { console.log('Ошибка:', e); });
+        }
+    }
+    var drawerTrackName = document.getElementById('drawerTrackName');
+    if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+    updateDrawerProgress();
+};
+
+window.toggleDrawerPlaylist = function() {
+    var playlist = document.getElementById('drawerPlaylist');
+    if (playlist) {
+        playlist.style.display = playlist.style.display === 'none' ? 'block' : 'none';
+    }
+};
+
+window.downloadCurrentTrack = function() {
+    if (!PLAYLIST[currentTrack]) return;
+    var track = PLAYLIST[currentTrack];
+    var link = document.createElement('a');
+    link.href = track.url;
+    link.download = track.name + '.mp3';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+window.openVisualizer = function() {
+    alert('🎨 Визуализация будет позже!');
+};
+
+// ===== КЛИК ПО ПРОГРЕСС-БАРУ =====
+document.addEventListener('DOMContentLoaded', function() {
+    var progressBar = document.getElementById('drawerProgressBar');
+    if (progressBar) {
+        progressBar.addEventListener('click', function(e) {
+            if (!audio || !audio.duration) return;
+            var rect = this.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var percent = x / rect.width;
+            var newTime = percent * audio.duration;
+            audio.currentTime = newTime;
+            updateDrawerProgress();
+        });
+    }
+});
+
+console.log('🎵 METAIMPERIYA PLAYER ЗАГРУЖЕН!');
