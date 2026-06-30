@@ -1,5 +1,5 @@
 // ================================================================
-// МУЗЫКАЛЬНЫЙ ПЛЕЕР
+// МУЗЫКАЛЬНЫЙ ПЛЕЕР — ПОЛНАЯ ВЕРСИЯ (С WINAMP-СТИЛЕМ)
 // ================================================================
 
 const PLAYLIST = [
@@ -18,31 +18,54 @@ let currentTrack = 0;
 let isPlaying = false;
 let audio = null;
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
+// ================================================================
+// 1. ИНИЦИАЛИЗАЦИЯ
+// ================================================================
 
 function initAudio() {
     if (!audio) {
         audio = new Audio(PLAYLIST[currentTrack].url);
         audio.crossOrigin = 'anonymous';
-        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('timeupdate', function() {
+            updateProgress();
+            updateFullProgress();
+        });
         audio.addEventListener('ended', function() {
-            currentTrack = (currentTrack + 1) % PLAYLIST.length;
-            audio.src = PLAYLIST[currentTrack].url;
-            audio.play().catch(function() {});
-            document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
-            updatePlaylistActive();
+            playNext();
         });
     }
     document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    document.getElementById('fullTrackName').textContent = PLAYLIST[currentTrack].name;
     updatePlaylistActive();
 }
 
+// ================================================================
+// 2. ОБНОВЛЕНИЕ ПРОГРЕССА
+// ================================================================
+
 function updateProgress() {
     if (!audio) return;
-    document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+    var current = document.getElementById('currentTime');
+    if (current) current.textContent = formatTime(audio.currentTime);
 }
 
-// ===== УПРАВЛЕНИЕ =====
+function updateFullProgress() {
+    if (!audio) return;
+    var current = document.getElementById('currentTimeFull');
+    var total = document.getElementById('totalTimeFull');
+    var fill = document.getElementById('progressFill');
+    
+    if (current) current.textContent = formatTime(audio.currentTime);
+    if (total) total.textContent = formatTime(audio.duration || 0);
+    if (fill) {
+        var percent = audio.duration ? (audio.currentTime / audio.duration * 100) : 0;
+        fill.style.width = percent + '%';
+    }
+}
+
+// ================================================================
+// 3. УПРАВЛЕНИЕ ВОСПРОИЗВЕДЕНИЕМ
+// ================================================================
 
 window.togglePlay = function() {
     initAudio();
@@ -52,15 +75,13 @@ window.togglePlay = function() {
         audio.pause();
         isPlaying = false;
         document.getElementById('playBtn').textContent = '▶';
+        document.getElementById('playBtnFull').textContent = '▶';
     } else {
         audio.play().catch(function(e) { console.log('Ошибка:', e); });
         isPlaying = true;
         document.getElementById('playBtn').textContent = '⏸';
+        document.getElementById('playBtnFull').textContent = '⏸';
     }
-};
-
-window.togglePlaylist = function() {
-    document.getElementById('playlistDropdown').classList.toggle('open');
 };
 
 window.playTrack = function(index) {
@@ -78,7 +99,41 @@ window.playTrack = function(index) {
         togglePlay();
     }
     document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    document.getElementById('fullTrackName').textContent = PLAYLIST[currentTrack].name;
     updatePlaylistActive();
+    updateFullProgress();
+};
+
+window.playNext = function() {
+    currentTrack = (currentTrack + 1) % PLAYLIST.length;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (isPlaying) audio.play().catch(function() {});
+    }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    document.getElementById('fullTrackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+    updateFullProgress();
+};
+
+window.playPrev = function() {
+    currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        if (isPlaying) audio.play().catch(function() {});
+    }
+    document.getElementById('trackName').textContent = PLAYLIST[currentTrack].name;
+    document.getElementById('fullTrackName').textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+    updateFullProgress();
+};
+
+// ================================================================
+// 4. ПЛЕЙЛИСТ
+// ================================================================
+
+window.togglePlaylist = function() {
+    document.getElementById('playlistDropdown').classList.toggle('open');
 };
 
 function updatePlaylistActive() {
@@ -89,5 +144,62 @@ function updatePlaylistActive() {
     });
 }
 
-// Запускаем
+// ================================================================
+// 5. ПОЛНОЭКРАННЫЙ ПЛЕЕР (WINAMP-СТИЛЬ)
+// ================================================================
+
+window.toggleFullPlayer = function() {
+    var player = document.getElementById('fullPlayer');
+    if (!player) return;
+    player.classList.toggle('open');
+    
+    // Обновляем информацию в полном плеере
+    document.getElementById('fullTrackName').textContent = PLAYLIST[currentTrack].name;
+    updateFullProgress();
+    
+    // Обновляем кнопку воспроизведения
+    var btn = document.getElementById('playBtnFull');
+    if (btn) btn.textContent = isPlaying ? '⏸' : '▶';
+};
+
+// Закрываем полный плеер по Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        var player = document.getElementById('fullPlayer');
+        if (player && player.classList.contains('open')) {
+            player.classList.remove('open');
+        }
+    }
+});
+
+// ================================================================
+// 6. МЕНЮ НАСТРОЕК (ТРИ ТОЧКИ)
+// ================================================================
+
+window.toggleSettingsMenu = function() {
+    var dropdown = document.getElementById('settingsDropdown');
+    if (!dropdown) return;
+    dropdown.classList.toggle('open');
+};
+
+window.closeSettingsMenu = function() {
+    var dropdown = document.getElementById('settingsDropdown');
+    if (dropdown) dropdown.classList.remove('open');
+};
+
+// Закрываем меню при клике вне
+document.addEventListener('click', function(e) {
+    var dropdown = document.getElementById('settingsDropdown');
+    var dots = document.querySelector('.menu-dots');
+    if (dropdown && dots) {
+        if (!dropdown.contains(e.target) && !dots.contains(e.target)) {
+            dropdown.classList.remove('open');
+        }
+    }
+});
+
+// ================================================================
+// 7. ЗАПУСК
+// ================================================================
+
 initAudio();
