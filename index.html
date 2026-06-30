@@ -238,6 +238,7 @@
                     <button class="player-btn" onclick="playNext()">⏭</button>
                     <button class="player-btn" onclick="toggleDrawerPlaylist()">📋</button>
                     <button class="player-btn" onclick="downloadCurrentTrack()">⬇️</button>
+                    <button class="player-btn" onclick="openVisualizer()">🎨</button>
                 </div>
 
                 <div class="player-playlist" id="drawerPlaylist" style="display:none;">
@@ -399,6 +400,12 @@
     </div>
 
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
+
+    <!-- ===== ВИЗУАЛИЗАЦИЯ НА ВЕСЬ ЭКРАН ===== -->
+    <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
+        <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
+        <canvas id="visualizerCanvas"></canvas>
+    </div>
 
 </div>
 
