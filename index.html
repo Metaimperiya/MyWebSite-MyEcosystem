@@ -197,7 +197,7 @@
     <div class="container">
 
         <!-- ===== РУЧКА ПЛЕЕРА (ВСЕГДА ВИДНА) ===== -->
-        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
+        <div class="player-handle" id="playerHandle" onclick="toggleDrawer()">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
@@ -420,37 +420,6 @@
 <script src="js/chat.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
-
-<!-- ===== КОСЫЛЬ ДЛЯ ПЛЕЕРА (ПРОВЕРКА ЧТО ЗАГРУЗИЛСЯ) ===== -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM загружен');
-    var handle = document.getElementById('playerHandle');
-    if (handle) {
-        console.log('Ручка найдена');
-        if (typeof window.toggleDrawer === 'function') {
-            console.log('toggleDrawer уже есть');
-        } else {
-            console.log('Ждём загрузки player.js...');
-            var checkInterval = setInterval(function() {
-                if (typeof window.toggleDrawer === 'function') {
-                    console.log('✅ toggleDrawer загружена!');
-                    clearInterval(checkInterval);
-                }
-            }, 200);
-            setTimeout(function() {
-                clearInterval(checkInterval);
-                if (typeof window.toggleDrawer !== 'function') {
-                    console.warn('⚠️ player.js не загрузился, создаём заглушку');
-                    window.toggleDrawer = function() {
-                        alert('Плеер не загрузился! Перезагрузите страницу.');
-                    };
-                }
-            }, 5000);
-        }
-    }
-});
-</script>
 
 </body>
 </html>
