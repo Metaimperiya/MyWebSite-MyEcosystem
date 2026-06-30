@@ -20,7 +20,7 @@
 
 <div class="app" id="app">
     
-    <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ (СКРЫВАЕТСЯ) ===== -->
+    <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
     <header class="topbar" id="topbar">
         <div class="left">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
@@ -196,7 +196,7 @@
     <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <div class="container" id="mainContainer">
 
-        <!-- ===== РУЧКА ПЛЕЕРА (СКРЫВАЕТСЯ ВМЕСТЕ С ШАПКОЙ) ===== -->
+        <!-- ===== РУЧКА ПЛЕЕРА ===== -->
         <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
@@ -421,7 +421,7 @@
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
 
-<!-- ===== АВТО-СКРЫТИЕ ШАПКИ И ПЛЕЕРА ===== -->
+<!-- ===== АВТО-СКРЫТИЕ ШАПКИ ===== -->
 <script>
 (function() {
     var lastScrollY = 0;
@@ -431,7 +431,6 @@
     var isPlayerOpen = false;
     var ticking = false;
 
-    // Проверяем, открыт ли плеер
     function checkPlayerState() {
         if (playerDrawer) {
             isPlayerOpen = playerDrawer.classList.contains('open');
@@ -440,21 +439,17 @@
 
     function updateHeader() {
         var currentScrollY = window.scrollY;
-
-        // Если плеер открыт — не скрываем
         checkPlayerState();
+
         if (isPlayerOpen) {
             showAll();
             lastScrollY = currentScrollY;
             return;
         }
 
-        // Если скролл вверх — показываем всё
-        if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        if (currentScrollY < lastScrollY || currentScrollY < 30) {
             showAll();
-        } 
-        // Если скролл вниз и проскроллили больше 50px — скрываем
-        else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
             hideAll();
         }
 
@@ -485,7 +480,6 @@
         }
     }
 
-    // Слушаем скролл
     window.addEventListener('scroll', function() {
         if (!ticking) {
             window.requestAnimationFrame(function() {
@@ -494,9 +488,8 @@
             });
             ticking = true;
         }
-    });
+    }, { passive: true });
 
-    // Следим за открытием плеера через MutationObserver
     if (playerDrawer) {
         var observer = new MutationObserver(function() {
             checkPlayerState();
@@ -507,7 +500,6 @@
         observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
     }
 
-    // При клике на ручку — показываем всё
     if (playerHandle) {
         playerHandle.addEventListener('click', function() {
             setTimeout(function() {
@@ -515,11 +507,11 @@
                 if (isPlayerOpen) {
                     showAll();
                 }
-            }, 100);
+            }, 150);
         });
     }
 
-    console.log('✅ Авто-скрытие шапки и плеера включено!');
+    console.log('✅ Авто-скрытие шапки включено!');
 })();
 </script>
 
