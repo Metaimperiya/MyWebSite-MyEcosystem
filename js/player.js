@@ -394,3 +394,122 @@ window.playPrev = function() {
     }
     oldPlayPrev();
 };
+
+// ================================================================
+// ВИЗУАЛИЗАЦИЯ МУЗЫКИ (НА ВЕСЬ ЭКРАН)
+// ================================================================
+
+let visualizerActive = false;
+let visualizerAnimationId = null;
+let canvas = null;
+let ctx = null;
+
+function openVisualizer() {
+    var overlay = document.getElementById('visualizerOverlay');
+    if (!overlay) return;
+    
+    overlay.style.display = 'flex';
+    overlay.classList.add('active');
+    
+    canvas = document.getElementById('visualizerCanvas');
+    if (!canvas) return;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    ctx = canvas.getContext('2d');
+    
+    visualizerActive = true;
+    drawVisualizer();
+}
+
+function closeVisualizer() {
+    var overlay = document.getElementById('visualizerOverlay');
+    if (!overlay) return;
+    
+    overlay.style.display = 'none';
+    overlay.classList.remove('active');
+    visualizerActive = false;
+    
+    if (visualizerAnimationId) {
+        cancelAnimationFrame(visualizerAnimationId);
+        visualizerAnimationId = null;
+    }
+}
+
+function drawVisualizer() {
+    if (!visualizerActive || !analyser || !ctx) {
+        visualizerAnimationId = requestAnimationFrame(drawVisualizer);
+        return;
+    }
+    
+    var width = canvas.width;
+    var height = canvas.height;
+    
+    // Очищаем
+    ctx.clearRect(0, 0, width, height);
+    
+    // Получаем данные
+    analyser.getByteFrequencyData(dataArray);
+    
+    // === РИСУЕМ КРУГОВУЮ ВОЛНУ ===
+    var centerX = width / 2;
+    var centerY = height / 2;
+    var radius = Math.min(width, height) * 0.3;
+    var bars = 64;
+    var barWidth = (Math.PI * 2) / bars;
+    
+    for (var i = 0; i < bars; i++) {
+        var value = dataArray[i] || 0;
+        var percent = value / 255;
+        var barHeight = percent * radius * 0.6;
+        
+        var angle = (i / bars) * Math.PI * 2;
+        var x1 = centerX + Math.cos(angle) * radius;
+        var y1 = centerY + Math.sin(angle) * radius;
+        var x2 = centerX + Math.cos(angle) * (radius + barHeight);
+        var y2 = centerY + Math.sin(angle) * (radius + barHeight);
+        
+        var hue = (i / bars) * 360 + Date.now() / 50;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = 'hsl(' + hue + ', 100%, 60%)';
+        ctx.lineWidth = 3;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = 'hsl(' + hue + ', 100%, 60%)';
+        ctx.stroke();
+    }
+    
+    // === ДОБАВЛЯЕМ ЦЕНТРАЛЬНЫЙ СВЕТ ===
+    var gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 0.5);
+    gradient.addColorStop(0, 'rgba(24, 119, 242, 0.2)');
+    gradient.addColorStop(1, 'rgba(24, 119, 242, 0)');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // === НАЗВАНИЕ ТРЕКА ===
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(PLAYLIST[currentTrack].name, centerX, height - 30);
+    
+    visualizerAnimationId = requestAnimationFrame(drawVisualizer);
+}
+
+// Обработка ресайза
+window.addEventListener('resize', function() {
+    if (canvas && visualizerActive) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+});
+
+// Закрытие по ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && visualizerActive) {
+        closeVisualizer();
+    }
+});
