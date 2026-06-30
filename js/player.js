@@ -211,3 +211,186 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
     initAudio();
 });
+
+// ================================================================
+// НАСТОЯЩИЙ ЭКВАЛАЙЗЕР (РАБОТАЕТ ОТ МУЗЫКИ)
+// ================================================================
+
+let audioContext = null;
+let analyser = null;
+let dataArray = null;
+let eqAnimationId = null;
+let eqBars = [];
+
+function initEqualizer() {
+    if (!audio) return;
+    if (audioContext) return;
+    
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 128;
+        
+        var source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        
+        // Находим все полоски эквалайзера
+        eqBars = document.querySelectorAll('.eq-bar');
+        
+        updateEqualizer();
+    } catch(e) {
+        console.log('Эквалайзер не поддерживается:', e);
+    }
+}
+
+function updateEqualizer() {
+    if (!analyser || !eqBars.length) {
+        eqAnimationId = requestAnimationFrame(updateEqualizer);
+        return;
+    }
+    
+    analyser.getByteFrequencyData(dataArray);
+    
+    var step = Math.floor(dataArray.length / eqBars.length);
+    var maxHeight = 40; // максимальная высота полоски
+    
+    for (var i = 0; i < eqBars.length; i++) {
+        var value = 0;
+        for (var j = 0; j < step; j++) {
+            value += dataArray[i * step + j] || 0;
+        }
+        value = value / step;
+        var percent = (value / 255) * 100;
+        var height = Math.max(3, (percent / 100) * maxHeight);
+        eqBars[i].style.height = height + 'px';
+    }
+    
+    eqAnimationId = requestAnimationFrame(updateEqualizer);
+}
+
+// Перезапускаем эквалайзер при воспроизведении
+var oldTogglePlay = window.togglePlay;
+window.togglePlay = function() {
+    initAudio();
+    if (!audio) return;
+    
+    if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+        var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+        if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
+        // Останавливаем эквалайзер
+        if (eqAnimationId) {
+            cancelAnimationFrame(eqAnimationId);
+            eqAnimationId = null;
+        }
+        // Сбрасываем полоски
+        eqBars.forEach(function(bar) {
+            bar.style.height = '3px';
+        });
+    } else {
+        // Инициализируем AudioContext при первом воспроизведении
+        if (!audioContext) {
+            initEqualizer();
+        }
+        audio.play()
+            .then(function() {
+                isPlaying = true;
+                var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+                // Запускаем эквалайзер
+                if (!eqAnimationId) {
+                    updateEqualizer();
+                }
+            })
+            .catch(function(e) {
+                console.log('Ошибка воспроизведения:', e);
+            });
+    }
+};
+
+// Обновляем при переключении треков
+var oldPlayTrack = window.playTrack;
+window.playTrack = function(index) {
+    if (index === currentTrack && isPlaying) {
+        togglePlay();
+        return;
+    }
+    
+    currentTrack = index;
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        // Пересоздаём эквалайзер для нового трека
+        if (audioContext) {
+            audioContext.close();
+            audioContext = null;
+            analyser = null;
+            if (eqAnimationId) {
+                cancelAnimationFrame(eqAnimationId);
+                eqAnimationId = null;
+            }
+            // Сбрасываем полоски
+            eqBars.forEach(function(bar) {
+                bar.style.height = '3px';
+            });
+        }
+        if (isPlaying) {
+            audio.play()
+                .then(function() {
+                    isPlaying = true;
+                    var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                    if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+                })
+                .catch(function(e) {
+                    console.log('Ошибка:', e);
+                });
+        }
+    } else {
+        initAudio();
+        togglePlay();
+    }
+    
+    var drawerTrackName = document.getElementById('drawerTrackName');
+    if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+    updateDrawerProgress();
+};
+
+// Останавливаем эквалайзер при паузе через другие кнопки
+var oldPlayNext = window.playNext;
+window.playNext = function() {
+    // Сбрасываем эквалайзер
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+        if (eqAnimationId) {
+            cancelAnimationFrame(eqAnimationId);
+            eqAnimationId = null;
+        }
+        eqBars.forEach(function(bar) {
+            bar.style.height = '3px';
+        });
+    }
+    oldPlayNext();
+};
+
+var oldPlayPrev = window.playPrev;
+window.playPrev = function() {
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+        if (eqAnimationId) {
+            cancelAnimationFrame(eqAnimationId);
+            eqAnimationId = null;
+        }
+        eqBars.forEach(function(bar) {
+            bar.style.height = '3px';
+        });
+    }
+    oldPlayPrev();
+};
