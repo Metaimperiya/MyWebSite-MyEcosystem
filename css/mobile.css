@@ -24,7 +24,6 @@
         height: 24px;
     }
     
-    /* Колокольчик еще меньше на мобилке */
     .notif-btn {
         font-size: 0.8rem;
         width: 24px;
@@ -38,6 +37,10 @@
         line-height: 14px;
         top: -3px;
         right: -3px;
+    }
+    
+    .menu-dots {
+        font-size: 1.2rem;
     }
     
     .player-mini {
@@ -56,15 +59,6 @@
         font-size: 7px;
     }
     
-    .player-mini .playlist-btn {
-        font-size: 0.6rem;
-    }
-    
-    .tab-bar .tab {
-        font-size: 0.5rem;
-        padding: 4px 6px;
-    }
-    
     .container {
         padding: 6px 6px 50px;
     }
@@ -78,12 +72,6 @@
         gap: 4px;
     }
     
-    .playlist-dropdown {
-        min-width: 120px;
-        right: 0;
-        top: 44px;
-    }
-    
     .sidebar {
         width: 260px;
         left: -260px;
@@ -91,114 +79,6 @@
         height: calc(100% - 44px);
     }
     
-    .comment-item .avatar-wrap {
-        width: 24px;
-        height: 24px;
-    }
-    
-    .profile-header .avatar-wrap {
-        width: 56px;
-        height: 56px;
-    }
-    
-    .profile-header .avatar-wrap .letter {
-        font-size: 1.5rem;
-    }
-}
-
-/* ================================================================
-   МОБИЛЬНЫЙ АДАПТИВ
-   ================================================================ */
-
-@media (max-width: 480px) {
-    .topbar {
-        padding: 6px 8px;
-    }
-    
-    .topbar .left .logo {
-        font-size: 0.7rem;
-    }
-    
-    .topbar .left .menu-btn {
-        font-size: 1rem;
-    }
-    
-    .topbar .right .username {
-        display: none;
-    }
-    
-    .topbar .right .avatar-wrap {
-        width: 24px;
-        height: 24px;
-    }
-    
-    .notif-btn {
-        font-size: 0.8rem;
-        width: 24px;
-        height: 24px;
-    }
-    
-    #notifBadge {
-        font-size: 0.4rem;
-        min-width: 14px;
-        height: 14px;
-        line-height: 14px;
-        top: -3px;
-        right: -3px;
-    }
-    
-    .player-mini {
-        max-width: 130px;
-        padding: 2px 6px;
-    }
-    
-    .player-mini .track-name {
-        max-width: 35px;
-        font-size: 0.45rem;
-    }
-    
-    .player-mini .play-btn {
-        width: 18px;
-        height: 18px;
-        font-size: 7px;
-    }
-    
-    .player-mini .playlist-btn {
-        font-size: 0.6rem;
-    }
-    
-    .tab-bar .tab {
-        font-size: 0.5rem;
-        padding: 4px 6px;
-    }
-    
-    .container {
-        padding: 6px 6px 50px;
-    }
-    
-    .post .link-preview iframe {
-        height: 160px;
-    }
-    
-    .group-list {
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-    }
-    
-    .playlist-dropdown {
-        min-width: 120px;
-        right: 0;
-        top: 44px;
-    }
-    
-    .sidebar {
-        width: 260px;
-        left: -260px;
-        top: 44px;
-        height: calc(100% - 44px);
-    }
-    
-    /* ===== КОММЕНТАРИИ НА МОБИЛКЕ ===== */
     .comment-item .avatar-wrap {
         width: 24px;
         height: 24px;
@@ -226,5 +106,37 @@
     
     .profile-header .avatar-wrap .letter {
         font-size: 1.5rem;
+    }
+    
+    .player-drawer {
+        transform: translateY(calc(100% - 40px));
+    }
+    
+    .player-content .player-controls {
+        gap: 4px;
+    }
+    
+    .player-content .player-btn {
+        font-size: 0.9rem;
+        padding: 3px 6px;
+    }
+    
+    .player-content .player-btn.play-large {
+        font-size: 1.5rem;
+    }
+    
+    .player-content .player-playlist .playlist-item {
+        font-size: 0.55rem;
+        padding: 2px 6px;
+    }
+    
+    .settings-dropdown {
+        min-width: 150px;
+        right: 4px;
+    }
+    
+    .settings-item {
+        font-size: 0.7rem;
+        padding: 6px 12px;
     }
 }
