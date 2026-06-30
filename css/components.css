@@ -1059,3 +1059,57 @@
 .friend-btn.received:hover {
     background: #b7ebc5;
 }
+
+/* ================================================================
+   КНОПКИ ДРУЗЕЙ
+   ================================================================ */
+
+.friend-btn {
+    padding: 4px 14px;
+    border: none;
+    border-radius: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.65rem;
+    transition: 0.2s;
+}
+
+.friend-btn.add {
+    background: #1877f2;
+    color: #fff;
+}
+
+.friend-btn.add:hover {
+    background: #4a9eff;
+}
+
+.friend-btn.friend {
+    background: #e4e6eb;
+    color: #555;
+    cursor: pointer;
+}
+
+.friend-btn.friend:hover {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.friend-btn.pending {
+    background: #fff3cd;
+    color: #856404;
+    cursor: pointer;
+}
+
+.friend-btn.pending:hover {
+    background: #ffeaa7;
+}
+
+.friend-btn.received {
+    background: #d4edda;
+    color: #155724;
+    cursor: pointer;
+}
+
+.friend-btn.received:hover {
+    background: #b7ebc5;
+}
