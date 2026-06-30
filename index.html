@@ -1,276 +1,118 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-    <title>METAIMPERIYA — Социальная платформа нового поколения</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAIMPERIYA — Социальная платформа</title>
     
-    <!-- ===== SEO ===== -->
-    <meta name="description" content="METAIMPERIYA — социальная платформа нового поколения. Общайся, создавай группы, делись постами и музыкой." />
-    <meta name="keywords" content="социальная сеть, общение, группы, посты, музыка, метаимперия, metaimperiya, чат, друзья" />
-    <meta name="author" content="METAIMPERIYA" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://metaimperiya.github.io/" />
+    <!-- SEO -->
+    <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
+    <meta name="theme-color" content="#1877f2">
     
-    <!-- ===== OPEN GRAPH ===== -->
-    <meta property="og:title" content="METAIMPERIYA — Социальная платформа" />
-    <meta property="og:description" content="Общайся, создавай группы, делись постами и музыкой. Присоединяйся к METAIMPERIYA!" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://metaimperiya.github.io/" />
-    <meta property="og:image" content="https://metaimperiya.github.io/metaimperiya-512x512.png" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:site_name" content="METAIMPERIYA" />
-    <meta property="og:locale" content="ru_RU" />
-    
-    <!-- ===== TWITTER ===== -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="METAIMPERIYA — Социальная платформа" />
-    <meta name="twitter:description" content="Общайся, создавай группы, делись постами и музыкой." />
-    <meta name="twitter:image" content="https://metaimperiya.github.io/metaimperiya-512x512.png" />
-    
-    <!-- ===== ДОП. META ===== -->
-    <meta name="theme-color" content="#1877f2" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="manifest" href="site.webmanifest" />
-    
-    <!-- ===== FAVICONS ===== -->
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya.ico" />
-    <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-16x16.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/icons/metaimperiya-32x32.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-192x192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-512x512.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/Metaimperiya/MyWebSite-MyEcosystem/main/assets/images/metaimperiya-icon.png" />
-
-    <!-- ===== FIREBASE ===== -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-
-    <!-- ===== CSS ===== -->
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/mobile.css">
-
 </head>
 <body>
 
-<div class="app">
-
-    <!-- ===== ТОПБАР ===== -->
-    <div class="topbar">
+<div class="app" id="app">
+    
+    <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
+    <header class="topbar">
         <div class="left">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+            <span class="logo" onclick="goToFeed()">METAIMPERIYA</span>
         </div>
         <div class="center">
             <div class="player-mini">
-                <button class="play-btn-mini" id="playBtn" onclick="playMusic()">▶</button>
-                <span class="track-name-mini" id="trackName">Capitulation</span>
-                <span class="track-time" id="currentTime">0:00</span>
-                <button class="playlist-btn-mini" onclick="togglePlaylist()">📋</button>
+                <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                <span class="track-name" id="trackName">Capitulation</span>
+                <button class="playlist-btn" onclick="togglePlaylist()">📋</button>
             </div>
         </div>
         <div class="right">
-            <button class="notif-btn" onclick="openNotifications()" title="Уведомления" style="background:none;border:none;font-size:1.2rem;cursor:pointer;position:relative;color:#555;margin-right:4px;">
-                🔔 <span id="notifBadge" style="display:none;background:#e74c3c;color:#fff;border-radius:50%;padding:0 5px;font-size:0.5rem;position:absolute;top:-4px;right:-4px;">0</span>
-            </button>
+            <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
             <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
                 <span class="letter">?</span>
             </div>
-            <span class="name" id="topName" onclick="goToProfile()">Гость</span>
-            <button class="logout-btn" onclick="logout()" title="Выйти">🚪</button>
+            <span class="username" id="topName" onclick="goToProfile()">Гость</span>
+            <button class="logout-btn" onclick="logout()">🚪</button>
         </div>
-    </div>
+    </header>
 
-    <!-- ===== ВЫПАДАЮЩИЙ СПИСОК ===== -->
+    <!-- ===== ПЛЕЙЛИСТ ===== -->
     <div class="playlist-dropdown" id="playlistDropdown">
-        <div class="playlist-item active" onclick="playTrack(0)">
-            <span class="playlist-num">01</span>
-            <span class="playlist-name">Capitulation</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(1)">
-            <span class="playlist-num">02</span>
-            <span class="playlist-name">Clean Victory</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(2)">
-            <span class="playlist-num">03</span>
-            <span class="playlist-name">Covenant of Change</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(3)">
-            <span class="playlist-num">04</span>
-            <span class="playlist-name">Dreams in the Wind</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(4)">
-            <span class="playlist-num">05</span>
-            <span class="playlist-name">Memory Like Dust</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(5)">
-            <span class="playlist-num">06</span>
-            <span class="playlist-name">Nobody</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(6)">
-            <span class="playlist-num">07</span>
-            <span class="playlist-name">Touch of Choice</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(7)">
-            <span class="playlist-num">08</span>
-            <span class="playlist-name">You Are Not in the Game</span>
-        </div>
-        <div class="playlist-item" onclick="playTrack(8)">
-            <span class="playlist-num">09</span>
-            <span class="playlist-name">You Can't See Me</span>
-        </div>
+        <div class="playlist-item active" onclick="playTrack(0)">01 Capitulation</div>
+        <div class="playlist-item" onclick="playTrack(1)">02 Clean Victory</div>
+        <div class="playlist-item" onclick="playTrack(2)">03 Covenant of Change</div>
+        <div class="playlist-item" onclick="playTrack(3)">04 Dreams in the Wind</div>
+        <div class="playlist-item" onclick="playTrack(4)">05 Memory Like Dust</div>
+        <div class="playlist-item" onclick="playTrack(5)">06 Nobody</div>
+        <div class="playlist-item" onclick="playTrack(6)">07 Touch of Choice</div>
+        <div class="playlist-item" onclick="playTrack(7)">08 You Are Not in the Game</div>
+        <div class="playlist-item" onclick="playTrack(8)">09 You Can't See Me</div>
     </div>
 
     <!-- ===== ТАБЫ ===== -->
-    <div class="tab-bar">
-        <button class="tab active" onclick="goToFeed()">📰 Лента</button>
-        <button class="tab" onclick="goToGroups()">👥 Группы</button>
-        <button class="tab" onclick="goToPeople()">👤 Люди</button>
-        <button class="tab" onclick="goToProfile()">👤 Профиль</button>
-    </div>
+    <nav class="tab-bar">
+        <button class="tab active" data-page="feed" onclick="goToFeed()">📰 Лента</button>
+        <button class="tab" data-page="groups" onclick="goToGroups()">👥 Группы</button>
+        <button class="tab" data-page="people" onclick="goToPeople()">👤 Люди</button>
+        <button class="tab" data-page="profile" onclick="goToProfile()">👤 Профиль</button>
+    </nav>
 
-    <!-- ================================================================
-         САЙДБАР С КУЧЕЙ РАЗДЕЛОВ
-         ================================================================ -->
+    <!-- ===== САЙДБАР ===== -->
     <div class="sidebar" id="sidebar">
-        <div class="head">
+        <div class="sidebar-header">
             <h3>📱 Меню</h3>
-            <button class="close" onclick="closeSidebar()">✕</button>
+            <button class="close-btn" onclick="closeSidebar()">✕</button>
         </div>
-
-        <!-- ===== ЮЗЕР ===== -->
-        <div class="user">
+        <div class="sidebar-user">
             <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
             <div>
                 <div class="name" id="sName">Гость</div>
-                <div class="online-status">онлайн</div>
+                <div class="status">онлайн</div>
             </div>
         </div>
-
-        <!-- ===== ГЛАВНЫЕ РАЗДЕЛЫ ===== -->
-        <div class="nav-item active" onclick="goToFeed();closeSidebar();">🏠 Главная</div>
-        <div class="nav-item" onclick="goToProfile();closeSidebar();">👤 Профиль</div>
-        <div class="nav-item" onclick="goToPeople();closeSidebar();">👥 Люди</div>
-        <div class="nav-item" onclick="goToGroups();closeSidebar();">💬 Сообщества</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== МУЛЬТИМЕДИА ===== -->
-        <div class="sidebar-title">🎵 Мультимедиа</div>
-        <div class="nav-item" onclick="closeSidebar();">📸 Фото</div>
-        <div class="nav-item" onclick="closeSidebar();">🎥 Видео</div>
-        <div class="nav-item" onclick="closeSidebar();">🎵 Музыка</div>
-        <div class="nav-item" onclick="closeSidebar();">📚 Книги</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ТЕХНОЛОГИИ ===== -->
-        <div class="sidebar-title">💻 Технологии</div>
-        <div class="nav-item" onclick="closeSidebar();">💻 Программирование</div>
-        <div class="nav-item" onclick="closeSidebar();">🌐 Сайты</div>
-        <div class="nav-item" onclick="closeSidebar();">🤖 AI / ChatGPT</div>
-        <div class="nav-item" onclick="closeSidebar();">🕶️ VR / AR</div>
-        <div class="nav-item" onclick="closeSidebar();">🔐 Безопасность</div>
-        <div class="nav-item" onclick="closeSidebar();">☁️ Cloud</div>
-        <div class="nav-item" onclick="closeSidebar();">🌐 Open Source</div>
-        <div class="nav-item" onclick="closeSidebar();">🧩 API / SDK</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== БИЗНЕС И ФИНАНСЫ ===== -->
-        <div class="sidebar-title">💰 Бизнес</div>
-        <div class="nav-item" onclick="closeSidebar();">💰 Бизнес</div>
-        <div class="nav-item" onclick="closeSidebar();">📈 Финансы</div>
-        <div class="nav-item" onclick="closeSidebar();">🪙 Криптовалюты</div>
-        <div class="nav-item" onclick="closeSidebar();">🛒 Маркетплейс</div>
-        <div class="nav-item" onclick="closeSidebar();">💼 Работа</div>
-        <div class="nav-item" onclick="closeSidebar();">📦 Проекты</div>
-        <div class="nav-item" onclick="closeSidebar();">🚀 Стартапы</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ЖИЗНЬ И ХОББИ ===== -->
-        <div class="sidebar-title">🌍 Жизнь</div>
-        <div class="nav-item" onclick="closeSidebar();">✈️ Путешествия</div>
-        <div class="nav-item" onclick="closeSidebar();">🍔 Еда</div>
-        <div class="nav-item" onclick="closeSidebar();">🏠 Недвижимость</div>
-        <div class="nav-item" onclick="closeSidebar();">⚽ Спорт</div>
-        <div class="nav-item" onclick="closeSidebar();">🎮 Игры</div>
-        <div class="nav-item" onclick="closeSidebar();">🎭 Аниме</div>
-        <div class="nav-item" onclick="closeSidebar();">🎬 Кино</div>
-        <div class="nav-item" onclick="closeSidebar();">📺 Сериалы</div>
-        <div class="nav-item" onclick="closeSidebar();">🎤 Блогеры</div>
-        <div class="nav-item" onclick="closeSidebar();">🎭 Мемы</div>
-        <div class="nav-item" onclick="closeSidebar();">👗 Мода</div>
-        <div class="nav-item" onclick="closeSidebar();">🚗 Автомобили</div>
-        <div class="nav-item" onclick="closeSidebar();">❤️ Волонтёрство</div>
-        <div class="nav-item" onclick="closeSidebar();">🐾 Животные</div>
-        <div class="nav-item" onclick="closeSidebar();">🎯 Хобби</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ОБЩЕНИЕ ===== -->
-        <div class="sidebar-title">💬 Общение</div>
-        <div class="nav-item" onclick="closeSidebar();">💖 Знакомства</div>
-        <div class="nav-item" onclick="closeSidebar();">🤝 Команда</div>
-        <div class="nav-item" onclick="closeSidebar();">🏳️‍🌈 LGBTQ+</div>
-        <div class="nav-item" onclick="closeSidebar();">🗣️ Языки</div>
-        <div class="nav-item" onclick="closeSidebar();">❓ Q&A</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== НОВОСТИ И МЕДИА ===== -->
-        <div class="sidebar-title">📰 Новости</div>
-        <div class="nav-item" onclick="closeSidebar();">📰 Новости</div>
-        <div class="nav-item" onclick="closeSidebar();">📡 Стримы</div>
-        <div class="nav-item" onclick="closeSidebar();">🎉 События</div>
-        <div class="nav-item" onclick="closeSidebar();">📻 Подкасты</div>
-        <div class="nav-item" onclick="closeSidebar();">🏆 Конкурсы</div>
-        <div class="nav-item" onclick="closeSidebar();">🎁 Акции и скидки</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== ОСТАЛЬНОЕ ===== -->
-        <div class="sidebar-title">🔧 Другое</div>
-        <div class="nav-item" onclick="closeSidebar();">📄 Страницы</div>
-        <div class="nav-item" onclick="closeSidebar();">📝 Блог</div>
-        <div class="nav-item" onclick="closeSidebar();">🛍️ Покупки</div>
-        <div class="nav-item" onclick="closeSidebar();">📞 Услуги</div>
-        <div class="nav-item" onclick="closeSidebar();">🧑‍💼 Фриланс</div>
-        <div class="nav-item" onclick="closeSidebar();">🏛️ Организации</div>
-        <div class="nav-item" onclick="closeSidebar();">🏴‍☠️ METAIMPERIYA</div>
-
-        <div class="sidebar-divider"></div>
-
-        <!-- ===== КНОПКА СОЗДАНИЯ ===== -->
-        <div class="footer">
+        <div class="sidebar-nav">
+            <div class="nav-item active" onclick="goToFeed();closeSidebar()">🏠 Главная</div>
+            <div class="nav-item" onclick="goToProfile();closeSidebar()">👤 Профиль</div>
+            <div class="nav-item" onclick="goToPeople();closeSidebar()">👥 Люди</div>
+            <div class="nav-item" onclick="goToGroups();closeSidebar()">💬 Сообщества</div>
+            <div class="nav-item" onclick="closeSidebar()">🎵 Музыка</div>
+            <div class="nav-item" onclick="closeSidebar()">📸 Фото</div>
+            <div class="nav-item" onclick="closeSidebar()">🎥 Видео</div>
+        </div>
+        <div class="sidebar-footer">
             <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
         </div>
     </div>
-
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-    <!-- ===== КОНТЕЙНЕР ===== -->
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <div class="container">
 
         <!-- ЛЕНТА -->
-        <div class="page feed-page active" id="feedPage">
+        <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
-                    <textarea id="postInput" placeholder="Что у вас нового?"></textarea>
-                    <div class="actions">
+                    <textarea id="postInput" placeholder="Что у вас нового?" rows="2"></textarea>
+                    <div class="post-actions">
                         <label class="file-label" for="fileInput">📎 Фото</label>
-                        <button class="submit" onclick="submitPost()">📤 Опубликовать</button>
-                        <button class="cancel" onclick="document.getElementById('postInput').value='';removeImage();">Очистить</button>
+                        <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                        <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
                     </div>
                     <input type="file" id="fileInput" accept="image/*" class="hidden">
-                    <div id="previewBox" class="preview-box">
+                    <div class="preview-box" id="previewBox">
                         <img id="previewImg">
-                        <span id="previewName" style="font-size:0.55rem;max-width:60px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;"></span>
+                        <span id="previewName"></span>
                         <button class="remove-pic" onclick="removeImage()">✕</button>
                     </div>
                 </div>
@@ -279,7 +121,7 @@
         </div>
 
         <!-- ГРУППЫ -->
-        <div class="page groups-page" id="groupsPage">
+        <div class="page" id="page-groups">
             <div class="card">
                 <h3>👥 Группы</h3>
                 <div class="group-list" id="groupList"></div>
@@ -287,7 +129,7 @@
         </div>
 
         <!-- ЛЮДИ -->
-        <div class="page people-page" id="peoplePage">
+        <div class="page" id="page-people">
             <div class="card">
                 <h3>👤 Все пользователи</h3>
                 <div class="people-list" id="peopleList"></div>
@@ -295,19 +137,18 @@
         </div>
 
         <!-- ПРОФИЛЬ -->
-        <div class="page profile-page" id="profilePage">
+        <div class="page" id="page-profile">
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()">
                     <span class="letter">?</span>
                 </div>
                 <div class="name" id="profileName">Гость</div>
-                <div class="bio" id="profileBio">Настройте свой профиль</div>
+                <div class="bio" id="profileBio">Настройте профиль</div>
                 <div class="profile-stats">
-                    <span onclick="toggleStat('friends')">🤝 Друзья: <span id="friendsCount">0</span></span>
-                    <span onclick="toggleStat('subscribers')">👀 Подписчики: <span id="subscribersCount">0</span></span>
-                    <span onclick="toggleStat('subscriptions')">📌 Подписки: <span id="subscriptionsCount">0</span></span>
+                    <span>🤝 Друзья: <span id="friendsCount">0</span></span>
+                    <span>👀 Подписчики: <span id="subscribersCount">0</span></span>
                 </div>
-                <div class="actions" id="profileActions">
+                <div class="profile-actions" id="profileActions">
                     <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
                     <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
                 </div>
@@ -316,114 +157,87 @@
                 <h4>🤝 Друзья</h4>
                 <div class="friend-list" id="friendList"></div>
             </div>
-            <h4 style="margin:4px 0;font-size:0.7rem;color:#555;">📰 Посты пользователя</h4>
+            <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
             <div id="profilePosts"></div>
         </div>
 
         <!-- ЧАТ -->
         <div class="chat-view" id="chatView">
-            <button class="back" onclick="closeChat()">← Назад</button>
-            <div class="messages" id="chatMessages"></div>
-            <div class="input-wrap">
+            <button class="back-btn" onclick="closeChat()">← Назад</button>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
                 <input type="text" id="chatInput" placeholder="Сообщение...">
-                <button onclick="sendChat()">→</button>
+                <button onclick="sendChatMessage()">→</button>
             </div>
         </div>
 
     </div>
 
-    <!-- ===== АДМИН ТОЧКА ===== -->
-    <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
-
     <!-- ===== МОДАЛКИ ===== -->
-
-    <!-- МОДАЛКА ВХОДА -->
+    
+    <!-- Вход -->
     <div class="modal" id="loginModal">
-        <div class="box">
+        <div class="modal-box">
             <h3>👤 Вход</h3>
             <button class="google-btn" id="googleBtn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Войти через Google
             </button>
             <div class="divider">или</div>
             <input type="text" id="nameInput" placeholder="Введите имя...">
-            <div class="btns">
-                <button class="cancel" onclick="closeLogin()">Отмена</button>
-                <button class="save" onclick="loginName()">Войти</button>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeLogin()">Отмена</button>
+                <button class="btn-save" onclick="loginWithName()">Войти</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА -->
-    <div class="modal" id="editModal">
-        <div class="box">
-            <h3>✏️ Редактировать пост</h3>
-            <div class="sub">Измените содержимое поста</div>
-            <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
-            <textarea id="editText" placeholder="📝 Текст поста"></textarea>
-            <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
-            <div class="frame-size-toggle">
-                <span class="label">📐 Размер фрейма:</span>
-                <div class="btn-group">
-                    <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">📱 Обычный</button>
-                    <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">🖥️ Широкий</button>
-                </div>
-            </div>
-            <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
-            <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
-            <div id="editButtonsContainer"></div>
-            <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
-            <div class="btns" style="margin-top:6px;">
-                <button class="save" onclick="saveEdit()">💾 Сохранить</button>
-                <button class="cancel" onclick="closeEdit()">✕ Отмена</button>
-            </div>
-            <button onclick="deleteEditPost()" style="width:100%;padding:3px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
-        </div>
-    </div>
-
-    <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+    <!-- Редактирование профиля -->
     <div class="modal" id="editProfileModal">
-        <div class="box">
+        <div class="modal-box">
             <h3>✏️ Редактировать профиль</h3>
             <input type="text" id="editName" placeholder="Имя">
             <textarea id="editBio" placeholder="О себе..."></textarea>
-            <div class="btns">
-                <button class="cancel" onclick="closeEditProfile()">Отмена</button>
-                <button class="save" onclick="saveProfile()">Сохранить</button>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeEditProfile()">Отмена</button>
+                <button class="btn-save" onclick="saveProfile()">Сохранить</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛКА СОЗДАНИЯ ГРУППЫ -->
+    <!-- Создание группы -->
     <div class="modal" id="createRoomModal">
-        <div class="box">
+        <div class="modal-box">
             <h3>📝 Новая группа</h3>
             <input type="text" id="roomName" placeholder="Название...">
-            <div class="btns">
-                <button class="cancel" onclick="closeCreateRoom()">Отмена</button>
-                <button class="save" onclick="doCreateRoom()">Создать</button>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeCreateRoom()">Отмена</button>
+                <button class="btn-save" onclick="createRoom()">Создать</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛКА АДМИНА -->
+    <!-- Админ -->
     <div class="modal" id="adminModal">
-        <div class="box">
+        <div class="modal-box">
             <h3>🏴‍☠️ Админ</h3>
             <input type="password" id="adminPass" placeholder="Пароль...">
-            <div class="btns">
-                <button class="cancel" onclick="closeAdminModal()">Отмена</button>
-                <button class="save" onclick="checkAdmin()">Войти</button>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAdminModal()">Отмена</button>
+                <button class="btn-save" onclick="checkAdmin()">Войти</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛКА УВЕДОМЛЕНИЙ -->
+    <!-- Уведомления -->
     <div class="modal" id="notificationsModal">
-        <div class="box">
-            <h3>🔔 Уведомления <button onclick="closeNotifications()" style="float:right;background:none;border:none;font-size:1.2rem;cursor:pointer;">✕</button></h3>
+        <div class="modal-box">
+            <h3>🔔 Уведомления <button class="close-btn" onclick="closeNotifications()">✕</button></h3>
             <div id="notificationsList"></div>
         </div>
     </div>
+
+    <!-- Админ-точка -->
+    <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
 </div>
 
