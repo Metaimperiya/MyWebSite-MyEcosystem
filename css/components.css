@@ -1,6 +1,7 @@
 /* ================================================================
    ПОСТЫ
    ================================================================ */
+
 .post-form {
     background: #fff;
     border-radius: 12px;
@@ -26,14 +27,15 @@
     border-color: #1877f2;
 }
 
-.post-form .actions {
+.post-form .post-actions {
     display: flex;
     gap: 4px;
     margin-top: 4px;
     flex-wrap: wrap;
 }
 
-.post-form .actions button {
+.post-form .post-actions button,
+.post-form .post-actions label {
     padding: 4px 14px;
     border: none;
     border-radius: 20px;
@@ -42,29 +44,19 @@
     font-size: 0.65rem;
 }
 
-.post-form .actions .submit {
+.post-form .post-actions .btn-submit {
     background: #1877f2;
     color: #fff;
 }
 
-.post-form .actions .cancel {
+.post-form .post-actions .btn-cancel {
     background: #e4e6eb;
     color: #555;
 }
 
-.post-form .file-label {
+.post-form .post-actions .file-label {
     background: #e4e6eb;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-size: 0.6rem;
-    cursor: pointer;
-    display: inline-block;
-    margin-top: 3px;
     color: #555;
-}
-
-.post-form .hidden {
-    display: none;
 }
 
 .post-form .preview-box {
@@ -89,7 +81,7 @@
     object-fit: cover;
 }
 
-.post-form .remove-pic {
+.post-form .preview-box .remove-pic {
     background: #ffebee;
     color: #c62828;
     border: none;
@@ -162,78 +154,17 @@
     font-size: 0.6rem;
 }
 
-.post .name {
+.post .author .name {
     font-weight: 600;
     font-size: 0.8rem;
     color: #1877f2;
     cursor: pointer;
 }
 
-.post .time {
+.post .author .time {
     color: #999;
     font-size: 0.5rem;
     margin-left: 6px;
-}
-
-.post .post-menu {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-}
-
-.post .post-menu .dots {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 0 4px;
-}
-
-.post .post-menu .dots:hover {
-    color: #222;
-}
-
-.post .post-menu .dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 22px;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    z-index: 50;
-    min-width: 120px;
-    padding: 4px 0;
-}
-
-.post .post-menu .dropdown.open {
-    display: block;
-}
-
-.post .post-menu .dropdown button {
-    display: block;
-    width: 100%;
-    padding: 4px 12px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.7rem;
-    cursor: pointer;
-    color: #555;
-}
-
-.post .post-menu .dropdown button:hover {
-    background: #f0f2f5;
-}
-
-.post .post-menu .dropdown .edit-btn {
-    color: #e67e22;
-}
-
-.post .post-menu .dropdown .del-btn {
-    color: #e74c3c;
 }
 
 .post .text {
@@ -354,43 +285,125 @@
     color: #1877f2;
 }
 
+.post .post-menu {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+}
+
+.post .post-menu .dots {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.post .post-menu .dots:hover {
+    color: #222;
+}
+
+.post .post-menu .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 22px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 50;
+    min-width: 120px;
+    padding: 4px 0;
+}
+
+.post .post-menu .dropdown.open {
+    display: block;
+}
+
+.post .post-menu .dropdown button {
+    display: block;
+    width: 100%;
+    padding: 4px 12px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: #555;
+}
+
+.post .post-menu .dropdown button:hover {
+    background: #f0f2f5;
+}
+
+.post .post-menu .dropdown .edit-btn {
+    color: #e67e22;
+}
+
+.post .post-menu .dropdown .del-btn {
+    color: #e74c3c;
+}
+
 /* ================================================================
-   КОММЕНТАРИИ (КАК В FACEBOOK)
+   КОММЕНТАРИИ
    ================================================================ */
-.comments {
+
+.comments-wrapper {
     margin-top: 6px;
     border-top: 1px solid #eee;
     padding-top: 6px;
 }
 
-.comments-toggle {
-    background: none;
-    border: none;
-    color: #65676b;
-    cursor: pointer;
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    border-radius: 20px;
-    transition: 0.2s;
-    display: inline-flex;
-    align-items: center;
+.comment-input-wrap {
+    display: flex;
     gap: 4px;
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 4px;
 }
 
-.comments-toggle:hover {
+.comment-input-wrap input {
+    flex: 1;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    outline: none;
     background: #f0f2f5;
-    color: #1877f2;
+    transition: 0.2s;
 }
 
-.comments-toggle.active {
-    color: #1877f2;
+.comment-input-wrap input:focus {
+    border-color: #1877f2;
+    background: #fff;
+}
+
+.comment-input-wrap button {
+    background: #1877f2;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+
+.comment-input-wrap button:hover {
+    background: #4a9eff;
 }
 
 .comments-body {
     display: none;
-    margin-top: 6px;
-    border-top: 1px solid #eee;
-    padding-top: 6px;
+    margin-top: 4px;
 }
 
 .comments-body.open {
@@ -401,7 +414,6 @@
     max-height: 300px;
     overflow-y: auto;
     padding-right: 4px;
-    margin-bottom: 6px;
 }
 
 .comments-list::-webkit-scrollbar {
@@ -416,10 +428,6 @@
 .comments-list::-webkit-scrollbar-thumb {
     background: #ccc;
     border-radius: 4px;
-}
-
-.comments-list::-webkit-scrollbar-thumb:hover {
-    background: #aaa;
 }
 
 .comment-item {
@@ -569,58 +577,11 @@
     color: #e74c3c;
 }
 
-.comment-input-wrap {
-    display: flex;
-    gap: 4px;
+.no-comments {
+    color: #bbb;
+    font-size: 0.6rem;
     padding: 4px 0;
-    border-top: 1px solid #eee;
-    margin-top: 2px;
-}
-
-.comment-input-wrap input {
-    flex: 1;
-    padding: 6px 12px;
-    border: 1px solid #ddd;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    outline: none;
-    background: #f0f2f5;
-    transition: 0.2s;
-}
-
-.comment-input-wrap input:focus {
-    border-color: #1877f2;
-    background: #fff;
-}
-
-.comment-input-wrap input::placeholder {
-    color: #999;
-}
-
-.comment-input-wrap button {
-    background: #1877f2;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s;
-    flex-shrink: 0;
-}
-
-.comment-input-wrap button:hover {
-    background: #4a9eff;
-}
-
-.comment-input-wrap button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+    text-align: center;
 }
 
 .show-more-btn {
@@ -638,16 +599,10 @@
     text-decoration: underline;
 }
 
-.no-comments {
-    color: #bbb;
-    font-size: 0.6rem;
-    padding: 4px 0;
-    text-align: center;
-}
-
 /* ================================================================
    ПРОФИЛЬ
    ================================================================ */
+
 .profile-header {
     background: #fff;
     border-radius: 12px;
@@ -694,34 +649,7 @@
     margin-top: 2px;
 }
 
-.profile-header .actions {
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-    margin-top: 6px;
-    flex-wrap: wrap;
-}
-
-.profile-header .actions button {
-    padding: 3px 12px;
-    border: none;
-    border-radius: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 0.6rem;
-}
-
-.profile-header .actions .edit-btn {
-    background: #e4e6eb;
-    color: #555;
-}
-
-.profile-header .actions .avatar-btn {
-    background: #333;
-    color: #fff;
-}
-
-.profile-stats {
+.profile-header .profile-stats {
     display: flex;
     gap: 12px;
     justify-content: center;
@@ -730,8 +658,31 @@
     color: #888;
 }
 
-.profile-stats span {
+.profile-header .profile-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.profile-header .profile-actions button {
+    padding: 3px 12px;
+    border: none;
+    border-radius: 16px;
+    font-weight: 600;
     cursor: pointer;
+    font-size: 0.6rem;
+}
+
+.profile-header .profile-actions .edit-btn {
+    background: #e4e6eb;
+    color: #555;
+}
+
+.profile-header .profile-actions .avatar-btn {
+    background: #333;
+    color: #fff;
 }
 
 .friends-section {
@@ -792,13 +743,14 @@
 /* ================================================================
    ГРУППЫ
    ================================================================ */
-.groups-page .group-list {
+
+.group-list {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px;
 }
 
-.groups-page .group-card {
+.group-card {
     background: #fff;
     border-radius: 12px;
     padding: 12px;
@@ -809,22 +761,22 @@
     transition: all 0.2s;
 }
 
-.groups-page .group-card:hover {
+.group-card:hover {
     transform: translateY(-2px);
     border-color: #1877f2;
 }
 
-.groups-page .group-card .icon {
+.group-card .icon {
     font-size: 1.5rem;
 }
 
-.groups-page .group-card .name {
+.group-card .name {
     font-weight: 600;
     font-size: 0.75rem;
     margin-top: 2px;
 }
 
-.groups-page .group-card .count {
+.group-card .count {
     color: #888;
     font-size: 0.6rem;
 }
@@ -832,13 +784,14 @@
 /* ================================================================
    ЛЮДИ
    ================================================================ */
-.people-page .people-list {
+
+.people-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.people-page .people-item {
+.people-item {
     background: #fff;
     border-radius: 10px;
     padding: 8px 12px;
@@ -850,7 +803,7 @@
     gap: 8px;
 }
 
-.people-page .people-item .avatar-wrap {
+.people-item .avatar-wrap {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -861,361 +814,128 @@
     justify-content: center;
 }
 
-.people-page .people-item .avatar-wrap img {
+.people-item .avatar-wrap img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.people-page .people-item .avatar-wrap .letter {
+.people-item .avatar-wrap .letter {
     color: #fff;
     font-weight: 700;
     font-size: 0.7rem;
 }
 
-.people-page .people-item .info {
+.people-item .info {
     flex: 1;
 }
 
-.people-page .people-item .info .name {
+.people-item .info .name {
     font-weight: 600;
     font-size: 0.75rem;
 }
 
-.people-page .people-item .info .status {
+.people-item .info .status {
     color: #888;
     font-size: 0.6rem;
 }
 
 /* ================================================================
-   ЧАТ
+   ПЛЕЙЛИСТ
    ================================================================ */
-.chat-view {
-    display: none;
-    background: #fff;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    border: 1px solid #e8e8e8;
-    height: 60vh;
-    flex-direction: column;
-}
 
-.chat-view.active {
-    display: flex;
-}
-
-.chat-view .back {
-    background: none;
-    border: none;
-    color: #1877f2;
-    cursor: pointer;
-    font-weight: 600;
-    margin-bottom: 4px;
-    font-size: 0.75rem;
-}
-
-.chat-view .messages {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 4px;
-}
-
-.chat-view .messages .msg {
-    padding: 4px 8px;
-    margin-bottom: 2px;
-    background: #f5f5f5;
-    border-radius: 6px;
-    font-size: 0.75rem;
-}
-
-.chat-view .messages .msg .author {
-    font-weight: 600;
-    font-size: 0.65rem;
-    color: #1877f2;
-}
-
-.chat-view .messages .msg .time {
-    color: #999;
-    font-size: 0.45rem;
-    margin-left: 4px;
-}
-
-.chat-view .input-wrap {
-    display: flex;
-    gap: 4px;
-}
-
-.chat-view .input-wrap input {
-    flex: 1;
-    padding: 4px 10px;
-    border: 1px solid #ddd;
-    border-radius: 16px;
-    outline: none;
-    font-size: 0.75rem;
-}
-
-.chat-view .input-wrap input:focus {
-    border-color: #1877f2;
-}
-
-.chat-view .input-wrap button {
-    background: #1877f2;
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    padding: 0 14px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 0.7rem;
-}
-
-/* ================================================================
-   ТУМБЛЕР РАЗМЕРА ФРЕЙМА
-   ================================================================ */
-.frame-size-toggle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 6px 0 8px 0;
-    padding: 4px 0;
-}
-
-.frame-size-toggle .label {
-    color: #888;
-    font-size: 0.7rem;
-    font-weight: 500;
-}
-
-.frame-size-toggle .btn-group {
-    display: flex;
-    gap: 4px;
-    background: #f0f2f5;
-    border-radius: 20px;
-    padding: 3px;
-}
-
-.frame-size-btn {
-    padding: 4px 14px;
-    border: none;
-    border-radius: 16px;
-    cursor: pointer;
-    font-size: 0.6rem;
-    font-weight: 600;
-    background: transparent;
-    color: #888;
-    transition: all 0.2s ease;
-}
-
-.frame-size-btn:hover {
-    background: #e8f0fe;
-    color: #1877f2;
-}
-
-.frame-size-btn.active {
-    background: #1877f2;
-    color: #fff;
-}
-
-/* ================================================================
-   ОТВЕТЫ НА КОММЕНТАРИИ
-   ================================================================ */
-.comment-actions-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 2px;
-}
-
-.comment-like-btn,
-.comment-reply-btn,
-.reply-like-btn {
-    background: none;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-size: 0.6rem;
-    padding: 2px 6px;
-    border-radius: 12px;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-.comment-like-btn:hover,
-.comment-reply-btn:hover,
-.reply-like-btn:hover {
-    background: #f0f2f5;
-    color: #1877f2;
-}
-
-.comment-like-btn.liked,
-.reply-like-btn.liked {
-    color: #1877f2;
-}
-
-.replies {
-    margin-left: 28px;
-    padding-left: 12px;
-    border-left: 2px solid #e0e0e0;
-    margin-top: 4px;
-}
-
-.reply-item {
-    display: flex;
-    gap: 8px;
-    padding: 4px 0;
-    align-items: flex-start;
-}
-
-.reply-item .avatar-wrap {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #1877f2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.reply-item .avatar-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.reply-item .avatar-wrap .letter {
-    color: #fff;
-    font-size: 0.5rem;
-    font-weight: 700;
-}
-
-.reply-item .body {
-    flex: 1;
-    font-size: 0.7rem;
-    line-height: 1.3;
-}
-
-.reply-item .body .name {
-    font-weight: 600;
-    color: #1877f2;
-    font-size: 0.65rem;
-}
-
-.reply-item .body .time {
-    color: #999;
-    font-size: 0.4rem;
-    margin-left: 4px;
-}
-
-.reply-item .body .text {
-    color: #333;
-    margin-top: 1px;
-    font-size: 0.7rem;
-}
-
-.reply-item .reply-actions {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    position: relative;
-}
-
-.reply-item .reply-actions .more-btn {
-    background: none;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 0 4px;
-    line-height: 1;
-}
-
-.reply-item .reply-actions .more-btn:hover {
-    color: #1877f2;
-}
-
-.reply-item .reply-actions .dropdown {
+.playlist-dropdown {
     display: none;
     position: absolute;
-    right: 0;
-    top: 20px;
+    top: 48px;
+    right: 10px;
     background: #fff;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    z-index: 60;
-    min-width: 120px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     padding: 4px 0;
+    max-height: 180px;
+    overflow-y: auto;
+    min-width: 160px;
+    z-index: 200;
 }
 
-.reply-item .reply-actions .dropdown.open {
+.playlist-dropdown.open {
     display: block;
 }
 
-.reply-item .reply-actions .dropdown button {
-    display: block;
-    width: 100%;
-    padding: 4px 14px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.7rem;
-    cursor: pointer;
-    color: #555;
-}
-
-.reply-item .reply-actions .dropdown button:hover {
-    background: #f0f2f5;
-}
-
-.reply-item .reply-actions .dropdown .edit-btn {
-    color: #e67e22;
-}
-
-.reply-item .reply-actions .dropdown .del-btn {
-    color: #e74c3c;
-}
-
-.reply-input-wrap {
-    display: none;
-    gap: 4px;
-    margin-top: 4px;
-}
-
-.reply-input-wrap input {
-    flex: 1;
+.playlist-dropdown .playlist-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     padding: 4px 10px;
-    border: 1px solid #ddd;
-    border-radius: 16px;
-    font-size: 0.65rem;
-    outline: none;
+    font-size: 11px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.playlist-dropdown .playlist-item:hover {
     background: #f0f2f5;
 }
 
-.reply-input-wrap input:focus {
-    border-color: #1877f2;
-    background: #fff;
+.playlist-dropdown .playlist-item.active {
+    background: #e8f0fe;
+    color: #1877f2;
+    font-weight: 600;
 }
 
-.reply-input-wrap button {
+/* ================================================================
+   МИНИ-ПЛЕЕР
+   ================================================================ */
+
+.player-mini {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f0f2f5;
+    padding: 3px 8px;
+    border-radius: 16px;
+    max-width: 220px;
+}
+
+.player-mini .play-btn {
     background: #1877f2;
     color: #fff;
     border: none;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
     cursor: pointer;
-    font-size: 0.7rem;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.reply-input-wrap button:hover {
+.player-mini .play-btn:hover {
     background: #4a9eff;
+}
+
+.player-mini .track-name {
+    font-weight: 500;
+    font-size: 0.6rem;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+}
+
+.player-mini .playlist-btn {
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0 2px;
+}
+
+.player-mini .playlist-btn:hover {
+    color: #1877f2;
 }
