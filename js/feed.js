@@ -162,7 +162,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// 6. РЕНДЕР ПОСТА — СТРОКА ВВОДА ВНИЗУ
+// 6. РЕНДЕР ПОСТА — СТРОКА ВВОДА ВСЕГДА ВИДНА
 // ================================================================
 
 function renderPost(p, type) {
@@ -211,6 +211,11 @@ function renderPost(p, type) {
 
     var actionsHtml = '<div class="stats"><button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button><button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button></div>';
 
+    // ================================================================
+    // ✅ СТРОКА ВВОДА — ВСЕГДА ВИДНА (ВНЕ comments-wrapper)
+    // ================================================================
+
+    // 1. Блок с комментариями (скрыт по умолчанию)
     var commentsHtml = `
         <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;">
             <div class="comments" id="comments_${p.id}">
@@ -218,16 +223,21 @@ function renderPost(p, type) {
                     <div class="comments-list" id="commentsList_${p.id}">
                         <div id="commentsContainer_${p.id}"></div>
                     </div>
-                    <div class="comment-input-wrap" id="commentInputWrap_${p.id}">
-                        <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
-                        <button onclick="submitComment('${p.id}', '${type}')">→</button>
-                    </div>
                 </div>
             </div>
         </div>
     `;
 
-    div.innerHTML = menuHtml + marqueeHtml + '<div class="author">' + avatarHtml + '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span><span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span></div><div class="text">' + textHtml + '</div>' + imgHtml + buttonsHtml + previewHtml + hashtagsHtml + actionsHtml + commentsHtml;
+    // 2. СТРОКА ВВОДА — СНАРУЖИ, ВСЕГДА ВИДНА
+    var inputHtml = `
+        <div class="comment-input-wrap" id="commentInputWrap_${p.id}">
+            <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
+            <button onclick="submitComment('${p.id}', '${type}')">→</button>
+        </div>
+    `;
+
+    // Собираем всё вместе: пост → комментарии (скрыты) → строка ввода (всегда видна)
+    div.innerHTML = menuHtml + marqueeHtml + '<div class="author">' + avatarHtml + '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span><span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span></div><div class="text">' + textHtml + '</div>' + imgHtml + buttonsHtml + previewHtml + hashtagsHtml + actionsHtml + commentsHtml + inputHtml;
 
     if (p.authorUid) {
         var avatarEl = document.getElementById('post-avatar-' + p.id);
