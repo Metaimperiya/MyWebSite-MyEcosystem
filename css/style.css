@@ -607,3 +607,107 @@ body {
 .hidden {
     display: none !important;
 }
+
+/* ================================================================
+   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ САЙДБАРА
+   ================================================================ */
+
+.sidebar-divider {
+    height: 1px;
+    background: #eee;
+    margin: 6px 16px;
+}
+
+.sidebar-title {
+    padding: 6px 16px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ================================================================
+   СТИЛИ ДЛЯ РЕДАКТИРОВАНИЯ ПОСТА
+   ================================================================ */
+
+.frame-size-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 6px 0 8px 0;
+    padding: 4px 0;
+}
+
+.frame-size-toggle .label {
+    color: #888;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.frame-size-toggle .btn-group {
+    display: flex;
+    gap: 4px;
+    background: #f0f2f5;
+    border-radius: 20px;
+    padding: 3px;
+}
+
+.frame-size-btn {
+    padding: 4px 14px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.6rem;
+    font-weight: 600;
+    background: transparent;
+    color: #888;
+    transition: all 0.2s ease;
+}
+
+.frame-size-btn:hover {
+    background: #e8f0fe;
+    color: #1877f2;
+}
+
+.frame-size-btn.active {
+    background: #1877f2;
+    color: #fff;
+}
+
+.btn-add {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    color: #e67e22;
+    padding: 3px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.65rem;
+    margin-top: 3px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+    align-items: center;
+}
+
+.btn-group input {
+    flex: 1;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.7rem;
+}
+
+.btn-remove {
+    background: #ffebee;
+    color: #c62828;
+    border: none;
+    border-radius: 30px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 0.6rem;
+}
