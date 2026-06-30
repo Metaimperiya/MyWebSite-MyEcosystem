@@ -1,5 +1,5 @@
 // ================================================================
-// ПРОФИЛЬ
+// ПРОФИЛЬ — ПОЛНАЯ ВЕРСИЯ С НОВОЙ СИСТЕМОЙ ДРУЗЕЙ
 // ================================================================
 
 function loadProfile() {
@@ -47,39 +47,34 @@ function loadProfilePosts(uid) {
     });
 }
 
+// ================================================================
+// КНОПКИ В ПРОФИЛЕ — НОВАЯ СИСТЕМА ДРУЗЕЙ
+// ================================================================
+
 function showProfileActions(uid) {
     var actions = document.getElementById('profileActions');
     if (!uid || uid === USER_UID) {
         actions.innerHTML = '<button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button><button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>';
         return;
     }
-    
-    var isFriend = checkFriend(uid);
-    actions.innerHTML = '<button class="friend-btn ' + (isFriend ? 'added' : '') + '" onclick="toggleFriend(\'' + uid + '\')">' + (isFriend ? '✅ В друзьях' : '➕ Добавить в друзья') + '</button>';
-}
 
-function checkFriend(uid) {
-    if (!USER_UID) return false;
-    return localStorage.getItem('fr_' + USER_UID + '_' + uid) === '1';
-}
+    // Определяем статус отношений через новую систему
+    var status = getFriendStatus(USER_UID, uid);
 
-window.toggleFriend = function(uid) {
-    if (!USER_UID) return;
-    var isFriend = checkFriend(uid);
-    
-    if (isFriend) {
-        if (!confirm('Удалить из друзей?')) return;
-        localStorage.removeItem('fr_' + USER_UID + '_' + uid);
-        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).remove();
-        db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).remove();
+    if (status === 'friend') {
+        actions.innerHTML = '<button class="friend-btn friend" onclick="removeFriend(\'' + uid + '\')">✅ В друзьях</button>';
+    } else if (status === 'pending_sent') {
+        actions.innerHTML = '<button class="friend-btn pending" onclick="cancelFriendRequest(\'' + uid + '\')">⏳ Запрос отправлен</button>';
+    } else if (status === 'pending_received') {
+        actions.innerHTML = '<button class="friend-btn received" onclick="acceptFriendRequest(\'' + uid + '\')">📩 Принять заявку</button>';
     } else {
-        localStorage.setItem('fr_' + USER_UID + '_' + uid, '1');
-        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).set(true);
-        db.ref('sites/' + SITE + '/friends/' + uid + '/' + USER_UID).set(true);
+        actions.innerHTML = '<button class="friend-btn add" onclick="sendFriendRequest(\'' + uid + '\')">➕ Добавить в друзья</button>';
     }
-    loadProfile();
-    if (VIEWING_USER) showProfileActions(VIEWING_USER);
-};
+}
+
+// ================================================================
+// ЗАГРУЗКА ДРУЗЕЙ
+// ================================================================
 
 function loadFriends(uid) {
     db.ref('sites/' + SITE + '/friends/' + uid).on('value', function(snap) {
@@ -188,28 +183,3 @@ window.uploadAvatar = function() {
     };
     input.click();
 };
-
-// ================================================================
-// ОБНОВЛЕНИЕ КНОПКИ ДРУЗЕЙ В ПРОФИЛЕ
-// ================================================================
-
-function showProfileActions(uid) {
-    var actions = document.getElementById('profileActions');
-    if (!uid || uid === USER_UID) {
-        actions.innerHTML = '<button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button><button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>';
-        return;
-    }
-
-    // Определяем статус отношений
-    var status = getFriendStatus(USER_UID, uid);
-
-    if (status === 'friend') {
-        actions.innerHTML = '<button class="friend-btn friend" onclick="removeFriend(\'' + uid + '\')">✅ В друзьях</button>';
-    } else if (status === 'pending_sent') {
-        actions.innerHTML = '<button class="friend-btn pending" onclick="cancelFriendRequest(\'' + uid + '\')">⏳ Запрос отправлен</button>';
-    } else if (status === 'pending_received') {
-        actions.innerHTML = '<button class="friend-btn received" onclick="acceptFriendRequest(\'' + uid + '\')">📩 Принять заявку</button>';
-    } else {
-        actions.innerHTML = '<button class="friend-btn add" onclick="sendFriendRequest(\'' + uid + '\')">➕ Добавить в друзья</button>';
-    }
-}
