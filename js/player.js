@@ -1,5 +1,5 @@
 // ================================================================
-// МУЗЫКАЛЬНЫЙ ПЛЕЕР
+// МУЗЫКАЛЬНЫЙ ПЛЕЕР — ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ================================================================
 
 const PLAYLIST = [
@@ -17,6 +17,9 @@ const PLAYLIST = [
 let currentTrack = 0;
 let isPlaying = false;
 let audio = null;
+let drawerOpen = false;
+let isDragging = false;
+let drawerStartY = 0;
 
 function formatTime(seconds) {
     if (!seconds || isNaN(seconds)) return '0:00';
@@ -63,10 +66,15 @@ window.togglePlay = function() {
         var drawerPlayBtn = document.getElementById('drawerPlayBtn');
         if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
     } else {
-        audio.play().catch(function(e) { console.log('Ошибка:', e); });
-        isPlaying = true;
-        var drawerPlayBtn = document.getElementById('drawerPlayBtn');
-        if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+        audio.play()
+            .then(function() {
+                isPlaying = true;
+                var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+            })
+            .catch(function(e) {
+                console.log('Ошибка воспроизведения:', e);
+            });
     }
 };
 
@@ -78,7 +86,15 @@ window.playTrack = function(index) {
     currentTrack = index;
     if (audio) {
         audio.src = PLAYLIST[currentTrack].url;
-        if (isPlaying) audio.play().catch(function() {});
+        if (isPlaying) {
+            audio.play()
+                .then(function() {
+                    isPlaying = true;
+                })
+                .catch(function(e) {
+                    console.log('Ошибка:', e);
+                });
+        }
     } else {
         initAudio();
         togglePlay();
@@ -93,7 +109,15 @@ window.playNext = function() {
     currentTrack = (currentTrack + 1) % PLAYLIST.length;
     if (audio) {
         audio.src = PLAYLIST[currentTrack].url;
-        if (isPlaying) audio.play().catch(function() {});
+        if (isPlaying) {
+            audio.play()
+                .then(function() {
+                    isPlaying = true;
+                })
+                .catch(function(e) {
+                    console.log('Ошибка:', e);
+                });
+        }
     }
     var drawerTrackName = document.getElementById('drawerTrackName');
     if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
@@ -105,7 +129,15 @@ window.playPrev = function() {
     currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
     if (audio) {
         audio.src = PLAYLIST[currentTrack].url;
-        if (isPlaying) audio.play().catch(function() {});
+        if (isPlaying) {
+            audio.play()
+                .then(function() {
+                    isPlaying = true;
+                })
+                .catch(function(e) {
+                    console.log('Ошибка:', e);
+                });
+        }
     }
     var drawerTrackName = document.getElementById('drawerTrackName');
     if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
@@ -121,7 +153,7 @@ function updatePlaylistActive() {
     });
 }
 
-// ===== ВЫДВИЖНОЙ ПЛЕЕР — ГЛАВНАЯ ФУНКЦИЯ! =====
+// ===== ВЫДВИЖНОЙ ПЛЕЕР =====
 window.toggleDrawer = function() {
     var drawer = document.getElementById('playerDrawer');
     if (!drawer) {
@@ -141,6 +173,7 @@ window.toggleDrawerPlaylist = function() {
     }
 };
 
+// ===== СКАЧИВАНИЕ ТРЕКА =====
 window.downloadCurrentTrack = function() {
     if (!PLAYLIST[currentTrack]) return;
     var track = PLAYLIST[currentTrack];
@@ -174,4 +207,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-initAudio();
+// ===== ЗАПУСК ПОСЛЕ ЗАГРУЗКИ DOM =====
+document.addEventListener('DOMContentLoaded', function() {
+    initAudio();
+});
