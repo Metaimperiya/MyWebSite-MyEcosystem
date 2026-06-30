@@ -135,7 +135,7 @@ window.closeSidebar = function() {
 };
 
 // ================================================================
-// АККОРДЕОН В САЙДБАРЕ (НОВАЯ ФУНКЦИЯ)
+// АККОРДЕОН В САЙДБАРЕ — РАБОТАЕТ!
 // ================================================================
 
 window.toggleAccordion = function(header) {
@@ -143,6 +143,17 @@ window.toggleAccordion = function(header) {
     var body = item.querySelector('.accordion-body');
     var arrow = header.querySelector('.accordion-arrow');
     
+    // Закрываем все другие открытые разделы
+    document.querySelectorAll('.accordion-body').forEach(function(b) {
+        if (b !== body && b.style.maxHeight) {
+            b.style.maxHeight = null;
+            b.style.padding = '0 16px';
+            var otherArrow = b.parentElement.querySelector('.accordion-arrow');
+            if (otherArrow) otherArrow.textContent = '▾';
+        }
+    });
+    
+    // Открываем/закрываем текущий
     if (body.style.maxHeight) {
         // Закрываем
         body.style.maxHeight = null;
