@@ -1,5 +1,5 @@
 // ================================================================
-// МУЗЫКАЛЬНЫЙ ПЛЕЕР — ПОЛНАЯ ВЕРСИЯ
+// МУЗЫКАЛЬНЫЙ ПЛЕЕР
 // ================================================================
 
 const PLAYLIST = [
@@ -17,11 +17,7 @@ const PLAYLIST = [
 let currentTrack = 0;
 let isPlaying = false;
 let audio = null;
-let drawerOpen = false;
-let isDragging = false;
-let drawerStartY = 0;
 
-// ===== ФОРМАТИРОВАНИЕ ВРЕМЕНИ =====
 function formatTime(seconds) {
     if (!seconds || isNaN(seconds)) return '0:00';
     var min = Math.floor(seconds / 60);
@@ -29,13 +25,11 @@ function formatTime(seconds) {
     return min + ':' + (sec < 10 ? '0' : '') + sec;
 }
 
-// ===== ИНИЦИАЛИЗАЦИЯ =====
 function initAudio() {
     if (!audio) {
         audio = new Audio(PLAYLIST[currentTrack].url);
         audio.crossOrigin = 'anonymous';
         audio.addEventListener('timeupdate', function() {
-            updateProgress();
             updateDrawerProgress();
         });
         audio.addEventListener('ended', function() {
@@ -45,12 +39,6 @@ function initAudio() {
     var drawerTrackName = document.getElementById('drawerTrackName');
     if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
     updatePlaylistActive();
-}
-
-function updateProgress() {
-    if (!audio) return;
-    var current = document.getElementById('currentTime');
-    if (current) current.textContent = formatTime(audio.currentTime);
 }
 
 function updateDrawerProgress() {
@@ -133,13 +121,15 @@ function updatePlaylistActive() {
     });
 }
 
-// ===== ВЫДВИЖНОЙ ПЛЕЕР =====
+// ===== ВЫДВИЖНОЙ ПЛЕЕР — ГЛАВНАЯ ФУНКЦИЯ! =====
 window.toggleDrawer = function() {
     var drawer = document.getElementById('playerDrawer');
-    if (!drawer) return;
-    drawerOpen = !drawerOpen;
-    drawer.classList.toggle('open', drawerOpen);
-    if (drawerOpen) {
+    if (!drawer) {
+        console.log('Плеер не найден!');
+        return;
+    }
+    drawer.classList.toggle('open');
+    if (drawer.classList.contains('open')) {
         updateDrawerProgress();
     }
 };
@@ -151,7 +141,6 @@ window.toggleDrawerPlaylist = function() {
     }
 };
 
-// ===== СКАЧИВАНИЕ ТРЕКА =====
 window.downloadCurrentTrack = function() {
     if (!PLAYLIST[currentTrack]) return;
     var track = PLAYLIST[currentTrack];
@@ -162,78 +151,6 @@ window.downloadCurrentTrack = function() {
     link.click();
     document.body.removeChild(link);
 };
-
-// ===== ПЕРЕТАСКИВАНИЕ ПЛЕЕРА =====
-document.addEventListener('DOMContentLoaded', function() {
-    var handle = document.getElementById('playerHandle');
-    var drawer = document.getElementById('playerDrawer');
-    if (handle && drawer) {
-        handle.addEventListener('mousedown', function(e) {
-            isDragging = true;
-            drawerStartY = e.clientY;
-            drawer.style.transition = 'none';
-            e.preventDefault();
-        });
-        handle.addEventListener('touchstart', function(e) {
-            isDragging = true;
-            drawerStartY = e.touches[0].clientY;
-            drawer.style.transition = 'none';
-            e.preventDefault();
-        });
-        document.addEventListener('mousemove', function(e) {
-            if (!isDragging) return;
-            var deltaY = e.clientY - drawerStartY;
-            var drawerHeight = drawer.offsetHeight;
-            var offset = -drawerHeight + deltaY;
-            if (offset > 0) offset = 0;
-            if (offset < -drawerHeight) offset = -drawerHeight;
-            drawer.style.transform = 'translateY(' + offset + 'px)';
-        });
-        document.addEventListener('touchmove', function(e) {
-            if (!isDragging) return;
-            var deltaY = e.touches[0].clientY - drawerStartY;
-            var drawerHeight = drawer.offsetHeight;
-            var offset = -drawerHeight + deltaY;
-            if (offset > 0) offset = 0;
-            if (offset < -drawerHeight) offset = -drawerHeight;
-            drawer.style.transform = 'translateY(' + offset + 'px)';
-        });
-        document.addEventListener('mouseup', function() {
-            if (!isDragging) return;
-            isDragging = false;
-            drawer.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            var drawerHeight = drawer.offsetHeight;
-            var offset = parseFloat(drawer.style.transform.replace('translateY(', '').replace('px)', '')) || -drawerHeight;
-            var percentOpen = ((drawerHeight + offset) / drawerHeight) * 100;
-            if (percentOpen > 40) {
-                drawerOpen = true;
-                drawer.style.transform = 'translateY(0)';
-                drawer.classList.add('open');
-            } else {
-                drawerOpen = false;
-                drawer.style.transform = 'translateY(-100%)';
-                drawer.classList.remove('open');
-            }
-        });
-        document.addEventListener('touchend', function() {
-            if (!isDragging) return;
-            isDragging = false;
-            drawer.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            var drawerHeight = drawer.offsetHeight;
-            var offset = parseFloat(drawer.style.transform.replace('translateY(', '').replace('px)', '')) || -drawerHeight;
-            var percentOpen = ((drawerHeight + offset) / drawerHeight) * 100;
-            if (percentOpen > 40) {
-                drawerOpen = true;
-                drawer.style.transform = 'translateY(0)';
-                drawer.classList.add('open');
-            } else {
-                drawerOpen = false;
-                drawer.style.transform = 'translateY(-100%)';
-                drawer.classList.remove('open');
-            }
-        });
-    }
-});
 
 // ===== МЕНЮ НАСТРОЕК =====
 window.toggleSettingsMenu = function() {
