@@ -738,7 +738,7 @@ body {
 }
 
 /* ================================================================
-   ВЫДВИЖНОЙ ПЛЕЕР (ПРИКЛЕЕН К ШАПКЕ)
+   ВЫДВИЖНОЙ ПЛЕЕР
    ================================================================ */
 
 .player-drawer {
@@ -762,7 +762,6 @@ body {
     transform: translateY(0);
 }
 
-/* ===== РУЧКА ===== */
 .player-handle {
     display: flex;
     flex-direction: column;
@@ -796,7 +795,6 @@ body {
     text-transform: uppercase;
 }
 
-/* ===== ЭКВАЛАЙЗЕР ===== */
 .equalizer {
     display: flex;
     justify-content: center;
@@ -818,7 +816,6 @@ body {
     100% { transform: scaleY(1); }
 }
 
-/* ===== БЕГУЩАЯ СТРОКА ===== */
 .marquee-text {
     display: block;
     white-space: nowrap;
@@ -832,7 +829,6 @@ body {
     100% { transform: translateX(-100%); }
 }
 
-/* ===== ОСТАЛЬНЫЕ СТИЛИ ПЛЕЕРА ===== */
 .player-content {
     padding: 0 8px 12px 8px;
 }
@@ -1022,7 +1018,6 @@ body {
     border-bottom: none;
 }
 
-/* Главные разделы (всегда видны) */
 .main-nav {
     border-bottom: 1px solid #eee;
     padding-bottom: 4px;
