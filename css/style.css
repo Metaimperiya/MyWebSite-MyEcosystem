@@ -738,206 +738,6 @@ body {
 }
 
 /* ================================================================
-   ПОЛНЫЙ ПЛЕЕР (WINAMP-СТИЛЬ)
-   ================================================================ */
-
-.full-player {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
-}
-
-.full-player.open {
-    display: flex;
-}
-
-.player-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.6);
-}
-
-.player-window {
-    position: relative;
-    background: #1a1a2e;
-    border-radius: 16px;
-    padding: 20px;
-    max-width: 380px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-    border: 1px solid #2a2a4a;
-}
-
-.player-window::-webkit-scrollbar {
-    width: 4px;
-}
-.player-window::-webkit-scrollbar-track {
-    background: #1a1a2e;
-}
-.player-window::-webkit-scrollbar-thumb {
-    background: #4a4a6a;
-    border-radius: 4px;
-}
-
-.player-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #888;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #2a2a4a;
-}
-
-.player-close {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
-.player-close:hover {
-    color: #fff;
-}
-
-.player-cover {
-    width: 100%;
-    max-width: 200px;
-    margin: 0 auto 16px;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 1/1;
-    background: #2a2a4a;
-}
-
-.player-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.player-track-info {
-    text-align: center;
-    margin-bottom: 16px;
-}
-
-.player-track-name {
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-.player-artist {
-    color: #888;
-    font-size: 0.8rem;
-    margin-top: 2px;
-}
-
-.player-progress {
-    margin-bottom: 16px;
-}
-
-.player-progress-bar {
-    width: 100%;
-    height: 4px;
-    background: #2a2a4a;
-    border-radius: 4px;
-    cursor: pointer;
-    position: relative;
-}
-
-.player-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #1877f2, #4a9eff);
-    border-radius: 4px;
-    width: 0%;
-    transition: width 0.1s;
-}
-
-.player-time {
-    display: flex;
-    justify-content: space-between;
-    color: #666;
-    font-size: 0.6rem;
-    margin-top: 4px;
-}
-
-.player-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.player-btn {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 50%;
-    transition: 0.2s;
-}
-
-.player-btn:hover {
-    color: #fff;
-    background: #2a2a4a;
-}
-
-.player-btn.play-large {
-    font-size: 2rem;
-    color: #1877f2;
-    padding: 0 4px;
-}
-
-.player-btn.play-large:hover {
-    color: #4a9eff;
-    background: none;
-}
-
-.player-playlist {
-    border-top: 1px solid #2a2a4a;
-    padding-top: 12px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.player-playlist .playlist-item {
-    color: #888;
-    font-size: 0.7rem;
-    padding: 4px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.15s;
-}
-
-.player-playlist .playlist-item:hover {
-    background: #2a2a4a;
-    color: #fff;
-}
-
-.player-playlist .playlist-item.active {
-    color: #1877f2;
-    background: #1a2a4a;
-}
-
-/* ================================================================
    МИНИ-ПЛЕЕР В ШАПКЕ
    ================================================================ */
 
@@ -987,7 +787,7 @@ body {
 }
 
 /* ================================================================
-   ВЫДВИЖНОЙ ПЛЕЕР (СВЕРХУ — КАК WINAMP)
+   ВЫДВИЖНОЙ ПЛЕЕР (СВЕРХУ — НА ВСЮ ШИРИНУ)
    ================================================================ */
 
 .player-drawer {
@@ -1003,14 +803,14 @@ body {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     max-height: 80vh;
     overflow: hidden;
-    padding-top: 44px;
+    padding-top: 56px;
 }
 
 .player-drawer.open {
     transform: translateY(0);
 }
 
-/* Ручка для перетаскивания — ВНИЗУ плеера */
+/* Ручка для перетаскивания — ВНИЗУ плеера, чуть выглядывает */
 .player-handle {
     display: flex;
     justify-content: center;
@@ -1031,8 +831,8 @@ body {
 }
 
 .handle-bar {
-    width: 40px;
-    height: 4px;
+    width: 50px;
+    height: 5px;
     background: #4a4a6a;
     border-radius: 4px;
     transition: background 0.2s;
