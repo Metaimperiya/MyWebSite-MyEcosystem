@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ (ВСЕ УРОВНИ КОММЕНТАРИЕВ)
+// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
 var commentStates = {};
@@ -100,7 +100,7 @@ function updatePostStats(postId, data) {
 }
 
 // ================================================================
-// ОТПРАВКА ПОСТА (В ЛЕНТУ И В ПРОФИЛЬ)
+// ОТПРАВКА ПОСТА
 // ================================================================
 
 window.submitPost = function() {
@@ -202,36 +202,6 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     };
     reader.readAsDataURL(file);
 });
-
-// ================================================================
-// ЗАГРУЗКА ПОСТОВ В ПРОФИЛЕ
-// ================================================================
-
-function loadProfilePosts(uid) {
-    if (!uid) return;
-    
-    var container = document.getElementById('profilePosts');
-    container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">Загрузка...</div>';
-    
-    db.ref('sites/' + SITE + '/user_posts/' + uid).orderByChild('timestamp').on('value', function(snap) {
-        container.innerHTML = '';
-        var data = snap.val() || {};
-        var keys = Object.keys(data).sort(function(a, b) {
-            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
-        });
-        
-        if (!keys.length) {
-            container.innerHTML = '<div style="text-align:center;padding:6px;color:#bbb;font-size:0.65rem;">Нет постов</div>';
-            return;
-        }
-        
-        keys.forEach(function(k) {
-            var p = data[k];
-            p.id = k;
-            container.appendChild(renderPost(p, 'profile'));
-        });
-    });
-}
 
 // ================================================================
 // РЕНДЕР ПОСТА
@@ -416,7 +386,7 @@ function loadComments(postId, type) {
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ — ВСЕ УРОВНИ (РЕКУРСИЯ)
+// РЕНДЕР КОММЕНТАРИЕВ (РЕКУРСИЯ)
 // ================================================================
 
 function renderComments(postId, type) {
@@ -429,7 +399,6 @@ function renderComments(postId, type) {
         return;
     }
 
-    // Строим дерево комментариев
     var commentsMap = {};
     state.allComments.forEach(function(c) {
         commentsMap[c.id] = c;
@@ -457,7 +426,6 @@ function renderComments(postId, type) {
     });
 }
 
-// ===== РЕКУРСИВНАЯ ФУНКЦИЯ ДЛЯ ВСЕХ УРОВНЕЙ =====
 function renderCommentTree(comment, commentsMap, postId, type, level) {
     var canEdit = (comment.author === USER || isAdmin);
     var likes = comment.likes || 0;
@@ -476,13 +444,12 @@ function renderCommentTree(comment, commentsMap, postId, type, level) {
     html += '<button class="comment-reply-btn" onclick="openReply(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')">💬 Ответить</button>';
     html += '</div>';
 
-    // Строка ввода под комментарием
     html += '<div class="comment-reply-input-wrap" id="replyInput_' + comment.id + '" style="display:none; margin-top:4px;">';
     html += '<input type="text" id="replyInputField_' + comment.id + '" placeholder="Написать ответ..." class="reply-input">';
     html += '<button onclick="submitReply(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')" class="reply-send-btn">→</button>';
     html += '</div>';
 
-    html += '</div>'; // body
+    html += '</div>';
 
     if (canEdit) {
         html += '<div class="comment-actions">';
@@ -496,7 +463,6 @@ function renderCommentTree(comment, commentsMap, postId, type, level) {
 
     html += '</div>';
 
-    // ===== РЕКУРСИВНО РЕНДЕРИМ ДОЧЕРНИЕ КОММЕНТАРИИ =====
     var children = [];
     Object.keys(commentsMap).forEach(function(id) {
         if (commentsMap[id].parentId === comment.id) {
@@ -874,13 +840,13 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ — С ПРОВЕРКОЙ НА ДУБЛИКАТЫ
+// РЕПОСТЫ — БЕЗ ОКОН, С СОХРАНЕНИЕМ В ЛЕНТУ И ПРОФИЛЬ
 // ================================================================
 
 window.doRepost = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
     
-    // Проверяем, не делал ли уже этот пользователь репост этого поста
+    // Проверяем, не делал ли уже репост
     var repostKey = 'repost_' + postId + '_' + USER_UID;
     if (localStorage.getItem(repostKey) === '1') {
         alert('❌ Вы уже сделали репост этого поста');
