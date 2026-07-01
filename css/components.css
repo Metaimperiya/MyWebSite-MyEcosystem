@@ -1056,3 +1056,37 @@
     margin-top: 2px;
     border-radius: 0 0 0 4px;
 }
+
+/* ================================================================
+   ПЛАВНОЕ ПОЯВЛЕНИЕ КОММЕНТАРИЕВ
+   ================================================================ */
+
+.comments-wrapper {
+    transition: opacity 0.25s ease;
+}
+
+.comments-wrapper[style*="display:block"] {
+    opacity: 1;
+}
+
+/* Ответы на комментарии */
+.comment-reply-btn {
+    background: none;
+    border: none;
+    color: #1877f2;
+    cursor: pointer;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+.comment-reply-btn:hover {
+    background: #e8f0fe;
+}
+
+.comment-item[style*="margin-left:24px"] {
+    border-left: 2px solid #1877f2;
+    padding-left: 8px;
+    margin-top: 2px;
+    border-radius: 0 0 0 4px;
+}
