@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ С РЕПОСТАМИ
+// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
 var commentStates = {};
@@ -326,7 +326,6 @@ window.toggleComments = function(postId, type) {
                 var rect = wrapperEl.getBoundingClientRect();
                 var scrollTop = window.scrollY;
                 var targetY = rect.top + scrollTop - 70;
-                
                 window.scrollTo({
                     top: targetY,
                     behavior: 'smooth'
@@ -377,7 +376,7 @@ function loadComments(postId, type) {
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ
+// РЕНДЕР КОММЕНТАРИЕВ — С ОТДЕЛЬНОЙ СТРОКОЙ ВВОДА ПОД КАЖДЫМ
 // ================================================================
 
 function renderComments(postId, type) {
@@ -435,7 +434,14 @@ function renderCommentItem(c, postId, type, level) {
     html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
     html += '<button class="comment-reply-btn" onclick="openReply(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')">💬 Ответить</button>';
     html += '</div>';
+
+    // ===== СТРОКА ВВОДА ПОД КАЖДЫМ КОММЕНТАРИЕМ (СКРЫТА ПО УМОЛЧАНИЮ) =====
+    html += '<div class="comment-reply-input-wrap" id="replyInput_' + c.id + '" style="display:none; margin-top:4px;">';
+    html += '<input type="text" id="replyInputField_' + c.id + '" placeholder="Написать ответ..." class="reply-input">';
+    html += '<button onclick="submitReply(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')" class="reply-send-btn">→</button>';
     html += '</div>';
+
+    html += '</div>'; // body
 
     if (canEdit) {
         html += '<div class="comment-actions">';
@@ -452,27 +458,56 @@ function renderCommentItem(c, postId, type, level) {
 }
 
 // ================================================================
-// ОТКРЫТЬ ОТВЕТ НА КОММЕНТАРИЙ
+// ОТКРЫТЬ ОТВЕТ — ПОКАЗЫВАЕТ СТРОКУ ПОД КОНКРЕТНЫМ КОММЕНТАРИЕМ
 // ================================================================
 
 window.openReply = function(postId, parentId, type) {
-    var input = document.getElementById('commentInput_' + postId);
+    // Скрываем все другие поля ввода
+    document.querySelectorAll('.comment-reply-input-wrap').forEach(function(el) {
+        el.style.display = 'none';
+    });
+    
+    // Показываем поле под этим комментарием
+    var wrap = document.getElementById('replyInput_' + parentId);
+    if (wrap) {
+        wrap.style.display = 'flex';
+        var input = document.getElementById('replyInputField_' + parentId);
+        if (input) {
+            input.focus();
+            setTimeout(function() {
+                wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 150);
+        }
+    }
+};
+
+// ================================================================
+// ОТПРАВКА ОТВЕТА (РЕПЛАЙ)
+// ================================================================
+
+window.submitReply = function(postId, parentId, type) {
+    if (!USER) { alert('Войдите!'); return; }
+    
+    var input = document.getElementById('replyInputField_' + parentId);
     if (!input) return;
     
-    input.focus();
-    input.placeholder = 'Ответить на комментарий...';
-    input.dataset.parentId = parentId;
+    var text = input.value.trim();
+    if (!text) return;
     
-    var wrap = document.getElementById('commentInputWrap_' + postId);
-    if (wrap) {
-        var rect = wrap.getBoundingClientRect();
-        var scrollTop = window.scrollY;
-        var targetY = rect.top + scrollTop - 80;
-        window.scrollTo({
-            top: targetY,
-            behavior: 'smooth'
-        });
-    }
+    var path = getPostPath(type);
+    
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
+        author: USER,
+        authorUid: USER_UID,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now(),
+        likes: 0,
+        parentId: parentId
+    });
+    
+    input.value = '';
+    document.getElementById('replyInput_' + parentId).style.display = 'none';
 };
 
 // ================================================================
@@ -529,7 +564,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// ОТПРАВКА КОММЕНТАРИЯ
+// ОТПРАВКА КОММЕНТАРИЯ К ПОСТУ (ОБЩАЯ СТРОКА)
 // ================================================================
 
 window.submitComment = function(postId, type) {
@@ -539,7 +574,6 @@ window.submitComment = function(postId, type) {
     var text = input.value.trim();
     if (!text) return;
 
-    var parentId = input.dataset.parentId || null;
     var path = getPostPath(type);
     
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
@@ -549,12 +583,10 @@ window.submitComment = function(postId, type) {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now(),
         likes: 0,
-        parentId: parentId
+        parentId: null
     });
 
     input.value = '';
-    input.placeholder = 'Написать комментарий...';
-    delete input.dataset.parentId;
 };
 
 // ================================================================
