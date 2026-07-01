@@ -7,6 +7,7 @@ var feedListener = null;
 
 function getPostPath(type) {
     if (type === 'group') return 'group_posts/' + currentGroup;
+    if (type === 'profile') return 'user_posts/' + VIEWING_USER;
     return 'feed_posts';
 }
 
@@ -133,17 +134,26 @@ window.submitPost = function() {
     var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
     if (linkMatch) postData.link = linkMatch[1];
 
+    var savePost = function(imgData) {
+        if (imgData) postData.img = imgData;
+        
+        // Сохраняем в общую ленту
+        db.ref('sites/' + SITE + '/feed_posts').push(postData);
+        
+        // Сохраняем в профиль пользователя
+        db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
+        
+        clearPostForm();
+    };
+
     if (pendingImageFile) {
         var reader = new FileReader();
         reader.onload = function(e) {
-            postData.img = e.target.result;
-            db.ref('sites/' + SITE + '/feed_posts').push(postData);
-            clearPostForm();
+            savePost(e.target.result);
         };
         reader.readAsDataURL(pendingImageFile);
     } else {
-        db.ref('sites/' + SITE + '/feed_posts').push(postData);
-        clearPostForm();
+        savePost(null);
     }
 };
 
@@ -192,6 +202,36 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     };
     reader.readAsDataURL(file);
 });
+
+// ================================================================
+// ЗАГРУЗКА ПОСТОВ В ПРОФИЛЕ
+// ================================================================
+
+function loadProfilePosts(uid) {
+    if (!uid) return;
+    
+    var container = document.getElementById('profilePosts');
+    container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">Загрузка...</div>';
+    
+    db.ref('sites/' + SITE + '/user_posts/' + uid).orderByChild('timestamp').on('value', function(snap) {
+        container.innerHTML = '';
+        var data = snap.val() || {};
+        var keys = Object.keys(data).sort(function(a, b) {
+            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
+        });
+        
+        if (!keys.length) {
+            container.innerHTML = '<div style="text-align:center;padding:6px;color:#bbb;font-size:0.65rem;">Нет постов</div>';
+            return;
+        }
+        
+        keys.forEach(function(k) {
+            var p = data[k];
+            p.id = k;
+            container.appendChild(renderPost(p, 'profile'));
+        });
+    });
+}
 
 // ================================================================
 // РЕНДЕР ПОСТА
@@ -265,7 +305,7 @@ function renderPost(p, type) {
     var actionsHtml = '<div class="stats">' +
         '<button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
         '<button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
-        '<button onclick="openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
+        '<button onclick="doRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
         '</div>';
 
     var commentsHtml = `
@@ -376,7 +416,7 @@ function loadComments(postId, type) {
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ — С ОТДЕЛЬНОЙ СТРОКОЙ ВВОДА ПОД КАЖДЫМ
+// РЕНДЕР КОММЕНТАРИЕВ
 // ================================================================
 
 function renderComments(postId, type) {
@@ -435,13 +475,13 @@ function renderCommentItem(c, postId, type, level) {
     html += '<button class="comment-reply-btn" onclick="openReply(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')">💬 Ответить</button>';
     html += '</div>';
 
-    // ===== СТРОКА ВВОДА ПОД КАЖДЫМ КОММЕНТАРИЕМ (СКРЫТА ПО УМОЛЧАНИЮ) =====
+    // Строка ввода под комментарием
     html += '<div class="comment-reply-input-wrap" id="replyInput_' + c.id + '" style="display:none; margin-top:4px;">';
     html += '<input type="text" id="replyInputField_' + c.id + '" placeholder="Написать ответ..." class="reply-input">';
     html += '<button onclick="submitReply(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')" class="reply-send-btn">→</button>';
     html += '</div>';
 
-    html += '</div>'; // body
+    html += '</div>';
 
     if (canEdit) {
         html += '<div class="comment-actions">';
@@ -458,16 +498,14 @@ function renderCommentItem(c, postId, type, level) {
 }
 
 // ================================================================
-// ОТКРЫТЬ ОТВЕТ — ПОКАЗЫВАЕТ СТРОКУ ПОД КОНКРЕТНЫМ КОММЕНТАРИЕМ
+// ОТКРЫТЬ ОТВЕТ
 // ================================================================
 
 window.openReply = function(postId, parentId, type) {
-    // Скрываем все другие поля ввода
     document.querySelectorAll('.comment-reply-input-wrap').forEach(function(el) {
         el.style.display = 'none';
     });
     
-    // Показываем поле под этим комментарием
     var wrap = document.getElementById('replyInput_' + parentId);
     if (wrap) {
         wrap.style.display = 'flex';
@@ -482,7 +520,7 @@ window.openReply = function(postId, parentId, type) {
 };
 
 // ================================================================
-// ОТПРАВКА ОТВЕТА (РЕПЛАЙ)
+// ОТПРАВКА ОТВЕТА
 // ================================================================
 
 window.submitReply = function(postId, parentId, type) {
@@ -564,7 +602,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// ОТПРАВКА КОММЕНТАРИЯ К ПОСТУ (ОБЩАЯ СТРОКА)
+// ОТПРАВКА КОММЕНТАРИЯ
 // ================================================================
 
 window.submitComment = function(postId, type) {
@@ -816,41 +854,22 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ
+// РЕПОСТЫ — БЕЗ ЛИШНИХ ОКОН
 // ================================================================
 
-window.openRepost = function(postId, type) {
+window.doRepost = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
-    
-    document.getElementById('repostModal').classList.add('open');
-    document.getElementById('repostPostId').value = postId;
-    document.getElementById('repostType').value = type;
-    document.getElementById('repostText').value = '';
-    document.getElementById('repostText').placeholder = 'Напишите что-нибудь (необязательно)...';
-    document.getElementById('repostText').focus();
-};
-
-window.closeRepost = function() {
-    document.getElementById('repostModal').classList.remove('open');
-};
-
-window.submitRepost = function() {
-    var postId = document.getElementById('repostPostId').value;
-    var type = document.getElementById('repostType').value;
-    var comment = document.getElementById('repostText').value.trim();
-    
-    if (!postId) { alert('Ошибка: пост не найден'); return; }
     
     var path = getPostPath(type);
     
     db.ref('sites/' + SITE + '/' + path + '/' + postId).once('value', function(snap) {
         var original = snap.val();
-        if (!original) { alert('Пост удалён'); closeRepost(); return; }
+        if (!original) { alert('Пост удалён'); return; }
         
         var repostData = {
             author: USER,
             authorUid: USER_UID,
-            text: comment || '🔁 Репост',
+            text: '🔁 Репост',
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             timestamp: Date.now(),
             likes: 0,
@@ -874,13 +893,18 @@ window.submitRepost = function() {
             }
         };
         
+        // Увеличиваем счётчик репостов у оригинала
         var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts');
         repostRef.transaction(function(current) {
             return (current || 0) + 1;
         });
         
+        // Сохраняем в общую ленту
         db.ref('sites/' + SITE + '/feed_posts').push(repostData);
-        closeRepost();
+        
+        // Сохраняем в профиль пользователя
+        db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
+        
         alert('✅ Репост создан!');
     });
 };
