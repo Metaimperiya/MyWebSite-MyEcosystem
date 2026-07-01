@@ -18,11 +18,23 @@ window.checkAdmin = function() {
         document.getElementById('adminDot').classList.add('active');
         closeAdminModal();
         alert('🏴‍☠️ Админ-режим включён!');
+        // Обновляем ленту, чтобы появились кнопки удаления
         loadFeed();
+        // Обновляем профиль
+        if (typeof loadProfile === 'function') loadProfile();
     } else {
         alert('❌ Неверный пароль');
     }
 };
+
+// Проверяем админку при загрузке
+(function checkAdminOnLoad() {
+    if (localStorage.getItem('dc_admin_' + SITE) === '1') {
+        isAdmin = true;
+        document.getElementById('adminDot').classList.add('active');
+        console.log('✅ Админ-режим активен (из localStorage)');
+    }
+})();
 
 function adminDeleteUser(uid) {
     if (!isAdmin || !uid || uid === USER_UID) return;
