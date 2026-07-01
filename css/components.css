@@ -1177,3 +1177,53 @@ body {
         padding: 8px;
     }
 }
+
+/* ================================================================
+   РЕПОСТЫ
+   ================================================================ */
+
+.repost-box {
+    background: var(--input-bg);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin: 4px 0 6px 0;
+    border: 1px solid var(--border-color);
+}
+
+.repost-header {
+    font-size: 0.65rem;
+    color: var(--muted-text);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.repost-author {
+    color: var(--link-color);
+    cursor: pointer;
+}
+
+.repost-author:hover {
+    text-decoration: underline;
+}
+
+.repost-content {
+    padding: 2px 0;
+}
+
+.repost-text {
+    font-size: 0.8rem;
+    color: var(--text-color);
+    word-break: break-word;
+}
+
+.repost-img {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 6px;
+    margin: 4px 0;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    background: var(--card-bg);
+}
