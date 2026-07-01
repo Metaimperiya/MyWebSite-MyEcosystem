@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — ИСПРАВЛЕННАЯ ВЕРСИЯ
+// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ С РЕПОСТАМИ
 // ================================================================
 
 var commentStates = {};
@@ -22,7 +22,7 @@ function getCommentState(postId) {
 }
 
 // ================================================================
-// ЗАГРУЗКА ЛЕНТЫ — БЕЗ ПЕРЕРЕНДЕРА ПРИ ЛАЙКАХ
+// ЗАГРУЗКА ЛЕНТЫ
 // ================================================================
 
 function loadFeed() {
@@ -91,9 +91,11 @@ function loadFeed() {
 function updatePostStats(postId, data) {
     var likeCount = document.getElementById('likeCount_' + postId);
     var commentCount = document.getElementById('commentCount_' + postId);
+    var repostCount = document.getElementById('repostCount_' + postId);
     
     if (likeCount) likeCount.textContent = data.likes || 0;
     if (commentCount) commentCount.textContent = data.commentCount || 0;
+    if (repostCount) repostCount.textContent = data.reposts || 0;
 }
 
 // ================================================================
@@ -118,6 +120,7 @@ window.submitPost = function() {
         timestamp: Date.now(),
         likes: 0,
         commentCount: 0,
+        reposts: 0,
         hashtags: hashtags,
         marquee: null,
         link: null,
@@ -207,6 +210,27 @@ function renderPost(p, type) {
     var textHtml = esc(p.text || '');
     var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="window.open(this.src)">' : '';
 
+    // ===== РЕПОСТ HTML =====
+    var repostHtml = '';
+    if (p.repost) {
+        var repost = p.repost;
+        repostHtml = '<div class="repost-box">' +
+            '<div class="repost-header">🔁 Репост от <span class="repost-author" onclick="viewUser(\'' + (repost.originalAuthorUid || '') + '\')">' + esc(repost.originalAuthor || 'Аноним') + '</span></div>' +
+            '<div class="repost-content">' +
+            '<div class="repost-text">' + esc(repost.originalText || '') + '</div>';
+        
+        if (repost.originalImg) {
+            repostHtml += '<img src="' + repost.originalImg + '" class="repost-img" onclick="window.open(this.src)">';
+        }
+        
+        if (repost.originalLink) {
+            var frameSize = p.frameSize || 'small';
+            repostHtml += '<div class="link-preview"><iframe src="' + repost.originalLink + '" class="' + frameSize + '" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>';
+        }
+        
+        repostHtml += '</div></div>';
+    }
+
     var buttonsHtml = '';
     if (p.buttons && p.buttons.length > 0) {
         buttonsHtml = '<div class="buttons-wrap">';
@@ -238,7 +262,11 @@ function renderPost(p, type) {
         menuHtml = '<div class="post-menu"><button class="dots" onclick="togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="openEdit(\'' + p.id + '\', \'' + type + '\')">✏️ Редактировать</button><button class="del-btn" onclick="deletePost(\'' + p.id + '\', \'' + type + '\')">🗑 Удалить</button></div></div>';
     }
 
-    var actionsHtml = '<div class="stats"><button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button><button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button></div>';
+    var actionsHtml = '<div class="stats">' +
+        '<button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
+        '<button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
+        '<button onclick="openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
+        '</div>';
 
     var commentsHtml = `
         <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;">
@@ -259,7 +287,7 @@ function renderPost(p, type) {
         </div>
     `;
 
-    div.innerHTML = menuHtml + marqueeHtml + '<div class="author">' + avatarHtml + '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span><span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span></div><div class="text">' + textHtml + '</div>' + imgHtml + buttonsHtml + previewHtml + hashtagsHtml + actionsHtml + commentsHtml + inputHtml;
+    div.innerHTML = menuHtml + marqueeHtml + '<div class="author">' + avatarHtml + '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span><span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span></div><div class="text">' + textHtml + '</div>' + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml + actionsHtml + commentsHtml + inputHtml;
 
     if (p.authorUid) {
         var avatarEl = document.getElementById('post-avatar-' + p.id);
@@ -271,7 +299,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ — ПЛАВНО ВНИЗ, БЕЗ СКАЧКОВ
+// ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ
 // ================================================================
 
 window.toggleComments = function(postId, type) {
@@ -282,28 +310,23 @@ window.toggleComments = function(postId, type) {
     if (!wrapper) return;
 
     if (state.open) {
-        // Показываем
         wrapper.style.display = 'block';
         wrapper.style.opacity = '0';
         wrapper.style.transition = 'opacity 0.2s ease';
         
-        // Загружаем комментарии
         loadComments(postId, type);
         
         setTimeout(function() {
             wrapper.style.opacity = '1';
         }, 10);
         
-        // ===== ГЛАВНОЕ: ПРОКРУТКА ВНИЗ, К НАЧАЛУ КОММЕНТАРИЕВ =====
         setTimeout(function() {
             var wrapperEl = document.getElementById('commentsWrapper_' + postId);
             if (wrapperEl) {
-                // Получаем позицию блока с комментариями
                 var rect = wrapperEl.getBoundingClientRect();
                 var scrollTop = window.scrollY;
-                var targetY = rect.top + scrollTop - 70; // 70px отступ сверху (чтобы не под шапку)
+                var targetY = rect.top + scrollTop - 70;
                 
-                // Плавно скроллим к этой позиции
                 window.scrollTo({
                     top: targetY,
                     behavior: 'smooth'
@@ -354,7 +377,7 @@ function loadComments(postId, type) {
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ — С ВЕТКАМИ
+// РЕНДЕР КОММЕНТАРИЕВ
 // ================================================================
 
 function renderComments(postId, type) {
@@ -400,7 +423,6 @@ function renderCommentItem(c, postId, type, level) {
     var letter = (c.author || '?').charAt(0).toUpperCase();
     var canEdit = (c.author === USER || isAdmin);
     var likes = c.likes || 0;
-    var marginLeft = level * 24;
     var replyClass = level > 0 ? ' comment-reply' : '';
 
     var html = '<div class="comment-item' + replyClass + '" data-id="' + c.id + '">';
@@ -441,7 +463,6 @@ window.openReply = function(postId, parentId, type) {
     input.placeholder = 'Ответить на комментарий...';
     input.dataset.parentId = parentId;
     
-    // Прокручиваем к полю ввода (оно всегда внизу поста)
     var wrap = document.getElementById('commentInputWrap_' + postId);
     if (wrap) {
         var rect = wrap.getBoundingClientRect();
@@ -760,4 +781,74 @@ window.searchByTag = function(tag) {
         input.value = tag + ' ';
         input.focus();
     }
+};
+
+// ================================================================
+// РЕПОСТЫ
+// ================================================================
+
+window.openRepost = function(postId, type) {
+    if (!USER) { alert('Войдите!'); return; }
+    
+    document.getElementById('repostModal').classList.add('open');
+    document.getElementById('repostPostId').value = postId;
+    document.getElementById('repostType').value = type;
+    document.getElementById('repostText').value = '';
+    document.getElementById('repostText').placeholder = 'Напишите что-нибудь (необязательно)...';
+    document.getElementById('repostText').focus();
+};
+
+window.closeRepost = function() {
+    document.getElementById('repostModal').classList.remove('open');
+};
+
+window.submitRepost = function() {
+    var postId = document.getElementById('repostPostId').value;
+    var type = document.getElementById('repostType').value;
+    var comment = document.getElementById('repostText').value.trim();
+    
+    if (!postId) { alert('Ошибка: пост не найден'); return; }
+    
+    var path = getPostPath(type);
+    
+    db.ref('sites/' + SITE + '/' + path + '/' + postId).once('value', function(snap) {
+        var original = snap.val();
+        if (!original) { alert('Пост удалён'); closeRepost(); return; }
+        
+        var repostData = {
+            author: USER,
+            authorUid: USER_UID,
+            text: comment || '🔁 Репост',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            reposts: 0,
+            hashtags: [],
+            marquee: null,
+            link: null,
+            buttons: [],
+            frameSize: 'small',
+            edited: false,
+            img: null,
+            repost: {
+                originalId: postId,
+                originalAuthor: original.author,
+                originalAuthorUid: original.authorUid,
+                originalText: original.text || '',
+                originalImg: original.img || null,
+                originalLink: original.link || null,
+                originalTime: original.time || ''
+            }
+        };
+        
+        var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts');
+        repostRef.transaction(function(current) {
+            return (current || 0) + 1;
+        });
+        
+        db.ref('sites/' + SITE + '/feed_posts').push(repostData);
+        closeRepost();
+        alert('✅ Репост создан!');
+    });
 };
