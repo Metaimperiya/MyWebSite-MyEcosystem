@@ -41,8 +41,21 @@
         <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
-                    <textarea id="postInput" placeholder="Что у вас нового?" rows="2"></textarea>
-                    <div class="post-actions">
+                    <!-- ===== ТУЛБАР РЕДАКТОРА ===== -->
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <!-- ===== РЕДАКТОР ===== -->
+                    <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
                         <label class="file-label" for="fileInput">📎 Фото</label>
                         <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
                         <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
@@ -173,7 +186,6 @@
     var isPlayerOpen = false;
     var ticking = false;
 
-    // Ждём загрузки топбара
     function waitForTopbar() {
         topbar = document.getElementById('topbar');
         if (!topbar) {
