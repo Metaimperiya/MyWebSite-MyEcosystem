@@ -409,7 +409,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// РЕНДЕР ПОСТА
+// РЕНДЕР ПОСТА — С ПРИНУДИТЕЛЬНЫМ УДАЛЕНИЕМ ДЛЯ АДМИНА
 // ================================================================
 
 function renderPost(p, type) {
@@ -456,8 +456,13 @@ function renderPost(p, type) {
         hashtagsHtml += '</div>';
     }
 
+    // ===== МЕНЮ УДАЛЕНИЯ — ДЛЯ ВСЕХ ПОСТОВ ЕСЛИ isAdmin = true =====
     var menuHtml = '';
-    if (p.author === USER || isAdmin) {
+    // Если админ — показываем меню для ВСЕХ постов (включая чужие и ботов)
+    if (isAdmin === true) {
+        menuHtml = '<div class="post-menu"><button class="dots" onclick="togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="openEdit(\'' + p.id + '\', \'' + type + '\')">✏️ Редактировать</button><button class="del-btn" onclick="deletePost(\'' + p.id + '\', \'' + type + '\')">🗑 Удалить</button></div></div>';
+    } else if (p.author === USER) {
+        // Если не админ, но автор поста — тоже показываем
         menuHtml = '<div class="post-menu"><button class="dots" onclick="togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="openEdit(\'' + p.id + '\', \'' + type + '\')">✏️ Редактировать</button><button class="del-btn" onclick="deletePost(\'' + p.id + '\', \'' + type + '\')">🗑 Удалить</button></div></div>';
     }
 
