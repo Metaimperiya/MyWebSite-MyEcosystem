@@ -21,36 +21,12 @@
 
 <div class="app" id="app">
 
-    <!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
-    <header class="topbar" id="topbar">
-        <div class="left">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
-        </div>
-        <div class="center"></div>
-        <div class="right">
-            <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
-            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()"><span class="letter">?</span></div>
-            <span class="username" id="topName" onclick="goToProfile()">Гость</span>
-            <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
-        </div>
-    </header>
-
-    <!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== -->
-    <div class="settings-dropdown" id="settingsDropdown">
-        <div class="settings-item" onclick="goToProfile();closeSettingsMenu()">👤 Профиль</div>
-        <div class="settings-item" onclick="goToPeople();closeSettingsMenu()">👥 Люди</div>
-        <div class="settings-item" onclick="goToGroups();closeSettingsMenu()">💬 Сообщества</div>
-        <div class="settings-divider"></div>
-        <div class="settings-item" onclick="closeSettingsMenu()">🌙 Тема</div>
-        <div class="settings-item" onclick="closeSettingsMenu()">🔒 Приватность</div>
-        <div class="settings-item" onclick="closeSettingsMenu()">❓ Помощь</div>
-        <div class="settings-divider"></div>
-        <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
-    </div>
-
-    <!-- ===== КОНТЕЙНЕР ДЛЯ САЙДБАРА ===== -->
+    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ ПОДГРУЗКИ ===== -->
+    <div id="topbarContainer"></div>
+    <div id="settingsContainer"></div>
     <div id="sidebarContainer"></div>
+    <div id="playerContainer"></div>
+    <div id="modalsContainer"></div>
 
     <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <div class="container" id="mainContainer">
@@ -59,59 +35,6 @@
         <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
-        </div>
-
-        <!-- ===== ВЫДВИЖНОЙ ПЛЕЕР ===== -->
-        <div class="player-drawer" id="playerDrawer">
-            <div class="player-content">
-                <div class="equalizer">
-                    <div class="eq-bar" style="height:15px;animation-delay:0s"></div>
-                    <div class="eq-bar" style="height:25px;animation-delay:0.1s"></div>
-                    <div class="eq-bar" style="height:35px;animation-delay:0.2s"></div>
-                    <div class="eq-bar" style="height:45px;animation-delay:0.3s"></div>
-                    <div class="eq-bar" style="height:55px;animation-delay:0.4s"></div>
-                    <div class="eq-bar" style="height:45px;animation-delay:0.5s"></div>
-                    <div class="eq-bar" style="height:35px;animation-delay:0.6s"></div>
-                    <div class="eq-bar" style="height:25px;animation-delay:0.7s"></div>
-                    <div class="eq-bar" style="height:15px;animation-delay:0.8s"></div>
-                </div>
-
-                <div class="player-track-info">
-                    <div class="player-track-name" id="drawerTrackName">Capitulation</div>
-                    <div class="player-artist">METAIMPERIYA</div>
-                </div>
-
-                <div class="player-progress">
-                    <div class="player-progress-bar" id="drawerProgressBar">
-                        <div class="player-progress-fill" id="drawerProgressFill" style="width:0%"></div>
-                    </div>
-                    <div class="player-time">
-                        <span id="drawerCurrentTime">0:00</span>
-                        <span id="drawerTotalTime">0:00</span>
-                    </div>
-                </div>
-
-                <div class="player-controls">
-                    <button class="player-btn" onclick="playPrev()">⏮</button>
-                    <button class="player-btn play-large" id="drawerPlayBtn" onclick="togglePlay()">▶</button>
-                    <button class="player-btn" onclick="playNext()">⏭</button>
-                    <button class="player-btn" onclick="toggleDrawerPlaylist()">📋</button>
-                    <button class="player-btn" onclick="downloadCurrentTrack()">⬇️</button>
-                    <button class="player-btn" onclick="openVisualizer()">🎨</button>
-                </div>
-
-                <div class="player-playlist" id="drawerPlaylist" style="display:none;">
-                    <div class="playlist-item active" onclick="playTrack(0)">01 Capitulation</div>
-                    <div class="playlist-item" onclick="playTrack(1)">02 Clean Victory</div>
-                    <div class="playlist-item" onclick="playTrack(2)">03 Covenant of Change</div>
-                    <div class="playlist-item" onclick="playTrack(3)">04 Dreams in the Wind</div>
-                    <div class="playlist-item" onclick="playTrack(4)">05 Memory Like Dust</div>
-                    <div class="playlist-item" onclick="playTrack(5)">06 Nobody</div>
-                    <div class="playlist-item" onclick="playTrack(6)">07 Touch of Choice</div>
-                    <div class="playlist-item" onclick="playTrack(7)">08 You Are Not in the Game</div>
-                    <div class="playlist-item" onclick="playTrack(8)">09 You Can't See Me</div>
-                </div>
-            </div>
         </div>
 
         <!-- ===== ЛЕНТА ===== -->
@@ -176,88 +99,6 @@
 
     </div>
 
-    <!-- ===== МОДАЛКИ ===== -->
-    <div class="modal" id="loginModal">
-        <div class="modal-box">
-            <h3>👤 Вход</h3>
-            <button class="google-btn" id="googleBtn">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Войти через Google
-            </button>
-            <div class="divider">или</div>
-            <input type="text" id="nameInput" placeholder="Введите имя...">
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeLogin()">Отмена</button>
-                <button class="btn-save" onclick="loginWithName()">Войти</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="editProfileModal">
-        <div class="modal-box">
-            <h3>✏️ Редактировать профиль</h3>
-            <input type="text" id="editName" placeholder="Имя">
-            <textarea id="editBio" placeholder="О себе..."></textarea>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeEditProfile()">Отмена</button>
-                <button class="btn-save" onclick="saveProfile()">Сохранить</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="editModal">
-        <div class="modal-box">
-            <h3>✏️ Редактировать пост</h3>
-            <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
-            <textarea id="editText" placeholder="📝 Текст поста"></textarea>
-            <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
-            <div class="frame-size-toggle">
-                <span class="label">📐 Размер фрейма:</span>
-                <div class="btn-group">
-                    <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">📱 Обычный</button>
-                    <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">🖥️ Широкий</button>
-                </div>
-            </div>
-            <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
-            <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
-            <div id="editButtonsContainer"></div>
-            <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
-            <div class="modal-actions">
-                <button class="btn-save" onclick="saveEdit()">💾 Сохранить</button>
-                <button class="btn-cancel" onclick="closeEdit()">✕ Отмена</button>
-            </div>
-            <button onclick="deleteEditPost()" style="width:100%;padding:3px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
-        </div>
-    </div>
-
-    <div class="modal" id="createRoomModal">
-        <div class="modal-box">
-            <h3>📝 Новая группа</h3>
-            <input type="text" id="roomName" placeholder="Название...">
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeCreateRoom()">Отмена</button>
-                <button class="btn-save" onclick="createRoom()">Создать</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="adminModal">
-        <div class="modal-box">
-            <h3>🏴‍☠️ Админ</h3>
-            <input type="password" id="adminPass" placeholder="Пароль...">
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeAdminModal()">Отмена</button>
-                <button class="btn-save" onclick="checkAdmin()">Войти</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="notificationsModal">
-        <div class="modal-box">
-            <h3>🔔 Уведомления <button class="close-btn" onclick="closeNotifications()">✕</button></h3>
-            <div id="notificationsList"></div>
-        </div>
-    </div>
-
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
     <!-- ===== ВИЗУАЛИЗАЦИЯ НА ВЕСЬ ЭКРАН ===== -->
@@ -280,40 +121,45 @@
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
 
-<!-- ===== ЗАГРУЗКА САЙДБАРА ===== -->
+<!-- ===== ЗАГРУЗКА ВСЕХ КОМПОНЕНТОВ ===== -->
 <script>
 (function() {
-    const container = document.getElementById('sidebarContainer');
-    if (!container) return;
+    const components = [
+        { id: 'topbarContainer', url: 'topbar.html' },
+        { id: 'settingsContainer', url: 'settings.html' },
+        { id: 'sidebarContainer', url: 'sidebar.html' },
+        { id: 'playerContainer', url: 'player.html' },
+        { id: 'modalsContainer', url: 'modals.html' }
+    ];
 
-    // Проверяем, не загружен ли уже сайдбар
-    if (container.innerHTML.trim() !== '') return;
+    let loaded = 0;
+    const total = components.length;
 
-    fetch('sidebar.html')
-        .then(response => {
-            if (!response.ok) throw new Error('Не удалось загрузить sidebar.html');
-            return response.text();
-        })
-        .then(html => {
-            container.innerHTML = html;
-            console.log('✅ Сайдбар загружен из sidebar.html');
-        })
-        .catch(err => {
-            console.warn('❌ Ошибка загрузки сайдбара:', err);
-            container.innerHTML = `
-                <div class="sidebar" id="sidebar">
-                    <div class="sidebar-header">
-                        <h3>📱 Меню</h3>
-                        <button class="close-btn" onclick="closeSidebar()">✕</button>
-                    </div>
-                    <div style="padding:20px;text-align:center;color:#888;">
-                        ⚠️ Сайдбар не загрузился.<br>
-                        Проверьте файл sidebar.html
-                    </div>
-                </div>
-                <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-            `;
-        });
+    components.forEach(function(comp) {
+        const container = document.getElementById(comp.id);
+        if (!container) return;
+
+        fetch(comp.url)
+            .then(response => {
+                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                return response.text();
+            })
+            .then(html => {
+                container.innerHTML = html;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены!');
+                }
+            })
+            .catch(err => {
+                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                container.innerHTML = `<div style="display:none;"></div>`;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены (с ошибками)');
+                }
+            });
+    });
 })();
 </script>
 
@@ -326,6 +172,17 @@
     var playerDrawer = document.getElementById('playerDrawer');
     var isPlayerOpen = false;
     var ticking = false;
+
+    // Ждём загрузки топбара
+    function waitForTopbar() {
+        topbar = document.getElementById('topbar');
+        if (!topbar) {
+            setTimeout(waitForTopbar, 200);
+            return;
+        }
+        console.log('✅ Топбар найден, авто-скрытие работает');
+    }
+    waitForTopbar();
 
     function checkPlayerState() {
         if (playerDrawer) {
