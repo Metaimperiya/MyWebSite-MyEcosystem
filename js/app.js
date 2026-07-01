@@ -182,3 +182,21 @@ window.setFrameSize = function(size) {
         if (btn2) btn2.classList.add('active');
     }
 };
+
+// ================================================================
+// ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (СВЕТЛАЯ / ТЁМНАЯ)
+// ================================================================
+
+window.toggleTheme = function() {
+    var currentTheme = document.documentElement.getAttribute('data-theme');
+    var newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+};
+
+// При загрузке — применяем сохранённую тему
+(function applySavedTheme() {
+    var savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+})();
