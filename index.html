@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <!-- ===== ЗАПРЕТ ИНДЕКСАЦИИ (СТРАХОВКА) ===== -->
-    <meta name="robots" content="noindex, nofollow" />
-
+    <meta name="robots" content="noindex, nofollow">
     <title>METAIMPERIYA — Социальная платформа</title>
     <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
     <meta name="theme-color" content="#1877f2">
@@ -30,9 +27,7 @@
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
             <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
         </div>
-        <div class="center">
-            <!-- ПЛЕЕР В ШАПКЕ УБРАН -->
-        </div>
+        <div class="center"></div>
         <div class="right">
             <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
             <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()"><span class="letter">?</span></div>
@@ -54,148 +49,8 @@
         <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
     </div>
 
-    <!-- ===== САЙДБАР ===== -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>📱 Меню</h3>
-            <button class="close-btn" onclick="closeSidebar()">✕</button>
-        </div>
-        <div class="sidebar-user">
-            <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
-            <div>
-                <div class="name" id="sName">Гость</div>
-                <div class="status">онлайн</div>
-            </div>
-        </div>
-        <div class="sidebar-nav main-nav">
-            <div class="nav-item active" onclick="goToFeed();closeSidebar()">🏠 Главная</div>
-            <div class="nav-item" onclick="goToProfile();closeSidebar()">👤 Профиль</div>
-            <div class="nav-item" onclick="goToPeople();closeSidebar()">👥 Люди</div>
-            <div class="nav-item" onclick="goToGroups();closeSidebar()">💬 Сообщества</div>
-        </div>
-        <div class="accordion">
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">🎵</span>
-                    <span class="accordion-title">Мультимедиа</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="closeSidebar()">📸 Фото</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎥 Видео</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎵 Музыка</div>
-                    <div class="nav-item" onclick="closeSidebar()">📚 Книги</div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">💻</span>
-                    <span class="accordion-title">Технологии</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="closeSidebar()">💻 Программирование</div>
-                    <div class="nav-item" onclick="closeSidebar()">🌐 Сайты</div>
-                    <div class="nav-item" onclick="closeSidebar()">🤖 AI / ChatGPT</div>
-                    <div class="nav-item" onclick="closeSidebar()">🕶️ VR / AR</div>
-                    <div class="nav-item" onclick="closeSidebar()">🔐 Безопасность</div>
-                    <div class="nav-item" onclick="closeSidebar()">☁️ Cloud</div>
-                    <div class="nav-item" onclick="closeSidebar()">🌐 Open Source</div>
-                    <div class="nav-item" onclick="closeSidebar()">🧩 API / SDK</div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">💰</span>
-                    <span class="accordion-title">Бизнес</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="closeSidebar()">💰 Бизнес</div>
-                    <div class="nav-item" onclick="closeSidebar()">📈 Финансы</div>
-                    <div class="nav-item" onclick="closeSidebar()">🪙 Криптовалюты</div>
-                    <div class="nav-item" onclick="closeSidebar()">🛒 Маркетплейс</div>
-                    <div class="nav-item" onclick="closeSidebar()">💼 Работа</div>
-                    <div class="nav-item" onclick="closeSidebar()">📦 Проекты</div>
-                    <div class="nav-item" onclick="closeSidebar()">🚀 Стартапы</div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">🌍</span>
-                    <span class="accordion-title">Жизнь</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="closeSidebar()">✈️ Путешествия</div>
-                    <div class="nav-item" onclick="closeSidebar()">🍔 Еда</div>
-                    <div class="nav-item" onclick="closeSidebar()">🏠 Недвижимость</div>
-                    <div class="nav-item" onclick="closeSidebar()">⚽ Спорт</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎮 Игры</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎭 Аниме</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎬 Кино</div>
-                    <div class="nav-item" onclick="closeSidebar()">📺 Сериалы</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎤 Блогеры</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎭 Мемы</div>
-                    <div class="nav-item" onclick="closeSidebar()">👗 Мода</div>
-                    <div class="nav-item" onclick="closeSidebar()">🚗 Автомобили</div>
-                    <div class="nav-item" onclick="closeSidebar()">❤️ Волонтёрство</div>
-                    <div class="nav-item" onclick="closeSidebar()">🐾 Животные</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎯 Хобби</div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">💬</span>
-                    <span class="accordion-title">Общение</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="closeSidebar()">💖 Знакомства</div>
-                    <div class="nav-item" onclick="closeSidebar()">🤝 Команда</div>
-                    <div class="nav-item" onclick="closeSidebar()">🏳️‍🌈 LGBTQ+</div>
-                    <div class="nav-item" onclick="closeSidebar()">🗣️ Языки</div>
-                    <div class="nav-item" onclick="closeSidebar()">❓ Q&A</div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">📰</span>
-                    <span class="accordion-title">Новости</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="closeSidebar()">📰 Новости</div>
-                    <div class="nav-item" onclick="closeSidebar()">📡 Стримы</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎉 События</div>
-                    <div class="nav-item" onclick="closeSidebar()">📻 Подкасты</div>
-                    <div class="nav-item" onclick="closeSidebar()">🏆 Конкурсы</div>
-                    <div class="nav-item" onclick="closeSidebar()">🎁 Акции и скидки</div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">🔧</span>
-                    <span class="accordion-title">Другое</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="closeSidebar()">📄 Страницы</div>
-                    <div class="nav-item" onclick="closeSidebar()">📝 Блог</div>
-                    <div class="nav-item" onclick="closeSidebar()">🛍️ Покупки</div>
-                    <div class="nav-item" onclick="closeSidebar()">📞 Услуги</div>
-                    <div class="nav-item" onclick="closeSidebar()">🧑‍💼 Фриланс</div>
-                    <div class="nav-item" onclick="closeSidebar()">🏛️ Организации</div>
-                    <div class="nav-item" onclick="closeSidebar()">🏴‍☠️ METAIMPERIYA</div>
-                </div>
-            </div>
-        </div>
-        <div class="sidebar-footer">
-            <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
-        </div>
-    </div>
-
-    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+    <!-- ===== КОНТЕЙНЕР ДЛЯ САЙДБАРА ===== -->
+    <div id="sidebarContainer"></div>
 
     <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <div class="container" id="mainContainer">
@@ -424,6 +279,43 @@
 <script src="js/chat.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
+
+<!-- ===== ЗАГРУЗКА САЙДБАРА ===== -->
+<script>
+(function() {
+    const container = document.getElementById('sidebarContainer');
+    if (!container) return;
+
+    // Проверяем, не загружен ли уже сайдбар
+    if (container.innerHTML.trim() !== '') return;
+
+    fetch('sidebar.html')
+        .then(response => {
+            if (!response.ok) throw new Error('Не удалось загрузить sidebar.html');
+            return response.text();
+        })
+        .then(html => {
+            container.innerHTML = html;
+            console.log('✅ Сайдбар загружен из sidebar.html');
+        })
+        .catch(err => {
+            console.warn('❌ Ошибка загрузки сайдбара:', err);
+            container.innerHTML = `
+                <div class="sidebar" id="sidebar">
+                    <div class="sidebar-header">
+                        <h3>📱 Меню</h3>
+                        <button class="close-btn" onclick="closeSidebar()">✕</button>
+                    </div>
+                    <div style="padding:20px;text-align:center;color:#888;">
+                        ⚠️ Сайдбар не загрузился.<br>
+                        Проверьте файл sidebar.html
+                    </div>
+                </div>
+                <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+            `;
+        });
+})();
+</script>
 
 <!-- ===== АВТО-СКРЫТИЕ ШАПКИ ===== -->
 <script>
