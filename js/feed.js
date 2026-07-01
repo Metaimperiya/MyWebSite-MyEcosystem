@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — С ВЛОЖЕННЫМИ РЕПОСТАМИ (МАТРЕШКА)
+// ЛЕНТА И ПОСТЫ — С РЕДАКТОРОМ И ВЛОЖЕННЫМИ РЕПОСТАМИ
 // ================================================================
 
 var commentStates = {};
@@ -100,13 +100,104 @@ function updatePostStats(postId, data) {
 }
 
 // ================================================================
-// ОТПРАВКА ПОСТА
+// РАБОТА С РЕДАКТОРОМ
+// ================================================================
+
+function getEditorText() {
+    var editor = document.getElementById('postEditor');
+    if (!editor) return '';
+    return editor.innerHTML;
+}
+
+function setEditorText(html) {
+    var editor = document.getElementById('postEditor');
+    if (!editor) return;
+    editor.innerHTML = html || '';
+}
+
+function clearEditor() {
+    var editor = document.getElementById('postEditor');
+    if (!editor) return;
+    editor.innerHTML = '';
+}
+
+function formatText(type) {
+    var editor = document.getElementById('postEditor');
+    if (!editor) return;
+    
+    var selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    
+    var range = selection.getRangeAt(0);
+    var selectedText = range.toString();
+    
+    if (!selectedText) {
+        var templates = {
+            'bold': '**жирный текст**',
+            'italic': '*курсив*',
+            'underline': '__подчёркнутый__',
+            'strike': '~~зачёркнутый~~',
+            'h1': '# Заголовок',
+            'h2': '## Подзаголовок',
+            'quote': '> Цитата',
+            'code': '```код```'
+        };
+        
+        var template = templates[type] || '';
+        if (template) {
+            document.execCommand('insertText', false, template);
+        }
+        return;
+    }
+    
+    var wrappers = {
+        'bold': '**',
+        'italic': '*',
+        'underline': '__',
+        'strike': '~~',
+        'h1': '# ',
+        'h2': '## ',
+        'quote': '> ',
+        'code': '```'
+    };
+    
+    var wrapper = wrappers[type];
+    if (!wrapper) return;
+    
+    var newText;
+    if (type === 'h1' || type === 'h2' || type === 'quote') {
+        newText = wrapper + selectedText;
+    } else {
+        var closeWrapper = wrapper;
+        if (type === 'code') closeWrapper = '```';
+        newText = wrapper + selectedText + closeWrapper;
+    }
+    
+    document.execCommand('insertText', false, newText);
+}
+
+function insertLink() {
+    var url = prompt('Введите ссылку:');
+    if (!url) return;
+    
+    var editor = document.getElementById('postEditor');
+    if (!editor) return;
+    
+    var selection = window.getSelection();
+    if (selection.rangeCount) {
+        var text = selection.toString() || 'ссылка';
+        document.execCommand('insertText', false, '[' + text + '](' + url + ')');
+    }
+}
+
+// ================================================================
+// ОТПРАВКА ПОСТА (С РЕДАКТОРОМ)
 // ================================================================
 
 window.submitPost = function() {
     if (!USER) { alert('Войдите!'); return; }
 
-    var text = document.getElementById('postInput').value.trim();
+    var text = getEditorText().trim();
     if (!text && !pendingImageFile) {
         alert('Введите текст или добавьте фото');
         return;
@@ -129,7 +220,7 @@ window.submitPost = function() {
         frameSize: 'small',
         edited: false,
         img: null,
-        repost: null // для вложенных репостов
+        repost: null
     };
 
     var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
@@ -140,6 +231,7 @@ window.submitPost = function() {
         
         db.ref('sites/' + SITE + '/feed_posts').push(postData);
         db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
+        clearEditor();
         clearPostForm();
     };
 
@@ -161,7 +253,7 @@ function extractHashtags(text) {
 }
 
 window.clearPostForm = function() {
-    document.getElementById('postInput').value = '';
+    clearEditor();
     pendingImage = null;
     pendingImageFile = null;
     document.getElementById('previewBox').classList.remove('visible');
@@ -214,7 +306,7 @@ function renderPost(p, type) {
     var avatarHtml = '<span class="avatar-wrap" id="post-avatar-' + p.id + '"><span class="letter">' + letter + '</span></span>';
 
     var marqueeHtml = p.marquee ? '<div class="marquee"><span>' + esc(p.marquee) + '</span></div>' : '';
-    var textHtml = esc(p.text || '');
+    var textHtml = p.text || '';
     var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="window.open(this.src)">' : '';
 
     // ===== ВЛОЖЕННЫЙ РЕПОСТ (РЕКУРСИВНО) =====
@@ -279,7 +371,6 @@ function renderPost(p, type) {
         </div>
     `;
 
-    // ===== СБОРКА =====
     var contentHtml = textHtml + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml;
     
     div.innerHTML = menuHtml + marqueeHtml + 
@@ -306,11 +397,10 @@ function renderPost(p, type) {
 function renderNestedRepost(repost, level) {
     if (!repost) return '';
     
-    var maxLevel = 5; // максимальная глубина вложенности
+    var maxLevel = 5;
     if (level > maxLevel) return '<div class="repost-nested" style="padding:6px;color:var(--muted-text);font-size:0.6rem;">📦 Слишком глубокий репост</div>';
     
-    var letter = (repost.author || '?').charAt(0).toUpperCase();
-    var textHtml = esc(repost.text || '');
+    var textHtml = repost.text || '';
     var imgHtml = repost.img ? '<img src="' + repost.img + '" class="repost-img" onclick="window.open(this.src)">' : '';
     var marqueeHtml = repost.marquee ? '<div class="marquee"><span>' + esc(repost.marquee) + '</span></div>' : '';
     
@@ -340,7 +430,6 @@ function renderNestedRepost(repost, level) {
         hashtagsHtml += '</div>';
     }
     
-    // Рекурсивно рендерим вложенный репост
     var nestedHtml = '';
     if (repost.repost) {
         nestedHtml = renderNestedRepost(repost.repost, level + 1);
@@ -893,15 +982,15 @@ document.addEventListener('click', function(e) {
 });
 
 window.searchByTag = function(tag) {
-    var input = document.getElementById('postInput');
+    var input = document.getElementById('postEditor');
     if (input) {
-        input.value = tag + ' ';
+        input.innerHTML = tag + ' ';
         input.focus();
     }
 };
 
 // ================================================================
-// РЕПОСТЫ — ВЛОЖЕННЫЕ (МАТРЕШКА)
+// РЕПОСТЫ — ВЛОЖЕННЫЕ (МАТРЕШКА) С ПОДДЕРЖКОЙ РЕДАКТОРА
 // ================================================================
 
 window.openRepost = function(postId, type) {
@@ -934,7 +1023,6 @@ window.submitRepost = function() {
         
         var repostText = comment || '🔁 Репост';
         
-        // ===== СОЗДАЁМ ВЛОЖЕННЫЙ РЕПОСТ (МАТРЕШКА) =====
         var repostData = {
             author: USER,
             authorUid: USER_UID,
@@ -951,16 +1039,13 @@ window.submitRepost = function() {
             frameSize: 'small',
             edited: false,
             img: null,
-            // ===== ВЛОЖЕННЫЙ РЕПОСТ =====
             repost: null
         };
         
-        // Если есть картинка — добавляем
         if (pendingImageFile) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 repostData.img = e.target.result;
-                // Вкладываем оригинальный пост в repost
                 repostData.repost = createRepostObject(original);
                 saveNestedRepost(repostData, postId, type, path);
             };
@@ -968,18 +1053,12 @@ window.submitRepost = function() {
             return;
         }
         
-        // Без картинки
         repostData.repost = createRepostObject(original);
         saveNestedRepost(repostData, postId, type, path);
     });
 };
 
-// ================================================================
-// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ: СОЗДАЁМ ОБЪЕКТ РЕПОСТА
-// ================================================================
-
 function createRepostObject(original) {
-    // Если оригинал уже содержит репост — вкладываем его
     if (original.repost) {
         return {
             author: original.author,
@@ -993,11 +1072,10 @@ function createRepostObject(original) {
             marquee: original.marquee || null,
             hashtags: original.hashtags || [],
             frameSize: original.frameSize || 'small',
-            repost: original.repost // передаём дальше
+            repost: original.repost
         };
     }
     
-    // Обычный пост
     return {
         author: original.author,
         authorUid: original.authorUid,
@@ -1014,12 +1092,7 @@ function createRepostObject(original) {
     };
 }
 
-// ================================================================
-// СОХРАНЕНИЕ ВЛОЖЕННОГО РЕПОСТА
-// ================================================================
-
 function saveNestedRepost(repostData, postId, type, path) {
-    // Увеличиваем счётчик у оригинального поста
     var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts');
     repostRef.transaction(function(current) {
         return (current || 0) + 1;
