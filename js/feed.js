@@ -268,7 +268,6 @@ function renderPost(p, type) {
         menuHtml = '<div class="post-menu"><button class="dots" onclick="togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="openEdit(\'' + p.id + '\', \'' + type + '\')">✏️ Редактировать</button><button class="del-btn" onclick="deletePost(\'' + p.id + '\', \'' + type + '\')">🗑 Удалить</button></div></div>';
     }
 
-    // ===== КНОПКА РЕПОСТА ВЫЗЫВАЕТ openRepost =====
     var actionsHtml = '<div class="stats">' +
         '<button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
         '<button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
@@ -837,18 +836,13 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ — С МОДАЛКОЙ ДЛЯ ВВОДА ТЕКСТА
+// РЕПОСТЫ — С ПОДДЕРЖКОЙ РЕПОСТА РЕПОСТА
 // ================================================================
 
 window.openRepost = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
     
-    var repostKey = 'repost_' + postId + '_' + USER_UID;
-    if (localStorage.getItem(repostKey) === '1') {
-        alert('❌ Вы уже сделали репост этого поста');
-        return;
-    }
-    
+    // Разрешаем репостить сколько угодно раз (убрал блокировку)
     document.getElementById('repostModal').classList.add('open');
     document.getElementById('repostPostId').value = postId;
     document.getElementById('repostType').value = type;
@@ -891,8 +885,22 @@ window.submitRepost = function() {
             buttons: [],
             frameSize: 'small',
             edited: false,
-            img: null,
-            repost: {
+            img: null
+        };
+        
+        // ===== ЕСЛИ ЭТО РЕПОСТ — БЕРЕМ ОРИГИНАЛ =====
+        if (original.repost) {
+            repostData.repost = {
+                originalId: original.repost.originalId || postId,
+                originalAuthor: original.repost.originalAuthor || original.author,
+                originalAuthorUid: original.repost.originalAuthorUid || original.authorUid,
+                originalText: original.repost.originalText || original.text || '',
+                originalImg: original.repost.originalImg || original.img || null,
+                originalLink: original.repost.originalLink || original.link || null,
+                originalTime: original.repost.originalTime || original.time || ''
+            };
+        } else {
+            repostData.repost = {
                 originalId: postId,
                 originalAuthor: original.author,
                 originalAuthorUid: original.authorUid,
@@ -900,18 +908,18 @@ window.submitRepost = function() {
                 originalImg: original.img || null,
                 originalLink: original.link || null,
                 originalTime: original.time || ''
-            }
-        };
+            };
+        }
         
-        var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts');
+        // Увеличиваем счётчик у оригинального поста
+        var originalId = repostData.repost.originalId;
+        var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + originalId + '/reposts');
         repostRef.transaction(function(current) {
             return (current || 0) + 1;
         });
         
         db.ref('sites/' + SITE + '/feed_posts').push(repostData);
         db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
-        
-        localStorage.setItem('repost_' + postId + '_' + USER_UID, '1');
         
         closeRepost();
         alert('✅ Репост создан!');
