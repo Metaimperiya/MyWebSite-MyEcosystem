@@ -1,5 +1,5 @@
 // ================================================================
-// ПРОФИЛЬ — ПОЛНАЯ ВЕРСИЯ С НОВОЙ СИСТЕМОЙ ДРУЗЕЙ
+// ПРОФИЛЬ — ПОЛНАЯ ВЕРСИЯ С РЕАЛЬНЫМ ВРЕМЕНЕМ
 // ================================================================
 
 function loadProfile() {
@@ -25,12 +25,10 @@ function loadProfilePosts(uid) {
     var container = document.getElementById('profilePosts');
     container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">Загрузка...</div>';
     
-    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', function(snap) {
+    db.ref('sites/' + SITE + '/user_posts/' + uid).orderByChild('timestamp').on('value', function(snap) {
         container.innerHTML = '';
         var data = snap.val() || {};
-        var keys = Object.keys(data).filter(function(k) {
-            return data[k].authorUid === uid;
-        }).sort(function(a, b) {
+        var keys = Object.keys(data).sort(function(a, b) {
             return (data[b].timestamp || 0) - (data[a].timestamp || 0);
         });
         
@@ -42,34 +40,47 @@ function loadProfilePosts(uid) {
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            container.appendChild(renderPost(p, 'feed'));
+            container.appendChild(renderPost(p, 'profile'));
         });
     });
 }
 
 // ================================================================
-// КНОПКИ В ПРОФИЛЕ — НОВАЯ СИСТЕМА ДРУЗЕЙ
+// КНОПКИ В ПРОФИЛЕ — В РЕАЛЬНОМ ВРЕМЕНИ
 // ================================================================
 
 function showProfileActions(uid) {
     var actions = document.getElementById('profileActions');
-    if (!uid || uid === USER_UID) {
+    if (!uid) return;
+    
+    // Очищаем и создаём кнопку
+    actions.innerHTML = '';
+    
+    if (uid === USER_UID) {
         actions.innerHTML = '<button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button><button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>';
         return;
     }
-
-    // Определяем статус отношений через новую систему
-    var status = getFriendStatus(USER_UID, uid);
-
-    if (status === 'friend') {
-        actions.innerHTML = '<button class="friend-btn friend" onclick="removeFriend(\'' + uid + '\')">✅ В друзьях</button>';
-    } else if (status === 'pending_sent') {
-        actions.innerHTML = '<button class="friend-btn pending" onclick="cancelFriendRequest(\'' + uid + '\')">⏳ Запрос отправлен</button>';
-    } else if (status === 'pending_received') {
-        actions.innerHTML = '<button class="friend-btn received" onclick="acceptFriendRequest(\'' + uid + '\')">📩 Принять заявку</button>';
-    } else {
-        actions.innerHTML = '<button class="friend-btn add" onclick="sendFriendRequest(\'' + uid + '\')">➕ Добавить в друзья</button>';
-    }
+    
+    // Кнопка для чужого профиля
+    var btn = document.createElement('button');
+    btn.id = 'friendActionBtn';
+    btn.className = 'friend-btn add';
+    btn.textContent = 'Загрузка...';
+    btn.style.display = 'inline-block';
+    actions.appendChild(btn);
+    
+    // Обновляем статус в реальном времени
+    updateFriendButton(uid);
+    
+    // Слушаем изменения в друзьях
+    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).on('value', function() {
+        updateFriendButton(uid);
+    });
+    
+    // Слушаем изменения в заявках
+    db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).on('value', function() {
+        updateFriendButton(uid);
+    });
 }
 
 // ================================================================
