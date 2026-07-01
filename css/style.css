@@ -1086,3 +1086,28 @@ body {
         transition: transform 0.25s ease, opacity 0.25s ease;
     }
 }
+
+/* ================================================================
+   КНОПКА ТЕМЫ
+   ================================================================ */
+
+.theme-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 2px 4px;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-btn:hover {
+    background: var(--input-bg);
+    color: var(--link-color);
+}
