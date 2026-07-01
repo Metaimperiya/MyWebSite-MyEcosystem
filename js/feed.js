@@ -137,12 +137,8 @@ window.submitPost = function() {
     var savePost = function(imgData) {
         if (imgData) postData.img = imgData;
         
-        // Сохраняем в общую ленту
         db.ref('sites/' + SITE + '/feed_posts').push(postData);
-        
-        // Сохраняем в профиль пользователя
         db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
-        
         clearPostForm();
     };
 
@@ -272,10 +268,11 @@ function renderPost(p, type) {
         menuHtml = '<div class="post-menu"><button class="dots" onclick="togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="openEdit(\'' + p.id + '\', \'' + type + '\')">✏️ Редактировать</button><button class="del-btn" onclick="deletePost(\'' + p.id + '\', \'' + type + '\')">🗑 Удалить</button></div></div>';
     }
 
+    // ===== КНОПКА РЕПОСТА ВЫЗЫВАЕТ openRepost =====
     var actionsHtml = '<div class="stats">' +
         '<button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
         '<button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
-        '<button onclick="doRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
+        '<button onclick="openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
         '</div>';
 
     var commentsHtml = `
@@ -840,29 +837,49 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ — БЕЗ ОКОН, С СОХРАНЕНИЕМ В ЛЕНТУ И ПРОФИЛЬ
+// РЕПОСТЫ — С МОДАЛКОЙ ДЛЯ ВВОДА ТЕКСТА
 // ================================================================
 
-window.doRepost = function(postId, type) {
+window.openRepost = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
     
-    // Проверяем, не делал ли уже репост
     var repostKey = 'repost_' + postId + '_' + USER_UID;
     if (localStorage.getItem(repostKey) === '1') {
         alert('❌ Вы уже сделали репост этого поста');
         return;
     }
     
+    document.getElementById('repostModal').classList.add('open');
+    document.getElementById('repostPostId').value = postId;
+    document.getElementById('repostType').value = type;
+    document.getElementById('repostText').value = '';
+    document.getElementById('repostText').placeholder = 'Напишите что-нибудь (необязательно)...';
+    document.getElementById('repostText').focus();
+};
+
+window.closeRepost = function() {
+    document.getElementById('repostModal').classList.remove('open');
+};
+
+window.submitRepost = function() {
+    var postId = document.getElementById('repostPostId').value;
+    var type = document.getElementById('repostType').value;
+    var comment = document.getElementById('repostText').value.trim();
+    
+    if (!postId) { alert('Ошибка: пост не найден'); return; }
+    
     var path = getPostPath(type);
     
     db.ref('sites/' + SITE + '/' + path + '/' + postId).once('value', function(snap) {
         var original = snap.val();
-        if (!original) { alert('Пост удалён'); return; }
+        if (!original) { alert('Пост удалён'); closeRepost(); return; }
+        
+        var repostText = comment || '🔁 Репост';
         
         var repostData = {
             author: USER,
             authorUid: USER_UID,
-            text: '🔁 Репост',
+            text: repostText,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             timestamp: Date.now(),
             likes: 0,
@@ -886,21 +903,17 @@ window.doRepost = function(postId, type) {
             }
         };
         
-        // Увеличиваем счётчик репостов у оригинала
         var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts');
         repostRef.transaction(function(current) {
             return (current || 0) + 1;
         });
         
-        // Сохраняем в общую ленту
         db.ref('sites/' + SITE + '/feed_posts').push(repostData);
-        
-        // Сохраняем в профиль пользователя
         db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
         
-        // Запоминаем, что репост уже сделан
-        localStorage.setItem(repostKey, '1');
+        localStorage.setItem('repost_' + postId + '_' + USER_UID, '1');
         
+        closeRepost();
         alert('✅ Репост создан!');
     });
 };
