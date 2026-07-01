@@ -41,7 +41,6 @@
         <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
-                    <!-- ===== ТУЛБАР РЕДАКТОРА ===== -->
                     <div class="editor-toolbar">
                         <button onclick="formatText('bold')"><b>B</b></button>
                         <button onclick="formatText('italic')"><i>I</i></button>
@@ -53,7 +52,6 @@
                         <button onclick="formatText('code')">&lt;/&gt;</button>
                         <button onclick="insertLink()">🔗</button>
                     </div>
-                    <!-- ===== РЕДАКТОР ===== -->
                     <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
                     <div class="post-actions" style="margin-top:6px;">
                         <label class="file-label" for="fileInput">📎 Фото</label>
@@ -78,7 +76,36 @@
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
 
+        <!-- ===== ПРОФИЛЬ С ФОРМОЙ ===== -->
         <div class="page" id="page-profile">
+            <!-- ===== ФОРМА ПОСТА В ПРОФИЛЕ ===== -->
+            <div class="card">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInputProfile">📎 Фото</label>
+                        <button class="btn-submit" onclick="submitProfilePost()">📤 Опубликовать</button>
+                        <button class="btn-cancel" onclick="clearProfilePostForm()">Очистить</button>
+                    </div>
+                    <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBoxProfile">
+                        <img id="previewImgProfile"><span id="previewNameProfile"></span>
+                        <button class="remove-pic" onclick="removeProfileImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
                 <div class="name" id="profileName">Гость</div>
@@ -114,7 +141,6 @@
 
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
-    <!-- ===== ВИЗУАЛИЗАЦИЯ НА ВЕСЬ ЭКРАН ===== -->
     <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
         <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
         <canvas id="visualizerCanvas"></canvas>
@@ -134,7 +160,6 @@
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
 
-<!-- ===== ЗАГРУЗКА ВСЕХ КОМПОНЕНТОВ ===== -->
 <script>
 (function() {
     const components = [
@@ -176,7 +201,6 @@
 })();
 </script>
 
-<!-- ===== АВТО-СКРЫТИЕ ШАПКИ ===== -->
 <script>
 (function() {
     var lastScrollY = 0;
