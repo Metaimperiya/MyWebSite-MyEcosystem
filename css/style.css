@@ -1111,3 +1111,82 @@ body {
     background: var(--input-bg);
     color: var(--link-color);
 }
+
+/* ================================================================
+   РЕДАКТОР ПОСТА (ДОБАВЛЕНО)
+   ================================================================ */
+
+.editor-toolbar {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-color, #ddd);
+    margin-bottom: 4px;
+}
+
+.editor-toolbar button {
+    background: none;
+    border: none;
+    padding: 2px 6px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: var(--text-secondary, #555);
+    transition: 0.2s;
+}
+
+.editor-toolbar button:hover {
+    background: var(--input-bg, #f0f2f5);
+    color: var(--link-color, #1877f2);
+}
+
+.post-editor {
+    min-height: 60px;
+    padding: 6px 10px;
+    outline: none;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-color, #222);
+    background: var(--input-bg, #f0f2f5);
+    border-radius: 6px;
+    border: 1px solid var(--input-border, #ddd);
+    transition: border 0.2s;
+}
+
+.post-editor:focus {
+    border-color: var(--link-color, #1877f2);
+}
+
+.post-editor:empty::before {
+    content: attr(placeholder);
+    color: var(--muted-text, #888);
+}
+
+.post-editor h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 4px 0;
+}
+
+.post-editor h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 4px 0;
+}
+
+.post-editor blockquote {
+    border-left: 3px solid var(--link-color, #1877f2);
+    padding-left: 10px;
+    margin: 4px 0;
+    color: var(--text-secondary, #555);
+}
+
+.post-editor pre {
+    background: var(--input-bg, #f0f2f5);
+    padding: 8px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: monospace;
+    font-size: 0.75rem;
+}
