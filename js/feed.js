@@ -233,6 +233,14 @@ window.submitPost = function() {
         db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
         clearEditor();
         clearPostForm();
+        
+        // Принудительное обновление ленты
+        setTimeout(function() {
+            if (typeof loadFeed === 'function') {
+                console.log('🔄 Обновление ленты после поста');
+                loadFeed();
+            }
+        }, 300);
     };
 
     if (pendingImageFile) {
@@ -1092,6 +1100,10 @@ function createRepostObject(original) {
     };
 }
 
+// ================================================================
+// СОХРАНЕНИЕ РЕПОСТА С ПРИНУДИТЕЛЬНЫМ ОБНОВЛЕНИЕМ ЛЕНТЫ
+// ================================================================
+
 function saveNestedRepost(repostData, postId, type, path) {
     var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts');
     repostRef.transaction(function(current) {
@@ -1103,4 +1115,21 @@ function saveNestedRepost(repostData, postId, type, path) {
     
     closeRepost();
     alert('✅ Репост создан!');
+    
+    // ===== ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ЛЕНТЫ И ПРОФИЛЯ =====
+    setTimeout(function() {
+        console.log('🔄 Принудительное обновление ленты после репоста');
+        if (typeof loadFeed === 'function') {
+            loadFeed();
+        }
+        if (typeof loadProfile === 'function') {
+            loadProfile();
+        }
+        // Обновляем также ленту через 1 секунду (на случай если Firebase медленно обновилась)
+        setTimeout(function() {
+            if (typeof loadFeed === 'function') {
+                loadFeed();
+            }
+        }, 1000);
+    }, 200);
 }
