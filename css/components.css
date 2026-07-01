@@ -1227,3 +1227,48 @@ body {
     cursor: pointer;
     background: var(--card-bg);
 }
+
+/* ================================================================
+   СТРОКА ВВОДА ПОД КОММЕНТАРИЕМ (ОТДЕЛЬНАЯ)
+   ================================================================ */
+
+.comment-reply-input-wrap {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.comment-reply-input-wrap .reply-input {
+    flex: 1;
+    padding: 4px 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 16px;
+    font-size: 0.65rem;
+    outline: none;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+.comment-reply-input-wrap .reply-input:focus {
+    border-color: var(--link-color);
+}
+
+.comment-reply-input-wrap .reply-send-btn {
+    background: var(--link-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.comment-reply-input-wrap .reply-send-btn:hover {
+    background: var(--link-hover);
+}
