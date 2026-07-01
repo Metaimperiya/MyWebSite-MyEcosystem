@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ
+// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ (ВСЕ УРОВНИ КОММЕНТАРИЕВ)
 // ================================================================
 
 var commentStates = {};
@@ -100,7 +100,7 @@ function updatePostStats(postId, data) {
 }
 
 // ================================================================
-// ОТПРАВКА ПОСТА
+// ОТПРАВКА ПОСТА (В ЛЕНТУ И В ПРОФИЛЬ)
 // ================================================================
 
 window.submitPost = function() {
@@ -416,7 +416,7 @@ function loadComments(postId, type) {
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ
+// РЕНДЕР КОММЕНТАРИЕВ — ВСЕ УРОВНИ (РЕКУРСИЯ)
 // ================================================================
 
 function renderComments(postId, type) {
@@ -429,23 +429,22 @@ function renderComments(postId, type) {
         return;
     }
 
-    var grouped = {};
+    // Строим дерево комментариев
+    var commentsMap = {};
+    state.allComments.forEach(function(c) {
+        commentsMap[c.id] = c;
+    });
+
     var roots = [];
     state.allComments.forEach(function(c) {
-        var parent = c.parentId || 'root';
-        if (!grouped[parent]) grouped[parent] = [];
-        grouped[parent].push(c);
-        if (parent === 'root') roots.push(c);
+        if (!c.parentId) {
+            roots.push(c);
+        }
     });
 
     var html = '';
     roots.forEach(function(root) {
-        html += renderCommentItem(root, postId, type, 0);
-        if (grouped[root.id]) {
-            grouped[root.id].forEach(function(reply) {
-                html += renderCommentItem(reply, postId, type, 1);
-            });
-        }
+        html += renderCommentTree(root, commentsMap, postId, type, 0);
     });
 
     container.innerHTML = html;
@@ -458,42 +457,62 @@ function renderComments(postId, type) {
     });
 }
 
-function renderCommentItem(c, postId, type, level) {
-    var letter = (c.author || '?').charAt(0).toUpperCase();
-    var canEdit = (c.author === USER || isAdmin);
-    var likes = c.likes || 0;
+// ===== РЕКУРСИВНАЯ ФУНКЦИЯ ДЛЯ ВСЕХ УРОВНЕЙ =====
+function renderCommentTree(comment, commentsMap, postId, type, level) {
+    var canEdit = (comment.author === USER || isAdmin);
+    var likes = comment.likes || 0;
+    var letter = (comment.author || '?').charAt(0).toUpperCase();
     var replyClass = level > 0 ? ' comment-reply' : '';
+    var marginLeft = level * 24;
 
-    var html = '<div class="comment-item' + replyClass + '" data-id="' + c.id + '">';
-    html += '<span class="avatar-wrap" id="comment-avatar-' + c.id + '"><span class="letter">' + letter + '</span></span>';
+    var html = '<div class="comment-item' + replyClass + '" data-id="' + comment.id + '" style="margin-left:' + marginLeft + 'px;">';
+    html += '<span class="avatar-wrap" id="comment-avatar-' + comment.id + '"><span class="letter">' + letter + '</span></span>';
     html += '<div class="body">';
-    html += '<span class="name">' + esc(c.author || 'Аноним') + '</span>';
-    html += '<span class="time">' + (c.time || '') + (c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>';
-    html += '<div class="text" id="comment-text-' + c.id + '">' + esc(c.text || '') + '</div>';
+    html += '<span class="name">' + esc(comment.author || 'Аноним') + '</span>';
+    html += '<span class="time">' + (comment.time || '') + (comment.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>';
+    html += '<div class="text" id="comment-text-' + comment.id + '">' + esc(comment.text || '') + '</div>';
     html += '<div class="comment-actions-row">';
-    html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
-    html += '<button class="comment-reply-btn" onclick="openReply(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')">💬 Ответить</button>';
+    html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')">👍 <span id="commentLikeCount_' + comment.id + '">' + likes + '</span></button>';
+    html += '<button class="comment-reply-btn" onclick="openReply(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')">💬 Ответить</button>';
     html += '</div>';
 
     // Строка ввода под комментарием
-    html += '<div class="comment-reply-input-wrap" id="replyInput_' + c.id + '" style="display:none; margin-top:4px;">';
-    html += '<input type="text" id="replyInputField_' + c.id + '" placeholder="Написать ответ..." class="reply-input">';
-    html += '<button onclick="submitReply(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')" class="reply-send-btn">→</button>';
+    html += '<div class="comment-reply-input-wrap" id="replyInput_' + comment.id + '" style="display:none; margin-top:4px;">';
+    html += '<input type="text" id="replyInputField_' + comment.id + '" placeholder="Написать ответ..." class="reply-input">';
+    html += '<button onclick="submitReply(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')" class="reply-send-btn">→</button>';
     html += '</div>';
 
-    html += '</div>';
+    html += '</div>'; // body
 
     if (canEdit) {
         html += '<div class="comment-actions">';
-        html += '<button class="more-btn" onclick="toggleCommentMenu(\'' + c.id + '\')">⋮</button>';
-        html += '<div class="dropdown" id="commentMenu_' + c.id + '">';
-        html += '<button class="edit-btn" onclick="editComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">✏️ Редактировать</button>';
-        html += '<button class="del-btn" onclick="deleteComment(\'' + postId + '\',\'' + c.id + '\',\'' + type + '\')">🗑 Удалить</button>';
+        html += '<button class="more-btn" onclick="toggleCommentMenu(\'' + comment.id + '\')">⋮</button>';
+        html += '<div class="dropdown" id="commentMenu_' + comment.id + '">';
+        html += '<button class="edit-btn" onclick="editComment(\'' + postId + '\',\'' + comment.id + '\',\'' + type + '\')">✏️ Редактировать</button>';
+        html += '<button class="del-btn" onclick="deleteComment(\'' + postId + '\',\'' + comment.id + '\',\'' + type + '\')">🗑 Удалить</button>';
         html += '</div>';
         html += '</div>';
     }
 
     html += '</div>';
+
+    // ===== РЕКУРСИВНО РЕНДЕРИМ ДОЧЕРНИЕ КОММЕНТАРИИ =====
+    var children = [];
+    Object.keys(commentsMap).forEach(function(id) {
+        if (commentsMap[id].parentId === comment.id) {
+            children.push(commentsMap[id]);
+        }
+    });
+
+    if (children.length > 0) {
+        children.sort(function(a, b) {
+            return (a.timestamp || 0) - (b.timestamp || 0);
+        });
+        children.forEach(function(child) {
+            html += renderCommentTree(child, commentsMap, postId, type, level + 1);
+        });
+    }
+
     return html;
 }
 
@@ -555,7 +574,8 @@ window.submitReply = function(postId, parentId, type) {
 window.toggleLikeComment = function(postId, commentId, type) {
     if (!USER) { alert('Войдите!'); return; }
 
-    var ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/comments/' + commentId + '/likes');
+    var path = getPostPath(type);
+    var ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/likes');
     var countEl = document.getElementById('commentLikeCount_' + commentId);
     
     ref.transaction(function(likes) {
@@ -854,11 +874,18 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ — БЕЗ ЛИШНИХ ОКОН
+// РЕПОСТЫ — С ПРОВЕРКОЙ НА ДУБЛИКАТЫ
 // ================================================================
 
 window.doRepost = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
+    
+    // Проверяем, не делал ли уже этот пользователь репост этого поста
+    var repostKey = 'repost_' + postId + '_' + USER_UID;
+    if (localStorage.getItem(repostKey) === '1') {
+        alert('❌ Вы уже сделали репост этого поста');
+        return;
+    }
     
     var path = getPostPath(type);
     
@@ -904,6 +931,9 @@ window.doRepost = function(postId, type) {
         
         // Сохраняем в профиль пользователя
         db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
+        
+        // Запоминаем, что репост уже сделан
+        localStorage.setItem(repostKey, '1');
         
         alert('✅ Репост создан!');
     });
