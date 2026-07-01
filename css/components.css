@@ -1272,3 +1272,99 @@ body {
 .comment-reply-input-wrap .reply-send-btn:hover {
     background: var(--link-hover);
 }
+
+/* ================================================================
+   МЕНЮ ПРОФИЛЯ (ТРИ ТОЧКИ)
+   ================================================================ */
+
+.profile-dots-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px 6px;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.profile-dots-btn:hover {
+    background: var(--input-bg);
+    color: var(--link-color);
+}
+
+.profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 200px;
+    padding: 6px 0;
+    z-index: 100;
+    margin-top: 4px;
+}
+
+.profile-dropdown-menu .profile-menu-item {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-dropdown-menu .profile-menu-item:hover {
+    background: var(--input-bg);
+}
+
+.profile-dropdown-menu .profile-menu-item[style*="color:var(--danger)"]:hover {
+    background: var(--danger-bg);
+}
+
+/* ================================================================
+   КНОПКИ ДРУЗЕЙ (обновлённые)
+   ================================================================ */
+
+.friend-btn {
+    padding: 4px 14px;
+    border: none;
+    border-radius: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.65rem;
+    transition: 0.2s;
+}
+
+.friend-btn.add {
+    background: var(--link-color);
+    color: #fff;
+}
+
+.friend-btn.add:hover {
+    background: var(--link-hover);
+}
+
+.friend-btn.friend {
+    background: var(--input-bg);
+    color: var(--text-secondary);
+}
+
+.friend-btn.friend:hover {
+    background: var(--input-bg);
+}
+
+.friend-btn.pending {
+    background: var(--warning);
+    color: #856404;
+}
+
+.friend-btn.received {
+    background: var(--success);
+    color: #155724;
+}
