@@ -135,7 +135,7 @@ window.closeSidebar = function() {
 };
 
 // ================================================================
-// АККОРДЕОН В САЙДБАРЕ — РАБОТАЕТ!
+// АККОРДЕОН В САЙДБАРЕ
 // ================================================================
 
 window.toggleAccordion = function(header) {
@@ -143,7 +143,6 @@ window.toggleAccordion = function(header) {
     var body = item.querySelector('.accordion-body');
     var arrow = header.querySelector('.accordion-arrow');
     
-    // Закрываем все другие открытые разделы
     document.querySelectorAll('.accordion-body').forEach(function(b) {
         if (b !== body && b.style.maxHeight) {
             b.style.maxHeight = null;
@@ -153,14 +152,11 @@ window.toggleAccordion = function(header) {
         }
     });
     
-    // Открываем/закрываем текущий
     if (body.style.maxHeight) {
-        // Закрываем
         body.style.maxHeight = null;
         body.style.padding = '0 16px';
         if (arrow) arrow.textContent = '▾';
     } else {
-        // Открываем
         body.style.maxHeight = body.scrollHeight + 'px';
         body.style.padding = '6px 16px 10px 16px';
         if (arrow) arrow.textContent = '▴';
@@ -184,7 +180,7 @@ window.setFrameSize = function(size) {
 };
 
 // ================================================================
-// ПЕРЕКЛЮЧЕНИЕ ТЕМЫ (СВЕТЛАЯ / ТЁМНАЯ)
+// ПЕРЕКЛЮЧЕНИЕ ТЕМЫ
 // ================================================================
 
 window.toggleTheme = function() {
@@ -195,8 +191,80 @@ window.toggleTheme = function() {
     localStorage.setItem('theme', newTheme);
 };
 
-// При загрузке — применяем сохранённую тему
 (function applySavedTheme() {
     var savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 })();
+
+// ================================================================
+// ФУНКЦИИ РЕДАКТОРА (ДОБАВЛЕНЫ)
+// ================================================================
+
+window.formatText = function(type) {
+    var editor = document.getElementById('postEditor');
+    if (!editor) return;
+    
+    var selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    
+    var range = selection.getRangeAt(0);
+    var selectedText = range.toString();
+    
+    if (!selectedText) {
+        var templates = {
+            'bold': '**жирный текст**',
+            'italic': '*курсив*',
+            'underline': '__подчёркнутый__',
+            'strike': '~~зачёркнутый~~',
+            'h1': '# Заголовок',
+            'h2': '## Подзаголовок',
+            'quote': '> Цитата',
+            'code': '```код```'
+        };
+        
+        var template = templates[type] || '';
+        if (template) {
+            document.execCommand('insertText', false, template);
+        }
+        return;
+    }
+    
+    var wrappers = {
+        'bold': '**',
+        'italic': '*',
+        'underline': '__',
+        'strike': '~~',
+        'h1': '# ',
+        'h2': '## ',
+        'quote': '> ',
+        'code': '```'
+    };
+    
+    var wrapper = wrappers[type];
+    if (!wrapper) return;
+    
+    var newText;
+    if (type === 'h1' || type === 'h2' || type === 'quote') {
+        newText = wrapper + selectedText;
+    } else {
+        var closeWrapper = wrapper;
+        if (type === 'code') closeWrapper = '```';
+        newText = wrapper + selectedText + closeWrapper;
+    }
+    
+    document.execCommand('insertText', false, newText);
+};
+
+window.insertLink = function() {
+    var url = prompt('Введите ссылку:');
+    if (!url) return;
+    
+    var editor = document.getElementById('postEditor');
+    if (!editor) return;
+    
+    var selection = window.getSelection();
+    if (selection.rangeCount) {
+        var text = selection.toString() || 'ссылка';
+        document.execCommand('insertText', false, '[' + text + '](' + url + ')');
+    }
+};
