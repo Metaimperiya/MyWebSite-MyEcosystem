@@ -1368,3 +1368,78 @@ body {
     background: var(--success);
     color: #155724;
 }
+
+/* ================================================================
+   ВЛОЖЕННЫЕ РЕПОСТЫ (МАТРЕШКА)
+   ================================================================ */
+
+.repost-nested {
+    border-left: 3px solid var(--link-color);
+    padding: 8px 10px;
+    margin-top: 6px;
+    background: var(--input-bg);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.repost-nested .repost-header {
+    font-size: 0.6rem;
+    color: var(--muted-text);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.repost-nested .repost-author {
+    color: var(--link-color);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.repost-nested .repost-author:hover {
+    text-decoration: underline;
+}
+
+.repost-nested .repost-time {
+    color: var(--muted-text);
+    font-size: 0.45rem;
+    margin-left: 4px;
+}
+
+.repost-nested .repost-text {
+    font-size: 0.75rem;
+    color: var(--text-color);
+    word-break: break-word;
+    padding: 2px 0;
+}
+
+.repost-nested .repost-img {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 6px;
+    margin: 4px 0;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    background: var(--card-bg);
+}
+
+.repost-nested .link-preview iframe {
+    height: 200px;
+}
+
+.repost-nested .buttons-wrap .btn-item {
+    font-size: 0.65rem;
+    padding: 4px 10px;
+}
+
+.repost-nested .marquee {
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    margin: 2px 0;
+}
+
+.repost-nested .hashtags .tag {
+    font-size: 0.5rem;
+    padding: 1px 8px;
+}
