@@ -79,3 +79,17 @@
         <div id="notificationsList"></div>
     </div>
 </div>
+
+<!-- ===== РЕПОСТ ===== -->
+<div class="modal" id="repostModal">
+    <div class="modal-box">
+        <h3>🔁 Репост</h3>
+        <input type="hidden" id="repostPostId">
+        <input type="hidden" id="repostType">
+        <textarea id="repostText" placeholder="Напишите что-нибудь (необязательно)..." rows="3"></textarea>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeRepost()">Отмена</button>
+            <button class="btn-save" onclick="submitRepost()">🔁 Репостнуть</button>
+        </div>
+    </div>
+</div>
