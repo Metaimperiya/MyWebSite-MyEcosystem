@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ
+// ЛЕНТА И ПОСТЫ — С ВЛОЖЕННЫМИ РЕПОСТАМИ (МАТРЕШКА)
 // ================================================================
 
 var commentStates = {};
@@ -128,7 +128,8 @@ window.submitPost = function() {
         buttons: [],
         frameSize: 'small',
         edited: false,
-        img: null
+        img: null,
+        repost: null // для вложенных репостов
     };
 
     var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
@@ -200,7 +201,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// РЕНДЕР ПОСТА
+// РЕНДЕР ПОСТА (С ВЛОЖЕННЫМИ РЕПОСТАМИ)
 // ================================================================
 
 function renderPost(p, type) {
@@ -216,25 +217,10 @@ function renderPost(p, type) {
     var textHtml = esc(p.text || '');
     var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="window.open(this.src)">' : '';
 
-    // ===== РЕПОСТ HTML =====
+    // ===== ВЛОЖЕННЫЙ РЕПОСТ (РЕКУРСИВНО) =====
     var repostHtml = '';
     if (p.repost) {
-        var repost = p.repost;
-        repostHtml = '<div class="repost-box">' +
-            '<div class="repost-header">🔁 Репост от <span class="repost-author" onclick="viewUser(\'' + (repost.originalAuthorUid || '') + '\')">' + esc(repost.originalAuthor || 'Аноним') + '</span></div>' +
-            '<div class="repost-content">' +
-            '<div class="repost-text">' + esc(repost.originalText || '') + '</div>';
-        
-        if (repost.originalImg) {
-            repostHtml += '<img src="' + repost.originalImg + '" class="repost-img" onclick="window.open(this.src)">';
-        }
-        
-        if (repost.originalLink) {
-            var frameSize = p.frameSize || 'small';
-            repostHtml += '<div class="link-preview"><iframe src="' + repost.originalLink + '" class="' + frameSize + '" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>';
-        }
-        
-        repostHtml += '</div></div>';
+        repostHtml = renderNestedRepost(p.repost, 1);
     }
 
     var buttonsHtml = '';
@@ -293,7 +279,16 @@ function renderPost(p, type) {
         </div>
     `;
 
-    div.innerHTML = menuHtml + marqueeHtml + '<div class="author">' + avatarHtml + '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span><span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span></div><div class="text">' + textHtml + '</div>' + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml + actionsHtml + commentsHtml + inputHtml;
+    // ===== СБОРКА =====
+    var contentHtml = textHtml + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml;
+    
+    div.innerHTML = menuHtml + marqueeHtml + 
+        '<div class="author">' + avatarHtml + 
+        '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span>' +
+        '<span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>' +
+        '</div>' +
+        '<div class="post-content">' + contentHtml + '</div>' +
+        actionsHtml + commentsHtml + inputHtml;
 
     if (p.authorUid) {
         var avatarEl = document.getElementById('post-avatar-' + p.id);
@@ -302,6 +297,76 @@ function renderPost(p, type) {
 
     loadComments(p.id, type);
     return div;
+}
+
+// ================================================================
+// РЕКУРСИВНЫЙ РЕНДЕР ВЛОЖЕННЫХ РЕПОСТОВ
+// ================================================================
+
+function renderNestedRepost(repost, level) {
+    if (!repost) return '';
+    
+    var maxLevel = 5; // максимальная глубина вложенности
+    if (level > maxLevel) return '<div class="repost-nested" style="padding:6px;color:var(--muted-text);font-size:0.6rem;">📦 Слишком глубокий репост</div>';
+    
+    var letter = (repost.author || '?').charAt(0).toUpperCase();
+    var textHtml = esc(repost.text || '');
+    var imgHtml = repost.img ? '<img src="' + repost.img + '" class="repost-img" onclick="window.open(this.src)">' : '';
+    var marqueeHtml = repost.marquee ? '<div class="marquee"><span>' + esc(repost.marquee) + '</span></div>' : '';
+    
+    var buttonsHtml = '';
+    if (repost.buttons && repost.buttons.length > 0) {
+        buttonsHtml = '<div class="buttons-wrap">';
+        repost.buttons.forEach(function(btn) {
+            if (btn.url) {
+                buttonsHtml += '<a href="' + esc(btn.url) + '" target="_blank" class="btn-item">' + esc(btn.label || '🔗 Перейти') + '</a>';
+            }
+        });
+        buttonsHtml += '</div>';
+    }
+    
+    var linkHtml = '';
+    if (repost.link) {
+        var frameSize = repost.frameSize || 'small';
+        linkHtml = '<div class="link-preview"><iframe src="' + repost.link + '" class="' + frameSize + '" sandbox="allow-scripts allow-same-origin allow-popups"></iframe></div>';
+    }
+    
+    var hashtagsHtml = '';
+    if (repost.hashtags && repost.hashtags.length > 0) {
+        hashtagsHtml = '<div class="hashtags">';
+        repost.hashtags.forEach(function(tag) {
+            hashtagsHtml += '<span class="tag" onclick="searchByTag(\'' + esc(tag) + '\')">' + esc(tag) + '</span>';
+        });
+        hashtagsHtml += '</div>';
+    }
+    
+    // Рекурсивно рендерим вложенный репост
+    var nestedHtml = '';
+    if (repost.repost) {
+        nestedHtml = renderNestedRepost(repost.repost, level + 1);
+    }
+    
+    var borderColor = level === 1 ? 'var(--link-color)' : 
+                      level === 2 ? 'var(--success)' : 
+                      level === 3 ? 'var(--warning)' : 
+                      'var(--muted-text)';
+    
+    var levelLabel = level === 1 ? '🔄 Репост' : 
+                     level === 2 ? '🔄 Репост репоста' : 
+                     level === 3 ? '🔄 Третий репост' : 
+                     '🔄 Репост #' + level;
+    
+    return '<div class="repost-nested" style="border-left:3px solid ' + borderColor + ';padding:8px 10px;margin-top:6px;background:var(--input-bg);border-radius:6px;">' +
+        '<div class="repost-header">' + levelLabel + ' от <span class="repost-author" onclick="viewUser(\'' + (repost.authorUid || '') + '\')">' + esc(repost.author || 'Аноним') + '</span>' +
+        ' <span class="repost-time">' + (repost.time || '') + '</span></div>' +
+        '<div class="repost-text">' + textHtml + '</div>' +
+        marqueeHtml +
+        imgHtml +
+        linkHtml +
+        buttonsHtml +
+        hashtagsHtml +
+        nestedHtml +
+        '</div>';
 }
 
 // ================================================================
@@ -836,13 +901,12 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ — С ПОДДЕРЖКОЙ РЕПОСТА РЕПОСТА
+// РЕПОСТЫ — ВЛОЖЕННЫЕ (МАТРЕШКА)
 // ================================================================
 
 window.openRepost = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
     
-    // Разрешаем репостить сколько угодно раз (убрал блокировку)
     document.getElementById('repostModal').classList.add('open');
     document.getElementById('repostPostId').value = postId;
     document.getElementById('repostType').value = type;
@@ -870,6 +934,7 @@ window.submitRepost = function() {
         
         var repostText = comment || '🔁 Репост';
         
+        // ===== СОЗДАЁМ ВЛОЖЕННЫЙ РЕПОСТ (МАТРЕШКА) =====
         var repostData = {
             author: USER,
             authorUid: USER_UID,
@@ -885,43 +950,84 @@ window.submitRepost = function() {
             buttons: [],
             frameSize: 'small',
             edited: false,
-            img: null
+            img: null,
+            // ===== ВЛОЖЕННЫЙ РЕПОСТ =====
+            repost: null
         };
         
-        // ===== ЕСЛИ ЭТО РЕПОСТ — БЕРЕМ ОРИГИНАЛ =====
-        if (original.repost) {
-            repostData.repost = {
-                originalId: original.repost.originalId || postId,
-                originalAuthor: original.repost.originalAuthor || original.author,
-                originalAuthorUid: original.repost.originalAuthorUid || original.authorUid,
-                originalText: original.repost.originalText || original.text || '',
-                originalImg: original.repost.originalImg || original.img || null,
-                originalLink: original.repost.originalLink || original.link || null,
-                originalTime: original.repost.originalTime || original.time || ''
+        // Если есть картинка — добавляем
+        if (pendingImageFile) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                repostData.img = e.target.result;
+                // Вкладываем оригинальный пост в repost
+                repostData.repost = createRepostObject(original);
+                saveNestedRepost(repostData, postId, type, path);
             };
-        } else {
-            repostData.repost = {
-                originalId: postId,
-                originalAuthor: original.author,
-                originalAuthorUid: original.authorUid,
-                originalText: original.text || '',
-                originalImg: original.img || null,
-                originalLink: original.link || null,
-                originalTime: original.time || ''
-            };
+            reader.readAsDataURL(pendingImageFile);
+            return;
         }
         
-        // Увеличиваем счётчик у оригинального поста
-        var originalId = repostData.repost.originalId;
-        var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + originalId + '/reposts');
-        repostRef.transaction(function(current) {
-            return (current || 0) + 1;
-        });
-        
-        db.ref('sites/' + SITE + '/feed_posts').push(repostData);
-        db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
-        
-        closeRepost();
-        alert('✅ Репост создан!');
+        // Без картинки
+        repostData.repost = createRepostObject(original);
+        saveNestedRepost(repostData, postId, type, path);
     });
 };
+
+// ================================================================
+// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ: СОЗДАЁМ ОБЪЕКТ РЕПОСТА
+// ================================================================
+
+function createRepostObject(original) {
+    // Если оригинал уже содержит репост — вкладываем его
+    if (original.repost) {
+        return {
+            author: original.author,
+            authorUid: original.authorUid,
+            text: original.text || '',
+            time: original.time || '',
+            timestamp: original.timestamp || Date.now(),
+            img: original.img || null,
+            link: original.link || null,
+            buttons: original.buttons || [],
+            marquee: original.marquee || null,
+            hashtags: original.hashtags || [],
+            frameSize: original.frameSize || 'small',
+            repost: original.repost // передаём дальше
+        };
+    }
+    
+    // Обычный пост
+    return {
+        author: original.author,
+        authorUid: original.authorUid,
+        text: original.text || '',
+        time: original.time || '',
+        timestamp: original.timestamp || Date.now(),
+        img: original.img || null,
+        link: original.link || null,
+        buttons: original.buttons || [],
+        marquee: original.marquee || null,
+        hashtags: original.hashtags || [],
+        frameSize: original.frameSize || 'small',
+        repost: null
+    };
+}
+
+// ================================================================
+// СОХРАНЕНИЕ ВЛОЖЕННОГО РЕПОСТА
+// ================================================================
+
+function saveNestedRepost(repostData, postId, type, path) {
+    // Увеличиваем счётчик у оригинального поста
+    var repostRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts');
+    repostRef.transaction(function(current) {
+        return (current || 0) + 1;
+    });
+    
+    db.ref('sites/' + SITE + '/feed_posts').push(repostData);
+    db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
+    
+    closeRepost();
+    alert('✅ Репост создан!');
+}
