@@ -76,10 +76,32 @@
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
 
-        <!-- ===== ПРОФИЛЬ С ФОРМОЙ ===== -->
+        <!-- ===== ПРОФИЛЬ — ФОРМА ПОД ШАПКОЙ ===== -->
         <div class="page" id="page-profile">
-            <!-- ===== ФОРМА ПОСТА В ПРОФИЛЕ ===== -->
-            <div class="card">
+            <!-- ===== ШАПКА ПРОФИЛЯ ===== -->
+            <div class="profile-header">
+                <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
+                <div class="name" id="profileName">Гость</div>
+                <div class="bio" id="profileBio">Настройте профиль</div>
+                <div class="profile-stats">
+                    <span>🤝 Друзья: <span id="friendsCount">0</span></span>
+                    <span>👀 Подписчики: <span id="subscribersCount">0</span></span>
+                    <span>📌 Подписки: <span id="subscriptionsCount">0</span></span>
+                </div>
+                <div class="profile-actions" id="profileActions">
+                    <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
+                    <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
+                </div>
+            </div>
+
+            <!-- ===== ДРУЗЬЯ ===== -->
+            <div class="friends-section" id="friendsSection">
+                <h4>🤝 Друзья</h4>
+                <div class="friend-list" id="friendList"></div>
+            </div>
+
+            <!-- ===== ФОРМА ПОСТА В ПРОФИЛЕ (ПОД ШАПКОЙ) ===== -->
+            <div class="card" style="margin-top:8px;">
                 <div class="post-form">
                     <div class="editor-toolbar">
                         <button onclick="formatText('bold')"><b>B</b></button>
@@ -106,24 +128,7 @@
                 </div>
             </div>
 
-            <div class="profile-header">
-                <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
-                <div class="name" id="profileName">Гость</div>
-                <div class="bio" id="profileBio">Настройте профиль</div>
-                <div class="profile-stats">
-                    <span>🤝 Друзья: <span id="friendsCount">0</span></span>
-                    <span>👀 Подписчики: <span id="subscribersCount">0</span></span>
-                    <span>📌 Подписки: <span id="subscriptionsCount">0</span></span>
-                </div>
-                <div class="profile-actions" id="profileActions">
-                    <button class="edit-btn" onclick="openEditProfile()">✏️ Редактировать</button>
-                    <button class="avatar-btn" onclick="uploadAvatar()">📷 Аватар</button>
-                </div>
-            </div>
-            <div class="friends-section" id="friendsSection">
-                <h4>🤝 Друзья</h4>
-                <div class="friend-list" id="friendList"></div>
-            </div>
+            <!-- ===== ПОСТЫ В ПРОФИЛЕ ===== -->
             <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
             <div id="profilePosts"></div>
         </div>
