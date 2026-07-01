@@ -1030,3 +1030,29 @@
         max-height: 200px;
     }
 }
+
+/* ================================================================
+   ОТВЕТЫ НА КОММЕНТАРИИ (ВЕТКИ)
+   ================================================================ */
+
+.comment-reply-btn {
+    background: none;
+    border: none;
+    color: #1877f2;
+    cursor: pointer;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+.comment-reply-btn:hover {
+    background: #e8f0fe;
+}
+
+/* Отступ для вложенных комментариев */
+.comment-item[style*="margin-left:24px"] {
+    border-left: 2px solid #1877f2;
+    padding-left: 8px;
+    margin-top: 2px;
+    border-radius: 0 0 0 4px;
+}
