@@ -1,8 +1,9 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — С ВЕТКАМИ КОММЕНТАРИЕВ
+// ЛЕНТА И ПОСТЫ — ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ================================================================
 
 var commentStates = {};
+var feedListener = null;
 
 function getPostPath(type) {
     if (type === 'group') return 'group_posts/' + currentGroup;
@@ -13,14 +14,15 @@ function getCommentState(postId) {
     if (!commentStates[postId]) {
         commentStates[postId] = {
             open: false,
-            allComments: []
+            allComments: [],
+            listener: null
         };
     }
     return commentStates[postId];
 }
 
 // ================================================================
-// ЗАГРУЗКА ЛЕНТЫ
+// ЗАГРУЗКА ЛЕНТЫ — БЕЗ ПЕРЕРЕНДЕРА ПРИ ЛАЙКАХ
 // ================================================================
 
 function loadFeed() {
@@ -29,9 +31,14 @@ function loadFeed() {
         return;
     }
 
-    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', function(snap) {
+    // Удаляем старый слушатель, чтобы не было дублей
+    if (feedListener) {
+        db.ref('sites/' + SITE + '/feed_posts').off('value', feedListener);
+        feedListener = null;
+    }
+
+    feedListener = function(snap) {
         var el = document.getElementById('feed');
-        el.innerHTML = '';
         var data = snap.val() || {};
         var keys = Object.keys(data).sort(function(a, b) {
             return (data[b].timestamp || 0) - (data[a].timestamp || 0);
@@ -42,12 +49,62 @@ function loadFeed() {
             return;
         }
 
+        // Сохраняем текущие ID постов, чтобы не пересоздавать существующие
+        var existingIds = {};
+        el.querySelectorAll('.post').forEach(function(post) {
+            var id = post.dataset.id;
+            if (id) existingIds[id] = post;
+        });
+
+        var html = '';
+        var newPosts = [];
+
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            el.appendChild(renderPost(p, 'feed'));
+            
+            // Если пост уже есть — обновляем только цифры (лайки/комменты)
+            if (existingIds[k]) {
+                updatePostStats(k, p);
+                delete existingIds[k];
+            } else {
+                // Новый пост — рендерим
+                newPosts.push(p);
+            }
         });
-    });
+
+        // Добавляем новые посты в начало
+        if (newPosts.length) {
+            var fragment = document.createDocumentFragment();
+            newPosts.reverse().forEach(function(p) {
+                var postEl = renderPost(p, 'feed');
+                fragment.insertBefore(postEl, fragment.firstChild);
+            });
+            el.insertBefore(fragment, el.firstChild);
+        }
+
+        // Удаляем посты, которых больше нет
+        Object.keys(existingIds).forEach(function(id) {
+            var post = existingIds[id];
+            if (post && post.parentNode) {
+                post.parentNode.removeChild(post);
+            }
+        });
+    };
+
+    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', feedListener);
+}
+
+// ================================================================
+// ОБНОВЛЕНИЕ СТАТИСТИКИ ПОСТА БЕЗ ПЕРЕРЕНДЕРА
+// ================================================================
+
+function updatePostStats(postId, data) {
+    var likeCount = document.getElementById('likeCount_' + postId);
+    var commentCount = document.getElementById('commentCount_' + postId);
+    
+    if (likeCount) likeCount.textContent = data.likes || 0;
+    if (commentCount) commentCount.textContent = data.commentCount || 0;
 }
 
 // ================================================================
@@ -233,7 +290,7 @@ function renderPost(p, type) {
 }
 
 // ================================================================
-// ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ
+// ПЕРЕКЛЮЧЕНИЕ КОММЕНТАРИЕВ — ПЛАВНО ВНИЗ
 // ================================================================
 
 window.toggleComments = function(postId, type) {
@@ -241,19 +298,28 @@ window.toggleComments = function(postId, type) {
     state.open = !state.open;
 
     var wrapper = document.getElementById('commentsWrapper_' + postId);
-    if (wrapper) {
-        wrapper.style.display = state.open ? 'block' : 'none';
-    }
+    if (!wrapper) return;
 
     if (state.open) {
-        loadComments(postId, type);
+        wrapper.style.display = 'block';
+        // Плавное появление
+        wrapper.style.opacity = '0';
+        wrapper.style.transition = 'opacity 0.2s ease';
         setTimeout(function() {
-            var input = document.getElementById('commentInput_' + postId);
-            if (input) {
-                input.focus();
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            wrapper.style.opacity = '1';
+        }, 10);
+        
+        loadComments(postId, type);
+        
+        // Прокручиваем к комментариям, а не к полю ввода
+        setTimeout(function() {
+            var list = document.getElementById('commentsList_' + postId);
+            if (list) {
+                list.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-        }, 400);
+        }, 300);
+    } else {
+        wrapper.style.display = 'none';
     }
 };
 
@@ -265,7 +331,13 @@ function loadComments(postId, type) {
     var path = getPostPath(type);
     var state = getCommentState(postId);
 
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').orderByChild('timestamp').on('value', function(snap) {
+    // Удаляем старый слушатель
+    if (state.listener) {
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').off('value', state.listener);
+        state.listener = null;
+    }
+
+    state.listener = function(snap) {
         var container = document.getElementById('commentsContainer_' + postId);
         if (!container) return;
 
@@ -283,11 +355,13 @@ function loadComments(postId, type) {
         db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(state.allComments.length);
 
         renderComments(postId, type);
-    });
+    };
+
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').orderByChild('timestamp').on('value', state.listener);
 }
 
 // ================================================================
-// РЕНДЕР КОММЕНТАРИЕВ — С ВЕТКАМИ (ОТВЕТЫ)
+// РЕНДЕР КОММЕНТАРИЕВ — С ВЕТКАМИ
 // ================================================================
 
 function renderComments(postId, type) {
@@ -300,7 +374,6 @@ function renderComments(postId, type) {
         return;
     }
 
-    // Группируем по parentId
     var grouped = {};
     var roots = [];
     state.allComments.forEach(function(c) {
@@ -343,7 +416,7 @@ function renderCommentItem(c, postId, type, level) {
     html += '<span class="time">' + (c.time || '') + (c.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>';
     html += '<div class="text" id="comment-text-' + c.id + '">' + esc(c.text || '') + '</div>';
     html += '<div class="comment-actions-row">';
-    html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
+    html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')">👍 <span id="commentLikeCount_' + c.id + '">' + likes + '</span></button>';
     html += '<button class="comment-reply-btn" onclick="openReply(\'' + postId + '\', \'' + c.id + '\', \'' + type + '\')">💬 Ответить</button>';
     html += '</div>';
     html += '</div>';
@@ -373,22 +446,27 @@ window.openReply = function(postId, parentId, type) {
     input.focus();
     input.placeholder = 'Ответить на комментарий...';
     input.dataset.parentId = parentId;
+    input.dataset.replyTo = parentId;
+    
+    // Прокручиваем к полю ввода
     input.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 
 // ================================================================
-// ЛАЙК КОММЕНТАРИЯ
+// ЛАЙК КОММЕНТАРИЯ — БЕЗ ПЕРЕЗАГРУЗКИ
 // ================================================================
 
-window.toggleLikeComment = function(postId, commentId) {
+window.toggleLikeComment = function(postId, commentId, type) {
     if (!USER) { alert('Войдите!'); return; }
 
     var ref = db.ref('sites/' + SITE + '/feed_posts/' + postId + '/comments/' + commentId + '/likes');
+    var countEl = document.getElementById('commentLikeCount_' + commentId);
+    
     ref.transaction(function(likes) {
         return (likes || 0) + 1;
     });
 
-    var countEl = document.getElementById('commentLikeCount_' + commentId);
+    // Мгновенное обновление UI
     if (countEl) {
         var current = parseInt(countEl.textContent) || 0;
         countEl.textContent = current + 1;
@@ -396,7 +474,7 @@ window.toggleLikeComment = function(postId, commentId) {
 };
 
 // ================================================================
-// ЛАЙК ПОСТА
+// ЛАЙК ПОСТА — БЕЗ ПЕРЕЗАГРУЗКИ
 // ================================================================
 
 window.toggleLike = function(postId, type) {
@@ -406,18 +484,30 @@ window.toggleLike = function(postId, type) {
     var liked = localStorage.getItem(key) === '1';
     var path = getPostPath(type);
     var ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/likes');
+    var countEl = document.getElementById('likeCount_' + postId);
+    var btn = document.querySelector('.post[data-id="' + postId + '"] .stats button:first-child');
 
     if (liked) {
         ref.transaction(function(v) { return Math.max(0, (v || 0) - 1); });
         localStorage.removeItem(key);
+        if (countEl) {
+            var current = parseInt(countEl.textContent) || 0;
+            countEl.textContent = Math.max(0, current - 1);
+        }
+        if (btn) btn.classList.remove('liked');
     } else {
         ref.transaction(function(v) { return (v || 0) + 1; });
         localStorage.setItem(key, '1');
+        if (countEl) {
+            var current = parseInt(countEl.textContent) || 0;
+            countEl.textContent = current + 1;
+        }
+        if (btn) btn.classList.add('liked');
     }
 };
 
 // ================================================================
-// ОТПРАВКА КОММЕНТАРИЯ (С ПОДДЕРЖКОЙ parentId)
+// ОТПРАВКА КОММЕНТАРИЯ
 // ================================================================
 
 window.submitComment = function(postId, type) {
@@ -443,6 +533,7 @@ window.submitComment = function(postId, type) {
     input.value = '';
     input.placeholder = 'Написать комментарий...';
     delete input.dataset.parentId;
+    delete input.dataset.replyTo;
 };
 
 // ================================================================
