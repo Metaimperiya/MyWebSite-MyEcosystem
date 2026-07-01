@@ -1,0 +1,14 @@
+<!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
+<header class="topbar" id="topbar">
+    <div class="left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+    </div>
+    <div class="center"></div>
+    <div class="right">
+        <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
+        <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()"><span class="letter">?</span></div>
+        <span class="username" id="topName" onclick="goToProfile()">Гость</span>
+        <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
+    </div>
+</header>
