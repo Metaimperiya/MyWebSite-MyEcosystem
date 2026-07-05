@@ -57,13 +57,13 @@ window.loginWithName = function() {
         });
         
         document.getElementById('loginModal').classList.remove('open');
-        updateUI();
-        loadFeed();
-        loadGroups();
-        loadPeople();
-        loadProfile();
-        loadNotifications();
-        loadFriendRequests();
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadGroups === 'function') loadGroups();
+        if (typeof loadPeople === 'function') loadPeople();
+        if (typeof loadProfile === 'function') loadProfile();
+        if (typeof loadNotifications === 'function') loadNotifications();
+        if (typeof loadFriendRequests === 'function') loadFriendRequests();
     }).catch(function(e) { alert('Ошибка: ' + e.message); });
 };
 
@@ -87,10 +87,11 @@ window.logout = function() {
         if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
         var dot = document.getElementById('adminDot');
         if (dot) dot.classList.remove('active');
-        closeSidebar();
-        document.getElementById('loginModal').classList.add('open');
-        updateUI();
-        loadSavedProfiles();
+        if (typeof closeSidebar === 'function') closeSidebar();
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
     }).catch(function(e) { alert('Ошибка: ' + e.message); });
 };
 
@@ -123,8 +124,13 @@ function loginWithSavedProfile(uid) {
         profile.lastUsed = Date.now();
         localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
         document.getElementById('loginModal').classList.remove('open');
-        updateUI();
-        loadFeed(); loadGroups(); loadPeople(); loadProfile(); loadNotifications(); loadFriendRequests();
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadGroups === 'function') loadGroups();
+        if (typeof loadPeople === 'function') loadPeople();
+        if (typeof loadProfile === 'function') loadProfile();
+        if (typeof loadNotifications === 'function') loadNotifications();
+        if (typeof loadFriendRequests === 'function') loadFriendRequests();
     }).catch(function(e) { alert('Ошибка: ' + e.message); });
 }
 
@@ -145,13 +151,18 @@ auth.onAuthStateChanged(function(user) {
         });
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.remove('open');
-        updateUI();
-        loadFeed(); loadGroups(); loadPeople(); loadProfile(); loadNotifications(); loadFriendRequests();
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadGroups === 'function') loadGroups();
+        if (typeof loadPeople === 'function') loadPeople();
+        if (typeof loadProfile === 'function') loadProfile();
+        if (typeof loadNotifications === 'function') loadNotifications();
+        if (typeof loadFriendRequests === 'function') loadFriendRequests();
     } else {
         USER = null; USER_UID = null;
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
-        updateUI();
-        loadSavedProfiles();
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
     }
 });
