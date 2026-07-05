@@ -157,7 +157,7 @@ window.toggleIframe = function() {
 };
 
 // ================================================================
-// КНОПКИ В ПРОФИЛЕ — ТРИ ТОЧКИ В ПРАВОМ ВЕРХНЕМ УГЛУ
+// КНОПКИ В ПРОФИЛЕ — КРАСИВО ПОД ОПИСАНИЕМ
 // ================================================================
 
 function showProfileActions(uid) {
@@ -165,16 +165,26 @@ function showProfileActions(uid) {
     if (!uid) return;
     
     actions.innerHTML = '';
-    actions.style.cssText = 'display:flex;justify-content:flex-end;width:100%;margin-top:-40px;position:relative;z-index:10;';
+    actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
     
     if (uid === USER_UID) {
+        // ===== СВОЙ ПРОФИЛЬ =====
         var wrapper = document.createElement('div');
-        wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;';
+        wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;justify-content:center;';
+        
+        var editBtn = document.createElement('button');
+        editBtn.className = 'friend-btn add';
+        editBtn.textContent = '✏️ Редактировать профиль';
+        editBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;background:var(--link-color);color:#fff;transition:0.2s;';
+        editBtn.onclick = function() { openEditProfile(); };
+        editBtn.onmouseover = function() { this.style.background = 'var(--link-hover)'; };
+        editBtn.onmouseout = function() { this.style.background = 'var(--link-color)'; };
+        wrapper.appendChild(editBtn);
         
         var dotsBtn = document.createElement('button');
         dotsBtn.className = 'profile-dots-btn';
         dotsBtn.textContent = '⋮';
-        dotsBtn.style.cssText = 'background:none;border:none;font-size:2rem;cursor:pointer;color:var(--text-secondary);padding:4px 8px;border-radius:50%;transition:0.2s;';
+        dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 8px;border-radius:50%;transition:0.2s;line-height:1;';
         dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
         dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
         dotsBtn.onclick = function(e) {
@@ -186,54 +196,53 @@ function showProfileActions(uid) {
         actions.appendChild(wrapper);
         
         var menuContainer = document.createElement('div');
-        menuContainer.style.cssText = 'position:relative;';
+        menuContainer.style.cssText = 'position:relative;width:100%;';
         actions.appendChild(menuContainer);
         
         var menu = document.createElement('div');
         menu.id = 'profileMenu';
         menu.className = 'profile-dropdown-menu';
-        menu.style.cssText = 'display:none;position:absolute;right:0;top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:180px;padding:4px 0;z-index:100;margin-top:4px;';
+        menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
         menuContainer.appendChild(menu);
         
         fillOwnProfileMenu(uid, menu);
         return;
     }
     
-    // ЧУЖОЙ ПРОФИЛЬ
+    // ===== ЧУЖОЙ ПРОФИЛЬ =====
     var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;flex-wrap:wrap;';
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
     
+    // Кнопка "В друзьях / Добавить"
     var mainBtn = document.createElement('button');
     mainBtn.id = 'friendActionBtn';
     mainBtn.className = 'friend-btn add';
     mainBtn.textContent = 'Загрузка...';
-    mainBtn.style.cssText = 'padding:4px 14px;border:none;border-radius:16px;font-weight:600;cursor:pointer;font-size:0.65rem;transition:0.2s;';
+    mainBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;';
     wrapper.appendChild(mainBtn);
     
+    // Кнопка "Написать"
     var msgBtn = document.createElement('button');
-    msgBtn.className = 'friend-btn add';
+    msgBtn.className = 'friend-btn';
     msgBtn.textContent = '💬 Написать';
-    msgBtn.style.cssText = 'padding:4px 14px;border:none;border-radius:16px;font-weight:600;cursor:pointer;font-size:0.65rem;transition:0.2s;background:#1877f2;color:#fff;';
+    msgBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;background:#1877f2;color:#fff;';
     msgBtn.onclick = function() { openPrivateChat(uid); };
     msgBtn.onmouseover = function() { this.style.background = '#4a9eff'; };
     msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
     wrapper.appendChild(msgBtn);
     
-    var dotsWrapper = document.createElement('div');
-    dotsWrapper.style.cssText = 'margin-left:auto;';
-    
+    // Три точки
     var dotsBtn = document.createElement('button');
     dotsBtn.className = 'profile-dots-btn';
     dotsBtn.textContent = '⋮';
-    dotsBtn.style.cssText = 'background:none;border:none;font-size:2rem;cursor:pointer;color:var(--text-secondary);padding:4px 8px;border-radius:50%;transition:0.2s;';
+    dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;border-radius:50%;transition:0.2s;line-height:1;';
     dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
     dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
     dotsBtn.onclick = function(e) {
         e.stopPropagation();
         toggleProfileMenu(uid);
     };
-    dotsWrapper.appendChild(dotsBtn);
-    wrapper.appendChild(dotsWrapper);
+    wrapper.appendChild(dotsBtn);
     
     actions.appendChild(wrapper);
     
@@ -244,7 +253,7 @@ function showProfileActions(uid) {
     var menu = document.createElement('div');
     menu.id = 'profileMenu';
     menu.className = 'profile-dropdown-menu';
-    menu.style.cssText = 'display:none;position:absolute;right:0;top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:180px;padding:4px 0;z-index:100;margin-top:4px;';
+    menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
     menuContainer.appendChild(menu);
     
     fillProfileMenu(uid, menu);
