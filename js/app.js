@@ -478,7 +478,6 @@ if (typeof toggleLanguage === 'undefined') {
     };
 }
 
-// 👇 ДОБАВЛЕНА ФУНКЦИЯ ОБНОВЛЕНИЯ ОТОБРАЖЕНИЯ ЯЗЫКА
 function updateLangDisplay() {
     var display = document.getElementById('langDisplay');
     if (display) {
@@ -486,16 +485,43 @@ function updateLangDisplay() {
     }
 }
 
+// ================================================================
+// 👇 НОВАЯ ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ БЕЙДЖИКА УВЕДОМЛЕНИЙ
+// ================================================================
+
+function updateNotifBadge() {
+    if (!USER_UID) return;
+    db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('read').equalTo(false).once('value', function(snap) {
+        var count = snap.numChildren();
+        var badge = document.getElementById('notifBadge');
+        if (badge) {
+            if (count > 0) {
+                badge.style.display = 'inline';
+                badge.textContent = count;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    });
+}
+
+// ================================================================
+
 var originalUpdateUI = updateUI || function() {};
 updateUI = function() {
     originalUpdateUI();
     setTimeout(function() {
         translatePage();
         updateLangDisplay();
+        updateNotifBadge();
     }, 200);
 };
 
 // Вызываем при загрузке
 setTimeout(function() {
     updateLangDisplay();
+    updateNotifBadge();
 }, 500);
+
+// Обновляем бейджик каждые 5 секунд
+setInterval(updateNotifBadge, 5000);
