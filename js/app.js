@@ -522,6 +522,34 @@ function updateNotifBadge() {
 }
 
 // ================================================================
+// ОТКРЫТИЕ СТРАНИЦ (SPA)
+// ================================================================
+
+function openPage(pageId) {
+    if (!pageId) return;
+    
+    document.querySelectorAll('.page').forEach(function(el) {
+        el.style.display = 'none';
+        el.classList.remove('active');
+    });
+    
+    var page = document.getElementById('page-' + pageId);
+    if (page) {
+        page.style.display = 'block';
+        page.classList.add('active');
+        console.log('✅ Открыта страница:', pageId);
+    } else {
+        console.warn('⚠️ Страница не найдена:', pageId);
+    }
+    
+    if (typeof closeSidebar === 'function') {
+        closeSidebar();
+    }
+}
+
+window.openPage = openPage;
+
+// ================================================================
 
 var originalUpdateUI = updateUI || function() {};
 updateUI = function() {
