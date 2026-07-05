@@ -1,0 +1,11 @@
+<!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== -->
+<div class="settings-dropdown" id="settingsDropdown">
+    <div class="settings-item" onclick="goToProfile();closeSettingsMenu()">👤 Профиль</div>
+    <div class="settings-item" onclick="goToPeople();closeSettingsMenu()">👥 Люди</div>
+    <div class="settings-item" onclick="goToGroups();closeSettingsMenu()">💬 Сообщества</div>
+    <div class="settings-divider"></div>
+    <div class="settings-item" onclick="toggleTheme();closeSettingsMenu()">🌙 Тема</div>
+    <div class="settings-item" id="adminChatsMenuItem" onclick="openAdminChats();closeSettingsMenu()" style="display:none;color:#e67e22;">🏴‍☠️ Все чаты</div>
+    <div class="settings-divider"></div>
+    <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
+</div>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>METAIMPERIYA — Социальная платформа</title>
+    <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
+    <meta name="theme-color" content="#1877f2">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ ПОДГРУЗКИ ===== -->
+    <div id="topbarContainer"></div>
+    <div id="settingsContainer"></div>
+    <div id="sidebarContainer"></div>
+    <div id="playerContainer"></div>
+    <div id="modalsContainer"></div>
+
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+    <div class="container" id="mainContainer">
+
+        <!-- ===== РУЧКА ПЛЕЕРА ===== -->
+        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
+            <div class="handle-bar"></div>
+            <div class="handle-label">🎵 ПЛЕЕР</div>
+        </div>
+
+        <!-- ===== ЛЕНТА ===== -->
+        <div class="page active" id="page-feed">
+            <div class="card">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInput">📎 Фото</label>
+                        <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                        <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBox">
+                        <img id="previewImg"><span id="previewName"></span>
+                        <button class="remove-pic" onclick="removeImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+            <div id="feed"></div>
+        </div>
+
+        <div class="page" id="page-groups">
+            <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
+        </div>
+
+        <div class="page" id="page-people">
+            <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
+        </div>
+
+        <!-- ===== ПРОФИЛЬ — ФОРМА ПОД ШАПКОЙ ===== -->
+        <div class="page" id="page-profile">
+            <!-- ===== ШАПКА ПРОФИЛЯ ===== -->
+            <div class="profile-header">
+                <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
+                <div class="name" id="profileName" data-i18n="guest">Гость</div>
+                <div class="bio" id="profileBio" data-i18n="setup_profile">Настройте профиль</div>
+                <div class="profile-stats">
+                    <span>🤝 <span data-i18n="friends">Друзья</span>: <span id="friendsCount" class="stat-clickable">0</span></span>
+                    <span>👀 <span data-i18n="subscribers">Подписчики</span>: <span id="subscribersCount" class="stat-clickable">0</span></span>
+                    <span>📌 <span data-i18n="subscriptions">Подписки</span>: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
+                </div>
+                <div class="profile-actions" id="profileActions"></div>
+            </div>
+
+            <!-- ===== ССЫЛКА (IFRAME) — ВМЕСТО БЛОКА ДРУЗЕЙ ===== -->
+            <div class="link-section" id="linkSection">
+                <div class="link-input-wrap">
+                    <input type="text" id="profileLinkInput" data-i18n-placeholder="enter_link" placeholder="Вставьте ссылку для встраивания...">
+                    <button onclick="saveProfileLink()">➡️</button>
+                </div>
+                <div class="profile-iframe-wrap" id="profileIframeWrap" style="display:none;">
+                    <div class="iframe-header">
+                        <span data-i18n="embedded_page">📄 Встроенная страница</span>
+                        <button onclick="toggleIframe()" data-i18n="collapse">🔼 Свернуть</button>
+                    </div>
+                    <iframe id="profileIframe" src="" class="profile-iframe"></iframe>
+                </div>
+            </div>
+
+            <!-- ===== ДРУЗЬЯ (СКРЫТЫЙ БЛОК, ОТКРЫВАЕТСЯ ПО КЛИКУ) ===== -->
+            <div class="friends-section" id="friendsSection" style="display:none;">
+                <h4>🤝 <span data-i18n="friends">Друзья</span> <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
+                <div class="friend-list" id="friendList"></div>
+            </div>
+
+            <!-- ===== ФОРМА ПОСТА В ПРОФИЛЕ (ПОД ШАПКОЙ) ===== -->
+            <div class="card" style="margin-top:8px;">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInputProfile">📎 <span data-i18n="photo">Фото</span></label>
+                        <button class="btn-submit" onclick="submitProfilePost()">📤 <span data-i18n="publish">Опубликовать</span></button>
+                        <button class="btn-cancel" onclick="clearProfilePostForm()"><span data-i18n="clear">Очистить</span></button>
+                    </div>
+                    <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBoxProfile">
+                        <img id="previewImgProfile"><span id="previewNameProfile"></span>
+                        <button class="remove-pic" onclick="removeProfileImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ПОСТЫ В ПРОФИЛЕ ===== -->
+            <h4 style="margin:10px 0 6px;" data-i18n="my_posts">📰 Мои посты</h4>
+            <div id="profilePosts"></div>
+        </div>
+
+        <div class="chat-view" id="chatView">
+            <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" data-i18n-placeholder="message" placeholder="Сообщение...">
+                <button onclick="sendChatMessage()">→</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
+
+    <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
+        <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
+        <canvas id="visualizerCanvas"></canvas>
+    </div>
+
+</div>
+
+<script src="js/firebase.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/player.js"></script>
+<script src="js/app.js"></script>
+<script src="js/feed.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/friends.js"></script>
+<script src="js/groups.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/admin.js"></script>
+
+<script>
+(function() {
+    const components = [
+        { id: 'topbarContainer', url: 'topbar.html' },
+        { id: 'settingsContainer', url: 'settings.html' },
+        { id: 'sidebarContainer', url: 'sidebar.html' },
+        { id: 'playerContainer', url: 'player.html' },
+        { id: 'modalsContainer', url: 'modals.html' }
+    ];
+
+    let loaded = 0;
+    const total = components.length;
+
+    components.forEach(function(comp) {
+        const container = document.getElementById(comp.id);
+        if (!container) return;
+
+        fetch(comp.url)
+            .then(response => {
+                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                return response.text();
+            })
+            .then(html => {
+                container.innerHTML = html;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены!');
+                    // Переводим страницу после загрузки компонентов
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') {
+                            translatePage();
+                        }
+                    }, 300);
+                }
+            })
+            .catch(err => {
+                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                container.innerHTML = `<div style="display:none;"></div>`;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены (с ошибками)');
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') {
+                            translatePage();
+                        }
+                    }, 300);
+                }
+            });
+    });
+})();
+</script>
+
+<script>
+(function() {
+    var lastScrollY = 0;
+    var topbar = document.getElementById('topbar');
+    var playerHandle = document.getElementById('playerHandle');
+    var playerDrawer = document.getElementById('playerDrawer');
+    var isPlayerOpen = false;
+    var ticking = false;
+
+    function waitForTopbar() {
+        topbar = document.getElementById('topbar');
+        if (!topbar) {
+            setTimeout(waitForTopbar, 200);
+            return;
+        }
+        console.log('✅ Топбар найден, авто-скрытие работает');
+    }
+    waitForTopbar();
+
+    function checkPlayerState() {
+        if (playerDrawer) {
+            isPlayerOpen = playerDrawer.classList.contains('open');
+        }
+    }
+
+    function updateHeader() {
+        var currentScrollY = window.scrollY;
+        checkPlayerState();
+
+        if (isPlayerOpen) {
+            showAll();
+            lastScrollY = currentScrollY;
+            return;
+        }
+
+        if (currentScrollY < lastScrollY || currentScrollY < 30) {
+            showAll();
+        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            hideAll();
+        }
+
+        lastScrollY = currentScrollY;
+    }
+
+    function showAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(0)';
+            topbar.style.opacity = '1';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(0)';
+            playerHandle.style.opacity = '1';
+        }
+    }
+
+    function hideAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(-100%)';
+            topbar.style.opacity = '0';
+            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(-100%)';
+            playerHandle.style.opacity = '0';
+            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+    }
+
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateHeader();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+
+    if (playerDrawer) {
+        var observer = new MutationObserver(function() {
+            checkPlayerState();
+            if (isPlayerOpen) {
+                showAll();
+            }
+        });
+        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (playerHandle) {
+        playerHandle.addEventListener('click', function() {
+            setTimeout(function() {
+                checkPlayerState();
+                if (isPlayerOpen) {
+                    showAll();
+                }
+            }, 150);
+        });
+    }
+
+    console.log('✅ Авто-скрытие шапки включено!');
+})();
+</script>
+
+</body>
+</html>
