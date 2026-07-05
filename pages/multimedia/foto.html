@@ -4,14 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Фото — METAIMPERIYA</title>
-    <meta name="description" content="Всё о фотографии: советы, техника, вдохновение">
-    <meta name="keywords" content="фото, фотография, снимки, камера">
+    <meta name="description" content="Опубликовать пост в разделе Фото">
+    <meta name="keywords" content="фото, пост, опубликовать">
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/components.css">
     <link rel="stylesheet" href="../../css/mobile.css">
     <style>
-        /* Скрываем ленту, но оставляем форму поста */
+        /* Скрываем ленту */
         #feed {
+            display: none !important;
+        }
+        /* Убираем всё лишнее */
+        .card .post-form .editor-toolbar {
+            display: flex !important;
+        }
+        .card .post-form .post-editor {
+            min-height: 80px !important;
+        }
+        .post-actions {
+            display: flex !important;
+            gap: 6px !important;
+            flex-wrap: wrap !important;
+        }
+        /* Убираем карточки с контентом */
+        .content-cards {
             display: none !important;
         }
     </style>
@@ -33,11 +49,15 @@
 
     <!-- ===== КОНТЕНТ ===== -->
     <div class="container" style="padding-top:10px;">
+        
+        <!-- ===== КНОПКА НАЗАД ===== -->
         <button onclick="window.location.href='/'">← Назад</button>
-        <h1>📸 Фото</h1>
-        <p style="color:#888;">Всё о фотографии: советы, техника, вдохновение</p>
 
-        <!-- ===== ТОЛЬКО ФОРМА ПОСТА (БЕЗ ЛЕНТЫ) ===== -->
+        <!-- ===== ЗАГОЛОВОК ===== -->
+        <h1>📸 Фото</h1>
+        <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Опубликуйте свой пост в разделе Фото</p>
+
+        <!-- ===== ТОЛЬКО ФОРМА ПОСТА (БЕЗ ЛЕНТЫ И КАРТОЧЕК) ===== -->
         <div class="card" style="margin-top:10px;">
             <div class="post-form">
                 <div class="editor-toolbar">
@@ -65,13 +85,9 @@
             </div>
         </div>
 
-        <!-- ===== КАРТОЧКИ С КОНТЕНТОМ ===== -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-            <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📷 Советы по съёмке</div>
-            <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📸 Лучшие камеры</div>
-            <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🎨 Обработка фото</div>
-            <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🌟 Вдохновение</div>
-        </div>
+        <!-- ===== ЛЕНТА (СКРЫТА) ===== -->
+        <div id="feed"></div>
+
     </div>
 
     <!-- ===== ПЛЕЕР ===== -->
@@ -131,10 +147,7 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
-                            // НЕ ЗАГРУЖАЕМ ЛЕНТУ — только форма поста
-                            // if (USER && typeof loadFeed === 'function') {
-                            //     loadFeed();
-                            // }
+                            // НЕ ЗАГРУЖАЕМ ЛЕНТУ
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
                         }
