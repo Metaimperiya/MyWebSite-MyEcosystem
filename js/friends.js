@@ -13,6 +13,7 @@ function getFriendStatusRealtime(myUid, targetUid, callback) {
     // Проверяем, друзья ли уже
     db.ref('sites/' + SITE + '/friends/' + myUid + '/' + targetUid).on('value', function(snap) {
         if (snap.val() === true) {
+            localStorage.setItem('fs_' + myUid + '_' + targetUid, 'friend');
             callback('friend');
             return;
         }
@@ -21,6 +22,7 @@ function getFriendStatusRealtime(myUid, targetUid, callback) {
         db.ref('sites/' + SITE + '/friend_requests/' + myUid + '/' + targetUid).once('value', function(reqSnap) {
             var req = reqSnap.val();
             if (req && req.from === targetUid && req.status === 'pending') {
+                localStorage.setItem('fs_' + myUid + '_' + targetUid, 'pending_received');
                 callback('pending_received');
                 return;
             }
@@ -29,10 +31,12 @@ function getFriendStatusRealtime(myUid, targetUid, callback) {
             db.ref('sites/' + SITE + '/friend_requests/' + targetUid + '/' + myUid).once('value', function(reqSnap2) {
                 var req2 = reqSnap2.val();
                 if (req2 && req2.from === myUid && req2.status === 'pending') {
+                    localStorage.setItem('fs_' + myUid + '_' + targetUid, 'pending_sent');
                     callback('pending_sent');
                     return;
                 }
                 
+                localStorage.removeItem('fs_' + myUid + '_' + targetUid);
                 callback('none');
             });
         });
@@ -75,7 +79,6 @@ function loadPeople() {
             var el2 = document.getElementById('pava-' + k);
             if (el2) renderAvatar(k, el2, '?');
             
-            // Обновляем статус в реальном времени для каждого пользователя
             getFriendStatusRealtime(USER_UID, k, function(status) {
                 var statusEl = document.getElementById('pstatus-' + k);
                 if (!statusEl) return;
@@ -104,14 +107,12 @@ function sendFriendRequest(targetUid) {
         return;
     }
 
-    // Проверяем, не друзья ли уже
     db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', function(friendSnap) {
         if (friendSnap.val() === true) {
             alert('✅ Вы уже друзья!');
             return;
         }
 
-        // Проверяем, нет ли уже заявки
         db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + targetUid).once('value', function(reqSnap) {
             if (reqSnap.val()) {
                 alert('⏳ Запрос уже отправлен');
@@ -131,6 +132,8 @@ function sendFriendRequest(targetUid) {
             updates['sites/' + SITE + '/friend_requests/' + targetUid + '/' + USER_UID] = requestData;
 
             db.ref().update(updates).then(function() {
+                localStorage.setItem('fs_' + USER_UID + '_' + targetUid, 'pending_sent');
+                
                 sendNotification(targetUid, {
                     type: 'friend_request',
                     from: USER_UID,
@@ -160,6 +163,7 @@ function cancelFriendRequest(targetUid) {
     updates['sites/' + SITE + '/friend_requests/' + targetUid + '/' + USER_UID] = null;
 
     db.ref().update(updates).then(function() {
+        localStorage.removeItem('fs_' + USER_UID + '_' + targetUid);
         alert('✅ Заявка отменена');
         if (VIEWING_USER) loadProfile();
         loadPeople();
@@ -167,7 +171,7 @@ function cancelFriendRequest(targetUid) {
 }
 
 // ================================================================
-// 5. ПРИНЯТИЕ ЗАЯВКИ
+// 5. ПРИНЯТИЕ ЗАЯВКИ — С ОБНОВЛЕНИЕМ СТАТУСА
 // ================================================================
 
 function acceptFriendRequest(fromUid) {
@@ -181,6 +185,10 @@ function acceptFriendRequest(fromUid) {
     updates['sites/' + SITE + '/friend_requests/' + fromUid + '/' + USER_UID] = null;
 
     db.ref().update(updates).then(function() {
+        // 👇 ОБНОВЛЯЕМ СТАТУС В ЛОКАЛЬНОМ ХРАНИЛИЩЕ
+        localStorage.setItem('fs_' + USER_UID + '_' + fromUid, 'friend');
+        localStorage.setItem('fs_' + fromUid + '_' + USER_UID, 'friend');
+        
         sendNotification(fromUid, {
             type: 'friend_accepted',
             from: USER_UID,
@@ -194,6 +202,19 @@ function acceptFriendRequest(fromUid) {
         loadPeople();
         loadFriends(USER_UID);
         closeNotifications();
+        
+        // 👇 ПЕРЕЗАГРУЖАЕМ УВЕДОМЛЕНИЯ
+        setTimeout(function() {
+            if (document.getElementById('notificationsModal') && document.getElementById('notificationsModal').classList.contains('open')) {
+                db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(50).once('value', function(snap) {
+                    var notifications = snap.val() || {};
+                    var keys = Object.keys(notifications).sort(function(a, b) {
+                        return (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0);
+                    });
+                    renderNotifications(notifications, keys);
+                });
+            }
+        }, 300);
     });
 }
 
@@ -210,6 +231,7 @@ function declineFriendRequest(fromUid) {
     updates['sites/' + SITE + '/friend_requests/' + fromUid + '/' + USER_UID] = null;
 
     db.ref().update(updates).then(function() {
+        localStorage.removeItem('fs_' + USER_UID + '_' + fromUid);
         alert('✅ Заявка отклонена');
         if (VIEWING_USER) loadProfile();
         loadPeople();
@@ -230,6 +252,8 @@ function removeFriend(targetUid) {
     updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
 
     db.ref().update(updates).then(function() {
+        localStorage.removeItem('fs_' + USER_UID + '_' + targetUid);
+        localStorage.removeItem('fs_' + targetUid + '_' + USER_UID);
         alert('✅ Пользователь удалён из друзей');
         if (VIEWING_USER) loadProfile();
         loadPeople();
@@ -284,7 +308,7 @@ function loadFriends(uid) {
 }
 
 // ================================================================
-// 9. ОБНОВЛЕНИЕ КНОПКИ В ПРОФИЛЕ (В РЕАЛЬНОМ ВРЕМЕНИ)
+// 9. ОБНОВЛЕНИЕ КНОПКИ В ПРОФИЛЕ
 // ================================================================
 
 function updateFriendButton(uid) {
@@ -300,7 +324,7 @@ function updateFriendButton(uid) {
     
     getFriendStatusRealtime(USER_UID, uid, function(status) {
         if (status === 'friend') {
-            btn.textContent = '✅ В друзьях';
+            btn.textContent = '🤝 В друзьях';
             btn.className = 'friend-btn friend';
             btn.onclick = function() { removeFriend(uid); };
         } else if (status === 'pending_sent') {
@@ -322,7 +346,7 @@ function updateFriendButton(uid) {
 }
 
 // ================================================================
-// 10. ЗАГРУЗКА ЗАЯВОК (ДЛЯ УВЕДОМЛЕНИЙ)
+// 10. ЗАГРУЗКА ЗАЯВОК
 // ================================================================
 
 function loadFriendRequests() {
