@@ -1,6 +1,8 @@
 // ================================================================
-// УВЕДОМЛЕНИЯ — ПОЛНАЯ ВЕРСИЯ С ЧАТОМ
+// УВЕДОМЛЕНИЯ — ПОЛНАЯ ВЕРСИЯ С ПЕРЕХОДОМ В ЧАТ
 // ================================================================
+
+// ===== 1. ОТПРАВКА УВЕДОМЛЕНИЯ =====
 
 function sendNotification(targetUid, data) {
     if (!USER_UID || !targetUid || targetUid === USER_UID) return;
@@ -13,6 +15,8 @@ function sendNotification(targetUid, data) {
         timestamp: Date.now()
     });
 }
+
+// ===== 2. ЗАГРУЗКА УВЕДОМЛЕНИЙ =====
 
 function loadNotifications() {
     if (!USER_UID) return;
@@ -42,6 +46,8 @@ function loadNotifications() {
     });
 }
 
+// ===== 3. РЕНДЕР УВЕДОМЛЕНИЙ =====
+
 function renderNotifications(notifications, keys) {
     var container = document.getElementById('notificationsList');
     if (!container) return;
@@ -57,11 +63,13 @@ function renderNotifications(notifications, keys) {
         var icon = n.type === 'friend_request' ? '🤝' : n.type === 'friend_accepted' ? '✅' : '💬';
         var time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
         
+        // Показываем текст сообщения
         var textDisplay = n.text || 'Уведомление';
         if (n.type === 'message') {
             textDisplay = '💬 ' + n.text;
         }
         
+        // Кнопки для заявок в друзья
         var actionsHtml = '';
         if (n.type === 'friend_request' && n.fromUid && n.fromUid !== USER_UID) {
             actionsHtml = '<div style="display:flex;gap:4px;margin-top:4px;">';
@@ -84,19 +92,32 @@ function renderNotifications(notifications, keys) {
     container.innerHTML = html;
 }
 
+// ===== 4. ОБРАБОТКА КЛИКА ПО УВЕДОМЛЕНИЮ =====
+
 function handleNotifClick(notifId, fromUid, type, chatId) {
     if (!USER_UID || !fromUid) return;
+    
+    // Помечаем как прочитанное
     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
     closeNotifications();
     
+    // 👇 ДЛЯ СООБЩЕНИЙ — ОТКРЫВАЕМ ЧАТ
     if (type === 'message') {
+        // Закрываем текущий чат если открыт
         if (document.getElementById('chatView').classList.contains('active')) {
-            closeChat();
+            document.getElementById('chatView').classList.remove('active');
+            if (chatUnsub) {
+                if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+                chatUnsub = null;
+            }
+            CURRENT_ROOM = null;
         }
+        // Открываем чат с отправителем
         openPrivateChat(fromUid);
         return;
     }
     
+    // ДЛЯ ЗАЯВОК В ДРУЗЬЯ — ОТКРЫВАЕМ ПРОФИЛЬ
     if (type === 'friend_request' || type === 'friend_accepted') {
         viewUser(fromUid);
         setTimeout(function() {
@@ -105,8 +126,11 @@ function handleNotifClick(notifId, fromUid, type, chatId) {
         return;
     }
     
+    // ВСЁ ОСТАЛЬНОЕ — ПРОФИЛЬ
     viewUser(fromUid);
 }
+
+// ===== 5. ОТКРЫТИЕ МОДАЛКИ =====
 
 window.openNotifications = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
@@ -120,9 +144,13 @@ window.openNotifications = function() {
     });
 };
 
+// ===== 6. ЗАКРЫТИЕ МОДАЛКИ =====
+
 window.closeNotifications = function() {
     document.getElementById('notificationsModal').classList.remove('open');
 };
+
+// ===== 7. СТИЛИ =====
 
 var style = document.createElement('style');
 style.textContent = `
