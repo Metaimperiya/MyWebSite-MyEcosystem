@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Фото — METAIMPERIYA</title>
-    <meta name="description" content="Всё о фотографии: советы, техника, вдохновение, лучшие камеры и обработка снимков. Фото-ресурсы на METAIMPERIYA">
-    <meta name="keywords" content="фото, фотография, снимки, камера, съёмка, обработка, вдохновение">
+    <meta name="description" content="Всё о фотографии: советы, техника, вдохновение">
+    <meta name="keywords" content="фото, фотография, снимки, камера">
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/components.css">
     <link rel="stylesheet" href="../../css/mobile.css">
 </head>
 <body>
 <div class="app">
+    <!-- ===== ШАПКА ===== -->
     <div id="topbarContainer"></div>
+
     <div class="container" style="padding-top:10px;">
         <button onclick="window.location.href='/'">← Назад</button>
         <h1>📸 Фото</h1>
@@ -25,8 +27,72 @@
         </div>
     </div>
 </div>
+
 <script src="../../js/firebase.js"></script>
 <script src="../../js/lang.js"></script>
 <script src="../../js/app.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/player.js"></script>
+<script src="../../js/feed.js"></script>
+<script src="../../js/profile.js"></script>
+<script src="../../js/friends.js"></script>
+<script src="../../js/groups.js"></script>
+<script src="../../js/chat.js"></script>
+<script src="../../js/notifications.js"></script>
+<script src="../../js/admin.js"></script>
+
+<script>
+// Загружаем компоненты
+(function() {
+    const components = [
+        { id: 'topbarContainer', url: '../../topbar.html' },
+        { id: 'settingsContainer', url: '../../settings.html' },
+        { id: 'sidebarContainer', url: '../../sidebar.html' },
+        { id: 'playerContainer', url: '../../player.html' },
+        { id: 'modalsContainer', url: '../../modals.html' }
+    ];
+
+    let loaded = 0;
+    const total = components.length;
+
+    components.forEach(function(comp) {
+        const container = document.getElementById(comp.id);
+        if (!container) return;
+
+        fetch(comp.url)
+            .then(response => {
+                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                return response.text();
+            })
+            .then(html => {
+                container.innerHTML = html;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены!');
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') translatePage();
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                    }, 500);
+                }
+            })
+            .catch(err => {
+                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                container.innerHTML = `<div style="display:none;"></div>`;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены (с ошибками)');
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') translatePage();
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                    }, 500);
+                }
+            });
+    });
+})();
+</script>
 </body>
 </html>
