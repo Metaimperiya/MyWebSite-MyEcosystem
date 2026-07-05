@@ -65,7 +65,6 @@ function loadFeed() {
             p.id = k;
             
             if (p.deleted && p.deletedAt && (Date.now() - p.deletedAt > 60000)) {
-                // Автоматически удаляем старые помеченные посты через 60 секунд
                 db.ref('sites/' + SITE + '/feed_posts/' + k).remove();
                 if (p.authorUid) {
                     db.ref('sites/' + SITE + '/user_posts/' + p.authorUid + '/' + k).remove();
@@ -1058,12 +1057,10 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// ПОЛНОЕ УДАЛЕНИЕ ПОСТА (НАВСЕГДА)
+// ПОЛНОЕ УДАЛЕНИЕ ПОСТА (НАВСЕГДА) — БЕЗ ПОДТВЕРЖДЕНИЯ
 // ================================================================
 
 window.permanentDeletePost = function(id, type) {
-    if (!confirm('🗑 Удалить пост навсегда? Это действие необратимо!')) return;
-    
     var path = getPostPath(type);
     
     db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
