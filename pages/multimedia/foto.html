@@ -4,17 +4,190 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Фото — METAIMPERIYA</title>
-    <meta name="description" content="Всё о фотографии: советы, техника, вдохновение">
-    <meta name="keywords" content="фото, фотография, снимки, камера">
+    <meta name="description" content="Всё о фотографии: советы, техника, вдохновение. Лучшие фото-ресурсы на METAIMPERIYA">
+    <meta name="keywords" content="фото, фотография, снимки, камера, съёмка">
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/components.css">
     <link rel="stylesheet" href="../../css/mobile.css">
 </head>
 <body>
 <div class="app">
-    <!-- ===== ШАПКА ===== -->
-    <div id="topbarContainer"></div>
+    <!-- ===== ШАПКА КАК НА ГЛАВНОЙ ===== -->
+    <header class="topbar" id="topbar">
+        <div class="left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <span class="logo" onclick="window.location.href='/'">METAIMPERIYA 🏴‍☠️</span>
+        </div>
+        <div class="center"></div>
+        <div class="right">
+            <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge"></span></button>
+            <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
+            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()"><span class="letter">?</span></div>
+            <span class="username" id="topName" onclick="goToProfile()">Гость</span>
+            <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
+        </div>
+    </header>
 
+    <!-- ===== МЕНЮ НАСТРОЕК ===== -->
+    <div class="settings-dropdown" id="settingsDropdown">
+        <div class="settings-item" onclick="goToProfile();closeSettingsMenu()">👤 Профиль</div>
+        <div class="settings-item" onclick="goToPeople();closeSettingsMenu()">👥 Люди</div>
+        <div class="settings-item" onclick="goToGroups();closeSettingsMenu()">💬 Сообщества</div>
+        <div class="settings-divider"></div>
+        <div class="settings-item" onclick="toggleLanguage();closeSettingsMenu()">🌐 Язык: <span id="langDisplay">Русский</span></div>
+        <div class="settings-item" onclick="toggleTheme();closeSettingsMenu()">🌙 Тема</div>
+        <div class="settings-item" id="adminChatsMenuItem" onclick="openAdminChats();closeSettingsMenu()" style="display:none;color:#e67e22;">🏴‍☠️ Все чаты</div>
+        <div class="settings-divider"></div>
+        <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
+    </div>
+
+    <!-- ===== САЙДБАР ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>📱 Меню</h3>
+            <button class="close-btn" onclick="closeSidebar()">✕</button>
+        </div>
+        <div class="sidebar-user">
+            <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
+            <div>
+                <div class="name" id="sName">Гость</div>
+                <div class="status">онлайн</div>
+            </div>
+        </div>
+        <div class="sidebar-nav main-nav">
+            <div class="nav-item active" onclick="window.location.href='/'">🏠 Главная</div>
+            <div class="nav-item" onclick="goToProfile();closeSidebar()">👤 Профиль</div>
+            <div class="nav-item" onclick="goToPeople();closeSidebar()">👥 Люди</div>
+            <div class="nav-item" onclick="goToGroups();closeSidebar()">💬 Сообщества</div>
+        </div>
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-icon">🎵</span>
+                    <span class="accordion-title">Мультимедиа</span>
+                    <span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                    <div class="nav-item" onclick="window.location.href='multimedia/foto.html'">📸 Фото</div>
+                    <div class="nav-item" onclick="window.location.href='multimedia/video.html'">🎥 Видео</div>
+                    <div class="nav-item" onclick="window.location.href='multimedia/muzyka.html'">🎵 Музыка</div>
+                    <div class="nav-item" onclick="window.location.href='multimedia/knigi.html'">📚 Книги</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-icon">💻</span>
+                    <span class="accordion-title">Технологии</span>
+                    <span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                    <div class="nav-item" onclick="window.location.href='tech/programmirovanie.html'">💻 Программирование</div>
+                    <div class="nav-item" onclick="window.location.href='tech/saity.html'">🌐 Сайты</div>
+                    <div class="nav-item" onclick="window.location.href='tech/ai-chatgpt.html'">🤖 AI / ChatGPT</div>
+                    <div class="nav-item" onclick="window.location.href='tech/vr-ar.html'">🕶️ VR / AR</div>
+                    <div class="nav-item" onclick="window.location.href='tech/bezopasnost.html'">🔐 Безопасность</div>
+                    <div class="nav-item" onclick="window.location.href='tech/cloud.html'">☁️ Cloud</div>
+                    <div class="nav-item" onclick="window.location.href='tech/open-source.html'">🌐 Open Source</div>
+                    <div class="nav-item" onclick="window.location.href='tech/api-sdk.html'">🧩 API / SDK</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-icon">💰</span>
+                    <span class="accordion-title">Бизнес</span>
+                    <span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                    <div class="nav-item" onclick="window.location.href='business/business.html'">💰 Бизнес</div>
+                    <div class="nav-item" onclick="window.location.href='business/finance.html'">📈 Финансы</div>
+                    <div class="nav-item" onclick="window.location.href='business/crypto.html'">🪙 Криптовалюты</div>
+                    <div class="nav-item" onclick="window.location.href='business/marketplace.html'">🛒 Маркетплейс</div>
+                    <div class="nav-item" onclick="window.location.href='business/rabota.html'">💼 Работа</div>
+                    <div class="nav-item" onclick="window.location.href='business/proekty.html'">📦 Проекты</div>
+                    <div class="nav-item" onclick="window.location.href='business/startapy.html'">🚀 Стартапы</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-icon">🌍</span>
+                    <span class="accordion-title">Жизнь</span>
+                    <span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                    <div class="nav-item" onclick="window.location.href='life/puteshestviya.html'">✈️ Путешествия</div>
+                    <div class="nav-item" onclick="window.location.href='life/eda.html'">🍔 Еда</div>
+                    <div class="nav-item" onclick="window.location.href='life/nedvizhimost.html'">🏠 Недвижимость</div>
+                    <div class="nav-item" onclick="window.location.href='life/sport.html'">⚽ Спорт</div>
+                    <div class="nav-item" onclick="window.location.href='life/igry.html'">🎮 Игры</div>
+                    <div class="nav-item" onclick="window.location.href='life/anime.html'">🎭 Аниме</div>
+                    <div class="nav-item" onclick="window.location.href='life/kino.html'">🎬 Кино</div>
+                    <div class="nav-item" onclick="window.location.href='life/serialy.html'">📺 Сериалы</div>
+                    <div class="nav-item" onclick="window.location.href='life/blogery.html'">🎤 Блогеры</div>
+                    <div class="nav-item" onclick="window.location.href='life/memy.html'">🎭 Мемы</div>
+                    <div class="nav-item" onclick="window.location.href='life/moda.html'">👗 Мода</div>
+                    <div class="nav-item" onclick="window.location.href='life/avtomobili.html'">🚗 Автомобили</div>
+                    <div class="nav-item" onclick="window.location.href='life/volonterstvo.html'">❤️ Волонтёрство</div>
+                    <div class="nav-item" onclick="window.location.href='life/zhivotnye.html'">🐾 Животные</div>
+                    <div class="nav-item" onclick="window.location.href='life/hobby.html'">🎯 Хобби</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-icon">💬</span>
+                    <span class="accordion-title">Общение</span>
+                    <span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                    <div class="nav-item" onclick="window.location.href='communication/znakomstva.html'">💖 Знакомства</div>
+                    <div class="nav-item" onclick="window.location.href='communication/komanda.html'">🤝 Команда</div>
+                    <div class="nav-item" onclick="window.location.href='communication/lgbtq.html'">🏳️‍🌈 LGBTQ+</div>
+                    <div class="nav-item" onclick="window.location.href='communication/yazyki.html'">🗣️ Языки</div>
+                    <div class="nav-item" onclick="window.location.href='communication/qa.html'">❓ Q&A</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-icon">📰</span>
+                    <span class="accordion-title">Новости</span>
+                    <span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                    <div class="nav-item" onclick="window.location.href='news/novosti.html'">📰 Новости</div>
+                    <div class="nav-item" onclick="window.location.href='news/strimy.html'">📡 Стримы</div>
+                    <div class="nav-item" onclick="window.location.href='news/sobytiya.html'">🎉 События</div>
+                    <div class="nav-item" onclick="window.location.href='news/podkasty.html'">📻 Подкасты</div>
+                    <div class="nav-item" onclick="window.location.href='news/konkursy.html'">🏆 Конкурсы</div>
+                    <div class="nav-item" onclick="window.location.href='news/akcii-skidki.html'">🎁 Акции и скидки</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-icon">🔧</span>
+                    <span class="accordion-title">Другое</span>
+                    <span class="accordion-arrow">▾</span>
+                </div>
+                <div class="accordion-body">
+                    <div class="nav-item" onclick="window.location.href='other/stranicy.html'">📄 Страницы</div>
+                    <div class="nav-item" onclick="window.location.href='other/blog.html'">📝 Блог</div>
+                    <div class="nav-item" onclick="window.location.href='other/pokupki.html'">🛍️ Покупки</div>
+                    <div class="nav-item" onclick="window.location.href='other/uslugi.html'">📞 Услуги</div>
+                    <div class="nav-item" onclick="window.location.href='other/frilans.html'">🧑‍💼 Фриланс</div>
+                    <div class="nav-item" onclick="window.location.href='other/organizacii.html'">🏛️ Организации</div>
+                    <div class="nav-item" onclick="window.location.href='other/metaimperiya.html'">🏴‍☠️ METAIMPERIYA</div>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- ===== МОДАЛКИ ===== -->
+    <div id="modalsContainer"></div>
+
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ СТРАНИЦЫ ===== -->
     <div class="container" style="padding-top:10px;">
         <button onclick="window.location.href='/'">← Назад</button>
         <h1>📸 Фото</h1>
@@ -26,13 +199,17 @@
             <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🌟 Вдохновение</div>
         </div>
     </div>
+
+    <!-- ===== ПЛЕЕР ===== -->
+    <div id="playerContainer"></div>
+
 </div>
 
 <script src="../../js/firebase.js"></script>
 <script src="../../js/lang.js"></script>
-<script src="../../js/app.js"></script>
 <script src="../../js/auth.js"></script>
 <script src="../../js/player.js"></script>
+<script src="../../js/app.js"></script>
 <script src="../../js/feed.js"></script>
 <script src="../../js/profile.js"></script>
 <script src="../../js/friends.js"></script>
@@ -42,14 +219,10 @@
 <script src="../../js/admin.js"></script>
 
 <script>
-// Загружаем компоненты
 (function() {
     const components = [
-        { id: 'topbarContainer', url: '../../topbar.html' },
-        { id: 'settingsContainer', url: '../../settings.html' },
-        { id: 'sidebarContainer', url: '../../sidebar.html' },
-        { id: 'playerContainer', url: '../../player.html' },
-        { id: 'modalsContainer', url: '../../modals.html' }
+        { id: 'modalsContainer', url: '../../modals.html' },
+        { id: 'playerContainer', url: '../../player.html' }
     ];
 
     let loaded = 0;
@@ -70,10 +243,18 @@
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
                     setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof translatePage === 'function') {
+                            translatePage();
+                        }
+                        if (typeof updateUI === 'function') {
+                            updateUI();
+                        }
+                        if (typeof loadNotifications === 'function') {
+                            loadNotifications();
+                        }
+                        if (typeof updateNotifBadge === 'function') {
+                            updateNotifBadge();
+                        }
                     }, 500);
                 }
             })
@@ -84,14 +265,112 @@
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof translatePage === 'function') {
+                            translatePage();
+                        }
+                        if (typeof updateUI === 'function') {
+                            updateUI();
+                        }
+                        if (typeof loadNotifications === 'function') {
+                            loadNotifications();
+                        }
+                        if (typeof updateNotifBadge === 'function') {
+                            updateNotifBadge();
+                        }
                     }, 500);
                 }
             });
     });
+})();
+
+// Авто-скрытие шапки
+(function() {
+    var lastScrollY = 0;
+    var topbar = document.getElementById('topbar');
+    var playerHandle = document.getElementById('playerHandle');
+    var playerDrawer = document.getElementById('playerDrawer');
+    var isPlayerOpen = false;
+    var ticking = false;
+
+    function checkPlayerState() {
+        if (playerDrawer) {
+            isPlayerOpen = playerDrawer.classList.contains('open');
+        }
+    }
+
+    function updateHeader() {
+        var currentScrollY = window.scrollY;
+        checkPlayerState();
+
+        if (isPlayerOpen) {
+            showAll();
+            lastScrollY = currentScrollY;
+            return;
+        }
+
+        if (currentScrollY < lastScrollY || currentScrollY < 30) {
+            showAll();
+        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            hideAll();
+        }
+
+        lastScrollY = currentScrollY;
+    }
+
+    function showAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(0)';
+            topbar.style.opacity = '1';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(0)';
+            playerHandle.style.opacity = '1';
+        }
+    }
+
+    function hideAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(-100%)';
+            topbar.style.opacity = '0';
+            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(-100%)';
+            playerHandle.style.opacity = '0';
+            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+    }
+
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateHeader();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+
+    if (playerDrawer) {
+        var observer = new MutationObserver(function() {
+            checkPlayerState();
+            if (isPlayerOpen) {
+                showAll();
+            }
+        });
+        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (playerHandle) {
+        playerHandle.addEventListener('click', function() {
+            setTimeout(function() {
+                checkPlayerState();
+                if (isPlayerOpen) {
+                    showAll();
+                }
+            }, 150);
+        });
+    }
 })();
 </script>
 </body>
