@@ -76,9 +76,8 @@
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
 
-        <!-- ===== ПРОФИЛЬ — ФОРМА ПОД ШАПКОЙ ===== -->
+        <!-- ===== ПРОФИЛЬ ===== -->
         <div class="page" id="page-profile">
-            <!-- ===== ШАПКА ПРОФИЛЯ ===== -->
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
                 <div class="name" id="profileName" data-i18n="guest">Гость</div>
@@ -91,7 +90,6 @@
                 <div class="profile-actions" id="profileActions"></div>
             </div>
 
-            <!-- ===== ССЫЛКА (IFRAME) — ВМЕСТО БЛОКА ДРУЗЕЙ ===== -->
             <div class="link-section" id="linkSection">
                 <div class="link-input-wrap">
                     <input type="text" id="profileLinkInput" data-i18n-placeholder="enter_link" placeholder="Вставьте ссылку для встраивания...">
@@ -106,13 +104,11 @@
                 </div>
             </div>
 
-            <!-- ===== ДРУЗЬЯ (СКРЫТЫЙ БЛОК, ОТКРЫВАЕТСЯ ПО КЛИКУ) ===== -->
             <div class="friends-section" id="friendsSection" style="display:none;">
                 <h4>🤝 <span data-i18n="friends">Друзья</span> <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
                 <div class="friend-list" id="friendList"></div>
             </div>
 
-            <!-- ===== ФОРМА ПОСТА В ПРОФИЛЕ (ПОД ШАПКОЙ) ===== -->
             <div class="card" style="margin-top:8px;">
                 <div class="post-form">
                     <div class="editor-toolbar">
@@ -140,14 +136,16 @@
                 </div>
             </div>
 
-            <!-- ===== ПОСТЫ В ПРОФИЛЕ ===== -->
             <h4 style="margin:10px 0 6px;" data-i18n="my_posts">📰 Мои посты</h4>
             <div id="profilePosts"></div>
         </div>
 
+        <!-- ===== ЧАТ С ИНДИКАТОРОМ ===== -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
+            <!-- 👇 ИНДИКАТОР НАБОРА ТЕКСТА -->
+            <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
             <div class="chat-input">
                 <input type="text" id="chatInput" data-i18n-placeholder="message" placeholder="Сообщение...">
                 <button onclick="sendChatMessage()">→</button>
@@ -205,7 +203,6 @@
                 loaded++;
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
-                    // Переводим страницу после загрузки компонентов
                     setTimeout(function() {
                         if (typeof translatePage === 'function') {
                             translatePage();
