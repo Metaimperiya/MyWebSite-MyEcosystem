@@ -113,8 +113,18 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
+                            // Пробуем загрузить ленту, только если есть USER
                             if (USER && typeof loadFeed === 'function') {
                                 loadFeed();
+                            } else {
+                                console.log('⏳ Ожидание авторизации для загрузки ленты');
+                                // Подписываемся на изменение USER
+                                var checkUserInterval = setInterval(function() {
+                                    if (USER && typeof loadFeed === 'function') {
+                                        loadFeed();
+                                        clearInterval(checkUserInterval);
+                                    }
+                                }, 1000);
                             }
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
