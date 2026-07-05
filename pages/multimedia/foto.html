@@ -10,25 +10,23 @@
     <link rel="stylesheet" href="../../css/components.css">
     <link rel="stylesheet" href="../../css/mobile.css">
     <style>
-        /* Скрываем ленту */
+        /* Скрываем всё лишнее */
         #feed {
             display: none !important;
         }
-        /* Убираем всё лишнее */
-        .card .post-form .editor-toolbar {
-            display: flex !important;
-        }
-        .card .post-form .post-editor {
-            min-height: 80px !important;
-        }
-        .post-actions {
-            display: flex !important;
-            gap: 6px !important;
-            flex-wrap: wrap !important;
-        }
         /* Убираем карточки с контентом */
-        .content-cards {
+        .content-cards,
+        .card .container > div[style*="display:grid"],
+        .container > div[style*="grid-template-columns"] {
             display: none !important;
+        }
+        /* Убираем лишний текст */
+        .container > p {
+            display: none !important;
+        }
+        /* Оставляем только форму поста */
+        .card .post-form {
+            display: block !important;
         }
     </style>
 </head>
@@ -49,15 +47,14 @@
 
     <!-- ===== КОНТЕНТ ===== -->
     <div class="container" style="padding-top:10px;">
-        
+
         <!-- ===== КНОПКА НАЗАД ===== -->
         <button onclick="window.location.href='/'">← Назад</button>
 
         <!-- ===== ЗАГОЛОВОК ===== -->
         <h1>📸 Фото</h1>
-        <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Опубликуйте свой пост в разделе Фото</p>
 
-        <!-- ===== ТОЛЬКО ФОРМА ПОСТА (БЕЗ ЛЕНТЫ И КАРТОЧЕК) ===== -->
+        <!-- ===== ТОЛЬКО ФОРМА ПОСТА ===== -->
         <div class="card" style="margin-top:10px;">
             <div class="post-form">
                 <div class="editor-toolbar">
@@ -147,7 +144,6 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
-                            // НЕ ЗАГРУЖАЕМ ЛЕНТУ
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
                         }
