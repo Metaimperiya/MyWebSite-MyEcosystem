@@ -1,123 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фото — METAIMPERIYA</title>
+    <meta name="description" content="Всё о фотографии: советы, техника, вдохновение">
+    <meta name="keywords" content="фото, фотография, снимки, камера">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/components.css">
+    <link rel="stylesheet" href="../../css/mobile.css">
+</head>
+<body>
+<div class="app">
+
+    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ КОМПОНЕНТОВ ===== -->
+    <div id="topbarContainer"></div>
+    <div id="settingsContainer"></div>
+    <div id="sidebarContainer"></div>
+    <div id="modalsContainer"></div>
+
+    <!-- ===== КОНТЕНТ ===== -->
+    <div class="container" style="padding-top:10px;">
+        <button onclick="window.location.href='/'">← Назад</button>
+        <h1>📸 Фото</h1>
+        <p style="color:#888;">Всё о фотографии: советы, техника, вдохновение</p>
+
+        <!-- ===== МИНИ-ЛЕНТА ===== -->
+        <div class="card" style="margin-top:10px;">
+            <div class="post-form">
+                <div class="editor-toolbar">
+                    <button onclick="formatText('bold')"><b>B</b></button>
+                    <button onclick="formatText('italic')"><i>I</i></button>
+                    <button onclick="formatText('underline')"><u>U</u></button>
+                    <button onclick="formatText('strike')"><s>S</s></button>
+                    <button onclick="formatText('h1')">H1</button>
+                    <button onclick="formatText('h2')">H2</button>
+                    <button onclick="formatText('quote')">"</button>
+                    <button onclick="formatText('code')">&lt;/&gt;</button>
+                    <button onclick="insertLink()">🔗</button>
+                </div>
+                <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                <div class="post-actions" style="margin-top:6px;">
+                    <label class="file-label" for="fileInput">📎 Фото</label>
+                    <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                    <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" class="hidden">
+                <div class="preview-box" id="previewBox">
+                    <img id="previewImg"><span id="previewName"></span>
+                    <button class="remove-pic" onclick="removeImage()">✕</button>
+                </div>
+            </div>
+        </div>
+        <div id="feed"></div>
+
+    </div>
+
+    <!-- ===== ПЛЕЕР ===== -->
+    <div id="playerContainer"></div>
+
+</div>
+
+<!-- ===== СКРИПТЫ ===== -->
+<script src="../../js/firebase.js"></script>
+<script src="../../js/lang.js"></script>
+<script src="../../js/auth.js"></script>
+<script src="../../js/player.js"></script>
+<script src="../../js/app.js"></script>
+<script src="../../js/feed.js"></script>
+<script src="../../js/profile.js"></script>
+<script src="../../js/friends.js"></script>
+<script src="../../js/groups.js"></script>
+<script src="../../js/chat.js"></script>
+<script src="../../js/notifications.js"></script>
+<script src="../../js/admin.js"></script>
+
+<script>
 // ================================================================
-// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
+// ЗАГРУЗКА КОМПОНЕНТОВ
 // ================================================================
 
-// ===== ОБНОВЛЕНИЕ UI =====
+(function() {
+    const components = [
+        { id: 'topbarContainer', url: '../../topbar.html' },
+        { id: 'settingsContainer', url: '../../settings.html' },
+        { id: 'sidebarContainer', url: '../../sidebar.html' },
+        { id: 'modalsContainer', url: '../../modals.html' },
+        { id: 'playerContainer', url: '../../player.html' }
+    ];
 
-function updateUI() {
-    const topAvatar = document.getElementById('topAvatar');
-    const sAvatar = document.getElementById('sAvatar');
-    const name = document.getElementById('topName');
-    const sName = document.getElementById('sName');
-    const dot = document.getElementById('adminDot');
+    let loaded = 0;
+    const total = components.length;
 
-    // 👇 ПРОВЕРКА НА СУЩЕСТВОВАНИЕ ЭЛЕМЕНТОВ
-    if (!topAvatar || !sAvatar || !name || !sName) {
-        console.warn('⚠️ Элементы UI не найдены');
-        return;
-    }
+    components.forEach(function(comp) {
+        const container = document.getElementById(comp.id);
+        if (!container) return;
 
-    if (USER && USER_UID) {
-        name.textContent = USER;
-        sName.textContent = USER;
-        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-        if (isAdmin) dot.classList.add('active');
-        else dot.classList.remove('active');
-        updateAdminMenu();
-    } else {
-        topAvatar.innerHTML = '<span class="letter">?</span>';
-        sAvatar.innerHTML = '<span class="letter">?</span>';
-        name.textContent = 'Гость';
-        sName.textContent = 'Гость';
-        dot.classList.remove('active');
-        var item = document.getElementById('adminChatsMenuItem');
-        if (item) item.style.display = 'none';
-    }
-}
-
-// ===== НАВИГАЦИЯ — С ПРОВЕРКОЙ =====
-
-window.goToFeed = function() {
-    if (!USER) { 
-        // Если нет пользователя — открываем модалку входа
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    setActivePage('feed');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadFeed === 'function') loadFeed();
-};
-
-window.goToGroups = function() {
-    if (!USER) { 
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    setActivePage('groups');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadGroups === 'function') loadGroups();
-};
-
-window.goToPeople = function() {
-    if (!USER) { 
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    setActivePage('people');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadPeople === 'function') loadPeople();
-};
-
-window.goToProfile = function() {
-    if (!USER) { 
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    VIEWING_USER = null;
-    setActivePage('profile');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadProfile === 'function') loadProfile();
-};
-
-// ===== ОБНОВЛЕНИЕ БЕЙДЖИКА — С ПРОВЕРКОЙ =====
-
-function updateNotifBadge() {
-    if (!USER_UID) return;
-    db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('read').equalTo(false).once('value', function(snap) {
-        var count = snap.numChildren();
-        var badge = document.getElementById('notifBadge');
-        if (badge) {
-            if (count > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = count;
-            } else {
-                badge.style.display = 'none';
-            }
-        }
+        fetch(comp.url)
+            .then(response => {
+                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                return response.text();
+            })
+            .then(html => {
+                container.innerHTML = html;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены!');
+                    setTimeout(function() {
+                        try {
+                            if (typeof updateUI === 'function') updateUI();
+                            if (typeof loadNotifications === 'function') loadNotifications();
+                            if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                            if (typeof initAudio === 'function') initAudio();
+                            if (typeof translatePage === 'function') translatePage();
+                            if (USER && typeof loadFeed === 'function') {
+                                loadFeed();
+                            }
+                        } catch(e) {
+                            console.warn('Ошибка инициализации:', e);
+                        }
+                    }, 500);
+                }
+            })
+            .catch(err => {
+                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                container.innerHTML = `<div style="display:none;"></div>`;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены (с ошибками)');
+                    setTimeout(function() {
+                        try {
+                            if (typeof updateUI === 'function') updateUI();
+                            if (typeof loadNotifications === 'function') loadNotifications();
+                            if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                            if (typeof initAudio === 'function') initAudio();
+                            if (typeof translatePage === 'function') translatePage();
+                            if (USER && typeof loadFeed === 'function') {
+                                loadFeed();
+                            }
+                        } catch(e) {
+                            console.warn('Ошибка инициализации:', e);
+                        }
+                    }, 500);
+                }
+            });
     });
-}
+})();
+
+// ================================================================
+// АВТО-СКРЫТИЕ ШАПКИ
+// ================================================================
+
+(function() {
+    var lastScrollY = 0;
+    var topbar = document.getElementById('topbar');
+    var playerHandle = document.getElementById('playerHandle');
+    var playerDrawer = document.getElementById('playerDrawer');
+    var isPlayerOpen = false;
+    var ticking = false;
+
+    setTimeout(function() {
+        topbar = document.getElementById('topbar');
+        if (!topbar) return;
+        console.log('✅ Авто-скрытие шапки работает');
+    }, 1000);
+
+    function checkPlayerState() {
+        if (playerDrawer) {
+            isPlayerOpen = playerDrawer.classList.contains('open');
+        }
+    }
+
+    function updateHeader() {
+        var currentScrollY = window.scrollY;
+        checkPlayerState();
+
+        if (isPlayerOpen) {
+            showAll();
+            lastScrollY = currentScrollY;
+            return;
+        }
+
+        if (currentScrollY < lastScrollY || currentScrollY < 30) {
+            showAll();
+        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            hideAll();
+        }
+
+        lastScrollY = currentScrollY;
+    }
+
+    function showAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(0)';
+            topbar.style.opacity = '1';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(0)';
+            playerHandle.style.opacity = '1';
+        }
+    }
+
+    function hideAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(-100%)';
+            topbar.style.opacity = '0';
+            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(-100%)';
+            playerHandle.style.opacity = '0';
+            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+    }
+
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateHeader();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+
+    if (playerDrawer) {
+        var observer = new MutationObserver(function() {
+            checkPlayerState();
+            if (isPlayerOpen) {
+                showAll();
+            }
+        });
+        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (playerHandle) {
+        playerHandle.addEventListener('click', function() {
+            setTimeout(function() {
+                checkPlayerState();
+                if (isPlayerOpen) {
+                    showAll();
+                }
+            }, 150);
+        });
+    }
+})();
+</script>
+</body>
+</html>
