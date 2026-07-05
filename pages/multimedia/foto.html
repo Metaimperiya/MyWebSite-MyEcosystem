@@ -13,81 +13,13 @@
 <body>
 <div class="app">
 
-    <!-- ===== ШАПКА ===== -->
-    <header class="topbar" id="topbar">
-        <div class="left">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <span class="logo" onclick="window.location.href='/'">METAIMPERIYA 🏴‍☠️</span>
-        </div>
-        <div class="center"></div>
-        <div class="right">
-            <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge"></span></button>
-            <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
-            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()"><span class="letter">?</span></div>
-            <span class="username" id="topName" onclick="goToProfile()">Гость</span>
-            <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
-        </div>
-    </header>
-
-    <!-- ===== МЕНЮ НАСТРОЕК ===== -->
-    <div class="settings-dropdown" id="settingsDropdown">
-        <div class="settings-item" onclick="goToProfile();closeSettingsMenu()">👤 Профиль</div>
-        <div class="settings-item" onclick="goToPeople();closeSettingsMenu()">👥 Люди</div>
-        <div class="settings-item" onclick="goToGroups();closeSettingsMenu()">💬 Сообщества</div>
-        <div class="settings-divider"></div>
-        <div class="settings-item" onclick="toggleLanguage();closeSettingsMenu()">🌐 Язык: <span id="langDisplay">Русский</span></div>
-        <div class="settings-item" onclick="toggleTheme();closeSettingsMenu()">🌙 Тема</div>
-        <div class="settings-item" id="adminChatsMenuItem" onclick="openAdminChats();closeSettingsMenu()" style="display:none;color:#e67e22;">🏴‍☠️ Все чаты</div>
-        <div class="settings-divider"></div>
-        <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
-    </div>
-
-    <!-- ===== САЙДБАР ===== -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>📱 Меню</h3>
-            <button class="close-btn" onclick="closeSidebar()">✕</button>
-        </div>
-        <div class="sidebar-user">
-            <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
-            <div>
-                <div class="name" id="sName">Гость</div>
-                <div class="status">онлайн</div>
-            </div>
-        </div>
-        <div class="sidebar-nav main-nav">
-            <div class="nav-item active" onclick="window.location.href='/'">🏠 Главная</div>
-            <div class="nav-item" onclick="goToProfile();closeSidebar()">👤 Профиль</div>
-            <div class="nav-item" onclick="goToPeople();closeSidebar()">👥 Люди</div>
-            <div class="nav-item" onclick="goToGroups();closeSidebar()">💬 Сообщества</div>
-        </div>
-        <div class="accordion">
-            <div class="accordion-item">
-                <div class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-icon">🎵</span>
-                    <span class="accordion-title">Мультимедиа</span>
-                    <span class="accordion-arrow">▾</span>
-                </div>
-                <div class="accordion-body">
-                    <div class="nav-item" onclick="window.location.href='foto.html'">📸 Фото</div>
-                    <div class="nav-item" onclick="window.location.href='video.html'">🎥 Видео</div>
-                    <div class="nav-item" onclick="window.location.href='muzyka.html'">🎵 Музыка</div>
-                    <div class="nav-item" onclick="window.location.href='knigi.html'">📚 Книги</div>
-                </div>
-            </div>
-            <!-- Остальные категории добавь по аналогии -->
-        </div>
-        <div class="sidebar-footer">
-            <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
-        </div>
-    </div>
-
-    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-    <!-- ===== МОДАЛКИ ===== -->
+    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ КОМПОНЕНТОВ ===== -->
+    <div id="topbarContainer"></div>
+    <div id="settingsContainer"></div>
+    <div id="sidebarContainer"></div>
     <div id="modalsContainer"></div>
 
-    <!-- ===== КОНТЕНТ СТРАНИЦЫ ===== -->
+    <!-- ===== КОНТЕНТ ===== -->
     <div class="container" style="padding-top:10px;">
         <button onclick="window.location.href='/'">← Назад</button>
         <h1>📸 Фото</h1>
@@ -120,8 +52,10 @@
 
 <script>
 (function() {
-    // Загружаем модалки и плеер
     const components = [
+        { id: 'topbarContainer', url: '../../topbar.html' },
+        { id: 'settingsContainer', url: '../../settings.html' },
+        { id: 'sidebarContainer', url: '../../sidebar.html' },
         { id: 'modalsContainer', url: '../../modals.html' },
         { id: 'playerContainer', url: '../../player.html' }
     ];
@@ -167,98 +101,6 @@
                 }
             });
     });
-})();
-
-// Авто-скрытие шапки
-(function() {
-    var lastScrollY = 0;
-    var topbar = document.getElementById('topbar');
-    var playerHandle = document.getElementById('playerHandle');
-    var playerDrawer = document.getElementById('playerDrawer');
-    var isPlayerOpen = false;
-    var ticking = false;
-
-    function checkPlayerState() {
-        if (playerDrawer) {
-            isPlayerOpen = playerDrawer.classList.contains('open');
-        }
-    }
-
-    function updateHeader() {
-        var currentScrollY = window.scrollY;
-        checkPlayerState();
-
-        if (isPlayerOpen) {
-            showAll();
-            lastScrollY = currentScrollY;
-            return;
-        }
-
-        if (currentScrollY < lastScrollY || currentScrollY < 30) {
-            showAll();
-        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
-            hideAll();
-        }
-
-        lastScrollY = currentScrollY;
-    }
-
-    function showAll() {
-        if (topbar) {
-            topbar.style.transform = 'translateY(0)';
-            topbar.style.opacity = '1';
-        }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(0)';
-            playerHandle.style.opacity = '1';
-        }
-    }
-
-    function hideAll() {
-        if (topbar) {
-            topbar.style.transform = 'translateY(-100%)';
-            topbar.style.opacity = '0';
-            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(-100%)';
-            playerHandle.style.opacity = '0';
-            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }
-    }
-
-    window.addEventListener('scroll', function() {
-        if (!ticking) {
-            window.requestAnimationFrame(function() {
-                updateHeader();
-                ticking = false;
-            });
-            ticking = true;
-        }
-    }, { passive: true });
-
-    if (playerDrawer) {
-        var observer = new MutationObserver(function() {
-            checkPlayerState();
-            if (isPlayerOpen) {
-                showAll();
-            }
-        });
-        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    if (playerHandle) {
-        playerHandle.addEventListener('click', function() {
-            setTimeout(function() {
-                checkPlayerState();
-                if (isPlayerOpen) {
-                    showAll();
-                }
-            }, 150);
-        });
-    }
-
-    console.log('✅ Авто-скрытие шапки включено!');
 })();
 </script>
 </body>
