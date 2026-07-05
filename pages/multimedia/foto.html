@@ -25,7 +25,7 @@
         <h1>📸 Фото</h1>
         <p style="color:#888;">Всё о фотографии: советы, техника, вдохновение</p>
 
-        <!-- ===== МИНИ-ЛЕНТА ===== -->
+        <!-- ===== МИНИ-ЛЕНТА (ФОРМА ПОСТА) ===== -->
         <div class="card" style="margin-top:10px;">
             <div class="post-form">
                 <div class="editor-toolbar">
@@ -61,7 +61,7 @@
 
 </div>
 
-<!-- ===== СКРИПТЫ ===== -->
+<!-- ===== СКРИПТЫ В ПРАВИЛЬНОМ ПОРЯДКЕ ===== -->
 <script src="../../js/firebase.js"></script>
 <script src="../../js/lang.js"></script>
 <script src="../../js/auth.js"></script>
@@ -77,7 +77,7 @@
 
 <script>
 // ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ
+// ЗАГРУЗКА КОМПОНЕНТОВ (ШАПКА, САЙДБАР, МОДАЛКИ, ПЛЕЕР)
 // ================================================================
 
 (function() {
@@ -113,16 +113,16 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
-                            // Пробуем загрузить ленту, только если есть USER
+                            // Загружаем ленту только если есть USER
                             if (USER && typeof loadFeed === 'function') {
                                 loadFeed();
                             } else {
                                 console.log('⏳ Ожидание авторизации для загрузки ленты');
-                                // Подписываемся на изменение USER
-                                var checkUserInterval = setInterval(function() {
+                                // Проверяем каждую секунду
+                                var checkUser = setInterval(function() {
                                     if (USER && typeof loadFeed === 'function') {
                                         loadFeed();
-                                        clearInterval(checkUserInterval);
+                                        clearInterval(checkUser);
                                     }
                                 }, 1000);
                             }
