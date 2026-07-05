@@ -851,33 +851,64 @@ window.toggleLikeComment = function(postId, commentId, type) {
     }
 };
 
+// ================================================================
+// ЛАЙКИ — ИСПРАВЛЕННАЯ ВЕРСИЯ (БЕЗ ГЛЮКОВ)
+// ================================================================
+
 window.toggleLike = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
 
     var key = 'lk_' + postId + '_' + USER_UID;
     var liked = localStorage.getItem(key) === '1';
     var path = getPostPath(type);
-    var ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/likes');
+    var postRef = db.ref('sites/' + SITE + '/' + path + '/' + postId);
     var countEl = document.getElementById('likeCount_' + postId);
     var btn = document.querySelector('.post[data-id="' + postId + '"] .stats button:first-child');
 
-    if (liked) {
-        ref.transaction(function(v) { return Math.max(0, (v || 0) - 1); });
-        localStorage.removeItem(key);
-        if (countEl) {
-            var current = parseInt(countEl.textContent) || 0;
-            countEl.textContent = Math.max(0, current - 1);
-        }
-        if (btn) btn.classList.remove('liked');
-    } else {
-        ref.transaction(function(v) { return (v || 0) + 1; });
-        localStorage.setItem(key, '1');
-        if (countEl) {
-            var current = parseInt(countEl.textContent) || 0;
-            countEl.textContent = current + 1;
-        }
-        if (btn) btn.classList.add('liked');
+    // Блокируем кнопку на время операции
+    if (btn) {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
     }
+
+    // Транзакция для атомарного обновления
+    postRef.child('likes').transaction(function(currentLikes) {
+        var current = currentLikes || 0;
+        if (liked) {
+            return Math.max(0, current - 1);
+        } else {
+            return current + 1;
+        }
+    }, function(error, committed, snapshot) {
+        // Разблокируем кнопку
+        if (btn) {
+            btn.style.pointerEvents = 'auto';
+            btn.style.opacity = '1';
+        }
+        
+        if (error) {
+            console.error('Ошибка лайка:', error);
+            return;
+        }
+        
+        if (committed) {
+            var newValue = snapshot.val() || 0;
+            
+            // Обновляем счётчик в DOM
+            if (countEl) {
+                countEl.textContent = newValue;
+            }
+            
+            // Обновляем localStorage
+            if (liked) {
+                localStorage.removeItem(key);
+                if (btn) btn.classList.remove('liked');
+            } else {
+                localStorage.setItem(key, '1');
+                if (btn) btn.classList.add('liked');
+            }
+        }
+    });
 };
 
 window.submitComment = function(postId, type) {
