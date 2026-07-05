@@ -1,5 +1,5 @@
 // ================================================================
-// ЧАТ — ПОЛНАЯ ВЕРСИЯ С УДАЛЕНИЕМ И ИНДИКАТОРОМ
+// ЧАТ — С РАЗДЕЛЕНИЕМ СООБЩЕНИЙ (СЛЕВА/СПРАВА) И УВЕДОМЛЕНИЯМИ
 // ================================================================
 
 function loadChat(path) {
@@ -34,15 +34,37 @@ function loadChat(path) {
             var isMy = (m.nick === USER);
             var canDelete = isMy || isAdmin;
             
+            // 👇 РАЗДЕЛЯЕМ СООБЩЕНИЯ: СВОИ СПРАВА, ЧУЖИЕ СЛЕВА
+            div.style.display = 'flex';
+            div.style.flexDirection = 'column';
+            div.style.alignItems = isMy ? 'flex-end' : 'flex-start';
+            div.style.marginBottom = '6px';
+            div.style.width = '100%';
+            
             var menuHtml = '';
             if (canDelete) {
-                menuHtml = '<span class="msg-menu" onclick="toggleMsgMenu(\'' + msgId + '\', event)">⋮</span>';
-                menuHtml += '<div class="msg-dropdown" id="msgMenu_' + msgId + '" style="display:none;position:absolute;right:0;top:20px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15);z-index:60;min-width:120px;padding:4px 0;">';
+                menuHtml = '<span class="msg-menu" onclick="toggleMsgMenu(\'' + msgId + '\', event)" style="position:absolute;right:6px;top:2px;cursor:pointer;color:var(--muted-text);font-size:0.8rem;padding:0 4px;z-index:5;">⋮</span>';
+                menuHtml += '<div class="msg-dropdown" id="msgMenu_' + msgId + '" style="display:none;position:absolute;right:0;top:18px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15);z-index:60;min-width:120px;padding:4px 0;">';
                 menuHtml += '<button class="del-btn" onclick="deleteMessage(\'' + path + '\', \'' + msgId + '\')" style="display:block;width:100%;padding:4px 12px;background:none;border:none;text-align:left;font-size:0.7rem;cursor:pointer;color:var(--danger);">🗑 Удалить</button>';
                 menuHtml += '</div>';
             }
             
-            div.innerHTML = '<span class="author">' + esc(m.nick || '?') + '</span><span class="time">' + (m.time || '') + '</span>' + menuHtml + '<div class="msg-text">' + esc(m.text || '') + '</div>';
+            var bubbleStyle = isMy 
+                ? 'background:var(--link-color);color:#fff;border-radius:16px 16px 4px 16px;padding:6px 12px;max-width:80%;word-break:break-word;position:relative;'
+                : 'background:var(--input-bg);color:var(--text-color);border-radius:16px 16px 16px 4px;padding:6px 12px;max-width:80%;word-break:break-word;position:relative;';
+            
+            var authorStyle = isMy
+                ? 'font-size:0.55rem;color:rgba(255,255,255,0.7);margin-bottom:1px;'
+                : 'font-size:0.55rem;color:var(--link-color);font-weight:600;margin-bottom:1px;';
+            
+            div.innerHTML = `
+                <div style="${bubbleStyle}">
+                    ${menuHtml}
+                    <div style="${authorStyle}">${esc(m.nick || '?')}</div>
+                    <div style="font-size:0.75rem;line-height:1.4;">${esc(m.text || '')}</div>
+                    <div style="font-size:0.45rem;text-align:right;margin-top:2px;opacity:0.7;${isMy ? 'color:rgba(255,255,255,0.6);' : 'color:var(--muted-text);'}">${m.time || ''}</div>
+                </div>
+            `;
             box.appendChild(div);
         });
         box.scrollTop = box.scrollHeight;
@@ -101,7 +123,6 @@ window.sendChatMessage = function() {
         timestamp: Date.now()
     });
     
-    // 👇 ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ С ID ЧАТА
     if (targetUid) {
         sendNotification(targetUid, {
             type: 'message',
