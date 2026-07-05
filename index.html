@@ -37,7 +37,7 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== ЛЕНТА ===== -->
+        <!-- ===== СТРАНИЦЫ ===== -->
         <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
@@ -76,7 +76,6 @@
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
 
-        <!-- ===== ПРОФИЛЬ ===== -->
         <div class="page" id="page-profile">
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
@@ -140,7 +139,99 @@
             <div id="profilePosts"></div>
         </div>
 
-        <!-- ===== ЧАТ С ИНДИКАТОРОМ ===== -->
+        <!-- ===== ВСЕ СТРАНИЦЫ ИЗ МЕНЮ ===== -->
+        <div class="page" id="page-foto" style="display:none;">
+            <div class="container">
+                <button onclick="window.location.href='/'">← Назад</button>
+                <h1>📸 Фото</h1>
+                <p style="color:#888;">Всё о фотографии: советы, техника, вдохновение</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📷 Советы по съёмке</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📸 Лучшие камеры</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🎨 Обработка фото</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🌟 Вдохновение</div>
+                </div>
+                <div class="card" style="margin-top:10px;">
+                    <div class="post-form">
+                        <div class="editor-toolbar">
+                            <button onclick="formatText('bold')"><b>B</b></button>
+                            <button onclick="formatText('italic')"><i>I</i></button>
+                            <button onclick="formatText('underline')"><u>U</u></button>
+                            <button onclick="formatText('strike')"><s>S</s></button>
+                            <button onclick="formatText('h1')">H1</button>
+                            <button onclick="formatText('h2')">H2</button>
+                            <button onclick="formatText('quote')">"</button>
+                            <button onclick="formatText('code')">&lt;/&gt;</button>
+                            <button onclick="insertLink()">🔗</button>
+                        </div>
+                        <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что у вас нового?"></div>
+                        <div class="post-actions" style="margin-top:6px;">
+                            <label class="file-label" for="fileInputFoto">📎 Фото</label>
+                            <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                            <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                        </div>
+                        <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
+                        <div class="preview-box" id="previewBoxFoto">
+                            <img id="previewImgFoto"><span id="previewNameFoto"></span>
+                            <button class="remove-pic" onclick="removeImage()">✕</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="feedFoto"></div>
+            </div>
+        </div>
+
+        <div class="page" id="page-video" style="display:none;">
+            <div class="container">
+                <button onclick="window.location.href='/'">← Назад</button>
+                <h1>🎥 Видео</h1>
+                <p style="color:#888;">Всё о видео: съёмка, монтаж, тренды</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📹 Советы по съёмке</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">✂️ Монтаж видео</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📈 Тренды видео</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🎥 Оборудование</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page-muzyka" style="display:none;">
+            <div class="container">
+                <button onclick="window.location.href='/'">← Назад</button>
+                <h1>🎵 Музыка</h1>
+                <p style="color:#888;">Всё о музыке: новинки, исполнители, жанры</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🎶 Новинки музыки</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🎤 Популярные исполнители</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🎸 Жанры музыки</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">💿 Альбомы</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page-knigi" style="display:none;">
+            <div class="container">
+                <button onclick="window.location.href='/'">← Назад</button>
+                <h1>📚 Книги</h1>
+                <p style="color:#888;">Всё о книгах: новинки, авторы, жанры</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📖 Новинки книг</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">✍️ Популярные авторы</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">📚 Жанры литературы</div>
+                    <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">⭐ Рекомендации</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ОСТАЛЬНЫЕ СТРАНИЦЫ ДОБАВЛЯЮТСЯ ПО ТАКОМУ ЖЕ ПРИНЦИПУ ===== -->
+        <!-- Для tech: programmirovanie, saity, ai-chatgpt, vr-ar, bezopasnost, cloud, open-source, api-sdk -->
+        <!-- Для business: business, finance, crypto, marketplace, rabota, proekty, startapy -->
+        <!-- Для life: puteshestviya, eda, nedvizhimost, sport, igry, anime, kino, serialy, blogery, memy, moda, avtomobili, volonterstvo, zhivotnye, hobby -->
+        <!-- Для communication: znakomstva, komanda, lgbtq, yazyki, qa -->
+        <!-- Для news: novosti, strimy, sobytiya, podkasty, konkursy, akcii-skidki -->
+        <!-- Для other: stranicy, blog, pokupki, uslugi, frilans, organizacii, metaimperiya -->
+
+        <!-- ===== ЧАТ ===== -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
@@ -214,6 +305,12 @@
                         if (typeof translatePage === 'function') {
                             translatePage();
                         }
+                        // Автоматически открываем страницу из URL
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var page = urlParams.get('page');
+                        if (page) {
+                            openPage(page);
+                        }
                     }, 300);
                 }
             })
@@ -226,6 +323,11 @@
                     setTimeout(function() {
                         if (typeof translatePage === 'function') {
                             translatePage();
+                        }
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var page = urlParams.get('page');
+                        if (page) {
+                            openPage(page);
                         }
                     }, 300);
                 }
