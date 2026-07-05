@@ -436,13 +436,14 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// РЕНДЕР ПОСТА
+// РЕНДЕР ПОСТА (КЛИКАБЕЛЬНЫЙ)
 // ================================================================
 
 function renderPost(p, type) {
     var div = document.createElement('div');
     div.className = 'post';
     div.dataset.id = p.id;
+    div.dataset.type = type;
 
     if (p.deleted) {
         div.innerHTML = `
@@ -466,7 +467,7 @@ function renderPost(p, type) {
 
     var marqueeHtml = p.marquee ? '<div class="marquee"><span>' + esc(p.marquee) + '</span></div>' : '';
     var textHtml = p.text || '';
-    var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="window.open(this.src)">' : '';
+    var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="event.stopPropagation();window.open(this.src)">' : '';
 
     var repostHtml = '';
     if (p.repost) {
@@ -478,25 +479,24 @@ function renderPost(p, type) {
         buttonsHtml = '<div class="buttons-wrap">';
         p.buttons.forEach(function(btn) {
             if (btn.url) {
-                buttonsHtml += '<a href="' + esc(btn.url) + '" target="_blank" class="btn-item">' + esc(btn.label || '🔗 Перейти') + '</a>';
+                buttonsHtml += '<a href="' + esc(btn.url) + '" target="_blank" class="btn-item" onclick="event.stopPropagation();">' + esc(btn.label || '🔗 Перейти') + '</a>';
             }
         });
         buttonsHtml += '</div>';
     }
 
-    // ===== ФРЕЙМ С РАЗМЕРОМ =====
     var previewHtml = '';
     if (p.link) {
         var frameSize = p.frameSize || 'small';
         var height = frameSize === 'large' ? '450px' : '250px';
-        previewHtml = '<div class="link-preview"><iframe src="' + p.link + '" style="width:100%;height:' + height + ';border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
+        previewHtml = '<div class="link-preview" onclick="event.stopPropagation();"><iframe src="' + p.link + '" style="width:100%;height:' + height + ';border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
 
     var hashtagsHtml = '';
     if (p.hashtags && p.hashtags.length > 0) {
         hashtagsHtml = '<div class="hashtags">';
         p.hashtags.forEach(function(tag) {
-            hashtagsHtml += '<span class="tag" onclick="searchByTag(\'' + esc(tag) + '\')">' + esc(tag) + '</span>';
+            hashtagsHtml += '<span class="tag" onclick="event.stopPropagation();searchByTag(\'' + esc(tag) + '\')">' + esc(tag) + '</span>';
         });
         hashtagsHtml += '</div>';
     }
@@ -506,17 +506,17 @@ function renderPost(p, type) {
 
     var menuHtml = '';
     if (canDelete) {
-        menuHtml = '<div class="post-menu"><button class="dots" onclick="togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="openEdit(\'' + p.id + '\', \'' + type + '\')" style="color:#e67e22;">✏️ Редактировать</button><button class="del-btn" onclick="deletePost(\'' + p.id + '\', \'' + type + '\')" style="color:var(--danger);">🗑 Удалить</button></div></div>';
+        menuHtml = '<div class="post-menu"><button class="dots" onclick="event.stopPropagation();togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="event.stopPropagation();openEdit(\'' + p.id + '\', \'' + type + '\')" style="color:#e67e22;">✏️ Редактировать</button><button class="del-btn" onclick="event.stopPropagation();deletePost(\'' + p.id + '\', \'' + type + '\')" style="color:var(--danger);">🗑 Удалить</button></div></div>';
     }
 
-    var actionsHtml = '<div class="stats">' +
-        '<button class="' + (isLiked ? 'liked' : '') + '" onclick="toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
-        '<button onclick="toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
-        '<button onclick="openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
+    var actionsHtml = '<div class="stats" onclick="event.stopPropagation();">' +
+        '<button class="' + (isLiked ? 'liked' : '') + '" onclick="event.stopPropagation();toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
+        '<button onclick="event.stopPropagation();toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
+        '<button onclick="event.stopPropagation();openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
         '</div>';
 
     var commentsHtml = `
-        <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;">
+        <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;" onclick="event.stopPropagation();">
             <div class="comments" id="comments_${p.id}">
                 <div class="comments-body" id="commentsBody_${p.id}">
                     <div class="comments-list" id="commentsList_${p.id}">
@@ -528,20 +528,20 @@ function renderPost(p, type) {
     `;
 
     var inputHtml = `
-        <div class="comment-input-wrap" id="commentInputWrap_${p.id}">
+        <div class="comment-input-wrap" id="commentInputWrap_${p.id}" onclick="event.stopPropagation();">
             <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
-            <button onclick="submitComment('${p.id}', '${type}')">→</button>
+            <button onclick="event.stopPropagation();submitComment('${p.id}', '${type}')">→</button>
         </div>
     `;
 
     var contentHtml = textHtml + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml;
     
     div.innerHTML = menuHtml + marqueeHtml + 
-        '<div class="author">' + avatarHtml + 
-        '<span class="name" onclick="viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span>' +
+        '<div class="author" onclick="event.stopPropagation();viewUser(\'' + (p.authorUid || '') + '\')">' + avatarHtml + 
+        '<span class="name" onclick="event.stopPropagation();viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span>' +
         '<span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>' +
         '</div>' +
-        '<div class="post-content">' + contentHtml + '</div>' +
+        '<div class="post-content" onclick="openPostPage(\'' + p.id + '\', \'' + type + '\')" style="cursor:pointer;">' + contentHtml + '</div>' +
         actionsHtml + commentsHtml + inputHtml;
 
     if (p.authorUid) {
@@ -879,6 +879,8 @@ window.toggleLike = function(postId, type) {
     }
 };
 
+// ===== ОТПРАВКА КОММЕНТАРИЯ С УВЕДОМЛЕНИЕМ =====
+
 window.submitComment = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
 
@@ -888,91 +890,131 @@ window.submitComment = function(postId, type) {
 
     var path = getPostPath(type);
     
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
-        author: USER,
-        authorUid: USER_UID,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now(),
-        likes: 0,
-        parentId: null
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/authorUid').once('value', function(authorSnap) {
+        var authorUid = authorSnap.val();
+        
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
+            author: USER,
+            authorUid: USER_UID,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            parentId: null
+        }).then(function() {
+            if (authorUid && authorUid !== USER_UID) {
+                sendNotification(authorUid, {
+                    type: 'comment',
+                    from: USER_UID,
+                    text: USER + ' прокомментировал(а) ваш пост: "' + (text.slice(0, 50)) + (text.length > 50 ? '...' : ''),
+                    postId: postId,
+                    postType: type,
+                    timestamp: Date.now()
+                });
+            }
+        });
     });
 
     input.value = '';
 };
 
-window.deleteComment = function(postId, commentId, type) {
-    if (!confirm('🗑 Удалить комментарий?')) return;
+// ===== ОТПРАВКА ОТВЕТА С УВЕДОМЛЕНИЕМ =====
+
+window.submitReply = function(postId, parentId, type) {
+    if (!USER) { alert('Войдите!'); return; }
+    
+    var input = document.getElementById('replyInputField_' + parentId);
+    if (!input) return;
+    
+    var text = input.value.trim();
+    if (!text) return;
+    
     var path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
-    var menu = document.getElementById('commentMenu_' + commentId);
-    if (menu) menu.classList.remove('open');
-};
-
-window.toggleCommentMenu = function(commentId) {
-    var menu = document.getElementById('commentMenu_' + commentId);
-    if (!menu) return;
-    document.querySelectorAll('.comment-actions .dropdown.open').forEach(function(el) {
-        if (el.id !== 'commentMenu_' + commentId) el.classList.remove('open');
-    });
-    menu.classList.toggle('open');
-};
-
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.comment-actions')) {
-        document.querySelectorAll('.comment-actions .dropdown.open').forEach(function(el) {
-            el.classList.remove('open');
-        });
-    }
-});
-
-function editComment(postId, commentId, type) {
-    var textEl = document.getElementById('comment-text-' + commentId);
-    if (!textEl) return;
-
-    var menu = document.getElementById('commentMenu_' + commentId);
-    if (menu) menu.classList.remove('open');
-
-    var currentText = textEl.textContent;
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.value = currentText;
-    input.className = 'edit-comment-input';
-
-    textEl.innerHTML = '';
-    textEl.appendChild(input);
-    input.focus();
-    input.select();
-
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            saveCommentEdit(postId, commentId, type, input.value.trim());
-        }
-    });
-
-    input.addEventListener('blur', function() {
-        setTimeout(function() {
-            if (document.activeElement !== input) {
-                saveCommentEdit(postId, commentId, type, input.value.trim());
+    
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + parentId + '/authorUid').once('value', function(parentSnap) {
+        var parentAuthorUid = parentSnap.val();
+        
+        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
+            author: USER,
+            authorUid: USER_UID,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            parentId: parentId
+        }).then(function() {
+            if (parentAuthorUid && parentAuthorUid !== USER_UID) {
+                sendNotification(parentAuthorUid, {
+                    type: 'comment',
+                    from: USER_UID,
+                    text: USER + ' ответил(а) на ваш комментарий: "' + (text.slice(0, 50)) + (text.length > 50 ? '...' : ''),
+                    postId: postId,
+                    postType: type,
+                    timestamp: Date.now()
+                });
             }
-        }, 200);
+        });
     });
-}
+    
+    input.value = '';
+    document.getElementById('replyInput_' + parentId).style.display = 'none';
+};
 
-function saveCommentEdit(postId, commentId, type, newText) {
-    if (!newText) {
-        deleteComment(postId, commentId, type);
-        return;
-    }
+// ===== ОТКРЫТИЕ ПОСТА (ГЛОБАЛЬНАЯ ФУНКЦИЯ) =====
+
+window.openPostPage = function(postId, type) {
+    window.CURRENT_POST_ID = postId;
+    window.CURRENT_POST_TYPE = type;
+    
+    var container = document.getElementById('postPageContainer');
+    if (!container) return;
+    
+    document.getElementById('postPage').classList.add('active');
+    setActivePage(null);
+    
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка поста...</div>';
+    
     var path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
-        text: newText,
-        edited: true
+    db.ref('sites/' + SITE + '/' + path + '/' + postId).once('value', function(snap) {
+        var post = snap.val();
+        if (!post) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#e74c3c;">❌ Пост не найден</div>';
+            return;
+        }
+        post.id = postId;
+        var postEl = renderPost(post, type);
+        container.innerHTML = '';
+        container.appendChild(postEl);
+        
+        setTimeout(function() {
+            var wrapper = document.getElementById('commentsWrapper_' + postId);
+            if (wrapper) {
+                wrapper.style.display = 'block';
+                wrapper.style.opacity = '1';
+                var state = getCommentState(postId);
+                state.open = true;
+                loadComments(postId, type);
+                
+                setTimeout(function() {
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        }, 500);
     });
-}
+};
+
+// ===== ЗАКРЫТИЕ СТРАНИЦЫ ПОСТА =====
+
+window.closePostPage = function() {
+    document.getElementById('postPage').classList.remove('active');
+    setActivePage('feed');
+    window.CURRENT_POST_ID = null;
+    window.CURRENT_POST_TYPE = null;
+    loadFeed();
+};
 
 // ================================================================
-// УДАЛЕНИЕ ПОСТА — С ПРИНУДИТЕЛЬНЫМ ОБНОВЛЕНИЕМ
+// УДАЛЕНИЕ ПОСТА
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -996,7 +1038,6 @@ window.deletePost = function(id, type) {
     var menu = document.getElementById('menu_' + id);
     if (menu) menu.classList.remove('open');
     
-    // ✅ ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ (без перезагрузки страницы)
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1007,10 +1048,6 @@ window.deletePost = function(id, type) {
         if (typeof loadProfile === 'function') loadProfile();
     }, 500);
 };
-
-// ================================================================
-// ВОССТАНОВЛЕНИЕ УДАЛЕННОГО ПОСТА
-// ================================================================
 
 window.restorePost = function(id, type) {
     var path = getPostPath(type);
@@ -1030,7 +1067,6 @@ window.restorePost = function(id, type) {
         }
     });
     
-    // ✅ ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1043,7 +1079,7 @@ window.restorePost = function(id, type) {
 };
 
 // ================================================================
-// РЕДАКТИРОВАНИЕ ПОСТА — С ПРИНУДИТЕЛЬНЫМ ОБНОВЛЕНИЕМ
+// РЕДАКТИРОВАНИЕ ПОСТА
 // ================================================================
 
 window.openEdit = function(id, type) {
@@ -1143,7 +1179,6 @@ window.saveEdit = function() {
     closeEdit();
     alert('✅ Пост обновлён!');
     
-    // ✅ ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1168,7 +1203,6 @@ window.deleteEditPost = function() {
     
     closeEdit();
     
-    // ✅ ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1333,7 +1367,6 @@ function saveNestedRepost(repostData, postId, type, path) {
     closeRepost();
     alert('✅ Репост создан!');
     
-    // ✅ ОБНОВЛЕНИЕ ПОСЛЕ РЕПОСТА
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
