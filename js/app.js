@@ -478,8 +478,24 @@ if (typeof toggleLanguage === 'undefined') {
     };
 }
 
+// 👇 ДОБАВЛЕНА ФУНКЦИЯ ОБНОВЛЕНИЯ ОТОБРАЖЕНИЯ ЯЗЫКА
+function updateLangDisplay() {
+    var display = document.getElementById('langDisplay');
+    if (display) {
+        display.textContent = currentLang === 'ru' ? 'Русский' : 'English';
+    }
+}
+
 var originalUpdateUI = updateUI || function() {};
 updateUI = function() {
     originalUpdateUI();
-    setTimeout(translatePage, 200);
+    setTimeout(function() {
+        translatePage();
+        updateLangDisplay();
+    }, 200);
 };
+
+// Вызываем при загрузке
+setTimeout(function() {
+    updateLangDisplay();
+}, 500);
