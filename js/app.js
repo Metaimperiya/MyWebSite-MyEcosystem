@@ -18,7 +18,6 @@ function updateUI() {
         renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
         if (isAdmin) dot.classList.add('active');
         else dot.classList.remove('active');
-        // Показываем админ-пункт в меню
         updateAdminMenu();
     } else {
         topAvatar.innerHTML = '<span class="letter">?</span>';
@@ -26,7 +25,6 @@ function updateUI() {
         name.textContent = 'Гость';
         sName.textContent = 'Гость';
         dot.classList.remove('active');
-        // Скрываем админ-пункт
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
     }
@@ -347,7 +345,49 @@ function loadChatList() {
 }
 
 // ================================================================
-// ОТПРАВКА СООБЩЕНИЙ (ПЕРЕОПРЕДЕЛЯЕМ)
+// ИНДИКАТОР НАБОРА ТЕКСТА
+// ================================================================
+
+var typingTimeout = null;
+
+function setupTypingIndicator(chatId) {
+    var typingRef = db.ref('dms/' + SITE + '/' + chatId + '/typing');
+    var input = document.getElementById('chatInput');
+
+    // Удаляем старый обработчик
+    if (window._typingHandler) {
+        input.removeEventListener('keydown', window._typingHandler);
+    }
+
+    window._typingHandler = function() {
+        typingRef.set({ [USER_UID]: true });
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(function() {
+            typingRef.set(null);
+        }, 2000);
+    };
+    input.addEventListener('keydown', window._typingHandler);
+
+    typingRef.on('value', function(snap) {
+        var data = snap.val() || {};
+        var isTyping = Object.keys(data).some(function(key) {
+            return data[key] === true && key !== USER_UID;
+        });
+
+        var indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+            if (isTyping) {
+                indicator.textContent = '✍️ Печатает...';
+                indicator.style.display = 'block';
+            } else {
+                indicator.style.display = 'none';
+            }
+        }
+    });
+}
+
+// ================================================================
+// ОТПРАВКА СООБЩЕНИЙ
 // ================================================================
 
 window.sendChatMessage = function() {
@@ -476,7 +516,7 @@ function updateAdminMenu() {
 }
 
 // ================================================================
-// ДОБАВЛЕНО: ЗАКРЫТИЕ ЧАТА С ВОЗВРАТОМ В СПИСОК
+// ЗАКРЫТИЕ ЧАТА С ВОЗВРАТОМ В СПИСОК
 // ================================================================
 
 window.closeChat = function() {
@@ -486,8 +526,6 @@ window.closeChat = function() {
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    
-    // Возвращаемся в список чатов (НЕ на главную!)
     openChatList();
 };
 
@@ -495,7 +533,6 @@ window.closeChat = function() {
 // ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
 // ================================================================
 
-// Функция уже добавлена в lang.js, но дублируем для надежности
 if (typeof toggleLanguage === 'undefined') {
     window.toggleLanguage = function() {
         var newLang = currentLang === 'ru' ? 'en' : 'ru';
@@ -503,20 +540,8 @@ if (typeof toggleLanguage === 'undefined') {
     };
 }
 
-// Обновляем язык после входа
 var originalUpdateUI = updateUI || function() {};
 updateUI = function() {
     originalUpdateUI();
     setTimeout(translatePage, 200);
-};
-
-// Закрытие чата
-window.closeChat = function() {
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    openChatList();
 };
