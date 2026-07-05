@@ -1,5 +1,5 @@
 // ================================================================
-// ЧАТ — ПОЛНАЯ ВЕРСИЯ С УДАЛЕНИЕМ
+// ЧАТ — ПОЛНАЯ ВЕРСИЯ С УДАЛЕНИЕМ И ИНДИКАТОРОМ
 // ================================================================
 
 function loadChat(path) {
@@ -12,6 +12,11 @@ function loadChat(path) {
     if (!box) return;
     box.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
     chatUnsub = path;
+    
+    // Если это личный чат, настраиваем индикатор набора
+    if (CURRENT_ROOM && CURRENT_ROOM.includes('_')) {
+        setupTypingIndicator(CURRENT_ROOM);
+    }
     
     db.ref(path).orderByChild('timestamp').on('value', function(snap) {
         box.innerHTML = '';
@@ -125,7 +130,7 @@ window.closeChat = function() {
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    goToGroups();
+    openChatList();
 };
 
 window.openPrivateChat = function(targetUid) {
