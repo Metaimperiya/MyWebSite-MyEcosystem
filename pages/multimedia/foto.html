@@ -13,7 +13,7 @@
 <body>
 <div class="app">
 
-    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ КОМПОНЕНТОВ ===== -->
+    <!-- ===== КОНТЕЙНЕРЫ ===== -->
     <div id="topbarContainer"></div>
     <div id="settingsContainer"></div>
     <div id="sidebarContainer"></div>
@@ -25,7 +25,6 @@
         <h1>📸 Фото</h1>
         <p style="color:#888;">Всё о фотографии: советы, техника, вдохновение</p>
 
-        <!-- ===== МИНИ-ЛЕНТА (ФОРМА ПОСТА) ===== -->
         <div class="card" style="margin-top:10px;">
             <div class="post-form">
                 <div class="editor-toolbar">
@@ -53,15 +52,12 @@
             </div>
         </div>
         <div id="feed"></div>
-
     </div>
 
-    <!-- ===== ПЛЕЕР ===== -->
     <div id="playerContainer"></div>
-
 </div>
 
-<!-- ===== СКРИПТЫ В ПРАВИЛЬНОМ ПОРЯДКЕ ===== -->
+<!-- ===== СКРИПТЫ ===== -->
 <script src="../../js/firebase.js"></script>
 <script src="../../js/lang.js"></script>
 <script src="../../js/auth.js"></script>
@@ -76,10 +72,6 @@
 <script src="../../js/admin.js"></script>
 
 <script>
-// ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ (ШАПКА, САЙДБАР, МОДАЛКИ, ПЛЕЕР)
-// ================================================================
-
 (function() {
     const components = [
         { id: 'topbarContainer', url: '../../topbar.html' },
@@ -108,23 +100,23 @@
                     console.log('✅ Все компоненты загружены!');
                     setTimeout(function() {
                         try {
+                            // ПРОВЕРЯЕМ, ЕСТЬ ЛИ USER В localStorage
+                            var savedUser = localStorage.getItem('dc_u_' + SITE);
+                            if (savedUser) {
+                                USER = savedUser;
+                            }
+                            
                             if (typeof updateUI === 'function') updateUI();
                             if (typeof loadNotifications === 'function') loadNotifications();
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
-                            // Загружаем ленту только если есть USER
+                            
+                            // Загружаем ленту
                             if (USER && typeof loadFeed === 'function') {
                                 loadFeed();
                             } else {
-                                console.log('⏳ Ожидание авторизации для загрузки ленты');
-                                // Проверяем каждую секунду
-                                var checkUser = setInterval(function() {
-                                    if (USER && typeof loadFeed === 'function') {
-                                        loadFeed();
-                                        clearInterval(checkUser);
-                                    }
-                                }, 1000);
+                                console.log('⏳ Ожидание авторизации...');
                             }
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
@@ -140,6 +132,10 @@
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     setTimeout(function() {
                         try {
+                            var savedUser = localStorage.getItem('dc_u_' + SITE);
+                            if (savedUser) {
+                                USER = savedUser;
+                            }
                             if (typeof updateUI === 'function') updateUI();
                             if (typeof loadNotifications === 'function') loadNotifications();
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
