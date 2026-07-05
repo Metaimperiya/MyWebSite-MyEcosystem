@@ -28,28 +28,8 @@
 <iframe src="/?page=foto" id="mainFrame"></iframe>
 
 <script>
-// ================================================================
-// НАВИГАЦИЯ ВНУТРИ IFRAME
-// ================================================================
-
-// Ждём загрузки iframe
 document.getElementById('mainFrame').addEventListener('load', function() {
-    try {
-        // Передаём параметр в iframe, чтобы он знал, какую страницу показать
-        var iframeWindow = this.contentWindow;
-        iframeWindow.postMessage({ type: 'navigate', page: 'foto' }, '*');
-    } catch(e) {
-        console.log('Не удалось отправить сообщение в iframe');
-    }
-});
-
-// ================================================================
-// ОБРАБОТКА СООБЩЕНИЙ ИЗ IFRAME (если нужно)
-// ================================================================
-
-window.addEventListener('message', function(event) {
-    // Можно обрабатывать сообщения из iframe
-    console.log('Сообщение из iframe:', event.data);
+    console.log('✅ Iframe загружен!');
 });
 </script>
 
