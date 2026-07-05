@@ -1,5 +1,5 @@
 // ================================================================
-// УВЕДОМЛЕНИЯ — ПОЛНАЯ ВЕРСИЯ С ПЕРЕХОДОМ В ЧАТ
+// УВЕДОМЛЕНИЯ — ПОЛНАЯ ВЕРСИЯ С ПЕРЕХОДОМ В ЧАТ И КОММЕНТАРИИ
 // ================================================================
 
 // ===== 1. ОТПРАВКА УВЕДОМЛЕНИЯ =====
@@ -60,16 +60,17 @@ function renderNotifications(notifications, keys) {
     var html = '';
     keys.slice(0, 20).forEach(function(k) {
         var n = notifications[k];
-        var icon = n.type === 'friend_request' ? '🤝' : n.type === 'friend_accepted' ? '✅' : '💬';
+        var icon = n.type === 'friend_request' ? '🤝' : n.type === 'friend_accepted' ? '✅' : n.type === 'comment' ? '💬' : '💬';
         var time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
         
-        // Показываем текст сообщения
         var textDisplay = n.text || 'Уведомление';
         if (n.type === 'message') {
             textDisplay = '💬 ' + n.text;
         }
+        if (n.type === 'comment') {
+            textDisplay = '💬 ' + n.text;
+        }
         
-        // Кнопки для заявок в друзья
         var actionsHtml = '';
         if (n.type === 'friend_request' && n.fromUid && n.fromUid !== USER_UID) {
             actionsHtml = '<div style="display:flex;gap:4px;margin-top:4px;">';
@@ -78,7 +79,7 @@ function renderNotifications(notifications, keys) {
             actionsHtml += '</div>';
         }
         
-        html += '<div class="notif-item ' + (n.read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + k + '\', \'' + (n.fromUid || n.from || '') + '\', \'' + n.type + '\', \'' + (n.chatId || '') + '\')">';
+        html += '<div class="notif-item ' + (n.read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + k + '\', \'' + (n.fromUid || n.from || '') + '\', \'' + n.type + '\', \'' + (n.chatId || '') + '\', \'' + (n.postId || '') + '\', \'' + (n.postType || '') + '\')">';
         html += '<span class="notif-icon">' + icon + '</span>';
         html += '<div class="notif-text">';
         html += '<div style="font-weight:' + (n.read ? '400' : '600') + ';font-size:13px;">' + textDisplay + '</div>';
@@ -94,16 +95,24 @@ function renderNotifications(notifications, keys) {
 
 // ===== 4. ОБРАБОТКА КЛИКА ПО УВЕДОМЛЕНИЮ =====
 
-function handleNotifClick(notifId, fromUid, type, chatId) {
+function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
     if (!USER_UID || !fromUid) return;
     
-    // Помечаем как прочитанное
     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
     closeNotifications();
     
+    // 👇 ДЛЯ КОММЕНТАРИЕВ — ОТКРЫВАЕМ ПОСТ
+    if (type === 'comment') {
+        if (postId) {
+            openPostPage(postId, postType || 'feed');
+        } else {
+            viewUser(fromUid);
+        }
+        return;
+    }
+    
     // 👇 ДЛЯ СООБЩЕНИЙ — ОТКРЫВАЕМ ЧАТ
     if (type === 'message') {
-        // Закрываем текущий чат если открыт
         if (document.getElementById('chatView').classList.contains('active')) {
             document.getElementById('chatView').classList.remove('active');
             if (chatUnsub) {
@@ -112,7 +121,6 @@ function handleNotifClick(notifId, fromUid, type, chatId) {
             }
             CURRENT_ROOM = null;
         }
-        // Открываем чат с отправителем
         openPrivateChat(fromUid);
         return;
     }
@@ -126,7 +134,6 @@ function handleNotifClick(notifId, fromUid, type, chatId) {
         return;
     }
     
-    // ВСЁ ОСТАЛЬНОЕ — ПРОФИЛЬ
     viewUser(fromUid);
 }
 
@@ -177,3 +184,56 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// ===== 8. ОТКРЫТИЕ СТРАНИЦЫ ПОСТА =====
+
+function openPostPage(postId, type) {
+    window.CURRENT_POST_ID = postId;
+    window.CURRENT_POST_TYPE = type;
+    
+    var container = document.getElementById('postPageContainer');
+    if (!container) return;
+    
+    document.getElementById('postPage').classList.add('active');
+    setActivePage(null);
+    
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка поста...</div>';
+    
+    var path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId).once('value', function(snap) {
+        var post = snap.val();
+        if (!post) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#e74c3c;">❌ Пост не найден</div>';
+            return;
+        }
+        post.id = postId;
+        var postEl = renderPost(post, type);
+        container.innerHTML = '';
+        container.appendChild(postEl);
+        
+        setTimeout(function() {
+            var wrapper = document.getElementById('commentsWrapper_' + postId);
+            if (wrapper) {
+                wrapper.style.display = 'block';
+                wrapper.style.opacity = '1';
+                var state = getCommentState(postId);
+                state.open = true;
+                loadComments(postId, type);
+                
+                setTimeout(function() {
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        }, 500);
+    });
+}
+
+// ===== 9. ЗАКРЫТИЕ СТРАНИЦЫ ПОСТА =====
+
+window.closePostPage = function() {
+    document.getElementById('postPage').classList.remove('active');
+    setActivePage('feed');
+    window.CURRENT_POST_ID = null;
+    window.CURRENT_POST_TYPE = null;
+    loadFeed();
+};
