@@ -1,9 +1,5 @@
 // ================================================================
-// УВЕДОМЛЕНИЯ — ПОЛНАЯ ВЕРСИЯ
-// ================================================================
-
-// ================================================================
-// 1. ОТПРАВКА УВЕДОМЛЕНИЯ
+// УВЕДОМЛЕНИЯ — ПОЛНАЯ ВЕРСИЯ С ЧАТОМ
 // ================================================================
 
 function sendNotification(targetUid, data) {
@@ -17,10 +13,6 @@ function sendNotification(targetUid, data) {
         timestamp: Date.now()
     });
 }
-
-// ================================================================
-// 2. ЗАГРУЗКА УВЕДОМЛЕНИЙ
-// ================================================================
 
 function loadNotifications() {
     if (!USER_UID) return;
@@ -50,10 +42,6 @@ function loadNotifications() {
     });
 }
 
-// ================================================================
-// 3. РЕНДЕР УВЕДОМЛЕНИЙ — С КНОПКАМИ ДЛЯ ЗАЯВОК
-// ================================================================
-
 function renderNotifications(notifications, keys) {
     var container = document.getElementById('notificationsList');
     if (!container) return;
@@ -69,7 +57,11 @@ function renderNotifications(notifications, keys) {
         var icon = n.type === 'friend_request' ? '🤝' : n.type === 'friend_accepted' ? '✅' : '💬';
         var time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
         
-        // ✅ ДЛЯ ЗАЯВОК В ДРУЗЬЯ ДОБАВЛЯЕМ КНОПКИ "ПРИНЯТЬ" И "ОТКЛОНИТЬ"
+        var textDisplay = n.text || 'Уведомление';
+        if (n.type === 'message') {
+            textDisplay = '💬 ' + n.text;
+        }
+        
         var actionsHtml = '';
         if (n.type === 'friend_request' && n.fromUid && n.fromUid !== USER_UID) {
             actionsHtml = '<div style="display:flex;gap:4px;margin-top:4px;">';
@@ -78,10 +70,10 @@ function renderNotifications(notifications, keys) {
             actionsHtml += '</div>';
         }
         
-        html += '<div class="notif-item ' + (n.read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + k + '\', \'' + (n.fromUid || n.from || '') + '\', \'' + n.type + '\')">';
+        html += '<div class="notif-item ' + (n.read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + k + '\', \'' + (n.fromUid || n.from || '') + '\', \'' + n.type + '\', \'' + (n.chatId || '') + '\')">';
         html += '<span class="notif-icon">' + icon + '</span>';
         html += '<div class="notif-text">';
-        html += '<div style="font-weight:' + (n.read ? '400' : '600') + ';font-size:13px;">' + (n.text || 'Уведомление') + '</div>';
+        html += '<div style="font-weight:' + (n.read ? '400' : '600') + ';font-size:13px;">' + textDisplay + '</div>';
         html += '<div class="notif-time">' + time + '</div>';
         html += actionsHtml;
         html += '</div>';
@@ -92,32 +84,32 @@ function renderNotifications(notifications, keys) {
     container.innerHTML = html;
 }
 
-// ================================================================
-// 4. ОБРАБОТКА КЛИКА ПО УВЕДОМЛЕНИЮ
-// ================================================================
-
-function handleNotifClick(notifId, fromUid, type) {
+function handleNotifClick(notifId, fromUid, type, chatId) {
     if (!USER_UID || !fromUid) return;
     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
     closeNotifications();
     
-    // ✅ ДЛЯ ЗАЯВОК В ДРУЗЬЯ — ОТКРЫВАЕМ ПРОФИЛЬ
+    if (type === 'message') {
+        if (document.getElementById('chatView').classList.contains('active')) {
+            closeChat();
+        }
+        openPrivateChat(fromUid);
+        return;
+    }
+    
     if (type === 'friend_request' || type === 'friend_accepted') {
         viewUser(fromUid);
-        // Обновляем кнопку в профиле
         setTimeout(function() {
             updateFriendButton(fromUid);
         }, 500);
-    } else {
-        viewUser(fromUid);
+        return;
     }
+    
+    viewUser(fromUid);
 }
 
-// ================================================================
-// 5. ОТКРЫТИЕ МОДАЛКИ УВЕДОМЛЕНИЙ
-// ================================================================
-
 window.openNotifications = function() {
+    if (!USER_UID) { alert('Войдите!'); return; }
     document.getElementById('notificationsModal').classList.add('open');
     db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20).once('value', function(snap) {
         var notifications = snap.val() || {};
@@ -128,17 +120,9 @@ window.openNotifications = function() {
     });
 };
 
-// ================================================================
-// 6. ЗАКРЫТИЕ МОДАЛКИ УВЕДОМЛЕНИЙ
-// ================================================================
-
 window.closeNotifications = function() {
     document.getElementById('notificationsModal').classList.remove('open');
 };
-
-// ================================================================
-// 7. СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ
-// ================================================================
 
 var style = document.createElement('style');
 style.textContent = `
