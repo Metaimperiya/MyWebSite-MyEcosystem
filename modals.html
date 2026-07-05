@@ -1,250 +1,115 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>НАЗВАНИЕ — METAIMPERIYA</title>
-    <meta name="description" content="Описание страницы">
-    <meta name="keywords" content="ключевые, слова">
-    <link rel="stylesheet" href="../../css/style.css">
-    <link rel="stylesheet" href="../../css/components.css">
-    <link rel="stylesheet" href="../../css/mobile.css">
-</head>
-<body>
-<div class="app">
-
-    <!-- ===== ШАПКА ===== -->
-    <header class="topbar" id="topbar">
-        <div class="left">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <span class="logo" onclick="window.location.href='/'">METAIMPERIYA 🏴‍☠️</span>
-        </div>
-        <div class="center"></div>
-        <div class="right">
-            <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge"></span></button>
-            <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
-            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()"><span class="letter">?</span></div>
-            <span class="username" id="topName" onclick="goToProfile()">Гость</span>
-            <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
-        </div>
-    </header>
-
-    <!-- ===== МЕНЮ НАСТРОЕК ===== -->
-    <div class="settings-dropdown" id="settingsDropdown">
-        <div class="settings-item" onclick="goToProfile();closeSettingsMenu()">👤 Профиль</div>
-        <div class="settings-item" onclick="goToPeople();closeSettingsMenu()">👥 Люди</div>
-        <div class="settings-item" onclick="goToGroups();closeSettingsMenu()">💬 Сообщества</div>
-        <div class="settings-divider"></div>
-        <div class="settings-item" onclick="toggleLanguage();closeSettingsMenu()">🌐 Язык: <span id="langDisplay">Русский</span></div>
-        <div class="settings-item" onclick="toggleTheme();closeSettingsMenu()">🌙 Тема</div>
-        <div class="settings-item" id="adminChatsMenuItem" onclick="openAdminChats();closeSettingsMenu()" style="display:none;color:#e67e22;">🏴‍☠️ Все чаты</div>
-        <div class="settings-divider"></div>
-        <div class="settings-item danger" onclick="logout();closeSettingsMenu()">🚪 Выйти</div>
-    </div>
-
-    <!-- ===== САЙДБАР ===== -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3>📱 Меню</h3>
-            <button class="close-btn" onclick="closeSidebar()">✕</button>
-        </div>
-        <div class="sidebar-user">
-            <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
-            <div>
-                <div class="name" id="sName">Гость</div>
-                <div class="status">онлайн</div>
-            </div>
-        </div>
-        <div class="sidebar-nav main-nav">
-            <div class="nav-item" onclick="window.location.href='/'">🏠 Главная</div>
-            <div class="nav-item" onclick="goToProfile();closeSidebar()">👤 Профиль</div>
-            <div class="nav-item" onclick="goToPeople();closeSidebar()">👥 Люди</div>
-            <div class="nav-item" onclick="goToGroups();closeSidebar()">💬 Сообщества</div>
-        </div>
-        <div class="accordion">
-            <!-- ВСЕ КАТЕГОРИИ ИЗ САЙДБАРА -->
-        </div>
-        <div class="sidebar-footer">
-            <button class="create-btn" onclick="openCreateRoom()">➕ Создать группу</button>
+<!-- ===== МОДАЛКИ ===== -->
+<div class="modal" id="loginModal">
+    <div class="modal-box">
+        <h3>👤 Вход</h3>
+        <button class="google-btn" id="googleBtn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Войти через Google
+        </button>
+        <div class="divider">или</div>
+        <input type="text" id="nameInput" placeholder="Введите имя...">
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeLogin()">Отмена</button>
+            <button class="btn-save" onclick="loginWithName()">Войти</button>
         </div>
     </div>
-
-    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-    <!-- ===== МОДАЛКИ ===== -->
-    <div id="modalsContainer"></div>
-
-    <!-- ===== КОНТЕНТ СТРАНИЦЫ ===== -->
-    <div class="container" style="padding-top:10px;">
-        <button onclick="window.location.href='/'">← Назад</button>
-        <h1>📌 НАЗВАНИЕ СТРАНИЦЫ</h1>
-        <p style="color:#888;">Описание страницы</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-            <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🔗 Ссылка 1</div>
-            <div style="background:var(--input-bg);padding:16px;border-radius:12px;text-align:center;">🔗 Ссылка 2</div>
-        </div>
-    </div>
-
-    <!-- ===== ПЛЕЕР ===== -->
-    <div id="playerContainer"></div>
-
 </div>
 
-<script src="../../js/firebase.js"></script>
-<script src="../../js/lang.js"></script>
-<script src="../../js/auth.js"></script>
-<script src="../../js/player.js"></script>
-<script src="../../js/app.js"></script>
-<script src="../../js/feed.js"></script>
-<script src="../../js/profile.js"></script>
-<script src="../../js/friends.js"></script>
-<script src="../../js/groups.js"></script>
-<script src="../../js/chat.js"></script>
-<script src="../../js/notifications.js"></script>
-<script src="../../js/admin.js"></script>
+<div class="modal" id="editProfileModal">
+    <div class="modal-box">
+        <h3>✏️ Редактировать профиль</h3>
+        <input type="text" id="editName" placeholder="Имя">
+        <textarea id="editBio" placeholder="О себе..."></textarea>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeEditProfile()">Отмена</button>
+            <button class="btn-save" onclick="saveProfile()">Сохранить</button>
+        </div>
+    </div>
+</div>
 
-<script>
-(function() {
-    // Загружаем модалки и плеер
-    const components = [
-        { id: 'modalsContainer', url: '../../modals.html' },
-        { id: 'playerContainer', url: '../../player.html' }
-    ];
+<div class="modal" id="editModal">
+    <div class="modal-box">
+        <h3>✏️ Редактировать пост</h3>
+        <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
+        <textarea id="editText" placeholder="📝 Текст поста"></textarea>
+        <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
+        <div class="frame-size-toggle">
+            <span class="label">📐 Размер фрейма:</span>
+            <div class="btn-group">
+                <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">📱 Обычный</button>
+                <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">🖥️ Широкий</button>
+            </div>
+        </div>
+        <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
+        <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
+        <div id="editButtonsContainer"></div>
+        <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
+        <div class="modal-actions">
+            <button class="btn-save" onclick="saveEdit()">💾 Сохранить</button>
+            <button class="btn-cancel" onclick="closeEdit()">✕ Отмена</button>
+        </div>
+        <button onclick="deleteEditPost()" style="width:100%;padding:3px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
+    </div>
+</div>
 
-    let loaded = 0;
-    const total = components.length;
+<div class="modal" id="createRoomModal">
+    <div class="modal-box">
+        <h3>📝 Новая группа</h3>
+        <input type="text" id="roomName" placeholder="Название...">
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeCreateRoom()">Отмена</button>
+            <button class="btn-save" onclick="createRoom()">Создать</button>
+        </div>
+    </div>
+</div>
 
-    components.forEach(function(comp) {
-        const container = document.getElementById(comp.id);
-        if (!container) return;
+<div class="modal" id="adminModal">
+    <div class="modal-box">
+        <h3>🏴‍☠️ Админ</h3>
+        <input type="password" id="adminPass" placeholder="Пароль...">
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeAdminModal()">Отмена</button>
+            <button class="btn-save" onclick="checkAdmin()">Войти</button>
+        </div>
+    </div>
+</div>
 
-        fetch(comp.url)
-            .then(response => {
-                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
-                return response.text();
-            })
-            .then(html => {
-                container.innerHTML = html;
-                loaded++;
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены!');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                        if (typeof initAudio === 'function') initAudio();
-                    }, 500);
-                }
-            })
-            .catch(err => {
-                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
-                container.innerHTML = `<div style="display:none;"></div>`;
-                loaded++;
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены (с ошибками)');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                    }, 500);
-                }
-            });
-    });
-})();
+<div class="modal" id="notificationsModal">
+    <div class="modal-box">
+        <h3>🔔 Уведомления <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeNotifications()">✕</button></h3>
+        <div id="notificationsList"></div>
+    </div>
+</div>
 
-// Авто-скрытие шапки
-(function() {
-    var lastScrollY = 0;
-    var topbar = document.getElementById('topbar');
-    var playerHandle = document.getElementById('playerHandle');
-    var playerDrawer = document.getElementById('playerDrawer');
-    var isPlayerOpen = false;
-    var ticking = false;
+<!-- ===== РЕПОСТ ===== -->
+<div class="modal" id="repostModal">
+    <div class="modal-box">
+        <h3>🔁 Репост</h3>
+        <input type="hidden" id="repostPostId">
+        <input type="hidden" id="repostType">
+        <textarea id="repostText" placeholder="Напишите что-нибудь (необязательно)..." rows="3"></textarea>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeRepost()">Отмена</button>
+            <button class="btn-save" onclick="submitRepost()">🔁 Репостнуть</button>
+        </div>
+    </div>
+</div>
 
-    function checkPlayerState() {
-        if (playerDrawer) {
-            isPlayerOpen = playerDrawer.classList.contains('open');
-        }
-    }
+<!-- ===== СПИСОК ЧАТОВ ===== -->
+<div class="modal" id="chatListModal">
+    <div class="modal-box">
+        <h3>💬 Сообщения <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeChatList()">✕</button></h3>
+        <div id="chatListContainer">
+            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">Загрузка...</div>
+        </div>
+    </div>
+</div>
 
-    function updateHeader() {
-        var currentScrollY = window.scrollY;
-        checkPlayerState();
-
-        if (isPlayerOpen) {
-            showAll();
-            lastScrollY = currentScrollY;
-            return;
-        }
-
-        if (currentScrollY < lastScrollY || currentScrollY < 30) {
-            showAll();
-        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
-            hideAll();
-        }
-
-        lastScrollY = currentScrollY;
-    }
-
-    function showAll() {
-        if (topbar) {
-            topbar.style.transform = 'translateY(0)';
-            topbar.style.opacity = '1';
-        }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(0)';
-            playerHandle.style.opacity = '1';
-        }
-    }
-
-    function hideAll() {
-        if (topbar) {
-            topbar.style.transform = 'translateY(-100%)';
-            topbar.style.opacity = '0';
-            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(-100%)';
-            playerHandle.style.opacity = '0';
-            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }
-    }
-
-    window.addEventListener('scroll', function() {
-        if (!ticking) {
-            window.requestAnimationFrame(function() {
-                updateHeader();
-                ticking = false;
-            });
-            ticking = true;
-        }
-    }, { passive: true });
-
-    if (playerDrawer) {
-        var observer = new MutationObserver(function() {
-            checkPlayerState();
-            if (isPlayerOpen) {
-                showAll();
-            }
-        });
-        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    if (playerHandle) {
-        playerHandle.addEventListener('click', function() {
-            setTimeout(function() {
-                checkPlayerState();
-                if (isPlayerOpen) {
-                    showAll();
-                }
-            }, 150);
-        });
-    }
-
-    console.log('✅ Авто-скрытие шапки включено!');
-})();
-</script>
-</body>
-</html>
+<!-- ===== АДМИН-ПАНЕЛЬ ЧАТОВ ===== -->
+<div class="modal" id="adminChatsModal">
+    <div class="modal-box">
+        <h3>🏴‍☠️ Все чаты (админ) <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeAdminChats()">✕</button></h3>
+        <div id="adminChatsList">
+            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">Загрузка...</div>
+        </div>
+    </div>
+</div>
