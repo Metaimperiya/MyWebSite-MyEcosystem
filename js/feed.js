@@ -1014,7 +1014,7 @@ window.closePostPage = function() {
 };
 
 // ================================================================
-// УДАЛЕНИЕ ПОСТА
+// УДАЛЕНИЕ ПОСТА — С МГНОВЕННЫМ ОБНОВЛЕНИЕМ
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -1038,6 +1038,20 @@ window.deletePost = function(id, type) {
     var menu = document.getElementById('menu_' + id);
     if (menu) menu.classList.remove('open');
     
+    // МГНОВЕННОЕ ОБНОВЛЕНИЕ
+    if (type === 'feed' || type === 'profile') {
+        var postEl = document.querySelector('.post[data-id="' + id + '"]');
+        if (postEl) {
+            var deletedHtml = `
+                <div style="padding:10px;text-align:center;color:var(--muted-text);background:var(--input-bg);border-radius:8px;border:1px solid var(--border-color);">
+                    🗑 Пост удален 
+                    <button onclick="restorePost('${id}', '${type}')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:6px;">↩️ Восстановить</button>
+                </div>
+            `;
+            postEl.innerHTML = deletedHtml;
+        }
+    }
+    
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1046,8 +1060,12 @@ window.deletePost = function(id, type) {
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
-    }, 500);
+    }, 300);
 };
+
+// ================================================================
+// ВОССТАНОВЛЕНИЕ УДАЛЕННОГО ПОСТА — С МГНОВЕННЫМ ОБНОВЛЕНИЕМ
+// ================================================================
 
 window.restorePost = function(id, type) {
     var path = getPostPath(type);
@@ -1067,6 +1085,21 @@ window.restorePost = function(id, type) {
         }
     });
     
+    // МГНОВЕННОЕ ВОССТАНОВЛЕНИЕ
+    if (type === 'feed' || type === 'profile') {
+        var postEl = document.querySelector('.post[data-id="' + id + '"]');
+        if (postEl) {
+            db.ref('sites/' + SITE + '/' + path + '/' + id).once('value', function(snap) {
+                var p = snap.val();
+                if (p) {
+                    p.id = id;
+                    var newPostEl = renderPost(p, type);
+                    postEl.parentNode.replaceChild(newPostEl, postEl);
+                }
+            });
+        }
+    }
+    
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1075,7 +1108,7 @@ window.restorePost = function(id, type) {
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
-    }, 500);
+    }, 300);
 };
 
 // ================================================================
