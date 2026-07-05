@@ -10,51 +10,23 @@
     <link rel="stylesheet" href="../../css/components.css">
     <link rel="stylesheet" href="../../css/mobile.css">
     <style>
-        /* Скрываем всё лишнее */
-        #feed {
-            display: none !important;
-        }
-        /* Убираем карточки с контентом */
-        .content-cards,
-        .card .container > div[style*="display:grid"],
-        .container > div[style*="grid-template-columns"] {
-            display: none !important;
-        }
-        /* Убираем лишний текст */
-        .container > p {
-            display: none !important;
-        }
-        /* Оставляем только форму поста */
-        .card .post-form {
-            display: block !important;
-        }
+        #feed { display: none !important; }
+        .container > p { display: none !important; }
+        .container > div[style*="grid-template-columns"] { display: none !important; }
     </style>
 </head>
 <body>
 <div class="app">
 
-    <!-- ===== ШАПКА ===== -->
     <div id="topbarContainer"></div>
-
-    <!-- ===== МЕНЮ НАСТРОЕК ===== -->
     <div id="settingsContainer"></div>
-
-    <!-- ===== САЙДБАР ===== -->
     <div id="sidebarContainer"></div>
-
-    <!-- ===== МОДАЛКИ ===== -->
     <div id="modalsContainer"></div>
 
-    <!-- ===== КОНТЕНТ ===== -->
     <div class="container" style="padding-top:10px;">
-
-        <!-- ===== КНОПКА НАЗАД ===== -->
         <button onclick="window.location.href='/'">← Назад</button>
-
-        <!-- ===== ЗАГОЛОВОК ===== -->
         <h1>📸 Фото</h1>
 
-        <!-- ===== ТОЛЬКО ФОРМА ПОСТА ===== -->
         <div class="card" style="margin-top:10px;">
             <div class="post-form">
                 <div class="editor-toolbar">
@@ -82,17 +54,13 @@
             </div>
         </div>
 
-        <!-- ===== ЛЕНТА (СКРЫТА) ===== -->
         <div id="feed"></div>
-
     </div>
 
-    <!-- ===== ПЛЕЕР ===== -->
     <div id="playerContainer"></div>
 
 </div>
 
-<!-- ===== СКРИПТЫ ===== -->
 <script src="../../js/firebase.js"></script>
 <script src="../../js/lang.js"></script>
 <script src="../../js/auth.js"></script>
@@ -107,10 +75,6 @@
 <script src="../../js/admin.js"></script>
 
 <script>
-// ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ
-// ================================================================
-
 (function() {
     const components = [
         { id: 'topbarContainer', url: '../../topbar.html' },
@@ -172,10 +136,7 @@
     });
 })();
 
-// ================================================================
-// АВТО-СКРЫТИЕ ШАПКИ
-// ================================================================
-
+// Авто-скрытие шапки
 (function() {
     var lastScrollY = 0;
     var topbar = document.getElementById('topbar');
