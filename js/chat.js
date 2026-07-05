@@ -13,7 +13,6 @@ function loadChat(path) {
     box.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
     chatUnsub = path;
     
-    // Если это личный чат, настраиваем индикатор набора
     if (CURRENT_ROOM && CURRENT_ROOM.includes('_')) {
         setupTypingIndicator(CURRENT_ROOM);
     }
@@ -69,7 +68,6 @@ window.deleteMessage = function(path, msgId) {
     if (menu) menu.style.display = 'none';
 };
 
-// Закрываем меню при клике вне
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.msg')) {
         document.querySelectorAll('.msg-dropdown').forEach(function(el) {
@@ -86,6 +84,7 @@ window.sendChatMessage = function() {
     
     var path = '';
     var targetUid = '';
+    var chatId = CURRENT_ROOM;
     
     if (CURRENT_ROOM.includes('_')) {
         path = 'dms/' + SITE + '/' + CURRENT_ROOM + '/messages';
@@ -107,6 +106,7 @@ window.sendChatMessage = function() {
             type: 'message',
             from: USER_UID,
             text: USER + ': ' + text,
+            chatId: CURRENT_ROOM,
             timestamp: Date.now()
         });
     }
