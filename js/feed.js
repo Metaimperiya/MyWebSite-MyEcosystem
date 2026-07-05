@@ -64,7 +64,8 @@ function loadFeed() {
             var p = data[k];
             p.id = k;
             
-            if (p.deleted && p.deletedAt && (Date.now() - p.deletedAt > 10000)) {
+            if (p.deleted && p.deletedAt && (Date.now() - p.deletedAt > 60000)) {
+                // Автоматически удаляем старые помеченные посты через 60 секунд
                 db.ref('sites/' + SITE + '/feed_posts/' + k).remove();
                 if (p.authorUid) {
                     db.ref('sites/' + SITE + '/user_posts/' + p.authorUid + '/' + k).remove();
@@ -436,7 +437,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// РЕНДЕР ПОСТА (КЛИКАБЕЛЬНЫЙ)
+// РЕНДЕР ПОСТА
 // ================================================================
 
 function renderPost(p, type) {
@@ -450,6 +451,7 @@ function renderPost(p, type) {
             <div style="padding:10px;text-align:center;color:var(--muted-text);background:var(--input-bg);border-radius:8px;border:1px solid var(--border-color);">
                 🗑 Пост удален 
                 <button onclick="restorePost('${p.id}', '${type}')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:6px;">↩️ Восстановить</button>
+                <button onclick="permanentDeletePost('${p.id}', '${type}')" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:4px;">✕ Удалить навсегда</button>
             </div>
         `;
         return div;
@@ -879,8 +881,6 @@ window.toggleLike = function(postId, type) {
     }
 };
 
-// ===== ОТПРАВКА КОММЕНТАРИЯ С УВЕДОМЛЕНИЕМ =====
-
 window.submitComment = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
 
@@ -917,8 +917,6 @@ window.submitComment = function(postId, type) {
 
     input.value = '';
 };
-
-// ===== ОТПРАВКА ОТВЕТА С УВЕДОМЛЕНИЕМ =====
 
 window.submitReply = function(postId, parentId, type) {
     if (!USER) { alert('Войдите!'); return; }
@@ -959,8 +957,6 @@ window.submitReply = function(postId, parentId, type) {
     input.value = '';
     document.getElementById('replyInput_' + parentId).style.display = 'none';
 };
-
-// ===== ОТКРЫТИЕ ПОСТА (ГЛОБАЛЬНАЯ ФУНКЦИЯ) =====
 
 window.openPostPage = function(postId, type) {
     window.CURRENT_POST_ID = postId;
@@ -1003,8 +999,6 @@ window.openPostPage = function(postId, type) {
     });
 };
 
-// ===== ЗАКРЫТИЕ СТРАНИЦЫ ПОСТА =====
-
 window.closePostPage = function() {
     document.getElementById('postPage').classList.remove('active');
     setActivePage('feed');
@@ -1014,7 +1008,7 @@ window.closePostPage = function() {
 };
 
 // ================================================================
-// УДАЛЕНИЕ ПОСТА — С МГНОВЕННЫМ ОБНОВЛЕНИЕМ
+// УДАЛЕНИЕ ПОСТА — С ВОЗМОЖНОСТЬЮ ПОЛНОГО УДАЛЕНИЯ
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -1038,7 +1032,6 @@ window.deletePost = function(id, type) {
     var menu = document.getElementById('menu_' + id);
     if (menu) menu.classList.remove('open');
     
-    // МГНОВЕННОЕ ОБНОВЛЕНИЕ
     if (type === 'feed' || type === 'profile') {
         var postEl = document.querySelector('.post[data-id="' + id + '"]');
         if (postEl) {
@@ -1046,6 +1039,7 @@ window.deletePost = function(id, type) {
                 <div style="padding:10px;text-align:center;color:var(--muted-text);background:var(--input-bg);border-radius:8px;border:1px solid var(--border-color);">
                     🗑 Пост удален 
                     <button onclick="restorePost('${id}', '${type}')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:6px;">↩️ Восстановить</button>
+                    <button onclick="permanentDeletePost('${id}', '${type}')" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:4px;">✕ Удалить навсегда</button>
                 </div>
             `;
             postEl.innerHTML = deletedHtml;
@@ -1064,7 +1058,36 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// ВОССТАНОВЛЕНИЕ УДАЛЕННОГО ПОСТА — С МГНОВЕННЫМ ОБНОВЛЕНИЕМ
+// ПОЛНОЕ УДАЛЕНИЕ ПОСТА (НАВСЕГДА)
+// ================================================================
+
+window.permanentDeletePost = function(id, type) {
+    if (!confirm('🗑 Удалить пост навсегда? Это действие необратимо!')) return;
+    
+    var path = getPostPath(type);
+    
+    db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
+    
+    db.ref('sites/' + SITE + '/' + path + '/' + id + '/authorUid').once('value', function(snap) {
+        var authorUid = snap.val();
+        if (authorUid) {
+            db.ref('sites/' + SITE + '/user_posts/' + authorUid + '/' + id).remove();
+        }
+    });
+    
+    var postEl = document.querySelector('.post[data-id="' + id + '"]');
+    if (postEl && postEl.parentNode) {
+        postEl.parentNode.removeChild(postEl);
+    }
+    
+    setTimeout(function() {
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadProfile === 'function') loadProfile();
+    }, 100);
+};
+
+// ================================================================
+// ВОССТАНОВЛЕНИЕ УДАЛЕННОГО ПОСТА
 // ================================================================
 
 window.restorePost = function(id, type) {
@@ -1085,7 +1108,6 @@ window.restorePost = function(id, type) {
         }
     });
     
-    // МГНОВЕННОЕ ВОССТАНОВЛЕНИЕ
     if (type === 'feed' || type === 'profile') {
         var postEl = document.querySelector('.post[data-id="' + id + '"]');
         if (postEl) {
