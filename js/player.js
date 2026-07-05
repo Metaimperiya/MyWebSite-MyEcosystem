@@ -1,5 +1,5 @@
 // ================================================================
-// МУЗЫКАЛЬНЫЙ ПЛЕЕР — С ТВОИМИ ТРЕКАМИ
+// МУЗЫКАЛЬНЫЙ ПЛЕЕР — ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ================================================================
 
 const PLAYLIST = [
@@ -31,16 +31,24 @@ function initAudio() {
     if (!audio) {
         audio = new Audio(PLAYLIST[currentTrack].url);
         audio.crossOrigin = 'anonymous';
+        audio.preload = 'auto';
         audio.addEventListener('timeupdate', function() {
             updateDrawerProgress();
         });
         audio.addEventListener('ended', function() {
             playNext();
         });
+        audio.addEventListener('error', function(e) {
+            console.error('Ошибка аудио:', e);
+            isPlaying = false;
+            var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+            if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
+        });
     }
     var drawerTrackName = document.getElementById('drawerTrackName');
     if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
     updatePlaylistActive();
+    updateDrawerProgress();
 }
 
 function updateDrawerProgress() {
@@ -65,12 +73,19 @@ function updatePlaylistActive() {
 }
 
 // ================================================================
-// 2. УПРАВЛЕНИЕ ВОСПРОИЗВЕДЕНИЕМ
+// 2. УПРАВЛЕНИЕ ВОСПРОИЗВЕДЕНИЕМ — ИСПРАВЛЕНО
 // ================================================================
 
 window.togglePlay = function() {
     initAudio();
     if (!audio) return;
+    
+    // Если аудио закончилось или сброшено — пересоздаём
+    if (audio.ended || audio.currentTime === audio.duration) {
+        audio.currentTime = 0;
+        audio.src = PLAYLIST[currentTrack].url;
+        audio.load();
+    }
     
     if (isPlaying) {
         audio.pause();
@@ -87,6 +102,10 @@ window.togglePlay = function() {
             });
         }
     } else {
+        // Восстанавливаем аудио-контекст если нужно
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
         if (!audioContext) {
             initEqualizer();
         }
@@ -101,6 +120,18 @@ window.togglePlay = function() {
             })
             .catch(function(e) {
                 console.log('Ошибка воспроизведения:', e);
+                // Пробуем пересоздать аудио
+                audio.src = PLAYLIST[currentTrack].url;
+                audio.load();
+                setTimeout(function() {
+                    audio.play().then(function() {
+                        isPlaying = true;
+                        var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                        if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+                    }).catch(function(err) {
+                        console.log('Повторная ошибка:', err);
+                    });
+                }, 200);
             });
     }
 };
@@ -111,46 +142,13 @@ window.playTrack = function(index) {
         return;
     }
     
-    currentTrack = index;
+    // Останавливаем текущее воспроизведение
     if (audio) {
-        audio.src = PLAYLIST[currentTrack].url;
-        if (audioContext) {
-            audioContext.close();
-            audioContext = null;
-            analyser = null;
-            if (eqAnimationId) {
-                cancelAnimationFrame(eqAnimationId);
-                eqAnimationId = null;
-            }
-            if (eqBars && eqBars.length) {
-                eqBars.forEach(function(bar) {
-                    bar.style.height = '3px';
-                });
-            }
-        }
-        if (isPlaying) {
-            audio.play()
-                .then(function() {
-                    isPlaying = true;
-                    var drawerPlayBtn = document.getElementById('drawerPlayBtn');
-                    if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
-                })
-                .catch(function(e) {
-                    console.log('Ошибка:', e);
-                });
-        }
-    } else {
-        initAudio();
-        togglePlay();
+        audio.pause();
+        audio.currentTime = 0;
     }
     
-    var drawerTrackName = document.getElementById('drawerTrackName');
-    if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
-    updatePlaylistActive();
-    updateDrawerProgress();
-};
-
-window.playNext = function() {
+    // Закрываем старый аудио-контекст
     if (audioContext) {
         audioContext.close();
         audioContext = null;
@@ -165,9 +163,77 @@ window.playNext = function() {
             });
         }
     }
-    currentTrack = (currentTrack + 1) % PLAYLIST.length;
+    
+    currentTrack = index;
+    
+    // Пересоздаём аудио
     if (audio) {
         audio.src = PLAYLIST[currentTrack].url;
+        audio.load();
+        audio.currentTime = 0;
+    } else {
+        audio = new Audio(PLAYLIST[currentTrack].url);
+        audio.crossOrigin = 'anonymous';
+        audio.preload = 'auto';
+        audio.addEventListener('timeupdate', function() {
+            updateDrawerProgress();
+        });
+        audio.addEventListener('ended', function() {
+            playNext();
+        });
+        audio.addEventListener('error', function(e) {
+            console.error('Ошибка аудио:', e);
+            isPlaying = false;
+            var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+            if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
+        });
+    }
+    
+    var drawerTrackName = document.getElementById('drawerTrackName');
+    if (drawerTrackName) drawerTrackName.textContent = PLAYLIST[currentTrack].name;
+    updatePlaylistActive();
+    updateDrawerProgress();
+    
+    // Автоматически воспроизводим
+    if (isPlaying) {
+        audio.play()
+            .then(function() {
+                isPlaying = true;
+                var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                if (drawerPlayBtn) drawerPlayBtn.textContent = '⏸';
+            })
+            .catch(function(e) {
+                console.log('Ошибка автовоспроизведения:', e);
+                isPlaying = false;
+                var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
+            });
+    }
+};
+
+window.playNext = function() {
+    // Закрываем старый аудио-контекст
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+        if (eqAnimationId) {
+            cancelAnimationFrame(eqAnimationId);
+            eqAnimationId = null;
+        }
+        if (eqBars && eqBars.length) {
+            eqBars.forEach(function(bar) {
+                bar.style.height = '3px';
+            });
+        }
+    }
+    
+    currentTrack = (currentTrack + 1) % PLAYLIST.length;
+    
+    if (audio) {
+        audio.src = PLAYLIST[currentTrack].url;
+        audio.load();
+        audio.currentTime = 0;
         if (isPlaying) {
             audio.play()
                 .then(function() {
@@ -175,6 +241,9 @@ window.playNext = function() {
                 })
                 .catch(function(e) {
                     console.log('Ошибка:', e);
+                    isPlaying = false;
+                    var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                    if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
                 });
         }
     }
@@ -202,6 +271,8 @@ window.playPrev = function() {
     currentTrack = (currentTrack - 1 + PLAYLIST.length) % PLAYLIST.length;
     if (audio) {
         audio.src = PLAYLIST[currentTrack].url;
+        audio.load();
+        audio.currentTime = 0;
         if (isPlaying) {
             audio.play()
                 .then(function() {
@@ -209,6 +280,9 @@ window.playPrev = function() {
                 })
                 .catch(function(e) {
                     console.log('Ошибка:', e);
+                    isPlaying = false;
+                    var drawerPlayBtn = document.getElementById('drawerPlayBtn');
+                    if (drawerPlayBtn) drawerPlayBtn.textContent = '▶';
                 });
         }
     }
@@ -224,10 +298,7 @@ window.playPrev = function() {
 
 window.toggleDrawer = function() {
     var drawer = document.getElementById('playerDrawer');
-    if (!drawer) {
-        console.log('Плеер не найден!');
-        return;
-    }
+    if (!drawer) return;
     drawer.classList.toggle('open');
     if (drawer.classList.contains('open')) {
         updateDrawerProgress();
@@ -282,7 +353,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ================================================================
-// 6. НАСТОЯЩИЙ ЭКВАЛАЙЗЕР
+// 6. ЭКВАЛАЙЗЕР
 // ================================================================
 
 let audioContext = null;
@@ -339,7 +410,7 @@ function updateEqualizer() {
 }
 
 // ================================================================
-// 7. ВИЗУАЛИЗАЦИЯ НА ВЕСЬ ЭКРАН
+// 7. ВИЗУАЛИЗАЦИЯ
 // ================================================================
 
 let visualizerActive = false;
@@ -363,8 +434,8 @@ function openVisualizer() {
     ctx = canvas.getContext('2d');
     
     if (!analyser || !dataArray) {
-        console.log('Анализатор не инициализирован');
-        return;
+        if (!audioContext) initEqualizer();
+        if (!analyser) return;
     }
     
     visualizerActive = true;
@@ -528,7 +599,25 @@ window.addEventListener('resize', function() {
 });
 
 // ================================================================
-// 8. ЗАПУСК
+// 8. ПРОГРЕСС-БАР (ПЕРЕМОТКА)
+// ================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    var progressBar = document.getElementById('drawerProgressBar');
+    if (progressBar) {
+        progressBar.addEventListener('click', function(e) {
+            if (!audio || !audio.duration) return;
+            var rect = this.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var percent = x / rect.width;
+            audio.currentTime = percent * audio.duration;
+            updateDrawerProgress();
+        });
+    }
+});
+
+// ================================================================
+// 9. ЗАПУСК
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
