@@ -101,6 +101,7 @@ window.sendChatMessage = function() {
         timestamp: Date.now()
     });
     
+    // 👇 ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ С ID ЧАТА
     if (targetUid) {
         sendNotification(targetUid, {
             type: 'message',
