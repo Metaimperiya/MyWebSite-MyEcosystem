@@ -64,7 +64,8 @@ function loadFeed() {
             var p = data[k];
             p.id = k;
             
-            if (p.deleted && p.deletedAt && (Date.now() - p.deletedAt > 60000)) {
+            // ✅ ПОСТЫ УДАЛЯЮТСЯ ИЗ БАЗЫ СРАЗУ, НЕ ЖДУТ
+            if (p.deleted && p.deletedAt) {
                 db.ref('sites/' + SITE + '/feed_posts/' + k).remove();
                 if (p.authorUid) {
                     db.ref('sites/' + SITE + '/user_posts/' + p.authorUid + '/' + k).remove();
@@ -852,7 +853,7 @@ window.toggleLikeComment = function(postId, commentId, type) {
 };
 
 // ================================================================
-// ЛАЙКИ — ИСПРАВЛЕННАЯ ВЕРСИЯ (БЕЗ ГЛЮКОВ)
+// ЛАЙКИ — ИСПРАВЛЕННАЯ ВЕРСИЯ
 // ================================================================
 
 window.toggleLike = function(postId, type) {
@@ -865,13 +866,11 @@ window.toggleLike = function(postId, type) {
     var countEl = document.getElementById('likeCount_' + postId);
     var btn = document.querySelector('.post[data-id="' + postId + '"] .stats button:first-child');
 
-    // Блокируем кнопку на время операции
     if (btn) {
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.6';
     }
 
-    // Транзакция для атомарного обновления
     postRef.child('likes').transaction(function(currentLikes) {
         var current = currentLikes || 0;
         if (liked) {
@@ -880,7 +879,6 @@ window.toggleLike = function(postId, type) {
             return current + 1;
         }
     }, function(error, committed, snapshot) {
-        // Разблокируем кнопку
         if (btn) {
             btn.style.pointerEvents = 'auto';
             btn.style.opacity = '1';
@@ -894,12 +892,10 @@ window.toggleLike = function(postId, type) {
         if (committed) {
             var newValue = snapshot.val() || 0;
             
-            // Обновляем счётчик в DOM
             if (countEl) {
                 countEl.textContent = newValue;
             }
             
-            // Обновляем localStorage
             if (liked) {
                 localStorage.removeItem(key);
                 if (btn) btn.classList.remove('liked');
@@ -1088,14 +1084,16 @@ window.deletePost = function(id, type) {
 };
 
 // ================================================================
-// ПОЛНОЕ УДАЛЕНИЕ ПОСТА (НАВСЕГДА) — БЕЗ ПОДТВЕРЖДЕНИЯ
+// ПОЛНОЕ УДАЛЕНИЕ ПОСТА (НАВСЕГДА) — МГНОВЕННОЕ
 // ================================================================
 
 window.permanentDeletePost = function(id, type) {
     var path = getPostPath(type);
     
+    // 1. Удаляем из feed_posts
     db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
     
+    // 2. Удаляем из user_posts
     db.ref('sites/' + SITE + '/' + path + '/' + id + '/authorUid').once('value', function(snap) {
         var authorUid = snap.val();
         if (authorUid) {
@@ -1103,15 +1101,17 @@ window.permanentDeletePost = function(id, type) {
         }
     });
     
+    // 3. Удаляем из DOM сразу
     var postEl = document.querySelector('.post[data-id="' + id + '"]');
     if (postEl && postEl.parentNode) {
         postEl.parentNode.removeChild(postEl);
     }
     
+    // 4. Принудительно обновляем ленту
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
-    }, 100);
+    }, 50);
 };
 
 // ================================================================
