@@ -77,7 +77,11 @@ function setActivePage(pageId) {
 }
 
 window.goToFeed = function() {
-    if (!USER) { alert('Войдите!'); return; }
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
     setActivePage('feed');
     document.getElementById('chatView').classList.remove('active');
     if (chatUnsub) {
@@ -85,11 +89,15 @@ window.goToFeed = function() {
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    loadFeed();
+    if (typeof loadFeed === 'function') loadFeed();
 };
 
 window.goToGroups = function() {
-    if (!USER) { alert('Войдите!'); return; }
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
     setActivePage('groups');
     document.getElementById('chatView').classList.remove('active');
     if (chatUnsub) {
@@ -97,11 +105,15 @@ window.goToGroups = function() {
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    loadGroups();
+    if (typeof loadGroups === 'function') loadGroups();
 };
 
 window.goToPeople = function() {
-    if (!USER) { alert('Войдите!'); return; }
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
     setActivePage('people');
     document.getElementById('chatView').classList.remove('active');
     if (chatUnsub) {
@@ -109,11 +121,15 @@ window.goToPeople = function() {
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    loadPeople();
+    if (typeof loadPeople === 'function') loadPeople();
 };
 
 window.goToProfile = function() {
-    if (!USER) { alert('Войдите!'); return; }
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
     VIEWING_USER = null;
     setActivePage('profile');
     document.getElementById('chatView').classList.remove('active');
@@ -122,7 +138,7 @@ window.goToProfile = function() {
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    loadProfile();
+    if (typeof loadProfile === 'function') loadProfile();
 };
 
 // ===== САЙДБАР =====
@@ -486,7 +502,7 @@ function updateLangDisplay() {
 }
 
 // ================================================================
-// 👇 НОВАЯ ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ БЕЙДЖИКА УВЕДОМЛЕНИЙ
+// ОБНОВЛЕНИЕ БЕЙДЖИКА УВЕДОМЛЕНИЙ
 // ================================================================
 
 function updateNotifBadge() {
@@ -511,7 +527,7 @@ var originalUpdateUI = updateUI || function() {};
 updateUI = function() {
     originalUpdateUI();
     setTimeout(function() {
-        translatePage();
+        if (typeof translatePage === 'function') translatePage();
         updateLangDisplay();
         updateNotifBadge();
     }, 200);
