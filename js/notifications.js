@@ -1,5 +1,5 @@
 // ================================================================
-// УВЕДОМЛЕНИЯ — ПОЛНАЯ ВЕРСИЯ С ПЕРЕХОДОМ В ЧАТ И КОММЕНТАРИИ
+// УВЕДОМЛЕНИЯ — С УДАЛЕНИЕМ И АВТООБНОВЛЕНИЕМ СТАТУСА ДРУЗЕЙ
 // ================================================================
 
 // ===== 1. ОТПРАВКА УВЕДОМЛЕНИЯ =====
@@ -22,7 +22,7 @@ function loadNotifications() {
     if (!USER_UID) return;
     if (notifUnsub) { notifUnsub(); notifUnsub = null; }
     
-    var ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20);
+    var ref = db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(50);
     notifUnsub = ref.on('value', function(snap) {
         var notifications = snap.val() || {};
         var keys = Object.keys(notifications).sort(function(a, b) {
@@ -58,7 +58,7 @@ function renderNotifications(notifications, keys) {
     }
     
     var html = '';
-    keys.slice(0, 20).forEach(function(k) {
+    keys.slice(0, 50).forEach(function(k) {
         var n = notifications[k];
         var icon = n.type === 'friend_request' ? '🤝' : n.type === 'friend_accepted' ? '✅' : n.type === 'comment' ? '💬' : '💬';
         var time = n.timestamp ? new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
@@ -71,13 +71,38 @@ function renderNotifications(notifications, keys) {
             textDisplay = '💬 ' + n.text;
         }
         
+        // 👇 ПРОВЕРЯЕМ СТАТУС ДРУЖБЫ ДЛЯ ЗАЯВОК
+        var isFriendRequest = (n.type === 'friend_request' && n.fromUid && n.fromUid !== USER_UID);
+        
+        // 👇 КНОПКИ ДЛЯ ЗАЯВОК
         var actionsHtml = '';
-        if (n.type === 'friend_request' && n.fromUid && n.fromUid !== USER_UID) {
-            actionsHtml = '<div style="display:flex;gap:4px;margin-top:4px;">';
-            actionsHtml += '<button onclick="event.stopPropagation();acceptFriendRequest(\'' + n.fromUid + '\');closeNotifications();" style="background:#1877f2;color:#fff;border:none;border-radius:12px;padding:2px 10px;font-size:0.6rem;cursor:pointer;">✅ Принять</button>';
-            actionsHtml += '<button onclick="event.stopPropagation();declineFriendRequest(\'' + n.fromUid + '\');closeNotifications();" style="background:#e4e6eb;color:#555;border:none;border-radius:12px;padding:2px 10px;font-size:0.6rem;cursor:pointer;">❌ Отклонить</button>';
-            actionsHtml += '</div>';
+        if (isFriendRequest) {
+            var friendCheck = localStorage.getItem('fs_' + USER_UID + '_' + n.fromUid);
+            if (friendCheck === 'friend') {
+                actionsHtml = '<div style="display:flex;gap:4px;margin-top:4px;">';
+                actionsHtml += '<span style="background:#e4e6eb;color:#555;border:none;border-radius:12px;padding:2px 10px;font-size:0.6rem;">🤝 В друзьях</span>';
+                actionsHtml += '</div>';
+            } else if (friendCheck === 'pending_sent') {
+                actionsHtml = '<div style="display:flex;gap:4px;margin-top:4px;">';
+                actionsHtml += '<span style="background:#fff3cd;color:#856404;border:none;border-radius:12px;padding:2px 10px;font-size:0.6rem;">⏳ Запрос отправлен</span>';
+                actionsHtml += '</div>';
+            } else {
+                actionsHtml = '<div style="display:flex;gap:4px;margin-top:4px;">';
+                actionsHtml += '<button onclick="event.stopPropagation();acceptFriendRequest(\'' + n.fromUid + '\');" style="background:#1877f2;color:#fff;border:none;border-radius:12px;padding:2px 10px;font-size:0.6rem;cursor:pointer;">✅ Принять</button>';
+                actionsHtml += '<button onclick="event.stopPropagation();declineFriendRequest(\'' + n.fromUid + '\');" style="background:#e4e6eb;color:#555;border:none;border-radius:12px;padding:2px 10px;font-size:0.6rem;cursor:pointer;">❌ Отклонить</button>';
+                actionsHtml += '</div>';
+            }
         }
+        
+        // 👇 ТРИ ТОЧКИ ДЛЯ УДАЛЕНИЯ
+        var menuHtml = `
+            <div style="position:relative;display:inline-block;margin-left:auto;flex-shrink:0;">
+                <button onclick="event.stopPropagation();toggleNotifMenu('${k}')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted-text);padding:0 4px;line-height:1;">⋮</button>
+                <div id="notifMenu_${k}" style="display:none;position:absolute;right:0;top:24px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15);z-index:70;min-width:120px;padding:4px 0;">
+                    <button onclick="event.stopPropagation();deleteNotification('${k}')" style="display:block;width:100%;padding:6px 14px;background:none;border:none;text-align:left;font-size:0.7rem;cursor:pointer;color:var(--danger);">🗑 Удалить</button>
+                </div>
+            </div>
+        `;
         
         html += '<div class="notif-item ' + (n.read ? '' : 'unread') + '" onclick="handleNotifClick(\'' + k + '\', \'' + (n.fromUid || n.from || '') + '\', \'' + n.type + '\', \'' + (n.chatId || '') + '\', \'' + (n.postId || '') + '\', \'' + (n.postType || '') + '\')">';
         html += '<span class="notif-icon">' + icon + '</span>';
@@ -86,6 +111,7 @@ function renderNotifications(notifications, keys) {
         html += '<div class="notif-time">' + time + '</div>';
         html += actionsHtml;
         html += '</div>';
+        html += menuHtml;
         html += (n.read ? '' : '<span class="notif-dot"></span>');
         html += '</div>';
     });
@@ -93,7 +119,38 @@ function renderNotifications(notifications, keys) {
     container.innerHTML = html;
 }
 
-// ===== 4. ОБРАБОТКА КЛИКА ПО УВЕДОМЛЕНИЮ =====
+// ===== 4. УДАЛЕНИЕ УВЕДОМЛЕНИЯ =====
+
+window.deleteNotification = function(notifId) {
+    if (!USER_UID) return;
+    db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
+    var menu = document.getElementById('notifMenu_' + notifId);
+    if (menu) menu.style.display = 'none';
+};
+
+// ===== 5. ОТКРЫТИЕ/ЗАКРЫТИЕ МЕНЮ УВЕДОМЛЕНИЯ =====
+
+window.toggleNotifMenu = function(notifId) {
+    var menu = document.getElementById('notifMenu_' + notifId);
+    if (!menu) return;
+    
+    document.querySelectorAll('.notif-item .dropdown-menu').forEach(function(el) {
+        if (el.id !== 'notifMenu_' + notifId) el.style.display = 'none';
+    });
+    
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+};
+
+// Закрываем меню при клике вне
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.notif-item')) {
+        document.querySelectorAll('.notif-item .dropdown-menu').forEach(function(el) {
+            el.style.display = 'none';
+        });
+    }
+});
+
+// ===== 6. ОБРАБОТКА КЛИКА ПО УВЕДОМЛЕНИЮ =====
 
 function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
     if (!USER_UID || !fromUid) return;
@@ -101,7 +158,6 @@ function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId + '/read').set(true);
     closeNotifications();
     
-    // 👇 ДЛЯ КОММЕНТАРИЕВ — ОТКРЫВАЕМ ПОСТ
     if (type === 'comment') {
         if (postId) {
             openPostPage(postId, postType || 'feed');
@@ -111,7 +167,6 @@ function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
         return;
     }
     
-    // 👇 ДЛЯ СООБЩЕНИЙ — ОТКРЫВАЕМ ЧАТ
     if (type === 'message') {
         if (document.getElementById('chatView').classList.contains('active')) {
             document.getElementById('chatView').classList.remove('active');
@@ -125,7 +180,6 @@ function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
         return;
     }
     
-    // ДЛЯ ЗАЯВОК В ДРУЗЬЯ — ОТКРЫВАЕМ ПРОФИЛЬ
     if (type === 'friend_request' || type === 'friend_accepted') {
         viewUser(fromUid);
         setTimeout(function() {
@@ -137,12 +191,12 @@ function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
     viewUser(fromUid);
 }
 
-// ===== 5. ОТКРЫТИЕ МОДАЛКИ =====
+// ===== 7. ОТКРЫТИЕ МОДАЛКИ =====
 
 window.openNotifications = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
     document.getElementById('notificationsModal').classList.add('open');
-    db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(20).once('value', function(snap) {
+    db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(50).once('value', function(snap) {
         var notifications = snap.val() || {};
         var keys = Object.keys(notifications).sort(function(a, b) {
             return (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0);
@@ -151,13 +205,13 @@ window.openNotifications = function() {
     });
 };
 
-// ===== 6. ЗАКРЫТИЕ МОДАЛКИ =====
+// ===== 8. ЗАКРЫТИЕ МОДАЛКИ =====
 
 window.closeNotifications = function() {
     document.getElementById('notificationsModal').classList.remove('open');
 };
 
-// ===== 7. СТИЛИ =====
+// ===== 9. СТИЛИ =====
 
 var style = document.createElement('style');
 style.textContent = `
@@ -169,11 +223,12 @@ style.textContent = `
         border-bottom: 1px solid #eee;
         cursor: pointer;
         transition: 0.15s;
+        position: relative;
     }
     .notif-item:hover { background: #f0f2f5; }
     .notif-item.unread { background: #e8f0fe; }
-    .notif-item .notif-icon { font-size: 1.2rem; }
-    .notif-item .notif-text { flex: 1; }
+    .notif-item .notif-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .notif-item .notif-text { flex: 1; min-width: 0; }
     .notif-item .notif-time { font-size: 0.55rem; color: #999; }
     .notif-item .notif-dot {
         width: 8px;
@@ -182,10 +237,43 @@ style.textContent = `
         border-radius: 50%;
         flex-shrink: 0;
     }
+    .notif-item .dropdown-menu {
+        position: absolute;
+        right: 10px;
+        top: 30px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        z-index: 70;
+        min-width: 120px;
+        padding: 4px 0;
+    }
+    .notif-item .dropdown-menu button {
+        display: block;
+        width: 100%;
+        padding: 6px 14px;
+        background: none;
+        border: none;
+        text-align: left;
+        font-size: 0.7rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: 0.15s;
+    }
+    .notif-item .dropdown-menu button:hover {
+        background: var(--input-bg);
+    }
+    .notif-item .dropdown-menu .del-btn {
+        color: var(--danger);
+    }
+    .notif-item .dropdown-menu .del-btn:hover {
+        background: var(--danger-bg);
+    }
 `;
 document.head.appendChild(style);
 
-// ===== 8. ОТКРЫТИЕ СТРАНИЦЫ ПОСТА =====
+// ===== 10. ОТКРЫТИЕ СТРАНИЦЫ ПОСТА =====
 
 function openPostPage(postId, type) {
     window.CURRENT_POST_ID = postId;
@@ -228,7 +316,7 @@ function openPostPage(postId, type) {
     });
 }
 
-// ===== 9. ЗАКРЫТИЕ СТРАНИЦЫ ПОСТА =====
+// ===== 11. ЗАКРЫТИЕ СТРАНИЦЫ ПОСТА =====
 
 window.closePostPage = function() {
     document.getElementById('postPage').classList.remove('active');
