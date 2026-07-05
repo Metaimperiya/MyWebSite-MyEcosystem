@@ -12,19 +12,7 @@ const FB_CONFIG = {
     appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
 };
 
-// Проверяем, что Firebase SDK загружен
-if (typeof firebase !== 'undefined' && firebase.initializeApp) {
-    firebase.initializeApp(FB_CONFIG);
-    console.log('✅ Firebase инициализирован');
-} else {
-    console.error('❌ Firebase SDK не загружен! Проверь подключение скриптов.');
-    // Пробуем инициализировать через window.firebase
-    if (window.firebase && window.firebase.initializeApp) {
-        window.firebase.initializeApp(FB_CONFIG);
-        console.log('✅ Firebase инициализирован через window');
-    }
-}
-
+firebase.initializeApp(FB_CONFIG);
 const db = firebase.database();
 const auth = firebase.auth();
 const storage = firebase.storage();
