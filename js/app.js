@@ -56,7 +56,7 @@ function renderAvatar(uid, container, letter) {
     });
 }
 
-// ===== НАВИГАЦИЯ ПО СТРАНИЦАМ =====
+// ===== НАВИГАЦИЯ =====
 
 function setActivePage(pageId) {
     document.querySelectorAll('.page').forEach(function(el) {
@@ -137,9 +137,7 @@ window.closeSidebar = function() {
     document.getElementById('overlay').classList.remove('show');
 };
 
-// ================================================================
-// АККОРДЕОН В САЙДБАРЕ
-// ================================================================
+// ===== АККОРДЕОН =====
 
 window.toggleAccordion = function(header) {
     var item = header.parentElement;
@@ -182,9 +180,7 @@ window.setFrameSize = function(size) {
     }
 };
 
-// ================================================================
-// ПЕРЕКЛЮЧЕНИЕ ТЕМЫ
-// ================================================================
+// ===== ТЕМА =====
 
 window.toggleTheme = function() {
     var currentTheme = document.documentElement.getAttribute('data-theme');
@@ -199,9 +195,7 @@ window.toggleTheme = function() {
     document.documentElement.setAttribute('data-theme', savedTheme);
 })();
 
-// ================================================================
-// ФУНКЦИИ РЕДАКТОРА
-// ================================================================
+// ===== РЕДАКТОР =====
 
 window.formatText = function(type) {
     var editor = document.getElementById('postEditor');
@@ -273,7 +267,7 @@ window.insertLink = function() {
 };
 
 // ================================================================
-// СПИСОК ЧАТОВ (ЛИЧНЫЕ СООБЩЕНИЯ)
+// СПИСОК ЧАТОВ
 // ================================================================
 
 window.openChatList = function() {
@@ -345,7 +339,7 @@ function loadChatList() {
 }
 
 // ================================================================
-// ИНДИКАТОР НАБОРА ТЕКСТА
+// ИНДИКАТОР НАБОРА (ДОБАВЛЕНО)
 // ================================================================
 
 var typingTimeout = null;
@@ -354,7 +348,6 @@ function setupTypingIndicator(chatId) {
     var typingRef = db.ref('dms/' + SITE + '/' + chatId + '/typing');
     var input = document.getElementById('chatInput');
 
-    // Удаляем старый обработчик
     if (window._typingHandler) {
         input.removeEventListener('keydown', window._typingHandler);
     }
@@ -387,47 +380,7 @@ function setupTypingIndicator(chatId) {
 }
 
 // ================================================================
-// ОТПРАВКА СООБЩЕНИЙ
-// ================================================================
-
-window.sendChatMessage = function() {
-    var input = document.getElementById('chatInput');
-    if (!input) return;
-    var text = input.value.trim();
-    if (!text || !CURRENT_ROOM) return;
-    
-    var path = '';
-    var targetUid = '';
-    
-    if (CURRENT_ROOM.includes('_')) {
-        path = 'dms/' + SITE + '/' + CURRENT_ROOM + '/messages';
-        var parts = CURRENT_ROOM.split('_');
-        targetUid = parts[0] === USER_UID ? parts[1] : parts[0];
-    } else {
-        path = 'rooms/' + SITE + '_' + CURRENT_ROOM + '/messages';
-    }
-    
-    db.ref(path).push({
-        nick: USER,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-    });
-    
-    if (targetUid) {
-        sendNotification(targetUid, {
-            type: 'message',
-            from: USER_UID,
-            text: USER + ': ' + text,
-            timestamp: Date.now()
-        });
-    }
-    
-    input.value = '';
-};
-
-// ================================================================
-// АДМИН-ПАНЕЛЬ ЧАТОВ
+// АДМИН-ПАНЕЛЬ
 // ================================================================
 
 window.openAdminChats = function() {
@@ -507,7 +460,6 @@ window.adminViewChat = function(chatId) {
     loadChat(path);
 };
 
-// ===== ПОКАЗЫВАЕМ ПУНКТ В МЕНЮ ТОЛЬКО АДМИНУ =====
 function updateAdminMenu() {
     var item = document.getElementById('adminChatsMenuItem');
     if (item) {
@@ -516,21 +468,7 @@ function updateAdminMenu() {
 }
 
 // ================================================================
-// ЗАКРЫТИЕ ЧАТА С ВОЗВРАТОМ В СПИСОК
-// ================================================================
-
-window.closeChat = function() {
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    openChatList();
-};
-
-// ================================================================
-// ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
+// ЯЗЫК
 // ================================================================
 
 if (typeof toggleLanguage === 'undefined') {
