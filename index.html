@@ -144,12 +144,19 @@
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
-            <!-- 👇 ИНДИКАТОР НАБОРА ТЕКСТА -->
             <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
             <div class="chat-input">
                 <input type="text" id="chatInput" data-i18n-placeholder="message" placeholder="Сообщение...">
                 <button onclick="sendChatMessage()">→</button>
             </div>
+        </div>
+
+        <!-- ===== СТРАНИЦА ПОСТА ===== -->
+        <div class="page" id="postPage">
+            <div style="padding:6px 0;">
+                <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
+            </div>
+            <div id="postPageContainer"></div>
         </div>
 
     </div>
