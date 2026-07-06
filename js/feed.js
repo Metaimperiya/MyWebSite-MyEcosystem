@@ -581,7 +581,15 @@ function renderPost(p, type) {
         }
     }
 
-    loadComments(p.id, type);
+    // Загружаем комментарии только если они открыты
+    var state = getCommentState(p.id);
+    if (state.open) {
+        loadComments(p.id, type);
+    } else {
+        // Просто обновляем счетчик
+        var countEl = document.getElementById('commentCount_' + p.id);
+        if (countEl) countEl.textContent = p.commentCount || 0;
+    }
     return div;
 }
 
@@ -655,7 +663,7 @@ function renderNestedRepost(repost, level) {
 }
 
 // ================================================================
-// КОММЕНТАРИИ (ПОЛНАЯ ВЕРСИЯ) — БЕЗ ПРЫЖКОВ
+// КОММЕНТАРИИ — БЕЗ ПРЫЖКОВ, БЕЗ ЗАКРЫТИЯ
 // ================================================================
 
 window.toggleComments = function(postId, type) {
@@ -669,16 +677,10 @@ window.toggleComments = function(postId, type) {
         wrapper.style.display = 'block';
         wrapper.style.opacity = '0';
         wrapper.style.transition = 'opacity 0.2s ease';
-        
         loadComments(postId, type);
-        
         setTimeout(function() {
             wrapper.style.opacity = '1';
         }, 10);
-        
-        // УБИРАЕМ ПРЫЖОК ВВЕРХ — больше не скроллим к комментариям
-        // Просто открываем и всё
-        
     } else {
         wrapper.style.display = 'none';
         wrapper.style.opacity = '0';
@@ -688,6 +690,11 @@ window.toggleComments = function(postId, type) {
 function loadComments(postId, type) {
     var path = getPostPath(type);
     var state = getCommentState(postId);
+
+    // Если комментарии не открыты — не грузим
+    if (!state.open) {
+        return;
+    }
 
     if (state.listener) {
         db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').off('value', state.listener);
@@ -835,6 +842,7 @@ window.submitReply = function(postId, parentId, type) {
     if (!text) return;
     
     var path = getPostPath(type);
+    var state = getCommentState(postId);
     
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
         author: USER,
@@ -848,6 +856,11 @@ window.submitReply = function(postId, parentId, type) {
     
     input.value = '';
     document.getElementById('replyInput_' + parentId).style.display = 'none';
+    
+    // Обновляем комментарии если они открыты
+    if (state.open) {
+        loadComments(postId, type);
+    }
 };
 
 window.toggleLikeComment = function(postId, commentId, type) {
@@ -922,6 +935,10 @@ window.toggleLike = function(postId, type) {
     });
 };
 
+// ================================================================
+// ОТПРАВКА КОММЕНТАРИЯ — НЕ ЗАКРЫВАЕТ КОММЕНТАРИИ
+// ================================================================
+
 window.submitComment = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
 
@@ -932,6 +949,7 @@ window.submitComment = function(postId, type) {
     if (!text) return;
 
     var path = getPostPath(type);
+    var state = getCommentState(postId);
     
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/authorUid').once('value', function(authorSnap) {
         var authorUid = authorSnap.val();
@@ -956,8 +974,10 @@ window.submitComment = function(postId, type) {
                     timestamp: Date.now()
                 });
             }
-            // Обновляем комментарии
-            loadComments(postId, type);
+            // Если комментарии открыты — обновляем их, НЕ ЗАКРЫВАЯ
+            if (state.open) {
+                loadComments(postId, type);
+            }
         });
     });
 };
@@ -969,6 +989,7 @@ window.submitComment = function(postId, type) {
 function deleteCommentWithChildren(postId, commentId, type) {
     var path = getPostPath(type);
     var commentsRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments');
+    var state = getCommentState(postId);
     
     commentsRef.once('value', function(snap) {
         var allComments = snap.val() || {};
@@ -999,8 +1020,9 @@ function deleteCommentWithChildren(postId, commentId, type) {
             db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(remaining);
             var countEl = document.getElementById('commentCount_' + postId);
             if (countEl) countEl.textContent = remaining;
-            // Обновляем отображение
-            loadComments(postId, type);
+            if (state.open) {
+                loadComments(postId, type);
+            }
         });
     });
 }
@@ -1068,9 +1090,14 @@ function saveCommentEdit(postId, commentId, type, newText) {
         return;
     }
     var path = getPostPath(type);
+    var state = getCommentState(postId);
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
         text: newText,
         edited: true
+    }).then(function() {
+        if (state.open) {
+            loadComments(postId, type);
+        }
     });
 }
 
@@ -1511,7 +1538,6 @@ function saveNestedRepost(repostData, postId, type, path) {
     db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
     
     closeRepost();
-    // Убрал alert
     
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
