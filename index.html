@@ -37,7 +37,7 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== ЛЕНТА ===== -->
+        <!-- ===== ЛЕНТА (ГЛАВНАЯ) ===== -->
         <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
@@ -68,10 +68,12 @@
             <div id="feed"></div>
         </div>
 
+        <!-- ===== ГРУППЫ ===== -->
         <div class="page" id="page-groups">
             <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
         </div>
 
+        <!-- ===== ЛЮДИ ===== -->
         <div class="page" id="page-people">
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
@@ -140,6 +142,46 @@
             <div id="profilePosts"></div>
         </div>
 
+        <!-- ===== СТРАНИЦА ФОТО (С ОТДЕЛЬНОЙ ЛЕНТОЙ) ===== -->
+        <div class="page" id="page-foto" style="display:none;">
+            <div class="container" style="padding-top:10px;">
+                <button onclick="window.location.href='/'">← Назад</button>
+                <h1>📸 Фото</h1>
+                <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
+
+                <!-- ===== ФОРМА ПОСТА ===== -->
+                <div class="card" style="margin-top:10px;">
+                    <div class="post-form">
+                        <div class="editor-toolbar">
+                            <button onclick="formatText('bold')"><b>B</b></button>
+                            <button onclick="formatText('italic')"><i>I</i></button>
+                            <button onclick="formatText('underline')"><u>U</u></button>
+                            <button onclick="formatText('strike')"><s>S</s></button>
+                            <button onclick="formatText('h1')">H1</button>
+                            <button onclick="formatText('h2')">H2</button>
+                            <button onclick="formatText('quote')">"</button>
+                            <button onclick="formatText('code')">&lt;/&gt;</button>
+                            <button onclick="insertLink()">🔗</button>
+                        </div>
+                        <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что нового в мире фото?"></div>
+                        <div class="post-actions" style="margin-top:6px;">
+                            <label class="file-label" for="fileInput">📎 Фото</label>
+                            <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
+                            <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        <div class="preview-box" id="previewBox">
+                            <img id="previewImg"><span id="previewName"></span>
+                            <button class="remove-pic" onclick="removeImage()">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ЛЕНТА ФОТО ===== -->
+                <div id="fotoFeed"></div>
+            </div>
+        </div>
+
         <!-- ===== ЧАТ ===== -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
@@ -184,6 +226,10 @@
 <script src="js/admin.js"></script>
 
 <script>
+// ================================================================
+// ЗАГРУЗКА КОМПОНЕНТОВ
+// ================================================================
+
 (function() {
     const components = [
         { id: 'topbarContainer', url: 'topbar.html' },
@@ -214,6 +260,15 @@
                         if (typeof translatePage === 'function') {
                             translatePage();
                         }
+                        // Автоматически открываем страницу из URL
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var page = urlParams.get('page');
+                        if (page) {
+                            openPage(page);
+                            if (page === 'foto') {
+                                setTimeout(loadFotoFeed, 500);
+                            }
+                        }
                     }, 300);
                 }
             })
@@ -227,14 +282,139 @@
                         if (typeof translatePage === 'function') {
                             translatePage();
                         }
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var page = urlParams.get('page');
+                        if (page) {
+                            openPage(page);
+                            if (page === 'foto') {
+                                setTimeout(loadFotoFeed, 500);
+                            }
+                        }
                     }, 300);
                 }
             });
     });
 })();
-</script>
 
-<script>
+// ================================================================
+// ФОТО-ЛЕНТА (ОТДЕЛЬНАЯ)
+// ================================================================
+
+var fotoFeedListener = null;
+
+function loadFotoFeed() {
+    var el = document.getElementById('fotoFeed');
+    if (!el) return;
+
+    if (!USER || !USER_UID) {
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
+        return;
+    }
+
+    if (fotoFeedListener) {
+        db.ref('sites/' + SITE + '/foto_posts').off('value', fotoFeedListener);
+        fotoFeedListener = null;
+    }
+
+    fotoFeedListener = function(snap) {
+        var data = snap.val() || {};
+        var keys = Object.keys(data).sort(function(a, b) {
+            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
+        });
+
+        if (!keys.length) {
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока нет фото-постов. Будьте первым!</div>';
+            return;
+        }
+
+        var html = '';
+        keys.forEach(function(k) {
+            var p = data[k];
+            p.id = k;
+            html += renderPost(p, 'foto');
+        });
+        el.innerHTML = html;
+    };
+
+    db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
+}
+
+// ================================================================
+// ОТПРАВКА ПОСТА В ФОТО-ЛЕНТУ
+// ================================================================
+
+window.submitFotoPost = function() {
+    if (!USER || !USER_UID) {
+        alert('Войдите, чтобы опубликовать пост!');
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return;
+    }
+
+    var text = getEditorText().trim();
+    if (!text && !pendingImageFile) {
+        alert('Введите текст или добавьте фото');
+        return;
+    }
+
+    var hashtags = extractHashtags(text);
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
+        var avatarUrl = avatarSnap.val() || null;
+        
+        var postData = {
+            author: USER,
+            authorUid: USER_UID,
+            authorAvatar: avatarUrl,
+            text: text || '📷',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            reposts: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            frameSize: 'small',
+            edited: false,
+            img: null,
+            repost: null,
+            deleted: null,
+            deletedAt: null
+        };
+
+        var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+        if (linkMatch) postData.link = linkMatch[1];
+
+        var savePost = function(imgData) {
+            if (imgData) postData.img = imgData;
+            
+            db.ref('sites/' + SITE + '/foto_posts').push(postData);
+            clearEditor();
+            clearPostForm();
+            
+            setTimeout(function() {
+                loadFotoFeed();
+            }, 300);
+        };
+
+        if (pendingImageFile) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                savePost(e.target.result);
+            };
+            reader.readAsDataURL(pendingImageFile);
+        } else {
+            savePost(null);
+        }
+    });
+};
+
+// ================================================================
+// АВТО-СКРЫТИЕ ШАПКИ
+// ================================================================
+
 (function() {
     var lastScrollY = 0;
     var topbar = document.getElementById('topbar');
