@@ -21,23 +21,20 @@
 
 <div class="app" id="app">
 
-    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ ПОДГРУЗКИ ===== -->
     <div id="topbarContainer"></div>
     <div id="settingsContainer"></div>
     <div id="sidebarContainer"></div>
     <div id="playerContainer"></div>
     <div id="modalsContainer"></div>
 
-    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
     <div class="container" id="mainContainer">
 
-        <!-- ===== РУЧКА ПЛЕЕРА ===== -->
         <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== ЛЕНТА (ГЛАВНАЯ) ===== -->
+        <!-- ===== ГЛАВНАЯ ЛЕНТА ===== -->
         <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
@@ -68,17 +65,14 @@
             <div id="feed"></div>
         </div>
 
-        <!-- ===== ГРУППЫ ===== -->
         <div class="page" id="page-groups">
             <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
         </div>
 
-        <!-- ===== ЛЮДИ ===== -->
         <div class="page" id="page-people">
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
 
-        <!-- ===== ПРОФИЛЬ ===== -->
         <div class="page" id="page-profile">
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
@@ -142,14 +136,13 @@
             <div id="profilePosts"></div>
         </div>
 
-        <!-- ===== СТРАНИЦА ФОТО (С ОТДЕЛЬНОЙ ЛЕНТОЙ) ===== -->
+        <!-- ===== ФОТО-ЛЕНТА ===== -->
         <div class="page" id="page-foto" style="display:none;">
             <div class="container" style="padding-top:10px;">
                 <button onclick="window.location.href='/'">← Назад</button>
                 <h1>📸 Фото</h1>
                 <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
 
-                <!-- ===== ФОРМА ПОСТА ===== -->
                 <div class="card" style="margin-top:10px;">
                     <div class="post-form">
                         <div class="editor-toolbar">
@@ -177,12 +170,10 @@
                     </div>
                 </div>
 
-                <!-- ===== ЛЕНТА ФОТО ===== -->
                 <div id="fotoFeed"></div>
             </div>
         </div>
 
-        <!-- ===== ЧАТ ===== -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
@@ -193,7 +184,6 @@
             </div>
         </div>
 
-        <!-- ===== СТРАНИЦА ПОСТА ===== -->
         <div class="page" id="postPage">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
@@ -227,7 +217,7 @@
 
 <script>
 // ================================================================
-// ФОТО-ЛЕНТА — САМОСТОЯТЕЛЬНЫЙ КОД
+// ФОТО-ЛЕНТА — ИСПОЛЬЗУЕТ ОБЩИЙ renderPost() ИЗ feed.js
 // ================================================================
 
 var fotoFeedListener = null;
@@ -260,157 +250,38 @@ function removeFotoImage() {
     if (input) input.value = '';
 }
 
-function extractHashtags(text) {
-    if (!text) return [];
-    var matches = text.match(/#[\wа-яё]+/gi) || [];
-    return matches.slice(0, 8);
-}
+document.addEventListener('DOMContentLoaded', function() {
+    var fileInput = document.getElementById('fileInputFoto');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Только изображения!');
+                this.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Максимум 5 МБ');
+                this.value = '';
+                return;
+            }
 
-function renderFotoPost(p) {
-    var div = document.createElement('div');
-    div.className = 'post';
-    div.dataset.id = p.id;
-
-    var letter = (p.author || '?').charAt(0).toUpperCase();
-    
-    var avatarHtml = '';
-    if (p.authorAvatar) {
-        avatarHtml = '<span class="avatar-wrap"><img src="' + p.authorAvatar + '" /></span>';
-    } else {
-        avatarHtml = '<span class="avatar-wrap"><span class="letter">' + letter + '</span></span>';
-    }
-
-    var textHtml = p.text || '';
-    var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="event.stopPropagation();window.open(this.src)">' : '';
-
-    // 👇 КНОПКА УДАЛЕНИЯ
-    var isAuthor = (p.authorUid === USER_UID);
-    var canDelete = isAuthor || isAdmin;
-    var deleteBtn = '';
-    if (canDelete) {
-        deleteBtn = '<button onclick="deleteFotoPost(\'' + p.id + '\')" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:2px 10px;cursor:pointer;font-size:0.6rem;margin-left:4px;">🗑 Удалить</button>';
-    }
-
-    // 👇 КНОПКА РЕПОСТА
-    var repostBtn = '';
-    if (USER && USER_UID) {
-        repostBtn = '<button onclick="repostFotoToFeed(\'' + p.id + '\')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 10px;cursor:pointer;font-size:0.6rem;margin-left:4px;">🔁 Репост</button>';
-    }
-
-    div.innerHTML = 
-        '<div class="author">' + avatarHtml + 
-        '<span class="name">' + esc(p.author || 'Аноним') + '</span>' +
-        '<span class="time">' + (p.time || '') + '</span>' +
-        '</div>' +
-        '<div class="post-content">' + textHtml + imgHtml + '</div>' +
-        '<div class="stats" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">' +
-        '<button onclick="toggleFotoLike(\'' + p.id + '\')">👍 <span id="fotoLikeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
-        repostBtn + deleteBtn +
-        '</div>';
-
-    return div;
-}
-
-// ===== ЛАЙКИ В ФОТО-ЛЕНТЕ =====
-
-window.toggleFotoLike = function(postId) {
-    if (!USER || !USER_UID) {
-        alert('Войдите, чтобы поставить лайк!');
-        return;
-    }
-
-    var key = 'foto_lk_' + postId + '_' + USER_UID;
-    var liked = localStorage.getItem(key) === '1';
-    var ref = db.ref('sites/' + SITE + '/foto_posts/' + postId + '/likes');
-    var countEl = document.getElementById('fotoLikeCount_' + postId);
-
-    if (liked) {
-        ref.transaction(function(v) { return Math.max(0, (v || 0) - 1); });
-        localStorage.removeItem(key);
-        if (countEl) {
-            var current = parseInt(countEl.textContent) || 0;
-            countEl.textContent = Math.max(0, current - 1);
-        }
-    } else {
-        ref.transaction(function(v) { return (v || 0) + 1; });
-        localStorage.setItem(key, '1');
-        if (countEl) {
-            var current = parseInt(countEl.textContent) || 0;
-            countEl.textContent = current + 1;
-        }
-    }
-};
-
-// ===== УДАЛЕНИЕ ПОСТА ИЗ ФОТО-ЛЕНТЫ =====
-
-window.deleteFotoPost = function(postId) {
-    if (!confirm('🗑 Удалить пост?')) return;
-    
-    db.ref('sites/' + SITE + '/foto_posts/' + postId).remove();
-    
-    var postEl = document.querySelector('.post[data-id="' + postId + '"]');
-    if (postEl && postEl.parentNode) {
-        postEl.parentNode.removeChild(postEl);
-    }
-    
-    setTimeout(loadFotoFeed, 300);
-};
-
-// ===== РЕПОСТ ИЗ ФОТО-ЛЕНТЫ В ГЛАВНУЮ =====
-
-window.repostFotoToFeed = function(postId) {
-    if (!USER || !USER_UID) {
-        alert('Войдите, чтобы сделать репост!');
-        return;
-    }
-    
-    db.ref('sites/' + SITE + '/foto_posts/' + postId).once('value', function(snap) {
-        var original = snap.val();
-        if (!original) {
-            alert('Пост не найден');
-            return;
-        }
-        
-        db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
-            var avatarUrl = avatarSnap.val() || null;
-            
-            var repostData = {
-                author: USER,
-                authorUid: USER_UID,
-                authorAvatar: avatarUrl,
-                text: '🔁 Репост из фото-ленты: ' + (original.text || ''),
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                timestamp: Date.now(),
-                likes: 0,
-                commentCount: 0,
-                reposts: 0,
-                hashtags: original.hashtags || [],
-                img: original.img || null,
-                link: original.link || null,
-                marquee: null,
-                buttons: [],
-                frameSize: 'small',
-                edited: false,
-                repost: null,
-                deleted: null,
-                deletedAt: null
+            pendingFotoImageFile = file;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                pendingFotoImage = ev.target.result;
+                var img = document.getElementById('previewImgFoto');
+                var name = document.getElementById('previewNameFoto');
+                var box = document.getElementById('previewBoxFoto');
+                if (img) img.src = pendingFotoImage;
+                if (name) name.textContent = file.name.slice(0, 16);
+                if (box) box.classList.add('visible');
             };
-            
-            db.ref('sites/' + SITE + '/feed_posts').push(repostData);
-            db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
-            
-            alert('✅ Репост в главную ленту создан!');
-            
-            // Обновляем счётчик репостов в фото-ленте
-            db.ref('sites/' + SITE + '/foto_posts/' + postId + '/reposts').transaction(function(current) {
-                return (current || 0) + 1;
-            });
-            
-            setTimeout(loadFotoFeed, 300);
-            if (typeof loadFeed === 'function') loadFeed();
+            reader.readAsDataURL(file);
         });
-    });
-};
+    }
+});
 
 function loadFotoFeed() {
     var el = document.getElementById('fotoFeed');
@@ -442,7 +313,7 @@ function loadFotoFeed() {
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            var postEl = renderFotoPost(p);
+            var postEl = renderPost(p, 'foto');
             if (postEl) {
                 el.appendChild(postEl);
             }
@@ -482,7 +353,13 @@ window.submitFotoPost = function() {
             commentCount: 0,
             reposts: 0,
             hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            frameSize: 'small',
+            edited: false,
             img: null,
+            repost: null,
             deleted: null,
             deletedAt: null
         };
@@ -495,7 +372,7 @@ window.submitFotoPost = function() {
             
             setTimeout(function() {
                 loadFotoFeed();
-            }, 300);
+            }, 100);
         };
 
         if (pendingFotoImageFile) {
