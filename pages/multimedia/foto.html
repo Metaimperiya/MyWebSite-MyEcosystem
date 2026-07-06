@@ -36,21 +36,21 @@
                     <button onclick="formatText('code')">&lt;/&gt;</button>
                     <button onclick="insertLink()">🔗</button>
                 </div>
-                <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что нового в мире фото?"></div>
                 <div class="post-actions" style="margin-top:6px;">
-                    <label class="file-label" for="fileInput">📎 Фото</label>
-                    <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
-                    <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                    <label class="file-label" for="fileInputFoto">📎 Фото</label>
+                    <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
+                    <button class="btn-cancel" onclick="clearFotoPostForm()">Очистить</button>
                 </div>
-                <input type="file" id="fileInput" accept="image/*" class="hidden">
-                <div class="preview-box" id="previewBox">
-                    <img id="previewImg"><span id="previewName"></span>
-                    <button class="remove-pic" onclick="removeImage()">✕</button>
+                <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
+                <div class="preview-box" id="previewBoxFoto">
+                    <img id="previewImgFoto"><span id="previewNameFoto"></span>
+                    <button class="remove-pic" onclick="removeFotoImage()">✕</button>
                 </div>
             </div>
         </div>
 
-        <div id="feed"></div>
+        <div id="fotoFeed"></div>
     </div>
 
 </div>
@@ -102,6 +102,7 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
+                            if (typeof loadFotoFeed === 'function') loadFotoFeed();
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
                         }
@@ -121,6 +122,7 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
+                            if (typeof loadFotoFeed === 'function') loadFotoFeed();
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
                         }
@@ -225,16 +227,6 @@
         });
     }
 })();
-
-// Загрузка ленты при открытии страницы
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        if (typeof loadFeed === 'function') {
-            loadFeed();
-            console.log('✅ Лента загружена');
-        }
-    }, 1000);
-});
 </script>
 </body>
 </html>
