@@ -227,7 +227,7 @@
 
 <script>
 // ================================================================
-// ФОТО-ЛЕНТА (ОТДЕЛЬНАЯ)
+// ФОТО-ЛЕНТА — САМОСТОЯТЕЛЬНЫЙ КОД
 // ================================================================
 
 var fotoFeedListener = null;
@@ -245,46 +245,56 @@ function clearFotoPostForm() {
     if (editor) editor.innerHTML = '';
     pendingFotoImage = null;
     pendingFotoImageFile = null;
-    document.getElementById('previewBoxFoto').classList.remove('visible');
-    document.getElementById('fileInputFoto').value = '';
+    var preview = document.getElementById('previewBoxFoto');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputFoto');
+    if (input) input.value = '';
 }
 
 function removeFotoImage() {
     pendingFotoImage = null;
     pendingFotoImageFile = null;
-    document.getElementById('previewBoxFoto').classList.remove('visible');
-    document.getElementById('fileInputFoto').value = '';
+    var preview = document.getElementById('previewBoxFoto');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputFoto');
+    if (input) input.value = '';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    var fileInput = document.getElementById('fileInputFoto');
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            var file = e.target.files[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) {
-                alert('Только изображения!');
-                this.value = '';
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Максимум 5 МБ');
-                this.value = '';
-                return;
-            }
+function extractHashtags(text) {
+    if (!text) return [];
+    var matches = text.match(/#[\wа-яё]+/gi) || [];
+    return matches.slice(0, 8);
+}
 
-            pendingFotoImageFile = file;
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                pendingFotoImage = ev.target.result;
-                document.getElementById('previewImgFoto').src = pendingFotoImage;
-                document.getElementById('previewNameFoto').textContent = file.name.slice(0, 16);
-                document.getElementById('previewBoxFoto').classList.add('visible');
-            };
-            reader.readAsDataURL(file);
-        });
+function renderFotoPost(p) {
+    var div = document.createElement('div');
+    div.className = 'post';
+    div.dataset.id = p.id;
+
+    var letter = (p.author || '?').charAt(0).toUpperCase();
+    
+    var avatarHtml = '';
+    if (p.authorAvatar) {
+        avatarHtml = '<span class="avatar-wrap"><img src="' + p.authorAvatar + '" /></span>';
+    } else {
+        avatarHtml = '<span class="avatar-wrap"><span class="letter">' + letter + '</span></span>';
     }
-});
+
+    var textHtml = p.text || '';
+    var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="event.stopPropagation();window.open(this.src)">' : '';
+
+    div.innerHTML = 
+        '<div class="author">' + avatarHtml + 
+        '<span class="name">' + esc(p.author || 'Аноним') + '</span>' +
+        '<span class="time">' + (p.time || '') + '</span>' +
+        '</div>' +
+        '<div class="post-content">' + textHtml + imgHtml + '</div>' +
+        '<div class="stats">' +
+        '<button>👍 <span>' + (p.likes || 0) + '</span></button>' +
+        '</div>';
+
+    return div;
+}
 
 function loadFotoFeed() {
     var el = document.getElementById('fotoFeed');
@@ -311,21 +321,20 @@ function loadFotoFeed() {
             return;
         }
 
-        var html = '';
+        el.innerHTML = '';
+
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            html += renderPost(p, 'foto');
+            var postEl = renderFotoPost(p);
+            if (postEl) {
+                el.appendChild(postEl);
+            }
         });
-        el.innerHTML = html;
     };
 
     db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
 }
-
-// ================================================================
-// ОТПРАВКА ПОСТА В ФОТО-ЛЕНТУ
-// ================================================================
 
 window.submitFotoPost = function() {
     if (!USER || !USER_UID) {
@@ -357,19 +366,10 @@ window.submitFotoPost = function() {
             commentCount: 0,
             reposts: 0,
             hashtags: hashtags,
-            marquee: null,
-            link: null,
-            buttons: [],
-            frameSize: 'small',
-            edited: false,
             img: null,
-            repost: null,
             deleted: null,
             deletedAt: null
         };
-
-        var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
-        if (linkMatch) postData.link = linkMatch[1];
 
         var savePost = function(imgData) {
             if (imgData) postData.img = imgData;
@@ -403,8 +403,8 @@ window.submitFotoPost = function() {
         { id: 'topbarContainer', url: 'topbar.html' },
         { id: 'settingsContainer', url: 'settings.html' },
         { id: 'sidebarContainer', url: 'sidebar.html' },
-        { id: 'playerContainer', url: 'player.html' },
-        { id: 'modalsContainer', url: 'modals.html' }
+        { id: 'modalsContainer', url: 'modals.html' },
+        { id: 'playerContainer', url: 'player.html' }
     ];
 
     let loaded = 0;
@@ -425,10 +425,7 @@ window.submitFotoPost = function() {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
                     setTimeout(function() {
-                        if (typeof translatePage === 'function') {
-                            translatePage();
-                        }
-                        // Автоматически открываем страницу из URL
+                        if (typeof translatePage === 'function') translatePage();
                         var urlParams = new URLSearchParams(window.location.search);
                         var page = urlParams.get('page');
                         if (page) {
@@ -437,7 +434,11 @@ window.submitFotoPost = function() {
                                 setTimeout(loadFotoFeed, 500);
                             }
                         }
-                    }, 300);
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof initAudio === 'function') initAudio();
+                    }, 500);
                 }
             })
             .catch(err => {
@@ -447,9 +448,7 @@ window.submitFotoPost = function() {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     setTimeout(function() {
-                        if (typeof translatePage === 'function') {
-                            translatePage();
-                        }
+                        if (typeof translatePage === 'function') translatePage();
                         var urlParams = new URLSearchParams(window.location.search);
                         var page = urlParams.get('page');
                         if (page) {
@@ -458,7 +457,11 @@ window.submitFotoPost = function() {
                                 setTimeout(loadFotoFeed, 500);
                             }
                         }
-                    }, 300);
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof initAudio === 'function') initAudio();
+                    }, 500);
                 }
             });
     });
@@ -568,19 +571,6 @@ window.submitFotoPost = function() {
 
     console.log('✅ Авто-скрытие шапки включено!');
 })();
-
-// ================================================================
-// ФУНКЦИИ ДЛЯ ПРАВИЛЬНОЙ РАБОТЫ openPage()
-// ================================================================
-
-// Переопределяем openPage для загрузки фото-ленты
-var originalOpenPage = window.openPage || function() {};
-window.openPage = function(pageId) {
-    originalOpenPage(pageId);
-    if (pageId === 'foto') {
-        setTimeout(loadFotoFeed, 500);
-    }
-};
 </script>
 
 </body>
