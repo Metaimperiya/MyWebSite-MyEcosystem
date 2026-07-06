@@ -64,7 +64,6 @@ function loadFeed() {
             var p = data[k];
             p.id = k;
             
-            // ✅ ПОСТЫ УДАЛЯЮТСЯ ИЗ БАЗЫ СРАЗУ, НЕ ЖДУТ
             if (p.deleted && p.deletedAt) {
                 db.ref('sites/' + SITE + '/feed_posts/' + k).remove();
                 if (p.authorUid) {
@@ -853,7 +852,7 @@ window.toggleLikeComment = function(postId, commentId, type) {
 };
 
 // ================================================================
-// ЛАЙКИ — ИСПРАВЛЕННАЯ ВЕРСИЯ
+// ЛАЙКИ
 // ================================================================
 
 window.toggleLike = function(postId, type) {
@@ -1034,7 +1033,7 @@ window.closePostPage = function() {
 };
 
 // ================================================================
-// УДАЛЕНИЕ ПОСТА — С ВОЗМОЖНОСТЬЮ ПОЛНОГО УДАЛЕНИЯ
+// УДАЛЕНИЕ ПОСТА
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -1083,17 +1082,11 @@ window.deletePost = function(id, type) {
     }, 300);
 };
 
-// ================================================================
-// ПОЛНОЕ УДАЛЕНИЕ ПОСТА (НАВСЕГДА) — МГНОВЕННОЕ
-// ================================================================
-
 window.permanentDeletePost = function(id, type) {
     var path = getPostPath(type);
     
-    // 1. Удаляем из feed_posts
     db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
     
-    // 2. Удаляем из user_posts
     db.ref('sites/' + SITE + '/' + path + '/' + id + '/authorUid').once('value', function(snap) {
         var authorUid = snap.val();
         if (authorUid) {
@@ -1101,22 +1094,16 @@ window.permanentDeletePost = function(id, type) {
         }
     });
     
-    // 3. Удаляем из DOM сразу
     var postEl = document.querySelector('.post[data-id="' + id + '"]');
     if (postEl && postEl.parentNode) {
         postEl.parentNode.removeChild(postEl);
     }
     
-    // 4. Принудительно обновляем ленту
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
     }, 50);
 };
-
-// ================================================================
-// ВОССТАНОВЛЕНИЕ УДАЛЕННОГО ПОСТА
-// ================================================================
 
 window.restorePost = function(id, type) {
     var path = getPostPath(type);
@@ -1480,7 +1467,7 @@ window.setFrameSize = function(size) {
 };
 
 // ================================================================
-// ФОТО-ЛЕНТА (ДОБАВИТЬ В КОНЕЦ ФАЙЛА)
+// ФОТО-ЛЕНТА — ИСПРАВЛЕННАЯ
 // ================================================================
 
 var fotoFeedListener = null;
@@ -1513,7 +1500,6 @@ function removeFotoImage() {
     if (input) input.value = '';
 }
 
-// Добавляем обработчик для загрузки фото
 document.addEventListener('DOMContentLoaded', function() {
     var fileInput = document.getElementById('fileInputFoto');
     if (fileInput) {
@@ -1572,21 +1558,20 @@ function loadFotoFeed() {
             return;
         }
 
-        var html = '';
+        el.innerHTML = '';
+
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            html += renderPost(p, 'foto');
+            var postEl = renderPost(p, 'foto');
+            if (postEl) {
+                el.appendChild(postEl);
+            }
         });
-        el.innerHTML = html;
     };
 
     db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
 }
-
-// ================================================================
-// ОТПРАВКА ПОСТА В ФОТО-ЛЕНТУ
-// ================================================================
 
 window.submitFotoPost = function() {
     if (!USER || !USER_UID) {
