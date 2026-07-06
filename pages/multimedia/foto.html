@@ -94,8 +94,12 @@
 var fotoFeedListener = null;
 
 function loadFotoFeed() {
-    if (!USER_UID) {
-        document.getElementById('fotoFeed').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
+    var el = document.getElementById('fotoFeed');
+    if (!el) return;
+
+    // Проверяем, есть ли пользователь
+    if (!USER || !USER_UID) {
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
         return;
     }
 
@@ -105,7 +109,6 @@ function loadFotoFeed() {
     }
 
     fotoFeedListener = function(snap) {
-        var el = document.getElementById('fotoFeed');
         var data = snap.val() || {};
         var keys = Object.keys(data).sort(function(a, b) {
             return (data[b].timestamp || 0) - (data[a].timestamp || 0);
@@ -133,7 +136,13 @@ function loadFotoFeed() {
 // ================================================================
 
 window.submitFotoPost = function() {
-    if (!USER) { alert('Войдите!'); return; }
+    // 👇 ПРОВЕРКА НА ПОЛЬЗОВАТЕЛЯ
+    if (!USER || !USER_UID) {
+        alert('Войдите, чтобы опубликовать пост!');
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return;
+    }
 
     var text = getEditorText().trim();
     if (!text && !pendingImageFile) {
@@ -227,11 +236,18 @@ window.submitFotoPost = function() {
                     console.log('✅ Все компоненты загружены!');
                     setTimeout(function() {
                         try {
+                            // Проверяем, есть ли сохранённый пользователь
+                            var savedUser = localStorage.getItem('dc_u_' + SITE);
+                            if (savedUser && !USER) {
+                                USER = savedUser;
+                            }
+                            
                             if (typeof updateUI === 'function') updateUI();
                             if (typeof loadNotifications === 'function') loadNotifications();
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
+                            
                             // Загружаем ленту фото
                             loadFotoFeed();
                         } catch(e) {
@@ -248,6 +264,10 @@ window.submitFotoPost = function() {
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     setTimeout(function() {
                         try {
+                            var savedUser = localStorage.getItem('dc_u_' + SITE);
+                            if (savedUser && !USER) {
+                                USER = savedUser;
+                            }
                             if (typeof updateUI === 'function') updateUI();
                             if (typeof loadNotifications === 'function') loadNotifications();
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
