@@ -26,15 +26,46 @@ function getCommentState(postId) {
     return commentStates[postId];
 }
 
+// ===== АНИМАЦИЯ ЗАГРУЗКИ =====
+function showLoading(el) {
+    if (!el) return;
+    el.innerHTML = `
+        <div style="text-align:center;padding:30px 20px;">
+            <div style="display:inline-block;width:40px;height:40px;border:3px solid var(--border-color);border-top:3px solid var(--link-color);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+            <div style="margin-top:12px;color:var(--muted-text);font-size:0.75rem;">Загрузка...</div>
+            <div style="width:100%;max-width:200px;height:4px;background:var(--border-color);border-radius:4px;margin:8px auto 0;overflow:hidden;">
+                <div style="width:0%;height:100%;background:var(--link-color);border-radius:4px;animation:progress 1.5s ease-in-out infinite;"></div>
+            </div>
+        </div>
+        <style>
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            @keyframes progress { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
+        </style>
+    `;
+}
+
+function hideLoading(el) {
+    if (!el) return;
+    // Убираем только если там осталась загрузка
+    if (el.querySelector('.loading-placeholder')) {
+        el.innerHTML = '';
+    }
+}
+
 // ================================================================
 // ЗАГРУЗКА ЛЕНТЫ (ГЛАВНАЯ)
 // ================================================================
 
 function loadFeed() {
+    var el = document.getElementById('feed');
+    if (!el) return;
+
     if (!USER_UID) {
-        document.getElementById('feed').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
         return;
     }
+
+    showLoading(el);
 
     if (feedListener) {
         db.ref('sites/' + SITE + '/feed_posts').off('value', feedListener);
@@ -42,7 +73,6 @@ function loadFeed() {
     }
 
     feedListener = function(snap) {
-        var el = document.getElementById('feed');
         var data = snap.val() || {};
         var keys = Object.keys(data).sort(function(a, b) {
             return (data[b].timestamp || 0) - (data[a].timestamp || 0);
@@ -950,10 +980,56 @@ window.submitComment = function(postId, type) {
     input.value = '';
 };
 
-window.deleteComment = function(postId, commentId, type) {
-    if (!confirm('🗑 Удалить комментарий?')) return;
+// ================================================================
+// УДАЛЕНИЕ КОММЕНТАРИЯ С ВЕТКОЙ
+// ================================================================
+
+function deleteCommentWithChildren(postId, commentId, type) {
     var path = getPostPath(type);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
+    var commentsRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments');
+    
+    // Сначала получаем все комментарии
+    commentsRef.once('value', function(snap) {
+        var allComments = snap.val() || {};
+        var toDelete = {};
+        
+        // Рекурсивно собираем все дочерние комментарии
+        function collectChildren(parentId) {
+            Object.keys(allComments).forEach(function(id) {
+                if (allComments[id].parentId === parentId) {
+                    toDelete[id] = true;
+                    collectChildren(id);
+                }
+            });
+        }
+        
+        // Добавляем сам комментарий
+        toDelete[commentId] = true;
+        // Собираем всех детей
+        collectChildren(commentId);
+        
+        // Удаляем все найденные комментарии
+        var updates = {};
+        Object.keys(toDelete).forEach(function(id) {
+            updates[id] = null;
+        });
+        
+        commentsRef.update(updates).then(function() {
+            // Обновляем счетчик комментариев
+            var remaining = 0;
+            Object.keys(allComments).forEach(function(id) {
+                if (!toDelete[id]) remaining++;
+            });
+            db.ref('sites/' + SITE + '/' + path + '/' + postId + '/commentCount').set(remaining);
+            var countEl = document.getElementById('commentCount_' + postId);
+            if (countEl) countEl.textContent = remaining;
+        });
+    });
+}
+
+window.deleteComment = function(postId, commentId, type) {
+    if (!confirm('🗑 Удалить комментарий и все ответы на него?')) return;
+    deleteCommentWithChildren(postId, commentId, type);
     var menu = document.getElementById('commentMenu_' + commentId);
     if (menu) menu.classList.remove('open');
 };
@@ -1010,7 +1086,7 @@ function editComment(postId, commentId, type) {
 
 function saveCommentEdit(postId, commentId, type, newText) {
     if (!newText) {
-        deleteComment(postId, commentId, type);
+        deleteCommentWithChildren(postId, commentId, type);
         return;
     }
     var path = getPostPath(type);
@@ -1357,7 +1433,7 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ
+// РЕПОСТЫ — БЕЗ ЛИШНЕГО ПОДТВЕРЖДЕНИЯ
 // ================================================================
 
 window.openRepost = function(postId, type) {
@@ -1476,7 +1552,7 @@ function saveNestedRepost(repostData, postId, type, path) {
     db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
     
     closeRepost();
-    alert('✅ Репост создан!');
+    // Убрал alert('✅ Репост создан!') — теперь без лишнего подтверждения
     
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
@@ -1582,6 +1658,8 @@ function loadFotoFeed() {
         el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
         return;
     }
+
+    showLoading(el);
 
     if (fotoFeedListener) {
         db.ref('sites/' + SITE + '/foto_posts').off('value', fotoFeedListener);
