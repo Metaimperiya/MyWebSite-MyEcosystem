@@ -1478,3 +1478,179 @@ window.setFrameSize = function(size) {
         if (btn) btn.classList.add('active');
     }
 };
+
+// ================================================================
+// ФОТО-ЛЕНТА (ДОБАВИТЬ В КОНЕЦ ФАЙЛА)
+// ================================================================
+
+var fotoFeedListener = null;
+var pendingFotoImage = null;
+var pendingFotoImageFile = null;
+
+function getFotoEditorText() {
+    var editor = document.getElementById('postEditorFoto');
+    if (!editor) return '';
+    return editor.innerHTML;
+}
+
+function clearFotoPostForm() {
+    var editor = document.getElementById('postEditorFoto');
+    if (editor) editor.innerHTML = '';
+    pendingFotoImage = null;
+    pendingFotoImageFile = null;
+    var preview = document.getElementById('previewBoxFoto');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputFoto');
+    if (input) input.value = '';
+}
+
+function removeFotoImage() {
+    pendingFotoImage = null;
+    pendingFotoImageFile = null;
+    var preview = document.getElementById('previewBoxFoto');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputFoto');
+    if (input) input.value = '';
+}
+
+// Добавляем обработчик для загрузки фото
+document.addEventListener('DOMContentLoaded', function() {
+    var fileInput = document.getElementById('fileInputFoto');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Только изображения!');
+                this.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Максимум 5 МБ');
+                this.value = '';
+                return;
+            }
+
+            pendingFotoImageFile = file;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                pendingFotoImage = ev.target.result;
+                var img = document.getElementById('previewImgFoto');
+                var name = document.getElementById('previewNameFoto');
+                var box = document.getElementById('previewBoxFoto');
+                if (img) img.src = pendingFotoImage;
+                if (name) name.textContent = file.name.slice(0, 16);
+                if (box) box.classList.add('visible');
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+});
+
+function loadFotoFeed() {
+    var el = document.getElementById('fotoFeed');
+    if (!el) return;
+
+    if (!USER || !USER_UID) {
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
+        return;
+    }
+
+    if (fotoFeedListener) {
+        db.ref('sites/' + SITE + '/foto_posts').off('value', fotoFeedListener);
+        fotoFeedListener = null;
+    }
+
+    fotoFeedListener = function(snap) {
+        var data = snap.val() || {};
+        var keys = Object.keys(data).sort(function(a, b) {
+            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
+        });
+
+        if (!keys.length) {
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока нет фото-постов. Будьте первым!</div>';
+            return;
+        }
+
+        var html = '';
+        keys.forEach(function(k) {
+            var p = data[k];
+            p.id = k;
+            html += renderPost(p, 'foto');
+        });
+        el.innerHTML = html;
+    };
+
+    db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
+}
+
+// ================================================================
+// ОТПРАВКА ПОСТА В ФОТО-ЛЕНТУ
+// ================================================================
+
+window.submitFotoPost = function() {
+    if (!USER || !USER_UID) {
+        alert('Войдите, чтобы опубликовать пост!');
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return;
+    }
+
+    var text = getFotoEditorText().trim();
+    if (!text && !pendingFotoImageFile) {
+        alert('Введите текст или добавьте фото');
+        return;
+    }
+
+    var hashtags = extractHashtags(text);
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
+        var avatarUrl = avatarSnap.val() || null;
+        
+        var postData = {
+            author: USER,
+            authorUid: USER_UID,
+            authorAvatar: avatarUrl,
+            text: text || '📷',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            reposts: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            frameSize: 'small',
+            edited: false,
+            img: null,
+            repost: null,
+            deleted: null,
+            deletedAt: null
+        };
+
+        var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+        if (linkMatch) postData.link = linkMatch[1];
+
+        var savePost = function(imgData) {
+            if (imgData) postData.img = imgData;
+            
+            db.ref('sites/' + SITE + '/foto_posts').push(postData);
+            clearFotoPostForm();
+            
+            setTimeout(function() {
+                loadFotoFeed();
+            }, 300);
+        };
+
+        if (pendingFotoImageFile) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                savePost(e.target.result);
+            };
+            reader.readAsDataURL(pendingFotoImageFile);
+        } else {
+            savePost(null);
+        }
+    });
+};
