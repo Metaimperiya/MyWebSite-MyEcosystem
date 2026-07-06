@@ -538,6 +538,15 @@ function openPage(pageId) {
         page.style.display = 'block';
         page.classList.add('active');
         console.log('✅ Открыта страница:', pageId);
+        
+        // Загружаем фото-ленту если открыта страница foto
+        if (pageId === 'foto') {
+            setTimeout(function() {
+                if (typeof loadFotoFeed === 'function') {
+                    loadFotoFeed();
+                }
+            }, 300);
+        }
     } else {
         console.warn('⚠️ Страница не найдена:', pageId);
     }
