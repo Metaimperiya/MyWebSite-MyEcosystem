@@ -4,29 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Фото — METAIMPERIYA</title>
-    <meta name="description" content="Опубликовать пост в разделе Фото">
-    <meta name="keywords" content="фото, пост, опубликовать">
+    <meta name="description" content="Фото-лента METAIMPERIYA">
+    <meta name="keywords" content="фото, лента, публикации">
     <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="../../css/components.css">
     <link rel="stylesheet" href="../../css/mobile.css">
-    <style>
-        #feed { display: none !important; }
-        .container > p { display: none !important; }
-        .container > div[style*="grid-template-columns"] { display: none !important; }
-    </style>
 </head>
 <body>
 <div class="app">
 
+    <!-- ===== ШАПКА ===== -->
     <div id="topbarContainer"></div>
+
+    <!-- ===== МЕНЮ НАСТРОЕК ===== -->
     <div id="settingsContainer"></div>
+
+    <!-- ===== САЙДБАР ===== -->
     <div id="sidebarContainer"></div>
+
+    <!-- ===== МОДАЛКИ ===== -->
     <div id="modalsContainer"></div>
 
+    <!-- ===== КОНТЕНТ ===== -->
     <div class="container" style="padding-top:10px;">
-        <button onclick="window.location.href='/'">← Назад</button>
-        <h1>📸 Фото</h1>
 
+        <!-- ===== КНОПКА НАЗАД ===== -->
+        <button onclick="window.location.href='/'">← Назад</button>
+
+        <h1>📸 Фото</h1>
+        <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
+
+        <!-- ===== ФОРМА ПОСТА ===== -->
         <div class="card" style="margin-top:10px;">
             <div class="post-form">
                 <div class="editor-toolbar">
@@ -40,10 +48,10 @@
                     <button onclick="formatText('code')">&lt;/&gt;</button>
                     <button onclick="insertLink()">🔗</button>
                 </div>
-                <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что нового в мире фото?"></div>
                 <div class="post-actions" style="margin-top:6px;">
                     <label class="file-label" for="fileInput">📎 Фото</label>
-                    <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                    <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
                     <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
                 </div>
                 <input type="file" id="fileInput" accept="image/*" class="hidden">
@@ -54,13 +62,17 @@
             </div>
         </div>
 
-        <div id="feed"></div>
+        <!-- ===== ЛЕНТА ФОТО ===== -->
+        <div id="fotoFeed"></div>
+
     </div>
 
+    <!-- ===== ПЛЕЕР ===== -->
     <div id="playerContainer"></div>
 
 </div>
 
+<!-- ===== СКРИПТЫ ===== -->
 <script src="../../js/firebase.js"></script>
 <script src="../../js/lang.js"></script>
 <script src="../../js/auth.js"></script>
@@ -75,6 +87,118 @@
 <script src="../../js/admin.js"></script>
 
 <script>
+// ================================================================
+// ОТДЕЛЬНАЯ ЛЕНТА ДЛЯ ФОТО
+// ================================================================
+
+var fotoFeedListener = null;
+
+function loadFotoFeed() {
+    if (!USER_UID) {
+        document.getElementById('fotoFeed').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
+        return;
+    }
+
+    if (fotoFeedListener) {
+        db.ref('sites/' + SITE + '/foto_posts').off('value', fotoFeedListener);
+        fotoFeedListener = null;
+    }
+
+    fotoFeedListener = function(snap) {
+        var el = document.getElementById('fotoFeed');
+        var data = snap.val() || {};
+        var keys = Object.keys(data).sort(function(a, b) {
+            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
+        });
+
+        if (!keys.length) {
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока нет фото-постов. Будьте первым!</div>';
+            return;
+        }
+
+        var html = '';
+        keys.forEach(function(k) {
+            var p = data[k];
+            p.id = k;
+            html += renderPost(p, 'foto');
+        });
+        el.innerHTML = html;
+    };
+
+    db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
+}
+
+// ================================================================
+// ОТПРАВКА ПОСТА В ЛЕНТУ ФОТО
+// ================================================================
+
+window.submitFotoPost = function() {
+    if (!USER) { alert('Войдите!'); return; }
+
+    var text = getEditorText().trim();
+    if (!text && !pendingImageFile) {
+        alert('Введите текст или добавьте фото');
+        return;
+    }
+
+    var hashtags = extractHashtags(text);
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
+        var avatarUrl = avatarSnap.val() || null;
+        
+        var postData = {
+            author: USER,
+            authorUid: USER_UID,
+            authorAvatar: avatarUrl,
+            text: text || '📷',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            reposts: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            frameSize: 'small',
+            edited: false,
+            img: null,
+            repost: null,
+            deleted: null,
+            deletedAt: null
+        };
+
+        var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+        if (linkMatch) postData.link = linkMatch[1];
+
+        var savePost = function(imgData) {
+            if (imgData) postData.img = imgData;
+            
+            db.ref('sites/' + SITE + '/foto_posts').push(postData);
+            clearEditor();
+            clearPostForm();
+            
+            setTimeout(function() {
+                loadFotoFeed();
+            }, 300);
+        };
+
+        if (pendingImageFile) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                savePost(e.target.result);
+            };
+            reader.readAsDataURL(pendingImageFile);
+        } else {
+            savePost(null);
+        }
+    });
+};
+
+// ================================================================
+// ЗАГРУЗКА КОМПОНЕНТОВ
+// ================================================================
+
 (function() {
     const components = [
         { id: 'topbarContainer', url: '../../topbar.html' },
@@ -108,6 +232,8 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
+                            // Загружаем ленту фото
+                            loadFotoFeed();
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
                         }
@@ -127,6 +253,7 @@
                             if (typeof updateNotifBadge === 'function') updateNotifBadge();
                             if (typeof initAudio === 'function') initAudio();
                             if (typeof translatePage === 'function') translatePage();
+                            loadFotoFeed();
                         } catch(e) {
                             console.warn('Ошибка инициализации:', e);
                         }
@@ -136,7 +263,10 @@
     });
 })();
 
-// Авто-скрытие шапки
+// ================================================================
+// АВТО-СКРЫТИЕ ШАПКИ
+// ================================================================
+
 (function() {
     var lastScrollY = 0;
     var topbar = document.getElementById('topbar');
