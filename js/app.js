@@ -76,6 +76,17 @@ function setActivePage(pageId) {
     if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
 }
 
+// ===== КНОПКА "ГЛАВНАЯ" В САЙДБАРЕ =====
+window.goToHome = function() {
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
+    // Перенаправляем на главную страницу
+    window.location.href = '/';
+};
+
 window.goToFeed = function() {
     if (!USER) { 
         var loginModal = document.getElementById('loginModal');
