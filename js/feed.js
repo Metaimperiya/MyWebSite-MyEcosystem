@@ -6,6 +6,7 @@ var commentStates = {};
 var feedListener = null;
 
 function getPostPath(type) {
+    if (type === 'foto') return 'foto_posts';
     if (type === 'group') return 'group_posts/' + currentGroup;
     if (type === 'profile') {
         var uid = VIEWING_USER || USER_UID;
@@ -1603,7 +1604,6 @@ function loadFotoFeed() {
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            // Используем renderPost с типом 'foto' — теперь есть три точки!
             var postEl = renderPost(p, 'foto');
             if (postEl) {
                 el.appendChild(postEl);
@@ -1661,7 +1661,6 @@ window.submitFotoPost = function() {
             db.ref('sites/' + SITE + '/foto_posts').push(postData);
             clearFotoPostForm();
             
-            // Мгновенное обновление ленты
             setTimeout(function() {
                 loadFotoFeed();
             }, 100);
@@ -1678,12 +1677,6 @@ window.submitFotoPost = function() {
         }
     });
 };
-
-// ===== УДАЛЕНИЕ ИЗ ФОТО-ЛЕНТЫ (ИСПОЛЬЗУЕТ ОБЩУЮ ФУНКЦИЮ) =====
-// deletePost уже есть выше, он работает для всех типов включая 'foto'
-
-// ===== РЕПОСТ ИЗ ФОТО-ЛЕНТЫ (ИСПОЛЬЗУЕТ openRepost) =====
-// openRepost уже есть выше
 
 // ================================================================
 // ТОГЛ МЕНЮ (ДЛЯ ТРИ ТОЧКИ)
