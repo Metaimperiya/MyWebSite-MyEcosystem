@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА И ПОСТЫ — С РЕДАКТОРОМ И АВТООБНОВЛЕНИЕМ
+// ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
 var commentStates = {};
@@ -26,7 +26,7 @@ function getCommentState(postId) {
 }
 
 // ================================================================
-// ЗАГРУЗКА ЛЕНТЫ
+// ЗАГРУЗКА ЛЕНТЫ (ГЛАВНАЯ)
 // ================================================================
 
 function loadFeed() {
@@ -100,6 +100,10 @@ function loadFeed() {
     db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', feedListener);
 }
 
+// ================================================================
+// ОБНОВЛЕНИЕ СТАТИСТИКИ ПОСТА
+// ================================================================
+
 function updatePostStats(postId, data) {
     var likeCount = document.getElementById('likeCount_' + postId);
     var commentCount = document.getElementById('commentCount_' + postId);
@@ -118,12 +122,6 @@ function getEditorText() {
     var editor = document.getElementById('postEditor');
     if (!editor) return '';
     return editor.innerHTML;
-}
-
-function setEditorText(html) {
-    var editor = document.getElementById('postEditor');
-    if (!editor) return;
-    editor.innerHTML = html || '';
 }
 
 function clearEditor() {
@@ -214,7 +212,7 @@ function insertLink() {
 }
 
 // ================================================================
-// ОТПРАВКА ПОСТА (ИЗ ЛЕНТЫ)
+// ОТПРАВКА ПОСТА (ГЛАВНАЯ ЛЕНТА)
 // ================================================================
 
 window.submitPost = function() {
@@ -282,7 +280,7 @@ window.submitPost = function() {
 };
 
 // ================================================================
-// ОТПРАВКА ПОСТА (ИЗ ПРОФИЛЯ)
+// ОТПРАВКА ПОСТА (ПРОФИЛЬ)
 // ================================================================
 
 var pendingProfileImageFile = null;
@@ -436,7 +434,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// РЕНДЕР ПОСТА
+// РЕНДЕР ПОСТА (ПОЛНАЯ ВЕРСИЯ С ТРИ ТОЧКИ)
 // ================================================================
 
 function renderPost(p, type) {
@@ -505,9 +503,16 @@ function renderPost(p, type) {
     var isAuthor = (p.authorUid === USER_UID);
     var canDelete = isAuthor || isAdmin;
 
+    // ===== ТРИ ТОЧКИ =====
     var menuHtml = '';
     if (canDelete) {
-        menuHtml = '<div class="post-menu"><button class="dots" onclick="event.stopPropagation();togglePostMenu(\'' + p.id + '\')">⋮</button><div class="dropdown" id="menu_' + p.id + '"><button class="edit-btn" onclick="event.stopPropagation();openEdit(\'' + p.id + '\', \'' + type + '\')" style="color:#e67e22;">✏️ Редактировать</button><button class="del-btn" onclick="event.stopPropagation();deletePost(\'' + p.id + '\', \'' + type + '\')" style="color:var(--danger);">🗑 Удалить</button></div></div>';
+        menuHtml = '<div class="post-menu">' +
+            '<button class="dots" onclick="event.stopPropagation();togglePostMenu(\'' + p.id + '\')">⋮</button>' +
+            '<div class="dropdown" id="menu_' + p.id + '">' +
+            '<button class="edit-btn" onclick="event.stopPropagation();openEdit(\'' + p.id + '\', \'' + type + '\')" style="color:#e67e22;">✏️ Редактировать</button>' +
+            '<button class="del-btn" onclick="event.stopPropagation();deletePost(\'' + p.id + '\', \'' + type + '\')" style="color:var(--danger);">🗑 Удалить</button>' +
+            '</div>' +
+            '</div>';
     }
 
     var actionsHtml = '<div class="stats" onclick="event.stopPropagation();">' +
@@ -516,6 +521,7 @@ function renderPost(p, type) {
         '<button onclick="event.stopPropagation();openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
         '</div>';
 
+    // ===== КОММЕНТАРИИ (ВЛОЖЕННЫЕ) =====
     var commentsHtml = `
         <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;" onclick="event.stopPropagation();">
             <div class="comments" id="comments_${p.id}">
@@ -626,7 +632,7 @@ function renderNestedRepost(repost, level) {
 }
 
 // ================================================================
-// КОММЕНТАРИИ
+// КОММЕНТАРИИ (ПОЛНАЯ ВЕРСИЯ)
 // ================================================================
 
 window.toggleComments = function(postId, type) {
@@ -943,45 +949,79 @@ window.submitComment = function(postId, type) {
     input.value = '';
 };
 
-window.submitReply = function(postId, parentId, type) {
-    if (!USER) { alert('Войдите!'); return; }
-    
-    var input = document.getElementById('replyInputField_' + parentId);
-    if (!input) return;
-    
-    var text = input.value.trim();
-    if (!text) return;
-    
+window.deleteComment = function(postId, commentId, type) {
+    if (!confirm('🗑 Удалить комментарий?')) return;
     var path = getPostPath(type);
-    
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + parentId + '/authorUid').once('value', function(parentSnap) {
-        var parentAuthorUid = parentSnap.val();
-        
-        db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
-            author: USER,
-            authorUid: USER_UID,
-            text: text,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: Date.now(),
-            likes: 0,
-            parentId: parentId
-        }).then(function() {
-            if (parentAuthorUid && parentAuthorUid !== USER_UID) {
-                sendNotification(parentAuthorUid, {
-                    type: 'comment',
-                    from: USER_UID,
-                    text: USER + ' ответил(а) на ваш комментарий: "' + (text.slice(0, 50)) + (text.length > 50 ? '...' : ''),
-                    postId: postId,
-                    postType: type,
-                    timestamp: Date.now()
-                });
-            }
-        });
-    });
-    
-    input.value = '';
-    document.getElementById('replyInput_' + parentId).style.display = 'none';
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).remove();
+    var menu = document.getElementById('commentMenu_' + commentId);
+    if (menu) menu.classList.remove('open');
 };
+
+window.toggleCommentMenu = function(commentId) {
+    var menu = document.getElementById('commentMenu_' + commentId);
+    if (!menu) return;
+    document.querySelectorAll('.comment-actions .dropdown.open').forEach(function(el) {
+        if (el.id !== 'commentMenu_' + commentId) el.classList.remove('open');
+    });
+    menu.classList.toggle('open');
+};
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.comment-actions')) {
+        document.querySelectorAll('.comment-actions .dropdown.open').forEach(function(el) {
+            el.classList.remove('open');
+        });
+    }
+});
+
+function editComment(postId, commentId, type) {
+    var textEl = document.getElementById('comment-text-' + commentId);
+    if (!textEl) return;
+
+    var menu = document.getElementById('commentMenu_' + commentId);
+    if (menu) menu.classList.remove('open');
+
+    var currentText = textEl.textContent;
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentText;
+    input.className = 'edit-comment-input';
+
+    textEl.innerHTML = '';
+    textEl.appendChild(input);
+    input.focus();
+    input.select();
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            saveCommentEdit(postId, commentId, type, input.value.trim());
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        setTimeout(function() {
+            if (document.activeElement !== input) {
+                saveCommentEdit(postId, commentId, type, input.value.trim());
+            }
+        }, 200);
+    });
+}
+
+function saveCommentEdit(postId, commentId, type, newText) {
+    if (!newText) {
+        deleteComment(postId, commentId, type);
+        return;
+    }
+    var path = getPostPath(type);
+    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId).update({
+        text: newText,
+        edited: true
+    });
+}
+
+// ================================================================
+// ОТКРЫТИЕ СТРАНИЦЫ ПОСТА
+// ================================================================
 
 window.openPostPage = function(postId, type) {
     window.CURRENT_POST_ID = postId;
@@ -1033,7 +1073,7 @@ window.closePostPage = function() {
 };
 
 // ================================================================
-// УДАЛЕНИЕ ПОСТА
+// УДАЛЕНИЕ ПОСТА (ЧЕРЕЗ ТРИ ТОЧКИ)
 // ================================================================
 
 window.deletePost = function(id, type) {
@@ -1467,7 +1507,7 @@ window.setFrameSize = function(size) {
 };
 
 // ================================================================
-// ФОТО-ЛЕНТА — ИСПРАВЛЕННАЯ
+// ФОТО-ЛЕНТА (ОТДЕЛЬНАЯ)
 // ================================================================
 
 var fotoFeedListener = null;
@@ -1563,6 +1603,7 @@ function loadFotoFeed() {
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
+            // Используем renderPost с типом 'foto' — теперь есть три точки!
             var postEl = renderPost(p, 'foto');
             if (postEl) {
                 el.appendChild(postEl);
@@ -1614,18 +1655,16 @@ window.submitFotoPost = function() {
             deletedAt: null
         };
 
-        var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
-        if (linkMatch) postData.link = linkMatch[1];
-
         var savePost = function(imgData) {
             if (imgData) postData.img = imgData;
             
             db.ref('sites/' + SITE + '/foto_posts').push(postData);
             clearFotoPostForm();
             
+            // Мгновенное обновление ленты
             setTimeout(function() {
                 loadFotoFeed();
-            }, 300);
+            }, 100);
         };
 
         if (pendingFotoImageFile) {
@@ -1639,3 +1678,31 @@ window.submitFotoPost = function() {
         }
     });
 };
+
+// ===== УДАЛЕНИЕ ИЗ ФОТО-ЛЕНТЫ (ИСПОЛЬЗУЕТ ОБЩУЮ ФУНКЦИЮ) =====
+// deletePost уже есть выше, он работает для всех типов включая 'foto'
+
+// ===== РЕПОСТ ИЗ ФОТО-ЛЕНТЫ (ИСПОЛЬЗУЕТ openRepost) =====
+// openRepost уже есть выше
+
+// ================================================================
+// ТОГЛ МЕНЮ (ДЛЯ ТРИ ТОЧКИ)
+// ================================================================
+
+window.togglePostMenu = function(id) {
+    var menu = document.getElementById('menu_' + id);
+    if (menu) {
+        document.querySelectorAll('.post-menu .dropdown.open').forEach(function(el) {
+            if (el.id !== 'menu_' + id) el.classList.remove('open');
+        });
+        menu.classList.toggle('open');
+    }
+};
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.post-menu')) {
+        document.querySelectorAll('.post-menu .dropdown.open').forEach(function(el) {
+            el.classList.remove('open');
+        });
+    }
+});
