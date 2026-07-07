@@ -88,34 +88,31 @@
 
 <script>
 // ================================================================
-// ЕДИНСТВЕННАЯ ФУНКЦИЯ ДЛЯ ШАПКИ
+// ТВОЙ НИК И АВАТАРКА — ПРОСТО ВСТАВЛЯЕМ
 // ================================================================
 
-function updateTopbar() {
+var MY_USERNAME = 'PLAYER Likee';
+var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
+
+function setTopbar() {
     var topName = document.getElementById('topName');
     var topAvatar = document.getElementById('topAvatar');
     
     if (topName) {
-        if (USER) {
-            topName.textContent = USER;
-        } else {
-            var saved = localStorage.getItem('dc_u_' + SITE);
-            topName.textContent = saved || 'Гость';
-        }
+        topName.textContent = MY_USERNAME;
     }
     
     if (topAvatar) {
-        if (USER_UID) {
-            renderAvatar(USER_UID, topAvatar, (USER || '?').charAt(0).toUpperCase());
-        } else {
-            var saved = localStorage.getItem('dc_u_' + SITE);
-            topAvatar.innerHTML = '<span class="letter">' + (saved ? saved.charAt(0).toUpperCase() : '?') + '</span>';
-        }
+        // Пробуем загрузить аватарку из Firebase
+        renderAvatar(MY_UID, topAvatar, MY_USERNAME.charAt(0).toUpperCase());
     }
 }
 
+// Запускаем сразу
+setTopbar();
+
 // ================================================================
-// АВТОРИЗАЦИЯ
+// АВТОРИЗАЦИЯ (для остального функционала)
 // ================================================================
 
 auth.onAuthStateChanged(function(user) {
@@ -134,8 +131,6 @@ auth.onAuthStateChanged(function(user) {
         USER_UID = null;
         console.log('⏳ Не авторизован');
     }
-    
-    updateTopbar();
 });
 
 // ================================================================
@@ -168,8 +163,8 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
                     
-                    // Сразу обновляем шапку — без таймеров
-                    updateTopbar();
+                    // После загрузки шапки — снова вставляем ник
+                    setTopbar();
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
@@ -178,7 +173,6 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
                             loadProfile();
@@ -193,7 +187,7 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     
-                    updateTopbar();
+                    setTopbar();
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
@@ -202,7 +196,6 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
                             loadProfile();
