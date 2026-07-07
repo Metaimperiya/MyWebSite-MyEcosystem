@@ -664,3 +664,66 @@ function show404() {
 
 // Запускаем после загрузки
 setTimeout(handleShortUrl, 600);
+
+// ================================================================
+// КОРОТКИЕ ССЫЛКИ
+// ================================================================
+
+function handleShortUrl() {
+    var path = window.location.pathname;
+    var slug = path.replace('/', '').replace(/\/$/, '');
+    
+    if (!slug || slug === '' || slug === 'index.html') {
+        return;
+    }
+    
+    // Если это твоя страница
+    if (slug === 'player-likee') {
+        // Показываем страницу с твоими постами
+        document.querySelectorAll('.page').forEach(function(el) {
+            el.style.display = 'none';
+            el.classList.remove('active');
+        });
+        var page = document.getElementById('page-profile');
+        if (page) {
+            page.style.display = 'block';
+            page.classList.add('active');
+            // Загружаем твой профиль
+            if (typeof loadProfile === 'function') {
+                VIEWING_USER = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
+                loadProfile();
+            }
+        }
+        return;
+    }
+    
+    // Если страница не найдена — 404
+    show404();
+}
+
+function show404() {
+    var container = document.getElementById('pageContainer');
+    if (!container) {
+        // Создаём контейнер если его нет
+        var main = document.querySelector('.container');
+        if (main) {
+            var div = document.createElement('div');
+            div.id = 'pageContainer';
+            main.appendChild(div);
+            container = div;
+        }
+    }
+    if (container) {
+        container.innerHTML = `
+            <div style="text-align:center;padding:40px 20px;">
+                <div style="font-size:48px;color:var(--muted-text);">404</div>
+                <div style="font-size:1.2rem;font-weight:600;margin:10px 0;">Страница не найдена</div>
+                <div style="color:var(--muted-text);font-size:0.8rem;">Страница ${window.location.pathname} не существует</div>
+                <button onclick="window.location.href='/'" style="margin-top:16px;padding:8px 24px;background:var(--link-color);color:#fff;border:none;border-radius:8px;cursor:pointer;">На главную</button>
+            </div>
+        `;
+    }
+}
+
+// Запускаем после загрузки
+setTimeout(handleShortUrl, 600);
