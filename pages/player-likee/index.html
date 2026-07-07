@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLAYER Likee — METAIMPERIYA</title>
-    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA">
+    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA. Посты, фото, общение.">
+    <meta name="keywords" content="PLAYER Likee, METAIMPERIYA, персональная страница">
     <meta property="og:title" content="PLAYER Likee — METAIMPERIYA">
     <meta property="og:description" content="Персональная страница PLAYER Likee на METAIMPERIYA">
     <meta property="og:type" content="website">
@@ -31,11 +32,13 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
+        <!-- ===== СТРАНИЦА С РЕАЛЬНЫМ КОНТЕНТОМ ===== -->
         <div class="page active" id="page-page">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
             </div>
             
+            <!-- ===== ПРОФИЛЬ ===== -->
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar"><span class="letter">P</span></div>
                 <div class="name">PLAYER Likee</div>
@@ -47,6 +50,7 @@
                 </div>
             </div>
 
+            <!-- ===== ПОСТЫ ===== -->
             <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
             <div id="profilePosts"></div>
         </div>
@@ -88,52 +92,6 @@
 
 <script>
 // ================================================================
-// ТВОЙ НИК И АВАТАРКА — ПРОСТО ВСТАВЛЯЕМ
-// ================================================================
-
-var MY_USERNAME = 'PLAYER Likee';
-var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-
-function setTopbar() {
-    var topName = document.getElementById('topName');
-    var topAvatar = document.getElementById('topAvatar');
-    
-    if (topName) {
-        topName.textContent = MY_USERNAME;
-    }
-    
-    if (topAvatar) {
-        // Пробуем загрузить аватарку из Firebase
-        renderAvatar(MY_UID, topAvatar, MY_USERNAME.charAt(0).toUpperCase());
-    }
-}
-
-// Запускаем сразу
-setTopbar();
-
-// ================================================================
-// АВТОРИЗАЦИЯ (для остального функционала)
-// ================================================================
-
-auth.onAuthStateChanged(function(user) {
-    if (user) {
-        USER_UID = user.uid;
-        USER = user.displayName || user.email || 'User';
-        localStorage.setItem('dc_u_' + SITE, USER);
-        
-        var avatarUrl = user.photoURL || null;
-        if (!avatarCache) avatarCache = {};
-        avatarCache[USER_UID] = avatarUrl;
-        
-        console.log('✅ Авторизован как:', USER);
-    } else {
-        USER = null;
-        USER_UID = null;
-        console.log('⏳ Не авторизован');
-    }
-});
-
-// ================================================================
 // ЗАГРУЗКА КОМПОНЕНТОВ
 // ================================================================
 
@@ -162,10 +120,6 @@ auth.onAuthStateChanged(function(user) {
                 loaded++;
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
-                    
-                    // После загрузки шапки — снова вставляем ник
-                    setTopbar();
-                    
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
                         if (typeof updateUI === 'function') updateUI();
@@ -173,11 +127,13 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
+                        // Загружаем посты
+                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
                             loadProfile();
                         }
-                    }, 300);
+                    }, 500);
                 }
             })
             .catch(err => {
@@ -186,9 +142,6 @@ auth.onAuthStateChanged(function(user) {
                 loaded++;
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
-                    
-                    setTopbar();
-                    
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
                         if (typeof updateUI === 'function') updateUI();
@@ -196,15 +149,35 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
+                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
                             loadProfile();
                         }
-                    }, 300);
+                    }, 500);
                 }
             });
     });
 })();
+
+// ================================================================
+// АВТОРИЗАЦИЯ
+// ================================================================
+
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        USER_UID = user.uid;
+        USER = user.displayName || user.email || 'User';
+        localStorage.setItem('dc_u_' + SITE, USER);
+        var avatarUrl = user.photoURL || null;
+        if (!avatarCache) avatarCache = {};
+        avatarCache[USER_UID] = avatarUrl;
+        if (typeof updateUI === 'function') updateUI();
+        console.log('✅ Авторизован как:', USER);
+    } else {
+        console.log('⏳ Не авторизован');
+    }
+});
 </script>
 
 </body>
