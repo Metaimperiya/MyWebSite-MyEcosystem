@@ -88,7 +88,7 @@
 
 <script>
 // ================================================================
-// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ НА СТРАНИЦЕ /player-likee
+// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ
 // ================================================================
 
 function forceUpdateTopbar() {
@@ -103,7 +103,10 @@ function forceUpdateTopbar() {
     }
 }
 
-// Ждём авторизацию и обновляем шапку
+// ================================================================
+// АВТОРИЗАЦИЯ
+// ================================================================
+
 auth.onAuthStateChanged(function(user) {
     if (user) {
         USER_UID = user.uid;
@@ -114,7 +117,6 @@ auth.onAuthStateChanged(function(user) {
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
         
-        // Обновляем шапку несколько раз с задержкой
         setTimeout(function() {
             if (typeof updateUI === 'function') updateUI();
             forceUpdateTopbar();
@@ -170,7 +172,6 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Принудительно обновляем шапку после загрузки компонентов
                         setTimeout(function() {
                             forceUpdateTopbar();
                         }, 300);
