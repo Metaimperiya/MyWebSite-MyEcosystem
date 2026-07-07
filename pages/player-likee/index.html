@@ -88,34 +88,30 @@
 
 <script>
 // ================================================================
-// ГЛАВНАЯ ФУНКЦИЯ — ПРИНУДИТЕЛЬНО ВСТАВЛЯЕТ ИМЯ В ШАПКУ
+// ЕДИНСТВЕННАЯ ФУНКЦИЯ ДЛЯ ШАПКИ
 // ================================================================
 
-function setTopbarName() {
+function updateTopbar() {
     var topName = document.getElementById('topName');
     var topAvatar = document.getElementById('topAvatar');
     
-    // Берём имя из разных мест
-    var name = null;
-    if (USER) name = USER;
-    else if (localStorage.getItem('dc_u_' + SITE)) name = localStorage.getItem('dc_u_' + SITE);
-    else name = 'PLAYER Likee';
-    
-    // Вставляем имя
     if (topName) {
-        topName.textContent = name;
-    }
-    
-    // Вставляем аватарку
-    if (topAvatar) {
-        if (USER_UID) {
-            renderAvatar(USER_UID, topAvatar, name.charAt(0).toUpperCase());
+        if (USER) {
+            topName.textContent = USER;
         } else {
-            topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
+            var saved = localStorage.getItem('dc_u_' + SITE);
+            topName.textContent = saved || 'Гость';
         }
     }
     
-    console.log('✅ Шапка обновлена:', name);
+    if (topAvatar) {
+        if (USER_UID) {
+            renderAvatar(USER_UID, topAvatar, (USER || '?').charAt(0).toUpperCase());
+        } else {
+            var saved = localStorage.getItem('dc_u_' + SITE);
+            topAvatar.innerHTML = '<span class="letter">' + (saved ? saved.charAt(0).toUpperCase() : '?') + '</span>';
+        }
+    }
 }
 
 // ================================================================
@@ -132,14 +128,14 @@ auth.onAuthStateChanged(function(user) {
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
         
-        setTopbarName();
         console.log('✅ Авторизован как:', USER);
     } else {
         USER = null;
         USER_UID = null;
-        setTopbarName();
         console.log('⏳ Не авторизован');
     }
+    
+    updateTopbar();
 });
 
 // ================================================================
@@ -172,16 +168,8 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
                     
-                    // Принудительно вставляем имя в шапку
-                    setTopbarName();
-                    
-                    setTimeout(function() {
-                        setTopbarName();
-                    }, 500);
-                    
-                    setTimeout(function() {
-                        setTopbarName();
-                    }, 1500);
+                    // Сразу обновляем шапку — без таймеров
+                    updateTopbar();
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
@@ -205,15 +193,7 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     
-                    setTopbarName();
-                    
-                    setTimeout(function() {
-                        setTopbarName();
-                    }, 500);
-                    
-                    setTimeout(function() {
-                        setTopbarName();
-                    }, 1500);
+                    updateTopbar();
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
