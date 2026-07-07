@@ -25,7 +25,6 @@ function loadComponent(name, containerId) {
                 container.innerHTML = html;
                 console.log('✅ Загружен компонент:', name);
                 
-                // 👇 ВАЖНО: обновляем UI после загрузки шапки
                 if (name === 'topbar' || name === 'sidebar') {
                     setTimeout(() => {
                         updateUI();
@@ -33,7 +32,6 @@ function loadComponent(name, containerId) {
                     }, 50);
                 }
                 
-                // Если есть специфичная инициализация для компонента
                 if (name === 'topbar') {
                     initTopbar();
                 }
@@ -42,9 +40,7 @@ function loadComponent(name, containerId) {
         .catch(err => console.error('❌ Ошибка загрузки компонента:', name, err));
 }
 
-// Инициализация после загрузки topbar
 function initTopbar() {
-    // Навешиваем обработчики на кнопки в шапке
     const chatBtn = document.querySelector('.chat-btn');
     if (chatBtn) {
         chatBtn.onclick = function(e) {
@@ -69,18 +65,16 @@ function initTopbar() {
         };
     }
     
-    // Обновляем бейджи
     updateNotifBadge();
     updateChatBadge();
 }
 
 // ================================================================
-// ОСНОВНАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ UI (БЕЗОПАСНАЯ)
+// ОСНОВНАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ UI
 // ================================================================
 function updateUI() {
     console.log('🔄 updateUI вызван, USER:', USER, 'USER_UID:', USER_UID);
     
-    // ---- ВЕРХНЯЯ ШАПКА (topbar) ----
     const topAvatar = document.getElementById('topAvatar');
     const topName = document.getElementById('topName');
     const adminDot = document.getElementById('adminDot');
@@ -112,7 +106,6 @@ function updateUI() {
         }
     }
     
-    // ---- САЙДБАР (sidebar) ----
     const sAvatar = document.getElementById('sAvatar');
     const sName = document.getElementById('sName');
     
@@ -126,10 +119,8 @@ function updateUI() {
         }
     }
     
-    // ---- АДМИН-МЕНЮ ----
     updateAdminMenu();
     
-    // ---- БЕЙДЖИКИ ----
     if (chatBadge) {
         updateChatBadge();
     }
@@ -137,7 +128,6 @@ function updateUI() {
         updateNotifBadge();
     }
     
-    // ---- ПЕРЕВОД ----
     setTimeout(() => {
         if (typeof translatePage === 'function') {
             translatePage();
@@ -147,7 +137,7 @@ function updateUI() {
 }
 
 // ================================================================
-// АВАТАРКИ (С КЕШЕМ)
+// АВАТАРКИ
 // ================================================================
 function getUserAvatar(uid, callback) {
     if (avatarCache && avatarCache[uid]) {
@@ -210,9 +200,6 @@ function setActivePage(pageId) {
     }
 }
 
-// ================================================================
-// КНОПКИ НАВИГАЦИИ
-// ================================================================
 window.goToFeed = function() {
     if (!USER) {
         openLoginModal();
@@ -499,7 +486,6 @@ function updateChatBadge() {
         return;
     }
     
-    // Проверяем непрочитанные сообщения
     db.ref('dms/' + SITE).once('value', snap => {
         const dms = snap.val() || {};
         let unread = 0;
@@ -615,7 +601,7 @@ function setLanguage(lang) {
 }
 
 // ================================================================
-// НАСТРОЙКИ (меню с тремя точками)
+// НАСТРОЙКИ
 // ================================================================
 window.toggleSettingsMenu = function() {
     const menu = document.getElementById('settingsMenu');
@@ -624,7 +610,6 @@ window.toggleSettingsMenu = function() {
     }
 };
 
-// Закрываем меню при клике вне его
 document.addEventListener('click', function(e) {
     const menu = document.getElementById('settingsMenu');
     const dots = document.querySelector('.menu-dots');
@@ -641,7 +626,6 @@ window.openNotifications = function() {
         alert('Войдите!');
         return;
     }
-    // Открываем модалку с уведомлениями
     const modal = document.getElementById('notificationsModal');
     if (modal) {
         modal.classList.add('open');
@@ -674,7 +658,6 @@ function loadNotifications() {
                 html += '<div class="notif-time">' + (n.time || '') + '</div>';
                 html += '</div>';
                 
-                // Отмечаем как прочитанное
                 if (!n.read) {
                     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + key + '/read').set(true);
                 }
@@ -696,35 +679,31 @@ function esc(str) {
 }
 
 // ================================================================
-// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+// ИНИЦИАЛИЗАЦИЯ
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 DOM загружен');
     
-    // Загружаем сохранённый язык
     const savedLang = localStorage.getItem('language') || 'ru';
     currentLang = savedLang;
     
-    // Загружаем компоненты
     loadComponent('topbar', 'topbar-container');
     loadComponent('sidebar', 'sidebar-container');
     
-    // Пытаемся обновить UI сразу (если данные уже есть)
     setTimeout(() => {
         updateUI();
     }, 100);
 });
 
 // ================================================================
-// АВТООБНОВЛЕНИЕ UI ПРИ ПОЯВЛЕНИИ ЭЛЕМЕНТОВ В DOM
+// АВТООБНОВЛЕНИЕ UI
 // ================================================================
 const uiObserver = new MutationObserver(function(mutations) {
     let shouldUpdate = false;
     
     mutations.forEach(mutation => {
         mutation.addedNodes.forEach(node => {
-            if (node.nodeType === 1) { // Element node
-                // Проверяем, не появилась ли шапка или сайдбар
+            if (node.nodeType === 1) {
                 if (node.id === 'topbar' || 
                     node.id === 'sidebar' ||
                     node.querySelector('#topName') ||
@@ -741,45 +720,37 @@ const uiObserver = new MutationObserver(function(mutations) {
     }
 });
 
-// Начинаем следить за изменениями
 uiObserver.observe(document.body, {
     childList: true,
     subtree: true
 });
 
 // ================================================================
-// ОБНОВЛЯЕМ UI КАЖДЫЕ 5 СЕКУНД (для бейджиков)
+// ОБНОВЛЕНИЕ БЕЙДЖИКОВ КАЖДЫЕ 5 СЕКУНД
 // ================================================================
 setInterval(() => {
     updateNotifBadge();
     updateChatBadge();
 }, 5000);
 
-console.log('✅ app.js полностью загружен');
-
 // ================================================================
 // ВЫХОД ИЗ СИСТЕМЫ
 // ================================================================
-
 window.logoutUser = function() {
     if (!USER) {
         console.log('Пользователь уже вышел');
         return;
     }
     
-    // Закрываем меню
     const menu = document.getElementById('settingsMenu');
     if (menu) menu.classList.remove('open');
     
-    // Очищаем данные
     USER = null;
     USER_UID = null;
     isAdmin = false;
     
-    // Обновляем UI
     updateUI();
     
-    // Отключаем Firebase авторизацию
     if (typeof firebase !== 'undefined' && firebase.auth) {
         firebase.auth().signOut().catch(function(err) {
             console.warn('Ошибка выхода из Firebase:', err);
@@ -787,10 +758,50 @@ window.logoutUser = function() {
     }
     
     console.log('✅ Пользователь вышел');
-    
-    // Возвращаем на главную
     window.location.href = '/';
 };
 
-// Добавляем в глобальный объект для доступа из HTML
 window.logout = window.logoutUser;
+
+// ================================================================
+// ОБНОВЛЕНИЕ ШАПКИ ПОСЛЕ ЛОГИНА
+// ================================================================
+window.updateTopbarAfterLogin = function(username, uid, isAdminFlag) {
+    console.log('🔄 Обновляем шапку после логина:', username);
+    
+    USER = username;
+    USER_UID = uid;
+    isAdmin = isAdminFlag || false;
+    
+    if (typeof updateUI === 'function') {
+        updateUI();
+    }
+    
+    setTimeout(function() {
+        const topName = document.getElementById('topName');
+        const topAvatar = document.getElementById('topAvatar');
+        const sName = document.getElementById('sName');
+        const sAvatar = document.getElementById('sAvatar');
+        const adminDot = document.getElementById('adminDot');
+        
+        if (topName) topName.textContent = username;
+        if (sName) sName.textContent = username;
+        if (topAvatar) {
+            renderAvatar(uid, topAvatar, username.charAt(0).toUpperCase());
+        }
+        if (sAvatar) {
+            renderAvatar(uid, sAvatar, username.charAt(0).toUpperCase());
+        }
+        if (adminDot) {
+            if (isAdminFlag) {
+                adminDot.classList.add('active');
+                adminDot.style.display = 'inline-block';
+            } else {
+                adminDot.classList.remove('active');
+                adminDot.style.display = 'none';
+            }
+        }
+    }, 100);
+};
+
+console.log('✅ app.js полностью загружен');
