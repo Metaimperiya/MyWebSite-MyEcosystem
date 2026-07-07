@@ -9,80 +9,65 @@ let currentLang = 'ru';
 let avatarCache = {};
 let CURRENT_ROOM = null;
 let chatUnsub = null;
+let componentsLoaded = false;
 
 // ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ С ПОВТОРНЫМ ВЫЗОВОМ updateUI
+// ЗАГРУЗКА КОМПОНЕНТОВ
 // ================================================================
 function loadComponent(name, containerId) {
-    fetch('/components/' + name + '.html')
-        .then(res => {
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            return res.text();
-        })
-        .then(html => {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = html;
-                console.log('✅ Загружен компонент:', name);
-                
-                if (name === 'topbar' || name === 'sidebar') {
-                    setTimeout(() => {
-                        updateUI();
-                        console.log('🔄 UI обновлён после загрузки', name);
-                    }, 50);
+    return new Promise((resolve, reject) => {
+        fetch(containerId + '/' + name + '.html')
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.text();
+            })
+            .then(html => {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = html;
+                    console.log('✅ Загружен компонент:', name);
+                    
+                    if (name === 'topbar' || name === 'sidebar') {
+                        console.log('🔄 Обновляем UI после загрузки', name);
+                        setTimeout(() => {
+                            updateUISafe();
+                        }, 100);
+                    }
+                    resolve();
+                } else {
+                    reject(new Error('Контейнер не найден: ' + containerId));
                 }
-                
-                if (name === 'topbar') {
-                    initTopbar();
-                }
-            }
-        })
-        .catch(err => console.error('❌ Ошибка загрузки компонента:', name, err));
-}
-
-function initTopbar() {
-    const chatBtn = document.querySelector('.chat-btn');
-    if (chatBtn) {
-        chatBtn.onclick = function(e) {
-            e.preventDefault();
-            openChatList();
-        };
-    }
-    
-    const notifBtn = document.querySelector('.notif-btn');
-    if (notifBtn) {
-        notifBtn.onclick = function(e) {
-            e.preventDefault();
-            openNotifications();
-        };
-    }
-    
-    const dotsBtn = document.querySelector('.menu-dots');
-    if (dotsBtn) {
-        dotsBtn.onclick = function(e) {
-            e.preventDefault();
-            toggleSettingsMenu();
-        };
-    }
-    
-    updateNotifBadge();
-    updateChatBadge();
+            })
+            .catch(err => {
+                console.error('❌ Ошибка загрузки компонента:', name, err);
+                reject(err);
+            });
+    });
 }
 
 // ================================================================
-// ОСНОВНАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ UI
+// БЕЗОПАСНОЕ ОБНОВЛЕНИЕ UI (ВСЕГДА РАБОТАЕТ)
 // ================================================================
-function updateUI() {
-    console.log('🔄 updateUI вызван, USER:', USER, 'USER_UID:', USER_UID);
+function updateUISafe() {
+    console.log('🔄 updateUISafe вызван, USER:', USER, 'USER_UID:', USER_UID);
     
+    // ---- ВЕРХНЯЯ ШАПКА ----
     const topAvatar = document.getElementById('topAvatar');
     const topName = document.getElementById('topName');
     const adminDot = document.getElementById('adminDot');
     const chatBadge = document.getElementById('chatBadge');
     const notifBadge = document.getElementById('notifBadge');
     
+    console.log('🔍 Найдены элементы:', { 
+        topAvatar: !!topAvatar, 
+        topName: !!topName, 
+        adminDot: !!adminDot 
+    });
+    
+    // ОБНОВЛЯЕМ ШАПКУ
     if (topAvatar && topName) {
         if (USER && USER_UID) {
+            console.log('👤 Устанавливаем имя:', USER);
             topName.textContent = USER;
             renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
             
@@ -96,6 +81,7 @@ function updateUI() {
                 }
             }
         } else {
+            console.log('👤 Гость');
             topName.textContent = 'Гость';
             topAvatar.innerHTML = '<span class="letter">?</span>';
             
@@ -104,8 +90,11 @@ function updateUI() {
                 adminDot.style.display = 'none';
             }
         }
+    } else {
+        console.warn('⚠️ Шапка ещё не загружена в DOM');
     }
     
+    // ---- САЙДБАР ----
     const sAvatar = document.getElementById('sAvatar');
     const sName = document.getElementById('sName');
     
@@ -119,8 +108,10 @@ function updateUI() {
         }
     }
     
+    // ---- АДМИН-МЕНЮ ----
     updateAdminMenu();
     
+    // ---- БЕЙДЖИКИ ----
     if (chatBadge) {
         updateChatBadge();
     }
@@ -128,12 +119,18 @@ function updateUI() {
         updateNotifBadge();
     }
     
+    // ---- ПЕРЕВОД ----
     setTimeout(() => {
         if (typeof translatePage === 'function') {
             translatePage();
         }
         updateLangDisplay();
     }, 100);
+}
+
+// Оставляем старую функцию для совместимости
+function updateUI() {
+    updateUISafe();
 }
 
 // ================================================================
@@ -679,61 +676,6 @@ function esc(str) {
 }
 
 // ================================================================
-// ИНИЦИАЛИЗАЦИЯ
-// ================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM загружен');
-    
-    const savedLang = localStorage.getItem('language') || 'ru';
-    currentLang = savedLang;
-    
-    loadComponent('topbar', 'topbar-container');
-    loadComponent('sidebar', 'sidebar-container');
-    
-    setTimeout(() => {
-        updateUI();
-    }, 100);
-});
-
-// ================================================================
-// АВТООБНОВЛЕНИЕ UI
-// ================================================================
-const uiObserver = new MutationObserver(function(mutations) {
-    let shouldUpdate = false;
-    
-    mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
-            if (node.nodeType === 1) {
-                if (node.id === 'topbar' || 
-                    node.id === 'sidebar' ||
-                    node.querySelector('#topName') ||
-                    node.querySelector('#sName')) {
-                    shouldUpdate = true;
-                }
-            }
-        });
-    });
-    
-    if (shouldUpdate) {
-        console.log('🔄 DOM изменился, обновляем UI');
-        setTimeout(() => updateUI(), 50);
-    }
-});
-
-uiObserver.observe(document.body, {
-    childList: true,
-    subtree: true
-});
-
-// ================================================================
-// ОБНОВЛЕНИЕ БЕЙДЖИКОВ КАЖДЫЕ 5 СЕКУНД
-// ================================================================
-setInterval(() => {
-    updateNotifBadge();
-    updateChatBadge();
-}, 5000);
-
-// ================================================================
 // ВЫХОД ИЗ СИСТЕМЫ
 // ================================================================
 window.logoutUser = function() {
@@ -749,7 +691,7 @@ window.logoutUser = function() {
     USER_UID = null;
     isAdmin = false;
     
-    updateUI();
+    updateUISafe();
     
     if (typeof firebase !== 'undefined' && firebase.auth) {
         firebase.auth().signOut().catch(function(err) {
@@ -773,35 +715,87 @@ window.updateTopbarAfterLogin = function(username, uid, isAdminFlag) {
     USER_UID = uid;
     isAdmin = isAdminFlag || false;
     
-    if (typeof updateUI === 'function') {
-        updateUI();
-    }
+    // Пытаемся обновить сразу
+    updateUISafe();
     
+    // И ещё раз через 200мс, на случай если шапка ещё не загрузилась
     setTimeout(function() {
-        const topName = document.getElementById('topName');
-        const topAvatar = document.getElementById('topAvatar');
-        const sName = document.getElementById('sName');
-        const sAvatar = document.getElementById('sAvatar');
-        const adminDot = document.getElementById('adminDot');
-        
-        if (topName) topName.textContent = username;
-        if (sName) sName.textContent = username;
-        if (topAvatar) {
-            renderAvatar(uid, topAvatar, username.charAt(0).toUpperCase());
-        }
-        if (sAvatar) {
-            renderAvatar(uid, sAvatar, username.charAt(0).toUpperCase());
-        }
-        if (adminDot) {
-            if (isAdminFlag) {
-                adminDot.classList.add('active');
-                adminDot.style.display = 'inline-block';
-            } else {
-                adminDot.classList.remove('active');
-                adminDot.style.display = 'none';
-            }
-        }
-    }, 100);
+        updateUISafe();
+    }, 200);
+    
+    // И через 500мс на всякий случай
+    setTimeout(function() {
+        updateUISafe();
+    }, 500);
 };
+
+// ================================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM загружен');
+    
+    const savedLang = localStorage.getItem('language') || 'ru';
+    currentLang = savedLang;
+    
+    // Загружаем компоненты
+    loadComponent('topbar', 'topbar-container');
+    loadComponent('sidebar', 'sidebar-container');
+    
+    // Постоянно обновляем UI каждые 500мс пока шапка не появится
+    let attempts = 0;
+    const interval = setInterval(function() {
+        attempts++;
+        console.log('🔄 Попытка обновления #' + attempts);
+        updateUISafe();
+        
+        // Если шапка появилась - прекращаем попытки
+        if (document.getElementById('topName') && document.getElementById('topAvatar')) {
+            console.log('✅ Шапка найдена, прекращаем попытки');
+            clearInterval(interval);
+        }
+        
+        // Если через 10 попыток всё ещё нет - всё равно прекращаем
+        if (attempts >= 10) {
+            console.warn('⚠️ Шапка не появилась после 10 попыток');
+            clearInterval(interval);
+        }
+    }, 300);
+    
+    setTimeout(() => {
+        updateUISafe();
+    }, 100);
+});
+
+// ================================================================
+// АВТООБНОВЛЕНИЕ UI ПРИ ИЗМЕНЕНИИ DOM
+// ================================================================
+const uiObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+            if (node.nodeType === 1) {
+                if (node.id === 'topbar' || 
+                    node.querySelector('#topName') ||
+                    node.querySelector('#sName')) {
+                    console.log('🔄 DOM изменился, обновляем UI');
+                    setTimeout(() => updateUISafe(), 50);
+                }
+            }
+        });
+    });
+});
+
+uiObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+// ================================================================
+// ОБНОВЛЕНИЕ БЕЙДЖИКОВ КАЖДЫЕ 5 СЕКУНД
+// ================================================================
+setInterval(() => {
+    updateNotifBadge();
+    updateChatBadge();
+}, 5000);
 
 console.log('✅ app.js полностью загружен');
