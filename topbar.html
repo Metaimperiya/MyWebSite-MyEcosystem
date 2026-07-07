@@ -28,13 +28,12 @@
     </div>
 </header>
 
-<!-- ===== СКРИПТ ДЛЯ ПРИНУДИТЕЛЬНОГО ОБНОВЛЕНИЯ ШАПКИ ===== -->
+<!-- ===== СКРИПТ ДЛЯ ОБНОВЛЕНИЯ ШАПКИ ===== -->
 <script>
 (function() {
-    console.log('🔥 ТОПБАР ЗАГРУЖЕН - ОБНОВЛЯЕМ ИМЯ');
+    console.log('🔥 ТОПБАР ЗАГРУЖЕН');
     
     function updateTopbar() {
-        // Берем имя из localStorage или из глобальной переменной
         var name = localStorage.getItem('dc_u_default') || 
                    localStorage.getItem('dc_u_') || 
                    window.USER || 
@@ -45,34 +44,37 @@
                   window.USER_UID || 
                   null;
         
-        console.log('📦 Найдено имя:', name, 'UID:', uid);
+        console.log('📦 Имя:', name, 'UID:', uid);
         
-        // Обновляем имя в шапке
+        // Обновляем имя
         var topName = document.getElementById('topName');
         if (topName) {
-            if (name) {
-                topName.textContent = name;
-                console.log('✅ Имя установлено:', name);
-            } else {
-                topName.textContent = 'Гость';
-                console.log('✅ Имя: Гость');
-            }
+            topName.textContent = name || 'Гость';
+            console.log('✅ topName:', topName.textContent);
         }
         
         // Обновляем аватар
-        var topAvatar = document.getElementById('topAvatar');
         var topAvatarLetter = document.getElementById('topAvatarLetter');
-        if (topAvatar && topAvatarLetter) {
-            if (name) {
-                var letter = name.charAt(0).toUpperCase();
-                topAvatarLetter.textContent = letter;
-                console.log('✅ Буква аватара:', letter);
-            } else {
-                topAvatarLetter.textContent = '?';
+        if (topAvatarLetter && name) {
+            topAvatarLetter.textContent = name.charAt(0).toUpperCase();
+            console.log('✅ Буква:', topAvatarLetter.textContent);
+        }
+        
+        // Обновляем сайдбар
+        var sName = document.getElementById('sName');
+        if (sName) {
+            sName.textContent = name || 'Гость';
+        }
+        
+        var sAvatar = document.getElementById('sAvatar');
+        if (sAvatar && name) {
+            var letterSpan = sAvatar.querySelector('.letter');
+            if (letterSpan) {
+                letterSpan.textContent = name.charAt(0).toUpperCase();
             }
         }
         
-        // Обновляем админ-точку
+        // Админ-точка
         var adminDot = document.getElementById('adminDot');
         if (adminDot) {
             var isAdmin = localStorage.getItem('dc_admin_default') === 'true' || 
@@ -89,14 +91,13 @@
         }
     }
     
-    // Запускаем обновление много раз с задержками
-    setTimeout(updateTopbar, 50);
-    setTimeout(updateTopbar, 200);
-    setTimeout(updateTopbar, 500);
+    // Запускаем много раз
+    setTimeout(updateTopbar, 100);
+    setTimeout(updateTopbar, 300);
+    setTimeout(updateTopbar, 600);
     setTimeout(updateTopbar, 1000);
-    setTimeout(updateTopbar, 2000);
     
-    // Каждые 2 секунды проверяем - если "Гость" - меняем
+    // Проверяем каждые 2 секунды
     setInterval(function() {
         var topName = document.getElementById('topName');
         var name = localStorage.getItem('dc_u_default') || 
@@ -105,16 +106,9 @@
                    null;
         
         if (topName && name && topName.textContent === 'Гость') {
-            console.log('🔄 Обнаружен Гость, меняем на:', name);
-            topName.textContent = name;
-            
-            var topAvatarLetter = document.getElementById('topAvatarLetter');
-            if (topAvatarLetter) {
-                topAvatarLetter.textContent = name.charAt(0).toUpperCase();
-            }
+            console.log('🔄 Меняем Гость на', name);
+            updateTopbar();
         }
     }, 2000);
-    
-    console.log('✅ Топбар инициализирован');
 })();
 </script>
