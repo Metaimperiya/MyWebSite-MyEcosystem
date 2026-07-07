@@ -117,18 +117,21 @@ auth.onAuthStateChanged(function(user) {
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
         
+        // Обновляем шапку сразу
+        forceUpdateTopbar();
+        
+        // И ещё несколько раз с задержкой
         setTimeout(function() {
-            if (typeof updateUI === 'function') updateUI();
             forceUpdateTopbar();
-        }, 300);
+        }, 500);
         
         setTimeout(function() {
             forceUpdateTopbar();
-        }, 800);
+        }, 1000);
         
         setTimeout(function() {
             forceUpdateTopbar();
-        }, 1500);
+        }, 2000);
         
         console.log('✅ Авторизован как:', USER);
     } else {
@@ -172,9 +175,14 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
+                        // Обновляем шапку ПОСЛЕ загрузки topbar.html
                         setTimeout(function() {
                             forceUpdateTopbar();
                         }, 300);
+                        
+                        setTimeout(function() {
+                            forceUpdateTopbar();
+                        }, 800);
                         
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
@@ -200,6 +208,10 @@ auth.onAuthStateChanged(function(user) {
                         setTimeout(function() {
                             forceUpdateTopbar();
                         }, 300);
+                        
+                        setTimeout(function() {
+                            forceUpdateTopbar();
+                        }, 800);
                         
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
