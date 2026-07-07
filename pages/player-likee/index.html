@@ -89,23 +89,7 @@
 
 <script>
 // ================================================================
-// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ
-// ================================================================
-
-function forceUpdateTopbar() {
-    var topName = document.getElementById('topName');
-    var topAvatar = document.getElementById('topAvatar');
-    
-    if (topName && USER) {
-        topName.textContent = USER;
-    }
-    if (topAvatar && USER_UID) {
-        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-    }
-}
-
-// ================================================================
-// АВТОРИЗАЦИЯ
+// АВТОРИЗАЦИЯ НА СТРАНИЦЕ
 // ================================================================
 
 auth.onAuthStateChanged(function(user) {
@@ -121,14 +105,6 @@ auth.onAuthStateChanged(function(user) {
         if (typeof updateUI === 'function') {
             updateUI();
         }
-        
-        setTimeout(function() {
-            forceUpdateTopbar();
-        }, 500);
-        
-        setTimeout(function() {
-            forceUpdateTopbar();
-        }, 1500);
         
         console.log('✅ Авторизован как:', USER);
     } else {
@@ -172,11 +148,6 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Принудительно обновляем шапку ещё раз после загрузки компонентов
-                        setTimeout(function() {
-                            forceUpdateTopbar();
-                        }, 300);
-                        
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
@@ -197,10 +168,6 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
-                        
-                        setTimeout(function() {
-                            forceUpdateTopbar();
-                        }, 300);
                         
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
