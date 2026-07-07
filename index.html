@@ -588,6 +588,55 @@ window.submitFotoPost = function() {
 
     console.log('✅ Авто-скрытие шапки включено!');
 })();
+
+// ================================================================
+// ⚠️ ВАЖНО: ДОПОЛНИТЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ДЛЯ ШАПКИ
+// ================================================================
+
+// Функция, которая обновляет шапку когда пользователь залогинился
+// Вызывается из auth.js после успешного входа
+window.updateTopbarAfterLogin = function(username, uid, isAdminFlag) {
+    console.log('🔄 Обновляем шапку после логина:', username);
+    
+    // Обновляем глобальные переменные
+    USER = username;
+    USER_UID = uid;
+    isAdmin = isAdminFlag || false;
+    
+    // Вызываем updateUI которая есть в app.js
+    if (typeof updateUI === 'function') {
+        updateUI();
+    }
+    
+    // Дополнительно обновляем элементы вручную, если updateUI не сработала
+    setTimeout(function() {
+        const topName = document.getElementById('topName');
+        const topAvatar = document.getElementById('topAvatar');
+        const sName = document.getElementById('sName');
+        const sAvatar = document.getElementById('sAvatar');
+        const adminDot = document.getElementById('adminDot');
+        
+        if (topName) topName.textContent = username;
+        if (sName) sName.textContent = username;
+        if (topAvatar) {
+            renderAvatar(uid, topAvatar, username.charAt(0).toUpperCase());
+        }
+        if (sAvatar) {
+            renderAvatar(uid, sAvatar, username.charAt(0).toUpperCase());
+        }
+        if (adminDot) {
+            if (isAdminFlag) {
+                adminDot.classList.add('active');
+                adminDot.style.display = 'inline-block';
+            } else {
+                adminDot.classList.remove('active');
+                adminDot.style.display = 'none';
+            }
+        }
+    }, 100);
+};
+
+console.log('✅ index.html полностью загружен, ждём компоненты...');
 </script>
 
 </body>
