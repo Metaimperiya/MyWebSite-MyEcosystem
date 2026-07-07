@@ -601,3 +601,35 @@ setTimeout(function() {
 }, 500);
 
 setInterval(updateNotifBadge, 5000);
+
+// ================================================================
+// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
+// ================================================================
+
+// ===== ОБНОВЛЕНИЕ UI =====
+
+function updateUI() {
+    const topAvatar = document.getElementById('topAvatar');
+    const sAvatar = document.getElementById('sAvatar');
+    const name = document.getElementById('topName');
+    const sName = document.getElementById('sName');
+    const dot = document.getElementById('adminDot');
+
+    if (USER && USER_UID) {
+        name.textContent = USER;
+        sName.textContent = USER;
+        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
+        if (isAdmin) dot.classList.add('active');
+        else dot.classList.remove('active');
+        updateAdminMenu();
+    } else {
+        topAvatar.innerHTML = '<span class="letter">?</span>';
+        sAvatar.innerHTML = '<span class="letter">?</span>';
+        name.textContent = 'Гость';
+        sName.textContent = 'Гость';
+        dot.classList.remove('active');
+        var item = document.getElementById('adminChatsMenuItem');
+        if (item) item.style.display = 'none';
+    }
+}
