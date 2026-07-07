@@ -88,10 +88,10 @@
 
 <script>
 // ================================================================
-// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ
+// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ — БЕЗ SETTIMEOUT
 // ================================================================
 
-function forceUpdateTopbar() {
+function updateTopbar() {
     var topName = document.getElementById('topName');
     var topAvatar = document.getElementById('topAvatar');
     
@@ -101,10 +101,13 @@ function forceUpdateTopbar() {
     if (topAvatar && USER_UID) {
         renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
     }
+    
+    // Показываем шапку после обновления
+    document.body.classList.add('data-loaded');
 }
 
 // ================================================================
-// АВТОРИЗАЦИЯ
+// АВТОРИЗАЦИЯ — ТОЛЬКО ОДИН РАЗ
 // ================================================================
 
 auth.onAuthStateChanged(function(user) {
@@ -117,24 +120,14 @@ auth.onAuthStateChanged(function(user) {
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
         
-        // Обновляем шапку сразу
-        forceUpdateTopbar();
-        
-        // И ещё несколько раз с задержкой
-        setTimeout(function() {
-            forceUpdateTopbar();
-        }, 500);
-        
-        setTimeout(function() {
-            forceUpdateTopbar();
-        }, 1000);
-        
-        setTimeout(function() {
-            forceUpdateTopbar();
-        }, 2000);
+        // Обновляем шапку
+        updateTopbar();
         
         console.log('✅ Авторизован как:', USER);
     } else {
+        USER = null;
+        USER_UID = null;
+        document.body.classList.add('data-loaded');
         console.log('⏳ Не авторизован');
     }
 });
@@ -168,6 +161,14 @@ auth.onAuthStateChanged(function(user) {
                 loaded++;
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
+                    
+                    // Если пользователь уже авторизован — обновляем шапку
+                    if (USER) {
+                        updateTopbar();
+                    } else {
+                        document.body.classList.add('data-loaded');
+                    }
+                    
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
                         if (typeof updateUI === 'function') updateUI();
@@ -175,21 +176,12 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Обновляем шапку ПОСЛЕ загрузки topbar.html
-                        setTimeout(function() {
-                            forceUpdateTopbar();
-                        }, 300);
-                        
-                        setTimeout(function() {
-                            forceUpdateTopbar();
-                        }, 800);
-                        
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
                             loadProfile();
                         }
-                    }, 500);
+                    }, 300);
                 }
             })
             .catch(err => {
@@ -198,6 +190,13 @@ auth.onAuthStateChanged(function(user) {
                 loaded++;
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
+                    
+                    if (USER) {
+                        updateTopbar();
+                    } else {
+                        document.body.classList.add('data-loaded');
+                    }
+                    
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
                         if (typeof updateUI === 'function') updateUI();
@@ -205,20 +204,12 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        setTimeout(function() {
-                            forceUpdateTopbar();
-                        }, 300);
-                        
-                        setTimeout(function() {
-                            forceUpdateTopbar();
-                        }, 800);
-                        
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
                             loadProfile();
                         }
-                    }, 500);
+                    }, 300);
                 }
             });
     });
