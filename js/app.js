@@ -756,3 +756,41 @@ setInterval(() => {
 }, 5000);
 
 console.log('✅ app.js полностью загружен');
+
+// ================================================================
+// ВЫХОД ИЗ СИСТЕМЫ
+// ================================================================
+
+window.logoutUser = function() {
+    if (!USER) {
+        console.log('Пользователь уже вышел');
+        return;
+    }
+    
+    // Закрываем меню
+    const menu = document.getElementById('settingsMenu');
+    if (menu) menu.classList.remove('open');
+    
+    // Очищаем данные
+    USER = null;
+    USER_UID = null;
+    isAdmin = false;
+    
+    // Обновляем UI
+    updateUI();
+    
+    // Отключаем Firebase авторизацию
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().signOut().catch(function(err) {
+            console.warn('Ошибка выхода из Firebase:', err);
+        });
+    }
+    
+    console.log('✅ Пользователь вышел');
+    
+    // Возвращаем на главную
+    window.location.href = '/';
+};
+
+// Добавляем в глобальный объект для доступа из HTML
+window.logout = window.logoutUser;
