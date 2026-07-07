@@ -204,7 +204,10 @@ auth.onAuthStateChanged(function(user) {
         });
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.remove('open');
+        
+        // !!! ОБНОВЛЯЕМ UI СРАЗУ ПОСЛЕ ПОЛУЧЕНИЯ ПОЛЬЗОВАТЕЛЯ !!!
         if (typeof updateUI === 'function') updateUI();
+        
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadGroups === 'function') loadGroups();
         if (typeof loadPeople === 'function') loadPeople();
