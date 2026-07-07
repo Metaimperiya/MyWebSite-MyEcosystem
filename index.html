@@ -226,7 +226,7 @@
 
 <script>
 // ================================================================
-// ФОТО-ЛЕНТА — ИСПОЛЬЗУЕТ ОБЩИЙ renderPost() ИЗ feed.js
+// ФОТО-ЛЕНТА
 // ================================================================
 
 var fotoFeedListener = null;
@@ -438,7 +438,6 @@ window.submitFotoPost = function() {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Загружаем страницу если открыта /pages/...
                         var path = window.location.pathname;
                         if (path.includes('/pages/')) {
                             var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
@@ -590,25 +589,20 @@ window.submitFotoPost = function() {
 })();
 
 // ================================================================
-// ⚠️ ВАЖНО: ДОПОЛНИТЕЛЬНАЯ ИНИЦИАЛИЗАЦИЯ ДЛЯ ШАПКИ
+// ⚠️ ВАЖНО: ФУНКЦИЯ ОБНОВЛЕНИЯ ШАПКИ ПОСЛЕ ЛОГИНА
 // ================================================================
 
-// Функция, которая обновляет шапку когда пользователь залогинился
-// Вызывается из auth.js после успешного входа
 window.updateTopbarAfterLogin = function(username, uid, isAdminFlag) {
     console.log('🔄 Обновляем шапку после логина:', username);
     
-    // Обновляем глобальные переменные
     USER = username;
     USER_UID = uid;
     isAdmin = isAdminFlag || false;
     
-    // Вызываем updateUI которая есть в app.js
     if (typeof updateUI === 'function') {
         updateUI();
     }
     
-    // Дополнительно обновляем элементы вручную, если updateUI не сработала
     setTimeout(function() {
         const topName = document.getElementById('topName');
         const topAvatar = document.getElementById('topAvatar');
@@ -636,7 +630,38 @@ window.updateTopbarAfterLogin = function(username, uid, isAdminFlag) {
     }, 100);
 };
 
-console.log('✅ index.html полностью загружен, ждём компоненты...');
+// ================================================================
+// ВЫХОД ИЗ СИСТЕМЫ
+// ================================================================
+
+window.logoutUser = function() {
+    if (!USER) {
+        console.log('Пользователь уже вышел');
+        return;
+    }
+    
+    const menu = document.getElementById('settingsMenu');
+    if (menu) menu.classList.remove('open');
+    
+    USER = null;
+    USER_UID = null;
+    isAdmin = false;
+    
+    updateUI();
+    
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().signOut().catch(function(err) {
+            console.warn('Ошибка выхода из Firebase:', err);
+        });
+    }
+    
+    console.log('✅ Пользователь вышел');
+    window.location.href = '/';
+};
+
+window.logout = window.logoutUser;
+
+console.log('✅ index.html полностью загружен');
 </script>
 
 </body>
