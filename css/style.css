@@ -1744,3 +1744,8 @@ body {
 .data-loaded #topAvatar {
     opacity: 1;
 }
+
+/* Скрываем пустое имя в шапке */
+.username:empty {
+    display: none;
+}
