@@ -88,26 +88,43 @@
 
 <script>
 // ================================================================
-// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ — БЕЗ SETTIMEOUT
+// САМЫЙ ТУПОЙ, НО РАБОЧИЙ СПОСОБ — ПИХАЕМ ИМЯ КАЖДУЮ СЕКУНДУ
 // ================================================================
 
-function updateTopbar() {
+function forceUpdateTopbar() {
     var topName = document.getElementById('topName');
     var topAvatar = document.getElementById('topAvatar');
     
-    if (topName && USER) {
-        topName.textContent = USER;
+    // Пытаемся получить имя из разных источников
+    var name = USER || localStorage.getItem('dc_u_' + SITE) || 'PLAYER Likee';
+    
+    if (topName) {
+        topName.textContent = name;
     }
     if (topAvatar && USER_UID) {
-        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+        renderAvatar(USER_UID, topAvatar, name.charAt(0).toUpperCase());
+    } else if (topAvatar) {
+        // Если USER_UID нет, но есть имя — показываем букву
+        topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
     }
     
-    // Показываем шапку после обновления
+    // Показываем шапку
     document.body.classList.add('data-loaded');
 }
 
+// Запускаем обновление каждую секунду (пока не появится)
+var updateInterval = setInterval(function() {
+    forceUpdateTopbar();
+    // Если имя появилось — останавливаем интервал
+    var topName = document.getElementById('topName');
+    if (topName && topName.textContent !== 'Гость' && topName.textContent !== '') {
+        clearInterval(updateInterval);
+        console.log('✅ Шапка обновлена, интервал остановлен');
+    }
+}, 1000);
+
 // ================================================================
-// АВТОРИЗАЦИЯ — ТОЛЬКО ОДИН РАЗ
+// АВТОРИЗАЦИЯ
 // ================================================================
 
 auth.onAuthStateChanged(function(user) {
@@ -120,13 +137,14 @@ auth.onAuthStateChanged(function(user) {
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
         
-        // Обновляем шапку
-        updateTopbar();
-        
+        forceUpdateTopbar();
         console.log('✅ Авторизован как:', USER);
     } else {
         USER = null;
         USER_UID = null;
+        // Если не авторизован — показываем "Гость"
+        var topName = document.getElementById('topName');
+        if (topName) topName.textContent = 'Гость';
         document.body.classList.add('data-loaded');
         console.log('⏳ Не авторизован');
     }
@@ -162,12 +180,10 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
                     
-                    // Если пользователь уже авторизован — обновляем шапку
-                    if (USER) {
-                        updateTopbar();
-                    } else {
-                        document.body.classList.add('data-loaded');
-                    }
+                    // Принудительно обновляем шапку после загрузки
+                    setTimeout(function() {
+                        forceUpdateTopbar();
+                    }, 100);
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
@@ -191,11 +207,9 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     
-                    if (USER) {
-                        updateTopbar();
-                    } else {
-                        document.body.classList.add('data-loaded');
-                    }
+                    setTimeout(function() {
+                        forceUpdateTopbar();
+                    }, 100);
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
