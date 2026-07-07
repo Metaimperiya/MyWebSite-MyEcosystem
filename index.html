@@ -226,9 +226,118 @@
 
 <script>
 // ================================================================
-// ФОТО-ЛЕНТА
+// 100% РАБОЧЕЕ ОБНОВЛЕНИЕ ШАПКИ - ГЛАВНЫЙ ФИКС
 // ================================================================
 
+(function() {
+    console.log('🔥 ГЛАВНЫЙ ФИКС ШАПКИ ЗАПУЩЕН');
+    
+    function updateTopbarForce(name) {
+        if (!name) {
+            name = localStorage.getItem('dc_u_default') || 
+                   localStorage.getItem('dc_u_') || 
+                   window.USER || 
+                   'Гость';
+        }
+        
+        console.log('👤 Устанавливаем имя:', name);
+        
+        // Обновляем шапку
+        var topName = document.getElementById('topName');
+        if (topName) {
+            topName.textContent = name;
+        }
+        
+        var topAvatar = document.getElementById('topAvatar');
+        if (topAvatar) {
+            var letter = name.charAt(0).toUpperCase();
+            topAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
+        }
+        
+        // Обновляем сайдбар
+        var sName = document.getElementById('sName');
+        if (sName) {
+            sName.textContent = name;
+        }
+        
+        var sAvatar = document.getElementById('sAvatar');
+        if (sAvatar) {
+            var letter2 = name.charAt(0).toUpperCase();
+            sAvatar.innerHTML = '<span class="letter">' + letter2 + '</span>';
+        }
+        
+        // Сохраняем в глобальные переменные
+        window.USER = name;
+        
+        console.log('✅ Шапка обновлена на:', name);
+    }
+    
+    // Запускаем сразу
+    updateTopbarForce();
+    
+    // Запускаем с задержками
+    setTimeout(function() { updateTopbarForce(); }, 200);
+    setTimeout(function() { updateTopbarForce(); }, 500);
+    setTimeout(function() { updateTopbarForce(); }, 1000);
+    setTimeout(function() { updateTopbarForce(); }, 2000);
+    
+    // Проверяем каждые 2 секунды
+    setInterval(function() {
+        var topName = document.getElementById('topName');
+        var name = localStorage.getItem('dc_u_default') || 
+                   localStorage.getItem('dc_u_') || 
+                   window.USER || 
+                   null;
+        
+        if (topName && name && topName.textContent === 'Гость') {
+            console.log('🔄 Меняем Гость на', name);
+            updateTopbarForce(name);
+        }
+        
+        if (topName && name && topName.textContent !== 'Гость' && topName.textContent !== name) {
+            console.log('🔄 Обновляем имя на', name);
+            updateTopbarForce(name);
+        }
+    }, 2000);
+    
+    // Следим за изменениями DOM
+    var observer = new MutationObserver(function() {
+        var topName = document.getElementById('topName');
+        var name = localStorage.getItem('dc_u_default') || 
+                   localStorage.getItem('dc_u_') || 
+                   window.USER || 
+                   null;
+        
+        if (topName && name && topName.textContent === 'Гость') {
+            console.log('🔄 Observer: меняем Гость на', name);
+            updateTopbarForce(name);
+        }
+    });
+    
+    try {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        console.log('✅ Observer запущен');
+    } catch(e) {}
+    
+    // Глобальная функция для ручного вызова
+    window.updateMyTopbar = function(name) {
+        if (!name) {
+            name = prompt('Введите ваш никнейм:');
+        }
+        if (name) {
+            localStorage.setItem('dc_u_default', name);
+            localStorage.setItem('dc_u_', name);
+            updateTopbarForce(name);
+        }
+    };
+    
+    console.log('✅ ГЛАВНЫЙ ФИКС ЗАВЕРШЁН!');
+})();
+
+// Фото-лента
 var fotoFeedListener = null;
 var pendingFotoImage = null;
 var pendingFotoImageFile = null;
@@ -438,6 +547,20 @@ window.submitFotoPost = function() {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
+                        // Обновляем шапку после загрузки
+                        setTimeout(function() {
+                            var name = localStorage.getItem('dc_u_default') || 
+                                       localStorage.getItem('dc_u_') || 
+                                       window.USER || 
+                                       'Гость';
+                            var topName = document.getElementById('topName');
+                            if (topName) topName.textContent = name;
+                            var topAvatar = document.getElementById('topAvatar');
+                            if (topAvatar) {
+                                topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
+                            }
+                        }, 200);
+                        
                         var path = window.location.pathname;
                         if (path.includes('/pages/')) {
                             var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
@@ -467,6 +590,19 @@ window.submitFotoPost = function() {
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
+                        
+                        setTimeout(function() {
+                            var name = localStorage.getItem('dc_u_default') || 
+                                       localStorage.getItem('dc_u_') || 
+                                       window.USER || 
+                                       'Гость';
+                            var topName = document.getElementById('topName');
+                            if (topName) topName.textContent = name;
+                            var topAvatar = document.getElementById('topAvatar');
+                            if (topAvatar) {
+                                topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
+                            }
+                        }, 200);
                         
                         var path = window.location.pathname;
                         if (path.includes('/pages/')) {
@@ -587,140 +723,6 @@ window.submitFotoPost = function() {
 
     console.log('✅ Авто-скрытие шапки включено!');
 })();
-
-// ================================================================
-// ⚠️ ВАЖНО: ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ - 100% РАБОТАЕТ
-// ================================================================
-
-(function() {
-    console.log('🔥 ЗАПУСКАЕМ ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ');
-    
-    function forceUpdateTopbar() {
-        console.log('🔄 Принудительное обновление шапки...');
-        
-        var savedName = localStorage.getItem('dc_u_default') || 
-                       localStorage.getItem('dc_u_') || 
-                       window.USER || 
-                       null;
-        
-        var savedUid = localStorage.getItem('dc_uid_default') || 
-                       localStorage.getItem('dc_uid_') || 
-                       window.USER_UID || 
-                       null;
-        
-        if (savedName) {
-            window.USER = savedName;
-            window.USER_UID = savedUid || 'unknown';
-        }
-        
-        var topName = document.getElementById('topName');
-        var topAvatar = document.getElementById('topAvatar');
-        var sName = document.getElementById('sName');
-        var sAvatar = document.getElementById('sAvatar');
-        var adminDot = document.getElementById('adminDot');
-        
-        var displayName = window.USER || 'Гость';
-        
-        if (topName) {
-            topName.textContent = displayName;
-            console.log('✅ topName установлен:', displayName);
-        }
-        
-        if (sName) {
-            sName.textContent = displayName;
-            console.log('✅ sName установлен:', displayName);
-        }
-        
-        var letter = displayName.charAt(0).toUpperCase() || '?';
-        
-        if (topAvatar) {
-            if (window.USER_UID && typeof renderAvatar === 'function') {
-                renderAvatar(window.USER_UID, topAvatar, letter);
-            } else {
-                topAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
-            }
-        }
-        
-        if (sAvatar) {
-            if (window.USER_UID && typeof renderAvatar === 'function') {
-                renderAvatar(window.USER_UID, sAvatar, letter);
-            } else {
-                sAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
-            }
-        }
-        
-        if (adminDot) {
-            var isAdmin = localStorage.getItem('dc_admin_default') === 'true' || 
-                         localStorage.getItem('dc_admin_') === 'true' ||
-                         window.isAdmin === true;
-            
-            if (isAdmin) {
-                adminDot.classList.add('active');
-                adminDot.style.display = 'inline-block';
-            } else {
-                adminDot.classList.remove('active');
-                adminDot.style.display = 'none';
-            }
-        }
-        
-        if (typeof updateUI === 'function') {
-            try { updateUI(); } catch(e) {}
-        }
-        
-        if (typeof updateUISafe === 'function') {
-            try { updateUISafe(); } catch(e) {}
-        }
-    }
-    
-    // Запускаем много раз с разными задержками
-    setTimeout(forceUpdateTopbar, 100);
-    setTimeout(forceUpdateTopbar, 300);
-    setTimeout(forceUpdateTopbar, 500);
-    setTimeout(forceUpdateTopbar, 800);
-    setTimeout(forceUpdateTopbar, 1200);
-    setTimeout(forceUpdateTopbar, 2000);
-    
-    // Каждые 2 секунды проверяем
-    setInterval(function() {
-        var topName = document.getElementById('topName');
-        if (topName && topName.textContent === 'Гость' && window.USER) {
-            console.log('🔄 Обнаружен Гость, обновляем');
-            forceUpdateTopbar();
-        }
-    }, 2000);
-    
-    // MutationObserver
-    var observer = new MutationObserver(function() {
-        var topName = document.getElementById('topName');
-        if (topName) {
-            setTimeout(forceUpdateTopbar, 50);
-        }
-    });
-    
-    setTimeout(function() {
-        try {
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-            console.log('✅ MutationObserver запущен');
-        } catch(e) {}
-    }, 500);
-    
-    console.log('✅ Принудительное обновление шапки запущено!');
-})();
-
-// ================================================================
-// ФУНКЦИЯ ДЛЯ РУЧНОГО ОБНОВЛЕНИЯ
-// ================================================================
-window.forceUpdateTopbar = function() {
-    var topName = document.getElementById('topName');
-    if (topName) {
-        var name = window.USER || localStorage.getItem('dc_u_default') || 'Гость';
-        topName.textContent = name;
-        console.log('👤 Ручное обновление:', name);
-    }
-};
 
 console.log('✅ index.html полностью загружен');
 </script>
