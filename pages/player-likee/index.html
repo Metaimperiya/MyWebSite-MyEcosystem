@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
-    <title>PLAYER Likee — Администратор METAIMPERIYA</title>
-    <meta name="description" content="PLAYER Likee — администратор METAIMPERIYA. Персональная страница.">
+    <title>PLAYER Likee — METAIMPERIYA</title>
+    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA">
     <meta name="theme-color" content="#1877f2">
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -149,6 +149,31 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
 })();
 
 // ================================================================
+// АВТОРИЗАЦИЯ НА СТРАНИЦЕ
+// ================================================================
+
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        // Пользователь авторизован — обновляем шапку
+        USER_UID = user.uid;
+        USER = user.displayName || user.email || 'User';
+        localStorage.setItem('dc_u_' + SITE, USER);
+        
+        var avatarUrl = user.photoURL || null;
+        if (!avatarCache) avatarCache = {};
+        avatarCache[USER_UID] = avatarUrl;
+        
+        if (typeof updateUI === 'function') {
+            updateUI();
+        }
+        
+        console.log('✅ Авторизован как:', USER);
+    } else {
+        console.log('⏳ Не авторизован');
+    }
+});
+
+// ================================================================
 // ЗАГРУЗКА ТВОИХ ПОСТОВ НА СТРАНИЦУ
 // ================================================================
 
@@ -156,7 +181,6 @@ function loadMyPagePosts() {
     var container = document.getElementById('pageFeedContainer');
     if (!container) return;
 
-    // Показываем загрузку
     container.innerHTML = `
         <div style="text-align:center;padding:20px;color:var(--muted-text);">
             <div style="display:inline-block;width:30px;height:30px;border:3px solid var(--border-color);border-top:3px solid var(--link-color);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
@@ -165,7 +189,6 @@ function loadMyPagePosts() {
         <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
     `;
 
-    // Загружаем посты из Firebase
     db.ref('sites/' + SITE + '/user_posts/' + MY_UID).orderByChild('timestamp').on('value', function(snap) {
         var data = snap.val() || {};
         var keys = Object.keys(data).sort(function(a, b) {
@@ -185,7 +208,6 @@ function loadMyPagePosts() {
         var myName = '';
         var myAvatar = '';
 
-        // Получаем имя и аватарку
         db.ref('sites/' + SITE + '/users/' + MY_UID).once('value', function(userSnap) {
             var userData = userSnap.val() || {};
             myName = userData.name || 'PLAYER Likee';
@@ -194,8 +216,6 @@ function loadMyPagePosts() {
             keys.forEach(function(k) {
                 var p = data[k];
                 p.id = k;
-                
-                // Добавляем имя и аватарку автора
                 p.author = myName;
                 p.authorUid = MY_UID;
                 p.authorAvatar = myAvatar;
