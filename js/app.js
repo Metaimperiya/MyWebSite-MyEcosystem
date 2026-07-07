@@ -2,10 +2,6 @@
 // ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
-// ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
-var USER = null;
-var USER_UID = null;
-
 // ===== ОБНОВЛЕНИЕ UI =====
 
 function updateUI() {
@@ -15,22 +11,19 @@ function updateUI() {
     const sName = document.getElementById('sName');
     const dot = document.getElementById('adminDot');
 
-    // ОДНА ТОЧКА ИСТИНЫ ДЛЯ ИМЕНИ
-    if (name) {
-        name.textContent = (USER) ? USER : 'Гость';
-    }
-
     if (USER && USER_UID) {
-        if (sName) sName.textContent = USER;
+        name.textContent = USER;
+        sName.textContent = USER;
         renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
         renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
         if (isAdmin) dot.classList.add('active');
         else dot.classList.remove('active');
         updateAdminMenu();
     } else {
-        if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
-        if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
-        if (sName) sName.textContent = 'Гость';
+        topAvatar.innerHTML = '<span class="letter">?</span>';
+        sAvatar.innerHTML = '<span class="letter">?</span>';
+        name.textContent = 'Гость';
+        sName.textContent = 'Гость';
         dot.classList.remove('active');
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
@@ -90,6 +83,7 @@ window.goToHome = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
+    // Перенаправляем на главную страницу
     window.location.href = '/';
 };
 
@@ -99,6 +93,7 @@ window.goToFeed = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
+    // Если мы на foto.html или другой странице — переходим на главную
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/';
         return;
@@ -608,119 +603,3 @@ setTimeout(function() {
 }, 500);
 
 setInterval(updateNotifBadge, 5000);
-
-// ================================================================
-// КОРОТКИЕ ССЫЛКИ
-// ================================================================
-
-function handleShortUrl() {
-    var path = window.location.pathname;
-    var slug = path.replace('/', '').replace(/\/$/, '');
-    
-    if (!slug || slug === '' || slug === 'index.html') {
-        return;
-    }
-    
-    if (slug === 'player-likee') {
-        document.querySelectorAll('.page').forEach(function(el) {
-            el.style.display = 'none';
-            el.classList.remove('active');
-        });
-        var page = document.getElementById('page-profile');
-        if (page) {
-            page.style.display = 'block';
-            page.classList.add('active');
-            if (typeof loadProfile === 'function') {
-                VIEWING_USER = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-                loadProfile();
-            }
-        }
-        return;
-    }
-    
-    show404();
-}
-
-function show404() {
-    var container = document.getElementById('pageContainer');
-    if (container) {
-        container.innerHTML = `
-            <div style="text-align:center;padding:40px 20px;">
-                <div style="font-size:48px;color:var(--muted-text);">404</div>
-                <div style="font-size:1.2rem;font-weight:600;margin:10px 0;">Страница не найдена</div>
-                <div style="color:var(--muted-text);font-size:0.8rem;">Страница ${window.location.pathname} не существует</div>
-                <button onclick="window.location.href='/'" style="margin-top:16px;padding:8px 24px;background:var(--link-color);color:#fff;border:none;border-radius:8px;cursor:pointer;">На главную</button>
-            </div>
-        `;
-    }
-}
-
-setTimeout(handleShortUrl, 600);
-
-// ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ
-// ================================================================
-
-(function() {
-    const components = [
-        { id: 'topbarContainer', url: 'topbar.html' },
-        { id: 'settingsContainer', url: 'settings.html' },
-        { id: 'sidebarContainer', url: 'sidebar.html' },
-        { id: 'modalsContainer', url: 'modals.html' }
-    ];
-
-    let loaded = 0;
-    const total = components.length;
-
-    components.forEach(function(comp) {
-        const container = document.getElementById(comp.id);
-        if (!container) return;
-
-        fetch(comp.url)
-            .then(response => {
-                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
-                return response.text();
-            })
-            .then(html => {
-                container.innerHTML = html;
-                loaded++;
-                
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены!');
-                    
-                    // !!! ВЫЗЫВАЕМ updateUI СРАЗУ, БЕЗ ТАЙМЕРОВ !!!
-                    if (typeof updateUI === 'function') updateUI();
-                    if (typeof translatePage === 'function') translatePage();
-                    if (typeof loadNotifications === 'function') loadNotifications();
-                    if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                    if (typeof initAudio === 'function') initAudio();
-                    
-                    var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-                    VIEWING_USER = MY_UID;
-                    if (typeof loadProfile === 'function') {
-                        loadProfile();
-                    }
-                }
-            })
-            .catch(err => {
-                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
-                container.innerHTML = `<div style="display:none;"></div>`;
-                loaded++;
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены (с ошибками)');
-                    
-                    if (typeof updateUI === 'function') updateUI();
-                    if (typeof translatePage === 'function') translatePage();
-                    if (typeof loadNotifications === 'function') loadNotifications();
-                    if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                    if (typeof initAudio === 'function') initAudio();
-                    
-                    var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-                    VIEWING_USER = MY_UID;
-                    if (typeof loadProfile === 'function') {
-                        loadProfile();
-                    }
-                }
-            });
-    });
-})();
