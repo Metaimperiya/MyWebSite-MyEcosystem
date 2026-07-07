@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLAYER Likee — METAIMPERIYA</title>
-    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA. Посты, фото, общение.">
-    <meta name="keywords" content="PLAYER Likee, METAIMPERIYA, персональная страница">
+    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA">
     <meta property="og:title" content="PLAYER Likee — METAIMPERIYA">
     <meta property="og:description" content="Персональная страница PLAYER Likee на METAIMPERIYA">
     <meta property="og:type" content="website">
@@ -89,7 +88,23 @@
 
 <script>
 // ================================================================
-// АВТОРИЗАЦИЯ НА СТРАНИЦЕ
+// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ
+// ================================================================
+
+function forceUpdateTopbar() {
+    var topName = document.getElementById('topName');
+    var topAvatar = document.getElementById('topAvatar');
+    
+    if (topName && USER) {
+        topName.textContent = USER;
+    }
+    if (topAvatar && USER_UID) {
+        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+    }
+}
+
+// ================================================================
+// АВТОРИЗАЦИЯ
 // ================================================================
 
 auth.onAuthStateChanged(function(user) {
@@ -105,6 +120,14 @@ auth.onAuthStateChanged(function(user) {
         if (typeof updateUI === 'function') {
             updateUI();
         }
+        
+        setTimeout(function() {
+            forceUpdateTopbar();
+        }, 500);
+        
+        setTimeout(function() {
+            forceUpdateTopbar();
+        }, 1500);
         
         console.log('✅ Авторизован как:', USER);
     } else {
@@ -148,6 +171,10 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
+                        setTimeout(function() {
+                            forceUpdateTopbar();
+                        }, 300);
+                        
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
@@ -168,6 +195,10 @@ auth.onAuthStateChanged(function(user) {
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
+                        
+                        setTimeout(function() {
+                            forceUpdateTopbar();
+                        }, 300);
                         
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
