@@ -88,40 +88,35 @@
 
 <script>
 // ================================================================
-// САМЫЙ ТУПОЙ, НО РАБОЧИЙ СПОСОБ — ПИХАЕМ ИМЯ КАЖДУЮ СЕКУНДУ
+// ГЛАВНАЯ ФУНКЦИЯ — ПРИНУДИТЕЛЬНО ВСТАВЛЯЕТ ИМЯ В ШАПКУ
 // ================================================================
 
-function forceUpdateTopbar() {
+function setTopbarName() {
     var topName = document.getElementById('topName');
     var topAvatar = document.getElementById('topAvatar');
     
-    // Пытаемся получить имя из разных источников
-    var name = USER || localStorage.getItem('dc_u_' + SITE) || 'PLAYER Likee';
+    // Берём имя из разных мест
+    var name = null;
+    if (USER) name = USER;
+    else if (localStorage.getItem('dc_u_' + SITE)) name = localStorage.getItem('dc_u_' + SITE);
+    else name = 'PLAYER Likee';
     
+    // Вставляем имя
     if (topName) {
         topName.textContent = name;
     }
-    if (topAvatar && USER_UID) {
-        renderAvatar(USER_UID, topAvatar, name.charAt(0).toUpperCase());
-    } else if (topAvatar) {
-        // Если USER_UID нет, но есть имя — показываем букву
-        topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
+    
+    // Вставляем аватарку
+    if (topAvatar) {
+        if (USER_UID) {
+            renderAvatar(USER_UID, topAvatar, name.charAt(0).toUpperCase());
+        } else {
+            topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
+        }
     }
     
-    // Показываем шапку
-    document.body.classList.add('data-loaded');
+    console.log('✅ Шапка обновлена:', name);
 }
-
-// Запускаем обновление каждую секунду (пока не появится)
-var updateInterval = setInterval(function() {
-    forceUpdateTopbar();
-    // Если имя появилось — останавливаем интервал
-    var topName = document.getElementById('topName');
-    if (topName && topName.textContent !== 'Гость' && topName.textContent !== '') {
-        clearInterval(updateInterval);
-        console.log('✅ Шапка обновлена, интервал остановлен');
-    }
-}, 1000);
 
 // ================================================================
 // АВТОРИЗАЦИЯ
@@ -137,15 +132,12 @@ auth.onAuthStateChanged(function(user) {
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
         
-        forceUpdateTopbar();
+        setTopbarName();
         console.log('✅ Авторизован как:', USER);
     } else {
         USER = null;
         USER_UID = null;
-        // Если не авторизован — показываем "Гость"
-        var topName = document.getElementById('topName');
-        if (topName) topName.textContent = 'Гость';
-        document.body.classList.add('data-loaded');
+        setTopbarName();
         console.log('⏳ Не авторизован');
     }
 });
@@ -180,10 +172,16 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
                     
-                    // Принудительно обновляем шапку после загрузки
+                    // Принудительно вставляем имя в шапку
+                    setTopbarName();
+                    
                     setTimeout(function() {
-                        forceUpdateTopbar();
-                    }, 100);
+                        setTopbarName();
+                    }, 500);
+                    
+                    setTimeout(function() {
+                        setTopbarName();
+                    }, 1500);
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
@@ -207,9 +205,15 @@ auth.onAuthStateChanged(function(user) {
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
                     
+                    setTopbarName();
+                    
                     setTimeout(function() {
-                        forceUpdateTopbar();
-                    }, 100);
+                        setTopbarName();
+                    }, 500);
+                    
+                    setTimeout(function() {
+                        setTopbarName();
+                    }, 1500);
                     
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
