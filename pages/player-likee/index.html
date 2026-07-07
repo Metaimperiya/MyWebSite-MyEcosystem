@@ -33,7 +33,6 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== СТРАНИЦА ПОЛЬЗОВАТЕЛЯ ===== -->
         <div class="page active" id="page-page">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
@@ -41,7 +40,6 @@
             <div id="pageContainer"></div>
         </div>
 
-        <!-- ===== ЛЕНТА СТРАНИЦЫ ===== -->
         <div id="pageFeedContainer" style="margin-top:10px;"></div>
 
         <div class="chat-view" id="chatView">
@@ -80,14 +78,7 @@
 <script src="/js/page.js"></script>
 
 <script>
-// ================================================================
-// ТВОЙ UID — ДЛЯ ЗАГРУЗКИ ТВОИХ ПОСТОВ
-// ================================================================
 var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-
-// ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ
-// ================================================================
 
 (function() {
     const components = [
@@ -120,7 +111,6 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
-                        
                         loadMyPagePosts();
                     }, 500);
                 }
@@ -137,7 +127,6 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
-                        
                         loadMyPagePosts();
                     }, 500);
                 }
@@ -145,33 +134,20 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
     });
 })();
 
-// ================================================================
-// АВТОРИЗАЦИЯ НА СТРАНИЦЕ
-// ================================================================
-
 auth.onAuthStateChanged(function(user) {
     if (user) {
         USER_UID = user.uid;
         USER = user.displayName || user.email || 'User';
         localStorage.setItem('dc_u_' + SITE, USER);
-        
         var avatarUrl = user.photoURL || null;
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
-        
-        if (typeof updateUI === 'function') {
-            updateUI();
-        }
-        
+        if (typeof updateUI === 'function') updateUI();
         console.log('✅ Авторизован как:', USER);
     } else {
         console.log('⏳ Не авторизован');
     }
 });
-
-// ================================================================
-// ЗАГРУЗКА ТВОИХ ПОСТОВ НА СТРАНИЦУ
-// ================================================================
 
 function loadMyPagePosts() {
     var container = document.getElementById('pageFeedContainer');
@@ -226,10 +202,6 @@ function loadMyPagePosts() {
         });
     });
 }
-
-// ================================================================
-// АВТО-СКРЫТИЕ ШАПКИ
-// ================================================================
 
 (function() {
     var lastScrollY = 0;
