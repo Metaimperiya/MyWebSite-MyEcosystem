@@ -8,10 +8,20 @@
     </div>
     <div class="center"></div>
     <div class="right">
-        <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge"></span></button>
-        <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
+        <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge" class="badge"></span></button>
+        <button class="notif-btn" onclick="openNotifications()" title="Уведомления">🔔 <span id="notifBadge" class="badge"></span></button>
         <div class="avatar-wrap" id="topAvatar" onclick="window.location.href='/player-likee'"><span class="letter">?</span></div>
         <span class="username" id="topName" onclick="window.location.href='/player-likee'" data-i18n="guest">Гость</span>
+        <span id="adminDot" class="admin-dot" style="display:none;"></span>
         <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
+        
+        <!-- ВЫПАДАЮЩЕЕ МЕНЮ (НАСТРОЙКИ) -->
+        <div id="settingsMenu" class="settings-dropdown">
+            <div class="settings-item" onclick="toggleTheme()">🌓 Тема</div>
+            <div class="settings-item" onclick="toggleLanguage()" id="langDisplay">Русский</div>
+            <div class="settings-divider"></div>
+            <div class="settings-item" onclick="openAdminChats()" id="adminChatsMenuItem" style="display:none;">👑 Админ-чаты</div>
+            <div class="settings-item danger" onclick="logoutUser()">🚪 Выйти</div>
+        </div>
     </div>
 </header>
