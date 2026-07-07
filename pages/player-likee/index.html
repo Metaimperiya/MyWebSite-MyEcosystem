@@ -24,7 +24,6 @@
     <div id="topbarContainer"></div>
     <div id="settingsContainer"></div>
     <div id="sidebarContainer"></div>
-    <div id="playerContainer"></div>
     <div id="modalsContainer"></div>
 
     <div class="container" id="mainContainer">
@@ -95,8 +94,7 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
         { id: 'topbarContainer', url: '/topbar.html' },
         { id: 'settingsContainer', url: '/settings.html' },
         { id: 'sidebarContainer', url: '/sidebar.html' },
-        { id: 'modalsContainer', url: '/modals.html' },
-        { id: 'playerContainer', url: '/player.html' }
+        { id: 'modalsContainer', url: '/modals.html' }
     ];
 
     let loaded = 0;
@@ -123,7 +121,6 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Загружаем ТВОИ посты из Firebase
                         loadMyPagePosts();
                     }, 500);
                 }
@@ -154,7 +151,6 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
 
 auth.onAuthStateChanged(function(user) {
     if (user) {
-        // Пользователь авторизован — обновляем шапку
         USER_UID = user.uid;
         USER = user.displayName || user.email || 'User';
         localStorage.setItem('dc_u_' + SITE, USER);
