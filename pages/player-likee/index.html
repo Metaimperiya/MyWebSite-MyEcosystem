@@ -108,7 +108,8 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
                         if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
+                        // Уведомления не загружаем на этой странице
+                        // if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         loadMyPagePosts();
@@ -124,7 +125,7 @@ var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                     setTimeout(function() {
                         if (typeof translatePage === 'function') translatePage();
                         if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
+                        // if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         loadMyPagePosts();
