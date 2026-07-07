@@ -32,13 +32,11 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== СТРАНИЦА С РЕАЛЬНЫМ КОНТЕНТОМ ===== -->
         <div class="page active" id="page-page">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
             </div>
             
-            <!-- ===== ПРОФИЛЬ ===== -->
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar"><span class="letter">P</span></div>
                 <div class="name">PLAYER Likee</div>
@@ -50,7 +48,6 @@
                 </div>
             </div>
 
-            <!-- ===== ПОСТЫ ===== -->
             <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
             <div id="profilePosts"></div>
         </div>
@@ -92,6 +89,30 @@
 
 <script>
 // ================================================================
+// АВТОРИЗАЦИЯ НА СТРАНИЦЕ
+// ================================================================
+
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        USER_UID = user.uid;
+        USER = user.displayName || user.email || 'User';
+        localStorage.setItem('dc_u_' + SITE, USER);
+        
+        var avatarUrl = user.photoURL || null;
+        if (!avatarCache) avatarCache = {};
+        avatarCache[USER_UID] = avatarUrl;
+        
+        if (typeof updateUI === 'function') {
+            updateUI();
+        }
+        
+        console.log('✅ Авторизован как:', USER);
+    } else {
+        console.log('⏳ Не авторизован');
+    }
+});
+
+// ================================================================
 // ЗАГРУЗКА КОМПОНЕНТОВ
 // ================================================================
 
@@ -127,7 +148,6 @@
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Загружаем посты
                         var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
                         VIEWING_USER = MY_UID;
                         if (typeof loadProfile === 'function') {
@@ -159,25 +179,6 @@
             });
     });
 })();
-
-// ================================================================
-// АВТОРИЗАЦИЯ
-// ================================================================
-
-auth.onAuthStateChanged(function(user) {
-    if (user) {
-        USER_UID = user.uid;
-        USER = user.displayName || user.email || 'User';
-        localStorage.setItem('dc_u_' + SITE, USER);
-        var avatarUrl = user.photoURL || null;
-        if (!avatarCache) avatarCache = {};
-        avatarCache[USER_UID] = avatarUrl;
-        if (typeof updateUI === 'function') updateUI();
-        console.log('✅ Авторизован как:', USER);
-    } else {
-        console.log('⏳ Не авторизован');
-    }
-});
 </script>
 
 </body>
