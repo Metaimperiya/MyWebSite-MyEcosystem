@@ -2,6 +2,10 @@
 // ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
+// ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
+var USER = null;
+var USER_UID = null;
+
 // ===== ОБНОВЛЕНИЕ UI =====
 
 function updateUI() {
@@ -11,19 +15,22 @@ function updateUI() {
     const sName = document.getElementById('sName');
     const dot = document.getElementById('adminDot');
 
+    // ОДНА ТОЧКА ИСТИНЫ ДЛЯ ИМЕНИ
+    if (name) {
+        name.textContent = (USER) ? USER : 'Гость';
+    }
+
     if (USER && USER_UID) {
-        name.textContent = USER;
-        sName.textContent = USER;
+        if (sName) sName.textContent = USER;
         renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
         renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
         if (isAdmin) dot.classList.add('active');
         else dot.classList.remove('active');
         updateAdminMenu();
     } else {
-        topAvatar.innerHTML = '<span class="letter">?</span>';
-        sAvatar.innerHTML = '<span class="letter">?</span>';
-        name.textContent = 'Гость';
-        sName.textContent = 'Гость';
+        if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
+        if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
+        if (sName) sName.textContent = 'Гость';
         dot.classList.remove('active');
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
@@ -651,22 +658,6 @@ function show404() {
 setTimeout(handleShortUrl, 600);
 
 // ================================================================
-// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ
-// ================================================================
-
-function forceUpdateTopbar() {
-    var topName = document.getElementById('topName');
-    var topAvatar = document.getElementById('topAvatar');
-    
-    if (topName && USER) {
-        topName.textContent = USER;
-    }
-    if (topAvatar && USER_UID) {
-        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-    }
-}
-
-// ================================================================
 // ЗАГРУЗКА КОМПОНЕНТОВ
 // ================================================================
 
@@ -694,26 +685,21 @@ function forceUpdateTopbar() {
                 container.innerHTML = html;
                 loaded++;
                 
-                // !!! ВОТ ЗДЕСЬ !!! — СРАЗУ ПОСЛЕ ВСТАВКИ HTML ОБНОВЛЯЕМ ШАПКУ
-                if (comp.id === 'topbarContainer') {
-                    forceUpdateTopbar();
-                }
-                
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены!');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                        if (typeof initAudio === 'function') initAudio();
-                        
-                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-                        VIEWING_USER = MY_UID;
-                        if (typeof loadProfile === 'function') {
-                            loadProfile();
-                        }
-                    }, 300);
+                    
+                    // !!! ВЫЗЫВАЕМ updateUI СРАЗУ, БЕЗ ТАЙМЕРОВ !!!
+                    if (typeof updateUI === 'function') updateUI();
+                    if (typeof translatePage === 'function') translatePage();
+                    if (typeof loadNotifications === 'function') loadNotifications();
+                    if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                    if (typeof initAudio === 'function') initAudio();
+                    
+                    var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
+                    VIEWING_USER = MY_UID;
+                    if (typeof loadProfile === 'function') {
+                        loadProfile();
+                    }
                 }
             })
             .catch(err => {
@@ -722,19 +708,18 @@ function forceUpdateTopbar() {
                 loaded++;
                 if (loaded === total) {
                     console.log('✅ Все компоненты загружены (с ошибками)');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                        if (typeof initAudio === 'function') initAudio();
-                        
-                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-                        VIEWING_USER = MY_UID;
-                        if (typeof loadProfile === 'function') {
-                            loadProfile();
-                        }
-                    }, 300);
+                    
+                    if (typeof updateUI === 'function') updateUI();
+                    if (typeof translatePage === 'function') translatePage();
+                    if (typeof loadNotifications === 'function') loadNotifications();
+                    if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                    if (typeof initAudio === 'function') initAudio();
+                    
+                    var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
+                    VIEWING_USER = MY_UID;
+                    if (typeof loadProfile === 'function') {
+                        loadProfile();
+                    }
                 }
             });
     });
