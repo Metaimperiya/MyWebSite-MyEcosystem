@@ -1,17 +1,64 @@
-<!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
-<header class="topbar" id="topbar">
-    <div class="left">
-        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <span class="logo" onclick="goToFeed()">
-            METAIMPERIYA 🏴‍☠️
-        </span>
-    </div>
-    <div class="center"></div>
-    <div class="right">
-        <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge"></span></button>
-        <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
-        <div class="avatar-wrap" id="topAvatar" onclick="window.location.href='/player-likee'"><span class="letter">?</span></div>
-        <span class="username" id="topName" onclick="window.location.href='/player-likee'" data-i18n="guest">Гость</span>
-        <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
-    </div>
-</header>
+Отлично, ты убрал текст «Гость» из HTML — это уже правильный первый шаг, теперь там просто пустота.
+
+Теперь, чтобы всё работало идеально без «миганий», нужно, чтобы JavaScript сразу после загрузки шапки проверял, кто там, и писал имя.
+
+Шаг 1: Правим HTML
+Ты всё сделал верно, оставив тег пустым. Теперь добавим ему начальное состояние в CSS, чтобы он не занимал лишнее место, если пуст.
+
+CSS
+/* Добавь это в style.css */
+.username:empty {
+    display: none; /* Скрывает элемент, пока он пустой */
+}
+Шаг 2: Правим логику обновления
+В твоём коде, который грузит компоненты (тот самый (function() { ... }) в самом низу), у тебя есть куча вызовов forceUpdateTopbar. Давай сделаем так, чтобы он срабатывал сразу при обновлении страницы.
+
+Замени свою функцию forceUpdateTopbar на эту версию:
+
+JavaScript
+function forceUpdateTopbar() {
+    var topName = document.getElementById('topName');
+    var topAvatar = document.getElementById('topAvatar');
+    
+    // Если пользователь авторизован, берем данные из глобальной переменной USER
+    if (topName) {
+        if (typeof USER !== 'undefined' && USER) {
+            topName.textContent = USER;
+        } else {
+            topName.textContent = 'Гость'; // Если переменная еще не заполнилась
+        }
+    }
+    
+    if (topAvatar && typeof USER_UID !== 'undefined' && USER_UID) {
+        renderAvatar(USER_UID, topAvatar, (USER ? USER.charAt(0).toUpperCase() : '?'));
+    }
+}
+Шаг 3: Как убрать "проскакивание" (самое важное)
+Проблема в том, что auth.onAuthStateChanged — это асинхронная функция. Она всегда срабатывает чуть позже, чем основной HTML.
+
+Чтобы убрать этот "дерг":
+Внутри того же скрипта, где ты грузишь компоненты (после того как loaded === total), не жди никаких setTimeout по 1500мс. Вызывай всё сразу:
+
+JavaScript
+// ... внутри блока загрузки компонентов ...
+if (loaded === total) {
+    console.log('✅ Все компоненты загружены!');
+    
+    // 1. Сначала переводы и логика
+    if (typeof translatePage === 'function') translatePage();
+    
+    // 2. СРАЗУ обновляем шапку, не дожидаясь 800мс
+    forceUpdateTopbar(); 
+    
+    // 3. Дальше остальное
+    if (typeof updateUI === 'function') updateUI();
+    // ... остальной код
+}
+Почему сейчас может "дергаться":
+Скорее всего, у тебя в auth.js или app.js есть еще один forceUpdateTopbar(), который вызывается автоматически при каждом входе.
+
+Совет: Найди в своих файлах (auth.js, app.js) все места, где вызывается forceUpdateTopbar или renderAvatar, и удали все setTimeout. Они — главные виновники того, что сначала отображается пустота, а потом через полсекунды «прилетает» имя.
+
+Оставь один прямой вызов forceUpdateTopbar() внутри onAuthStateChanged — этого будет достаточно. Если нужно, чтобы он сработал «наверняка», просто сделай это в самом начале функции, как только юзер определился.
+
+Хочешь, чтобы я посмотрел, что именно происходит в твоем auth.js? Можешь скинуть этот кусок, там скорее всего и сидит причина задержки.
