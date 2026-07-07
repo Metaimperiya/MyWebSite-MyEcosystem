@@ -1,801 +1,461 @@
 // ================================================================
+// АВТОРИЗАЦИЯ - ПОЛНОСТЬЮ ГОТОВЫЙ ФАЙЛ
+// ================================================================
+
+// ================================================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ================================================================
-const SITE = 'default';
-let USER = null;
-let USER_UID = null;
-let isAdmin = false;
-let currentLang = 'ru';
-let avatarCache = {};
-let CURRENT_ROOM = null;
-let chatUnsub = null;
-let componentsLoaded = false;
+var SAVED_PROFILES = [];
+var notifUnsub = null;
 
 // ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ
+// GOOGLE-ВХОД
 // ================================================================
-function loadComponent(name, containerId) {
-    return new Promise((resolve, reject) => {
-        fetch(containerId + '/' + name + '.html')
-            .then(res => {
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                return res.text();
-            })
-            .then(html => {
-                const container = document.getElementById(containerId);
-                if (container) {
-                    container.innerHTML = html;
-                    console.log('✅ Загружен компонент:', name);
-                    
-                    if (name === 'topbar' || name === 'sidebar') {
-                        console.log('🔄 Обновляем UI после загрузки', name);
-                        setTimeout(() => {
-                            updateUISafe();
-                        }, 100);
-                    }
-                    resolve();
-                } else {
-                    reject(new Error('Контейнер не найден: ' + containerId));
-                }
-            })
-            .catch(err => {
-                console.error('❌ Ошибка загрузки компонента:', name, err);
-                reject(err);
-            });
-    });
-}
-
-// ================================================================
-// БЕЗОПАСНОЕ ОБНОВЛЕНИЕ UI (ВСЕГДА РАБОТАЕТ)
-// ================================================================
-function updateUISafe() {
-    console.log('🔄 updateUISafe вызван, USER:', USER, 'USER_UID:', USER_UID);
-    
-    // ---- ВЕРХНЯЯ ШАПКА ----
-    const topAvatar = document.getElementById('topAvatar');
-    const topName = document.getElementById('topName');
-    const adminDot = document.getElementById('adminDot');
-    const chatBadge = document.getElementById('chatBadge');
-    const notifBadge = document.getElementById('notifBadge');
-    
-    console.log('🔍 Найдены элементы:', { 
-        topAvatar: !!topAvatar, 
-        topName: !!topName, 
-        adminDot: !!adminDot 
-    });
-    
-    // ОБНОВЛЯЕМ ШАПКУ
-    if (topAvatar && topName) {
-        if (USER && USER_UID) {
-            console.log('👤 Устанавливаем имя:', USER);
-            topName.textContent = USER;
-            renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-            
-            if (adminDot) {
-                if (isAdmin) {
-                    adminDot.classList.add('active');
-                    adminDot.style.display = 'inline-block';
-                } else {
-                    adminDot.classList.remove('active');
-                    adminDot.style.display = 'none';
-                }
-            }
-        } else {
-            console.log('👤 Гость');
-            topName.textContent = 'Гость';
-            topAvatar.innerHTML = '<span class="letter">?</span>';
-            
-            if (adminDot) {
-                adminDot.classList.remove('active');
-                adminDot.style.display = 'none';
-            }
-        }
-    } else {
-        console.warn('⚠️ Шапка ещё не загружена в DOM');
-    }
-    
-    // ---- САЙДБАР ----
-    const sAvatar = document.getElementById('sAvatar');
-    const sName = document.getElementById('sName');
-    
-    if (sAvatar && sName) {
-        if (USER && USER_UID) {
-            sName.textContent = USER;
-            renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-        } else {
-            sName.textContent = 'Гость';
-            sAvatar.innerHTML = '<span class="letter">?</span>';
-        }
-    }
-    
-    // ---- АДМИН-МЕНЮ ----
-    updateAdminMenu();
-    
-    // ---- БЕЙДЖИКИ ----
-    if (chatBadge) {
-        updateChatBadge();
-    }
-    if (notifBadge) {
-        updateNotifBadge();
-    }
-    
-    // ---- ПЕРЕВОД ----
-    setTimeout(() => {
-        if (typeof translatePage === 'function') {
-            translatePage();
-        }
-        updateLangDisplay();
-    }, 100);
-}
-
-// Оставляем старую функцию для совместимости
-function updateUI() {
-    updateUISafe();
-}
-
-// ================================================================
-// АВАТАРКИ
-// ================================================================
-function getUserAvatar(uid, callback) {
-    if (avatarCache && avatarCache[uid]) {
-        callback(avatarCache[uid]);
-        return;
-    }
-    
-    if (!uid) {
-        callback(null);
-        return;
-    }
-    
-    db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value')
-        .then(snap => {
-            const url = snap.val() || null;
-            if (!avatarCache) avatarCache = {};
-            avatarCache[uid] = url;
-            callback(url);
-        })
-        .catch(() => callback(null));
-}
-
-function renderAvatar(uid, container, letter) {
-    if (!container) return;
-    if (!uid) {
-        container.innerHTML = '<span class="letter">' + (letter || '?') + '</span>';
-        return;
-    }
-    
-    getUserAvatar(uid, function(url) {
-        if (url) {
-            container.innerHTML = '<img src="' + url + '" alt="аватар" />';
-        } else {
-            container.innerHTML = '<span class="letter">' + (letter || '?') + '</span>';
-        }
-    });
-}
-
-// ================================================================
-// НАВИГАЦИЯ
-// ================================================================
-function setActivePage(pageId) {
-    document.querySelectorAll('.page').forEach(el => {
-        el.classList.remove('active');
-    });
-    
-    if (pageId) {
-        const el = document.getElementById('page-' + pageId);
-        if (el) el.classList.add('active');
-    }
-    
-    document.querySelectorAll('.tab-bar .tab').forEach(el => {
-        el.classList.remove('active');
-    });
-    
-    const tabs = document.querySelectorAll('.tab-bar .tab');
-    const map = { feed: 0, groups: 1, people: 2, profile: 3 };
-    if (tabs[map[pageId]]) {
-        tabs[map[pageId]].classList.add('active');
-    }
-}
-
-window.goToFeed = function() {
-    if (!USER) {
-        openLoginModal();
-        return;
-    }
-    window.location.href = '/';
-};
-
-window.goToProfile = function() {
-    if (!USER) {
-        openLoginModal();
-        return;
-    }
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/?page=profile';
-        return;
-    }
-    VIEWING_USER = null;
-    setActivePage('profile');
-    document.getElementById('chatView')?.classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadProfile === 'function') loadProfile();
-};
-
-window.goToPeople = function() {
-    if (!USER) {
-        openLoginModal();
-        return;
-    }
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/?page=people';
-        return;
-    }
-    setActivePage('people');
-    document.getElementById('chatView')?.classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadPeople === 'function') loadPeople();
-};
-
-window.goToGroups = function() {
-    if (!USER) {
-        openLoginModal();
-        return;
-    }
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/?page=groups';
-        return;
-    }
-    setActivePage('groups');
-    document.getElementById('chatView')?.classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadGroups === 'function') loadGroups();
-};
-
-window.goToHome = function() {
-    if (!USER) {
-        openLoginModal();
-        return;
-    }
-    window.location.href = '/';
-};
-
-function openLoginModal() {
-    const modal = document.getElementById('loginModal');
-    if (modal) modal.classList.add('open');
-}
-
-// ================================================================
-// САЙДБАР
-// ================================================================
-window.toggleSidebar = function() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    if (sidebar) sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('show');
-};
-
-window.closeSidebar = function() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    if (sidebar) sidebar.classList.remove('open');
-    if (overlay) overlay.classList.remove('show');
-};
-
-// ================================================================
-// АДМИН-МЕНЮ
-// ================================================================
-function updateAdminMenu() {
-    const item = document.getElementById('adminChatsMenuItem');
-    if (item) {
-        item.style.display = isAdmin ? 'block' : 'none';
-    }
-}
-
-window.openAdminChats = function() {
-    if (!isAdmin) {
-        alert('Только для администратора!');
-        return;
-    }
-    const modal = document.getElementById('adminChatsModal');
-    if (modal) modal.classList.add('open');
-    loadAdminChats();
-};
-
-window.closeAdminChats = function() {
-    const modal = document.getElementById('adminChatsModal');
-    if (modal) modal.classList.remove('open');
-};
-
-function loadAdminChats() {
-    const container = document.getElementById('adminChatsList');
-    if (!container) return;
-    
-    container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>';
-    
-    db.ref('dms/' + SITE).once('value', snap => {
-        const dms = snap.val() || {};
-        const chatIds = Object.keys(dms);
-        
-        if (!chatIds.length) {
-            container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">Нет личных чатов</div>';
-            return;
-        }
-        
-        let html = '';
-        let loaded = 0;
-        
-        chatIds.forEach(chatId => {
-            const uids = chatId.split('_');
-            const promises = uids.map(uid => 
-                db.ref('sites/' + SITE + '/users/' + uid + '/name').once('value')
-            );
-            
-            Promise.all(promises).then(results => {
-                const names = results.map(r => r.val() || 'Аноним');
-                const chatName = names.join(' ⬄ ');
-                const path = 'dms/' + SITE + '/' + chatId + '/messages';
-                
-                db.ref(path).once('value', msgSnap => {
-                    const count = msgSnap.numChildren();
-                    let lastMsg = '';
-                    msgSnap.orderByChild('timestamp').limitToLast(1).forEach(m => {
-                        lastMsg = m.val().text || '';
-                    });
-                    
-                    html += '<div class="chat-list-item" onclick="adminViewChat(\'' + chatId + '\')">';
-                    html += '<div class="chat-list-info">';
-                    html += '<div class="chat-list-name">💬 ' + esc(chatName) + '</div>';
-                    html += '<div class="chat-list-last">' + (lastMsg ? esc(lastMsg.slice(0, 30)) : 'Сообщений: ' + count) + '</div>';
-                    html += '</div>';
-                    html += '</div>';
-                    
-                    loaded++;
-                    if (loaded === chatIds.length) {
-                        container.innerHTML = html;
-                    }
-                });
-            });
-        });
-    });
-}
-
-window.adminViewChat = function(chatId) {
-    if (!isAdmin) return;
-    const path = 'dms/' + SITE + '/' + chatId + '/messages';
-    closeAdminChats();
-    CURRENT_ROOM = chatId;
-    document.getElementById('chatView')?.classList.add('active');
-    setActivePage(null);
-    loadChat(path);
-};
-
-// ================================================================
-// СПИСОК ЧАТОВ
-// ================================================================
-window.openChatList = function() {
-    if (!USER_UID) {
-        alert('Войдите!');
-        return;
-    }
-    const modal = document.getElementById('chatListModal');
-    if (modal) modal.classList.add('open');
-    loadChatList();
-};
-
-window.closeChatList = function() {
-    const modal = document.getElementById('chatListModal');
-    if (modal) modal.classList.remove('open');
-};
-
-function loadChatList() {
-    const container = document.getElementById('chatListContainer');
-    if (!container) return;
-    
-    container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>';
-    
-    db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', snap => {
-        const friends = snap.val() || {};
-        const friendIds = Object.keys(friends).filter(k => friends[k] === true);
-        
-        if (!friendIds.length) {
-            container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">🤝 Добавьте друзей, чтобы начать общение</div>';
-            return;
-        }
-        
-        let html = '';
-        let loaded = 0;
-        
-        friendIds.forEach(uid => {
-            db.ref('sites/' + SITE + '/users/' + uid).once('value', usnap => {
-                const u = usnap.val() || {};
-                const name = u.name || 'Аноним';
-                const letter = name.charAt(0).toUpperCase();
-                
-                const chatId = [USER_UID, uid].sort().join('_');
-                const path = 'dms/' + SITE + '/' + chatId + '/messages';
-                
-                db.ref(path).orderByChild('timestamp').limitToLast(1).once('value', msgSnap => {
-                    let lastMsg = '';
-                    msgSnap.forEach(m => {
-                        lastMsg = m.val().text || '';
-                    });
-                    
-                    html += '<div class="chat-list-item" onclick="openPrivateChat(\'' + uid + '\');closeChatList();">';
-                    html += '<span class="avatar-wrap" id="clava-' + uid + '"><span class="letter">' + letter + '</span></span>';
-                    html += '<div class="chat-list-info">';
-                    html += '<div class="chat-list-name">' + esc(name) + '</div>';
-                    html += '<div class="chat-list-last">' + (lastMsg ? esc(lastMsg.slice(0, 30)) : 'Нет сообщений') + '</div>';
-                    html += '</div>';
-                    html += '</div>';
-                    
-                    loaded++;
-                    if (loaded === friendIds.length) {
-                        container.innerHTML = html;
-                        friendIds.forEach(k => {
-                            const el = document.getElementById('clava-' + k);
-                            if (el) renderAvatar(k, el, '?');
-                        });
-                    }
-                });
-            });
-        });
-    });
-}
-
-// ================================================================
-// БЕЙДЖИКИ
-// ================================================================
-function updateNotifBadge() {
-    if (!USER_UID) return;
-    const badge = document.getElementById('notifBadge');
-    if (!badge) return;
-    
-    db.ref('sites/' + SITE + '/notifications/' + USER_UID)
-        .orderByChild('read').equalTo(false)
-        .once('value', snap => {
-            const count = snap.numChildren();
-            if (count > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = count;
-            } else {
-                badge.style.display = 'none';
-            }
-        });
-}
-
-function updateChatBadge() {
-    const badge = document.getElementById('chatBadge');
-    if (!badge) return;
-    if (!USER_UID) {
-        badge.style.display = 'none';
-        return;
-    }
-    
-    db.ref('dms/' + SITE).once('value', snap => {
-        const dms = snap.val() || {};
-        let unread = 0;
-        let checked = 0;
-        const keys = Object.keys(dms);
-        
-        if (!keys.length) {
-            badge.style.display = 'none';
-            return;
-        }
-        
-        keys.forEach(chatId => {
-            if (!chatId.includes(USER_UID)) {
-                checked++;
-                if (checked === keys.length) {
-                    if (unread > 0) {
-                        badge.style.display = 'inline';
-                        badge.textContent = unread;
+function initGoogleButton() {
+    var btn = document.getElementById('googleBtn');
+    if (btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔵 Google-вход нажат');
+            auth.signInWithPopup(provider)
+                .then(function(result) {
+                    console.log('✅ Google-вход успешен:', result.user.displayName);
+                    updateTopbarAfterLogin(result.user.displayName, result.user.uid, false);
+                })
+                .catch(function(err) {
+                    console.error('❌ Ошибка:', err);
+                    if (err.code === 'auth/popup-blocked') {
+                        alert('Разрешите попапы для этого сайта');
+                        auth.signInWithRedirect(provider);
                     } else {
-                        badge.style.display = 'none';
-                    }
-                }
-                return;
-            }
-            
-            db.ref('dms/' + SITE + '/' + chatId + '/messages')
-                .orderByChild('read').equalTo(false)
-                .once('value', msgSnap => {
-                    msgSnap.forEach(msg => {
-                        const val = msg.val();
-                        if (val && val.from !== USER_UID) {
-                            unread++;
-                        }
-                    });
-                    
-                    checked++;
-                    if (checked === keys.length) {
-                        if (unread > 0) {
-                            badge.style.display = 'inline';
-                            badge.textContent = unread;
-                        } else {
-                            badge.style.display = 'none';
-                        }
+                        alert('Ошибка: ' + err.message);
                     }
                 });
         });
-    });
+        console.log('✅ Google-кнопка подключена');
+        return true;
+    }
+    return false;
 }
 
 // ================================================================
-// НАБОР ТЕКСТА
+// ОБНОВЛЕНИЕ ШАПКИ (ГЛАВНАЯ ФУНКЦИЯ)
 // ================================================================
-let typingTimeout = null;
-
-function setupTypingIndicator(chatId) {
-    const typingRef = db.ref('dms/' + SITE + '/' + chatId + '/typing');
-    const input = document.getElementById('chatInput');
-    if (!input) return;
+function updateTopbarAfterLogin(username, uid, isAdminFlag) {
+    console.log('🔄 ОБНОВЛЯЕМ ШАПКУ:', username);
     
-    if (window._typingHandler) {
-        input.removeEventListener('keydown', window._typingHandler);
-    }
+    // Обновляем глобальные переменные
+    window.USER = username;
+    window.USER_UID = uid;
+    window.isAdmin = isAdminFlag || false;
     
-    window._typingHandler = function() {
-        typingRef.set({ [USER_UID]: true });
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            typingRef.set(null);
-        }, 2000);
-    };
-    input.addEventListener('keydown', window._typingHandler);
-    
-    typingRef.on('value', snap => {
-        const data = snap.val() || {};
-        const isTyping = Object.keys(data).some(key => {
-            return data[key] === true && key !== USER_UID;
-        });
-        
-        const indicator = document.getElementById('typingIndicator');
-        if (indicator) {
-            if (isTyping) {
-                indicator.textContent = '✍️ Печатает...';
-                indicator.style.display = 'block';
-            } else {
-                indicator.style.display = 'none';
-            }
+    // Сохраняем в localStorage
+    try {
+        localStorage.setItem('dc_u_' + SITE, username);
+        localStorage.setItem('dc_uid_' + SITE, uid);
+        if (isAdminFlag) {
+            localStorage.setItem('dc_admin_' + SITE, 'true');
+        } else {
+            localStorage.removeItem('dc_admin_' + SITE);
         }
-    });
-}
-
-// ================================================================
-// ЯЗЫК
-// ================================================================
-window.toggleLanguage = function() {
-    const newLang = currentLang === 'ru' ? 'en' : 'ru';
-    setLanguage(newLang);
-};
-
-function updateLangDisplay() {
-    const display = document.getElementById('langDisplay');
-    if (display) {
-        display.textContent = currentLang === 'ru' ? 'Русский' : 'English';
-    }
-}
-
-function setLanguage(lang) {
-    currentLang = lang;
-    localStorage.setItem('language', lang);
-    updateLangDisplay();
-    if (typeof translatePage === 'function') {
-        translatePage();
-    }
-}
-
-// ================================================================
-// НАСТРОЙКИ
-// ================================================================
-window.toggleSettingsMenu = function() {
-    const menu = document.getElementById('settingsMenu');
-    if (menu) {
-        menu.classList.toggle('open');
-    }
-};
-
-document.addEventListener('click', function(e) {
-    const menu = document.getElementById('settingsMenu');
-    const dots = document.querySelector('.menu-dots');
-    if (menu && dots && !menu.contains(e.target) && !dots.contains(e.target)) {
-        menu.classList.remove('open');
-    }
-});
-
-// ================================================================
-// УВЕДОМЛЕНИЯ
-// ================================================================
-window.openNotifications = function() {
-    if (!USER_UID) {
-        alert('Войдите!');
-        return;
-    }
-    const modal = document.getElementById('notificationsModal');
-    if (modal) {
-        modal.classList.add('open');
-        loadNotifications();
-    }
-};
-
-function loadNotifications() {
-    const container = document.getElementById('notificationsList');
-    if (!container) return;
+    } catch(e) {}
     
-    container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;">⏳ Загрузка...</div>';
-    
-    db.ref('sites/' + SITE + '/notifications/' + USER_UID)
-        .orderByChild('timestamp').limitToLast(50)
-        .once('value', snap => {
-            const notifs = snap.val() || {};
-            const keys = Object.keys(notifs);
-            
-            if (!keys.length) {
-                container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;">Нет уведомлений</div>';
-                return;
-            }
-            
-            let html = '';
-            keys.reverse().forEach(key => {
-                const n = notifs[key];
-                html += '<div class="notif-item' + (n.read ? '' : ' unread') + '">';
-                html += '<div class="notif-text">' + esc(n.text || '') + '</div>';
-                html += '<div class="notif-time">' + (n.time || '') + '</div>';
-                html += '</div>';
-                
-                if (!n.read) {
-                    db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + key + '/read').set(true);
-                }
-            });
-            
-            container.innerHTML = html;
-            updateNotifBadge();
-        });
-}
-
-// ================================================================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ================================================================
-function esc(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-// ================================================================
-// ВЫХОД ИЗ СИСТЕМЫ
-// ================================================================
-window.logoutUser = function() {
-    if (!USER) {
-        console.log('Пользователь уже вышел');
-        return;
-    }
-    
-    const menu = document.getElementById('settingsMenu');
-    if (menu) menu.classList.remove('open');
-    
-    USER = null;
-    USER_UID = null;
-    isAdmin = false;
-    
-    updateUISafe();
-    
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().signOut().catch(function(err) {
-            console.warn('Ошибка выхода из Firebase:', err);
-        });
-    }
-    
-    console.log('✅ Пользователь вышел');
-    window.location.href = '/';
-};
-
-window.logout = window.logoutUser;
-
-// ================================================================
-// ОБНОВЛЕНИЕ ШАПКИ ПОСЛЕ ЛОГИНА
-// ================================================================
-window.updateTopbarAfterLogin = function(username, uid, isAdminFlag) {
-    console.log('🔄 Обновляем шапку после логина:', username);
-    
-    USER = username;
-    USER_UID = uid;
-    isAdmin = isAdminFlag || false;
-    
-    // Пытаемся обновить сразу
-    updateUISafe();
-    
-    // И ещё раз через 200мс, на случай если шапка ещё не загрузилась
+    // Пытаемся обновить UI всеми способами
     setTimeout(function() {
-        updateUISafe();
+        // Способ 1: через updateUI
+        if (typeof updateUI === 'function') {
+            updateUI();
+        }
+        
+        // Способ 2: через updateUISafe
+        if (typeof updateUISafe === 'function') {
+            updateUISafe();
+        }
+        
+        // Способ 3: ручное обновление
+        updateTopbarManually(username, uid, isAdminFlag);
+    }, 50);
+    
+    // Дополнительные попытки через 200мс и 500мс
+    setTimeout(function() {
+        updateTopbarManually(username, uid, isAdminFlag);
     }, 200);
     
-    // И через 500мс на всякий случай
     setTimeout(function() {
-        updateUISafe();
+        updateTopbarManually(username, uid, isAdminFlag);
     }, 500);
+}
+
+// ================================================================
+// РУЧНОЕ ОБНОВЛЕНИЕ ШАПКИ
+// ================================================================
+function updateTopbarManually(username, uid, isAdminFlag) {
+    var topName = document.getElementById('topName');
+    var topAvatar = document.getElementById('topAvatar');
+    var sName = document.getElementById('sName');
+    var sAvatar = document.getElementById('sAvatar');
+    var adminDot = document.getElementById('adminDot');
+    
+    console.log('🔍 Ручное обновление, найдены элементы:', {
+        topName: !!topName,
+        topAvatar: !!topAvatar,
+        sName: !!sName,
+        sAvatar: !!sAvatar
+    });
+    
+    // Обновляем имя в шапке
+    if (topName) {
+        topName.textContent = username || 'Гость';
+        console.log('✅ Имя в шапке установлено:', topName.textContent);
+    }
+    
+    // Обновляем имя в сайдбаре
+    if (sName) {
+        sName.textContent = username || 'Гость';
+        console.log('✅ Имя в сайдбаре установлено:', sName.textContent);
+    }
+    
+    // Обновляем аватар в шапке
+    if (topAvatar) {
+        if (typeof renderAvatar === 'function') {
+            renderAvatar(uid, topAvatar, (username || '?').charAt(0).toUpperCase());
+        } else {
+            topAvatar.innerHTML = '<span class="letter">' + (username || '?').charAt(0).toUpperCase() + '</span>';
+        }
+    }
+    
+    // Обновляем аватар в сайдбаре
+    if (sAvatar) {
+        if (typeof renderAvatar === 'function') {
+            renderAvatar(uid, sAvatar, (username || '?').charAt(0).toUpperCase());
+        } else {
+            sAvatar.innerHTML = '<span class="letter">' + (username || '?').charAt(0).toUpperCase() + '</span>';
+        }
+    }
+    
+    // Обновляем админ-точку
+    if (adminDot) {
+        if (isAdminFlag) {
+            adminDot.classList.add('active');
+            adminDot.style.display = 'inline-block';
+        } else {
+            adminDot.classList.remove('active');
+            adminDot.style.display = 'none';
+        }
+    }
+}
+
+// ================================================================
+// ВХОД ПО ИМЕНИ
+// ================================================================
+window.loginWithName = function() {
+    var input = document.getElementById('nameInput');
+    if (!input) { alert('Ошибка: поле ввода не найдено'); return; }
+    var n = input.value.trim();
+    if (!n) { alert('Введите имя'); return; }
+    
+    auth.signInAnonymously()
+        .then(function() {
+            var username = n.slice(0, 24);
+            var uid = 'anon_' + Date.now();
+            
+            // Сохраняем данные
+            window.USER = username;
+            window.USER_UID = uid;
+            window.isAdmin = false;
+            
+            // Сохраняем в Firebase
+            return db.ref('sites/' + SITE + '/users/' + uid).update({
+                name: username,
+                email: 'anon@anon.com',
+                uid: uid,
+                lastLogin: Date.now()
+            }).then(function() {
+                return db.ref('sites/' + SITE + '/all_users/' + uid).set({
+                    name: username,
+                    email: 'anon@anon.com',
+                    uid: uid,
+                    lastLogin: Date.now()
+                });
+            }).then(function() {
+                // Закрываем модалку
+                var modal = document.getElementById('loginModal');
+                if (modal) modal.classList.remove('open');
+                
+                // ОБНОВЛЯЕМ ШАПКУ
+                updateTopbarAfterLogin(username, uid, false);
+                
+                // Загружаем данные
+                if (typeof loadFeed === 'function') loadFeed();
+                if (typeof loadGroups === 'function') loadGroups();
+                if (typeof loadPeople === 'function') loadPeople();
+                if (typeof loadProfile === 'function') loadProfile();
+                if (typeof loadNotifications === 'function') loadNotifications();
+                if (typeof loadFriendRequests === 'function') loadFriendRequests();
+            });
+        })
+        .catch(function(e) {
+            alert('Ошибка: ' + e.message);
+        });
 };
+
+// ================================================================
+// ЗАКРЫТЬ ВХОД
+// ================================================================
+window.closeLogin = function() {
+    var modal = document.getElementById('loginModal');
+    if (modal) modal.classList.remove('open');
+};
+
+// ================================================================
+// ВЫХОД
+// ================================================================
+window.logout = function() {
+    if (!confirm('Выйти из профиля?')) return;
+    
+    if (notifUnsub) {
+        try { notifUnsub(); } catch(e) {}
+        notifUnsub = null;
+    }
+    
+    auth.signOut()
+        .then(function() {
+            // Очищаем данные
+            localStorage.removeItem('dc_u_' + SITE);
+            localStorage.removeItem('dc_uid_' + SITE);
+            localStorage.removeItem('dc_admin_' + SITE);
+            
+            window.USER = null;
+            window.USER_UID = null;
+            window.isAdmin = false;
+            
+            // Обновляем UI
+            var feed = document.getElementById('feed');
+            if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
+            
+            var dot = document.getElementById('adminDot');
+            if (dot) dot.classList.remove('active');
+            
+            if (typeof closeSidebar === 'function') closeSidebar();
+            
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.add('open');
+            
+            // Обновляем шапку
+            updateTopbarAfterLogin(null, null, false);
+            
+            if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
+        })
+        .catch(function(e) {
+            alert('Ошибка: ' + e.message);
+        });
+};
+
+// ================================================================
+// СОХРАНЕННЫЕ ПРОФИЛИ
+// ================================================================
+function loadSavedProfiles() {
+    try {
+        SAVED_PROFILES = JSON.parse(localStorage.getItem('dc_profiles_' + SITE) || '[]');
+    } catch(e) {
+        SAVED_PROFILES = [];
+    }
+}
+
+function saveProfileToList(uid, name, email, avatarUrl) {
+    var existing = SAVED_PROFILES.find(function(p) { return p.uid === uid; });
+    if (!existing) {
+        SAVED_PROFILES.push({
+            uid: uid,
+            name: name,
+            email: email || 'anon',
+            avatarUrl: avatarUrl || null,
+            lastUsed: Date.now()
+        });
+    } else {
+        existing.name = name;
+        existing.email = email || 'anon';
+        existing.avatarUrl = avatarUrl || null;
+        existing.lastUsed = Date.now();
+    }
+    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+}
+
+function removeSavedProfile(uid) {
+    if (!confirm('Удалить сохраненный профиль?')) return;
+    SAVED_PROFILES = SAVED_PROFILES.filter(function(p) { return p.uid !== uid; });
+    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+}
+
+function loginWithSavedProfile(uid) {
+    var profile = SAVED_PROFILES.find(function(p) { return p.uid === uid; });
+    if (!profile) return;
+    
+    auth.signInAnonymously()
+        .then(function() {
+            window.USER = profile.name;
+            window.USER_UID = uid;
+            window.isAdmin = false;
+            
+            localStorage.setItem('dc_u_' + SITE, profile.name);
+            localStorage.setItem('dc_uid_' + SITE, uid);
+            
+            return db.ref('sites/' + SITE + '/users/' + uid).update({
+                name: profile.name,
+                email: profile.email || 'anon',
+                uid: uid,
+                lastLogin: Date.now()
+            }).then(function() {
+                return db.ref('sites/' + SITE + '/all_users/' + uid).set({
+                    name: profile.name,
+                    email: profile.email || 'anon',
+                    uid: uid,
+                    lastLogin: Date.now()
+                });
+            }).then(function() {
+                profile.lastUsed = Date.now();
+                localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+                
+                var modal = document.getElementById('loginModal');
+                if (modal) modal.classList.remove('open');
+                
+                updateTopbarAfterLogin(profile.name, uid, false);
+                
+                if (typeof loadFeed === 'function') loadFeed();
+                if (typeof loadGroups === 'function') loadGroups();
+                if (typeof loadPeople === 'function') loadPeople();
+                if (typeof loadProfile === 'function') loadProfile();
+                if (typeof loadNotifications === 'function') loadNotifications();
+                if (typeof loadFriendRequests === 'function') loadFriendRequests();
+            });
+        })
+        .catch(function(e) {
+            alert('Ошибка: ' + e.message);
+        });
+}
+
+// ================================================================
+// AUTH STATE
+// ================================================================
+auth.onAuthStateChanged(function(user) {
+    console.log('🔄 Auth state changed:', user ? user.uid : 'null');
+    
+    if (user) {
+        // Пользователь залогинен через Firebase
+        var username = user.displayName || user.email || 'User';
+        var uid = user.uid;
+        var avatarUrl = user.photoURL || null;
+        
+        window.USER = username;
+        window.USER_UID = uid;
+        
+        if (!avatarCache) avatarCache = {};
+        avatarCache[uid] = avatarUrl;
+        
+        // Сохраняем в Firebase
+        db.ref('sites/' + SITE + '/users/' + uid).update({
+            name: username,
+            email: user.email || 'anon',
+            uid: uid,
+            lastLogin: Date.now(),
+            avatarUrl: avatarUrl
+        });
+        
+        db.ref('sites/' + SITE + '/all_users/' + uid).set({
+            name: username,
+            email: user.email || 'anon',
+            uid: uid,
+            lastLogin: Date.now(),
+            avatarUrl: avatarUrl
+        });
+        
+        // Закрываем модалку
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.remove('open');
+        
+        // Обновляем шапку
+        updateTopbarAfterLogin(username, uid, false);
+        
+        // Загружаем данные
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadGroups === 'function') loadGroups();
+        if (typeof loadPeople === 'function') loadPeople();
+        if (typeof loadProfile === 'function') loadProfile();
+        if (typeof loadNotifications === 'function') loadNotifications();
+        if (typeof loadFriendRequests === 'function') loadFriendRequests();
+        
+    } else {
+        // Пользователь не залогинен - проверяем localStorage
+        var savedUid = localStorage.getItem('dc_uid_' + SITE);
+        var savedName = localStorage.getItem('dc_u_' + SITE);
+        
+        if (savedUid && savedName) {
+            console.log('🔄 Восстанавливаем пользователя из localStorage:', savedName);
+            window.USER = savedName;
+            window.USER_UID = savedUid;
+            
+            // Проверяем, существует ли пользователь в Firebase
+            db.ref('sites/' + SITE + '/users/' + savedUid).once('value')
+                .then(function(snap) {
+                    if (snap.exists()) {
+                        var data = snap.val();
+                        window.USER = data.name || savedName;
+                        updateTopbarAfterLogin(window.USER, savedUid, false);
+                    } else {
+                        // Пользователь не найден в Firebase - чистим localStorage
+                        localStorage.removeItem('dc_u_' + SITE);
+                        localStorage.removeItem('dc_uid_' + SITE);
+                        window.USER = null;
+                        window.USER_UID = null;
+                        updateTopbarAfterLogin(null, null, false);
+                        
+                        var loginModal = document.getElementById('loginModal');
+                        if (loginModal) loginModal.classList.add('open');
+                    }
+                })
+                .catch(function() {
+                    // Ошибка - показываем вход
+                    var loginModal = document.getElementById('loginModal');
+                    if (loginModal) loginModal.classList.add('open');
+                });
+        } else {
+            // Нет сохраненных данных
+            window.USER = null;
+            window.USER_UID = null;
+            window.isAdmin = false;
+            
+            updateTopbarAfterLogin(null, null, false);
+            
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.add('open');
+            
+            if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
+        }
+    }
+});
 
 // ================================================================
 // ИНИЦИАЛИЗАЦИЯ
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 DOM загружен');
+    console.log('🚀 auth.js инициализирован');
     
-    const savedLang = localStorage.getItem('language') || 'ru';
-    currentLang = savedLang;
+    // Пытаемся подключить Google-кнопку
+    if (!initGoogleButton()) {
+        setTimeout(initGoogleButton, 1500);
+        setTimeout(initGoogleButton, 3000);
+    }
     
-    // Загружаем компоненты
-    loadComponent('topbar', 'topbar-container');
-    loadComponent('sidebar', 'sidebar-container');
+    // Восстанавливаем пользователя из localStorage
+    var savedUid = localStorage.getItem('dc_uid_' + SITE);
+    var savedName = localStorage.getItem('dc_u_' + SITE);
     
-    // Постоянно обновляем UI каждые 500мс пока шапка не появится
-    let attempts = 0;
-    const interval = setInterval(function() {
-        attempts++;
-        console.log('🔄 Попытка обновления #' + attempts);
-        updateUISafe();
-        
-        // Если шапка появилась - прекращаем попытки
-        if (document.getElementById('topName') && document.getElementById('topAvatar')) {
-            console.log('✅ Шапка найдена, прекращаем попытки');
-            clearInterval(interval);
-        }
-        
-        // Если через 10 попыток всё ещё нет - всё равно прекращаем
-        if (attempts >= 10) {
-            console.warn('⚠️ Шапка не появилась после 10 попыток');
-            clearInterval(interval);
-        }
-    }, 300);
-    
-    setTimeout(() => {
-        updateUISafe();
-    }, 100);
+    if (savedUid && savedName) {
+        console.log('🔄 Восстанавливаем пользователя при загрузке:', savedName);
+        setTimeout(function() {
+            updateTopbarAfterLogin(savedName, savedUid, false);
+        }, 300);
+    }
 });
 
-// ================================================================
-// АВТООБНОВЛЕНИЕ UI ПРИ ИЗМЕНЕНИИ DOM
-// ================================================================
-const uiObserver = new MutationObserver(function(mutations) {
-    mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
-            if (node.nodeType === 1) {
-                if (node.id === 'topbar' || 
-                    node.querySelector('#topName') ||
-                    node.querySelector('#sName')) {
-                    console.log('🔄 DOM изменился, обновляем UI');
-                    setTimeout(() => updateUISafe(), 50);
-                }
-            }
-        });
-    });
-});
-
-uiObserver.observe(document.body, {
-    childList: true,
-    subtree: true
-});
-
-// ================================================================
-// ОБНОВЛЕНИЕ БЕЙДЖИКОВ КАЖДЫЕ 5 СЕКУНД
-// ================================================================
-setInterval(() => {
-    updateNotifBadge();
-    updateChatBadge();
-}, 5000);
-
-console.log('✅ app.js полностью загружен');
+console.log('✅ auth.js полностью загружен');
