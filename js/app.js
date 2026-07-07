@@ -727,3 +727,48 @@ function show404() {
 
 // Запускаем после загрузки
 setTimeout(handleShortUrl, 600);
+
+// ================================================================
+// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ
+// ================================================================
+
+function forceUpdateTopbar() {
+    var topName = document.getElementById('topName');
+    var topAvatar = document.getElementById('topAvatar');
+    
+    if (topName && USER) {
+        topName.textContent = USER;
+    } else if (topName) {
+        var savedName = localStorage.getItem('dc_u_' + SITE);
+        if (savedName) {
+            topName.textContent = savedName;
+        }
+    }
+    
+    if (topAvatar && USER_UID) {
+        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+    } else if (topAvatar) {
+        var savedName = localStorage.getItem('dc_u_' + SITE);
+        if (savedName) {
+            topAvatar.innerHTML = '<span class="letter">' + savedName.charAt(0).toUpperCase() + '</span>';
+        }
+    }
+}
+
+// Переопределяем updateUI, чтобы она вызывала forceUpdateTopbar
+var originalUpdateUI = updateUI || function() {};
+updateUI = function() {
+    originalUpdateUI();
+    setTimeout(function() {
+        forceUpdateTopbar();
+    }, 300);
+};
+
+// Вызываем принудительно после загрузки страницы
+setTimeout(function() {
+    forceUpdateTopbar();
+}, 1000);
+
+setTimeout(function() {
+    forceUpdateTopbar();
+}, 2000);
