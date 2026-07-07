@@ -1731,21 +1731,3 @@ body {
     background: var(--input-bg);
     color: var(--link-color);
 }
-
-/* Скрываем имя и аватарку в шапке, пока данные не загружены */
-#topName,
-#topAvatar {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-/* Когда данные загружены — показываем */
-.data-loaded #topName,
-.data-loaded #topAvatar {
-    opacity: 1;
-}
-
-/* Скрываем пустое имя в шапке */
-.username:empty {
-    display: none;
-}
