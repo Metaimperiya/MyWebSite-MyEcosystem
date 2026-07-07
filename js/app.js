@@ -459,3 +459,105 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log('✅ auth.js полностью загружен');
+
+// ================================================================
+// ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ - 100%
+// ================================================================
+
+(function() {
+    console.log('🔥 ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ШАПКИ ЗАПУЩЕНО');
+    
+    function forceUpdate() {
+        var name = localStorage.getItem('dc_u_default') || 
+                   localStorage.getItem('dc_u_') || 
+                   window.USER || 
+                   null;
+        
+        var uid = localStorage.getItem('dc_uid_default') || 
+                  localStorage.getItem('dc_uid_') || 
+                  window.USER_UID || 
+                  null;
+        
+        // Обновляем глобальные переменные
+        if (name) {
+            window.USER = name;
+            window.USER_UID = uid;
+        }
+        
+        // Обновляем элементы
+        var topName = document.getElementById('topName');
+        var topAvatarLetter = document.getElementById('topAvatarLetter');
+        var sName = document.getElementById('sName');
+        var sAvatar = document.getElementById('sAvatar');
+        var adminDot = document.getElementById('adminDot');
+        
+        if (topName) {
+            topName.textContent = name || 'Гость';
+            console.log('👤 topName:', topName.textContent);
+        }
+        
+        if (topAvatarLetter && name) {
+            topAvatarLetter.textContent = name.charAt(0).toUpperCase();
+        }
+        
+        if (sName) {
+            sName.textContent = name || 'Гость';
+        }
+        
+        if (adminDot) {
+            var isAdmin = localStorage.getItem('dc_admin_default') === 'true' || 
+                         localStorage.getItem('dc_admin_') === 'true' ||
+                         window.isAdmin === true;
+            
+            if (isAdmin) {
+                adminDot.classList.add('active');
+                adminDot.style.display = 'inline-block';
+            } else {
+                adminDot.classList.remove('active');
+                adminDot.style.display = 'none';
+            }
+        }
+    }
+    
+    // Запускаем каждую секунду пока не появится имя
+    var attempts = 0;
+    var interval = setInterval(function() {
+        attempts++;
+        var topName = document.getElementById('topName');
+        var name = localStorage.getItem('dc_u_default') || 
+                   localStorage.getItem('dc_u_') || 
+                   window.USER || 
+                   null;
+        
+        if (topName && name && topName.textContent === 'Гость') {
+            console.log('🔄 Попытка #' + attempts + ' - меняем Гость на', name);
+            forceUpdate();
+        }
+        
+        if (topName && name && topName.textContent !== 'Гость') {
+            console.log('✅ Шапка обновлена! Имя:', topName.textContent);
+            clearInterval(interval);
+        }
+        
+        if (attempts > 20) {
+            console.log('⚠️ Останавливаем попытки');
+            clearInterval(interval);
+        }
+    }, 500);
+    
+    // Мутация обсервер
+    var observer = new MutationObserver(function() {
+        forceUpdate();
+    });
+    
+    setTimeout(function() {
+        try {
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        } catch(e) {}
+    }, 300);
+    
+    console.log('✅ Принудительное обновление запущено!');
+})();
