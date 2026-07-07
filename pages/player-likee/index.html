@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>PLAYER Likee — Администратор METAIMPERIYA</title>
+    <meta name="description" content="PLAYER Likee — администратор METAIMPERIYA. Персональная страница.">
+    <meta name="theme-color" content="#1877f2">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/mobile.css">
+</head>
+<body>
+
+<div class="app">
+
+    <div id="topbarContainer"></div>
+    <div id="settingsContainer"></div>
+    <div id="sidebarContainer"></div>
+    <div id="playerContainer"></div>
+    <div id="modalsContainer"></div>
+
+    <div class="container" id="mainContainer">
+
+        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
+            <div class="handle-bar"></div>
+            <div class="handle-label">🎵 ПЛЕЕР</div>
+        </div>
+
+        <!-- ===== СТРАНИЦА АДМИНИСТРАТОРА ===== -->
+        <div class="page active" id="page-page">
+            <div style="padding:6px 0;">
+                <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
+            </div>
+            <div id="pageContainer"></div>
+        </div>
+
+        <div class="chat-view" id="chatView">
+            <button class="back-btn" onclick="closeChat()">← Назад</button>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Сообщение...">
+                <button onclick="sendChatMessage()">→</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
+
+    <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
+        <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
+        <canvas id="visualizerCanvas"></canvas>
+    </div>
+
+</div>
+
+<script src="/js/firebase.js"></script>
+<script src="/js/lang.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/player.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/feed.js"></script>
+<script src="/js/profile.js"></script>
+<script src="/js/friends.js"></script>
+<script src="/js/groups.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/admin.js"></script>
+<script src="/js/page.js"></script>
+
+<script>
+// ================================================================
+// ЗАГРУЗКА КОМПОНЕНТОВ
+// ================================================================
+
+(function() {
+    const components = [
+        { id: 'topbarContainer', url: '/topbar.html' },
+        { id: 'settingsContainer', url: '/settings.html' },
+        { id: 'sidebarContainer', url: '/sidebar.html' },
+        { id: 'modalsContainer', url: '/modals.html' },
+        { id: 'playerContainer', url: '/player.html' }
+    ];
+
+    let loaded = 0;
+    const total = components.length;
+
+    components.forEach(function(comp) {
+        const container = document.getElementById(comp.id);
+        if (!container) return;
+
+        fetch(comp.url)
+            .then(response => {
+                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                return response.text();
+            })
+            .then(html => {
+                container.innerHTML = html;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены!');
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') translatePage();
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof initAudio === 'function') initAudio();
+                        
+                        // Загружаем страницу админа
+                        if (typeof loadPage === 'function') {
+                            loadPage('player-likee');
+                        }
+                    }, 500);
+                }
+            })
+            .catch(err => {
+                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                container.innerHTML = `<div style="display:none;"></div>`;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены (с ошибками)');
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') translatePage();
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof initAudio === 'function') initAudio();
+                        
+                        if (typeof loadPage === 'function') {
+                            loadPage('player-likee');
+                        }
+                    }, 500);
+                }
+            });
+    });
+})();
+
+// ================================================================
+// АВТО-СКРЫТИЕ ШАПКИ
+// ================================================================
+
+(function() {
+    var lastScrollY = 0;
+    var topbar = document.getElementById('topbar');
+    var playerHandle = document.getElementById('playerHandle');
+    var playerDrawer = document.getElementById('playerDrawer');
+    var isPlayerOpen = false;
+    var ticking = false;
+
+    function waitForTopbar() {
+        topbar = document.getElementById('topbar');
+        if (!topbar) {
+            setTimeout(waitForTopbar, 200);
+            return;
+        }
+        console.log('✅ Топбар найден, авто-скрытие работает');
+    }
+    waitForTopbar();
+
+    function checkPlayerState() {
+        if (playerDrawer) {
+            isPlayerOpen = playerDrawer.classList.contains('open');
+        }
+    }
+
+    function updateHeader() {
+        var currentScrollY = window.scrollY;
+        checkPlayerState();
+
+        if (isPlayerOpen) {
+            showAll();
+            lastScrollY = currentScrollY;
+            return;
+        }
+
+        if (currentScrollY < lastScrollY || currentScrollY < 30) {
+            showAll();
+        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            hideAll();
+        }
+
+        lastScrollY = currentScrollY;
+    }
+
+    function showAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(0)';
+            topbar.style.opacity = '1';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(0)';
+            playerHandle.style.opacity = '1';
+        }
+    }
+
+    function hideAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(-100%)';
+            topbar.style.opacity = '0';
+            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(-100%)';
+            playerHandle.style.opacity = '0';
+            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+    }
+
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateHeader();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+
+    if (playerDrawer) {
+        var observer = new MutationObserver(function() {
+            checkPlayerState();
+            if (isPlayerOpen) {
+                showAll();
+            }
+        });
+        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (playerHandle) {
+        playerHandle.addEventListener('click', function() {
+            setTimeout(function() {
+                checkPlayerState();
+                if (isPlayerOpen) {
+                    showAll();
+                }
+            }, 150);
+        });
+    }
+
+    console.log('✅ Авто-скрытие шапки включено!');
+})();
+</script>
+
+</body>
+</html>
