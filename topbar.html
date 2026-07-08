@@ -1,43 +1,17 @@
+<!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
 <header class="topbar" id="topbar">
     <div class="left">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+        <span class="logo" onclick="goToFeed()">
+            METAIMPERIYA 🏴‍☠️
+        </span>
     </div>
+    <div class="center"></div>
     <div class="right">
-        <button class="chat-btn" onclick="openChatList()">💬 <span id="chatBadge"></span></button>
+        <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge"></span></button>
         <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
-        <div class="avatar-wrap" id="topAvatar"><span class="letter" id="topAvatarLetter">?</span></div>
-        <span class="username" id="topName">Гость</span>
+        <div class="avatar-wrap" id="topAvatar" onclick="window.location.href='/player-likee'"><span class="letter">?</span></div>
+        <span class="username" id="topName" onclick="window.location.href='/player-likee'" data-i18n="guest">Гость</span>
         <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
-        <div id="settingsMenu" class="settings-dropdown">
-            <div class="settings-item" onclick="toggleTheme()">🌓 Тема</div>
-            <div class="settings-item" onclick="toggleLanguage()">🌐 Язык</div>
-            <div class="settings-item danger" onclick="logout()">🚪 Выйти</div>
-        </div>
     </div>
 </header>
-
-<script>
-// ================================================================
-// БЫСТРОЕ ОБНОВЛЕНИЕ ШАПКИ
-// ================================================================
-(function() {
-    function update() {
-        var name = localStorage.getItem('dc_u_') || 
-                   localStorage.getItem('dc_u_default') || 
-                   window.USER || 
-                   'Гость';
-        
-        var el = document.getElementById('topName');
-        if (el) el.textContent = name;
-        
-        var av = document.getElementById('topAvatarLetter');
-        if (av) av.textContent = name === 'Гость' ? '?' : name.charAt(0).toUpperCase();
-    }
-    
-    update();
-    setTimeout(update, 200);
-    setTimeout(update, 500);
-    setInterval(update, 2000);
-})();
-</script>
