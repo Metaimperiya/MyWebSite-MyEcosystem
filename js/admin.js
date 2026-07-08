@@ -13,7 +13,6 @@ const MY_UID = "ayXehcol9FgAQU6tZuup7aSaRoV2"; // <- СЮДА ВСТАВЬ СВ�
         var dot = document.getElementById('adminDot');
         if (dot) dot.classList.add('active');
         console.log('✅ Админ-режим активен (автовход по UID)');
-        // Обновляем ленту, чтобы появились кнопки удаления
         setTimeout(function() {
             if (typeof loadFeed === 'function') loadFeed();
             if (typeof loadProfile === 'function') loadProfile();
@@ -141,7 +140,6 @@ function adminExportData() {
 }
 
 // ===== ПРИНУДИТЕЛЬНАЯ ПРОВЕРКА АДМИНКИ =====
-// Вызываем при загрузке страницы
 setTimeout(function() {
     if (localStorage.getItem('dc_admin_' + SITE) === '1') {
         isAdmin = true;
@@ -151,3 +149,37 @@ setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
     }
 }, 1000);
+
+// ===== СОЗДАТЬ СТРАНИЦУ АДМИНИСТРАТОРА =====
+window.createAdminPage = function() {
+    if (!isAdmin) {
+        alert('❌ Только для администратора!');
+        return;
+    }
+
+    if (!USER_UID) {
+        alert('❌ Вы не авторизованы');
+        return;
+    }
+
+    var pageData = {
+        slug: 'player-likee',
+        type: 'profile',
+        role: 'admin',
+        name: 'PLAYER Likee',
+        description: 'Администратор METAIMPERIYA',
+        ownerUid: USER_UID,
+        createdAt: Date.now(),
+        isActive: true
+    };
+
+    db.ref('sites/' + SITE + '/pages/profiles/' + USER_UID).set(pageData)
+        .then(function() {
+            alert('✅ Страница PLAYER Likee создана!');
+            console.log('✅ Страница создана:', pageData);
+        })
+        .catch(function(err) {
+            console.error('❌ Ошибка:', err);
+            alert('❌ Ошибка: ' + err.message);
+        });
+};
