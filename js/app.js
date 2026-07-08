@@ -1,5 +1,5 @@
 // ================================================================
-// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
+// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
 function updateUI() {
@@ -293,7 +293,6 @@ window.insertLink = function() {
     }
 };
 
-// ===== ЧАТЫ =====
 window.openChatList = function() {
     if (!USER_UID) {
         alert('Войдите!');
@@ -362,7 +361,6 @@ function loadChatList() {
     });
 }
 
-// ===== ИНДИКАТОР НАБОРА =====
 var typingTimeout = null;
 
 function setupTypingIndicator(chatId) {
@@ -400,7 +398,6 @@ function setupTypingIndicator(chatId) {
     });
 }
 
-// ===== АДМИН-ПАНЕЛЬ =====
 window.openAdminChats = function() {
     if (!isAdmin) {
         alert('Только для администратора!');
@@ -485,7 +482,6 @@ function updateAdminMenu() {
     }
 }
 
-// ===== ЯЗЫК =====
 function updateLangDisplay() {
     var display = document.getElementById('langDisplay');
     if (display) {
@@ -557,3 +553,29 @@ setTimeout(function() {
 }, 500);
 
 setInterval(updateNotifBadge, 5000);
+
+// ================================================================
+// ЭКСПОРТ
+// ================================================================
+
+window.updateUI = updateUI;
+window.renderAvatar = renderAvatar;
+window.setActivePage = setActivePage;
+window.goToFeed = goToFeed;
+window.goToProfile = goToProfile;
+window.goToPeople = goToPeople;
+window.goToGroups = goToGroups;
+window.goToHome = goToHome;
+window.toggleSidebar = toggleSidebar;
+window.closeSidebar = closeSidebar;
+window.toggleAccordion = toggleAccordion;
+window.toggleTheme = toggleTheme;
+window.formatText = formatText;
+window.insertLink = insertLink;
+window.openChatList = openChatList;
+window.closeChatList = closeChatList;
+window.openAdminChats = openAdminChats;
+window.closeAdminChats = closeAdminChats;
+window.adminViewChat = adminViewChat;
+window.openPage = openPage;
+window.updateNotifBadge = updateNotifBadge;
