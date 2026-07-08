@@ -1,242 +1,152 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>METAIMPERIYA</title>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: Arial; background:#f0f2f5; }
+        .topbar {
+            background:#fff;
+            padding:10px 16px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-bottom:1px solid #ddd;
+            position:sticky;
+            top:0;
+            z-index:999;
+        }
+        .logo { font-weight:bold; font-size:18px; color:#1877f2; cursor:pointer; }
+        .right { display:flex; align-items:center; gap:10px; }
+        .avatar {
+            width:32px; height:32px; border-radius:50%;
+            background:#1877f2; color:#fff;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:bold; font-size:16px;
+        }
+        .username { font-weight:600; font-size:14px; }
+        .modal {
+            display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+            background:rgba(0,0,0,0.5); z-index:9999;
+            justify-content:center; align-items:center;
+        }
+        .modal.open { display:flex; }
+        .modal-box {
+            background:#fff; padding:30px; border-radius:12px;
+            width:300px; text-align:center;
+        }
+        .modal-box input {
+            width:100%; padding:10px; margin:10px 0;
+            border:1px solid #ddd; border-radius:6px;
+            font-size:16px;
+        }
+        .modal-box button {
+            width:100%; padding:10px; background:#1877f2;
+            color:#fff; border:none; border-radius:6px;
+            font-size:16px; cursor:pointer;
+        }
+        .modal-box button:hover { background:#1558b0; }
+        .menu-btn { background:none; border:none; font-size:24px; cursor:pointer; }
+        .menu-dots { background:none; border:none; font-size:20px; cursor:pointer; }
+    </style>
 </head>
 <body>
 
-<div id="app">
-
-    <!-- ===== ШАПКА ===== -->
-    <header class="topbar" id="topbar">
-        <div class="left">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
-        </div>
-        <div class="right">
-            <div class="avatar-wrap" id="topAvatar"><span class="letter" id="topAvatarLetter">?</span></div>
-            <span class="username" id="topName">Гость</span>
-            <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
-            <div id="settingsMenu" class="settings-dropdown">
-                <div class="settings-item" onclick="logout()">🚪 Выйти</div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ===== ПЛЕЕР ===== -->
-    <div class="player-handle" onclick="togglePlayer()">
-        <div class="handle-bar"></div>
-        <div class="handle-label">🎵 ПЛЕЕР</div>
+<!-- ===== ШАПКА ===== -->
+<div class="topbar" id="topbar">
+    <div>
+        <button class="menu-btn">☰</button>
+        <span class="logo">METAIMPERIYA 🏴‍☠️</span>
     </div>
-
-    <div class="player-drawer" id="playerDrawer">
-        <div class="player-content">
-            <div class="player-track-info">
-                <div class="player-track-name" id="trackName">Нет трека</div>
-                <div class="player-artist" id="trackArtist">PLAYER Likee</div>
-            </div>
-            <div class="player-controls">
-                <button class="player-btn" onclick="prevTrack()">⏮</button>
-                <button class="player-btn play-large" onclick="togglePlay()" id="playBtn">▶</button>
-                <button class="player-btn" onclick="nextTrack()">⏭</button>
-            </div>
-            <div class="player-progress">
-                <div class="player-progress-bar" onclick="seekTrack(event)">
-                    <div class="player-progress-fill" id="progressFill" style="width:0%"></div>
-                </div>
-                <div class="player-time">
-                    <span id="currentTime">00:00</span>
-                    <span id="totalTime">00:00</span>
-                </div>
-            </div>
-        </div>
+    <div class="right">
+        <div class="avatar" id="avatar">?</div>
+        <span class="username" id="username">Гость</span>
+        <button class="menu-dots" onclick="logout()">⋮</button>
     </div>
-
-    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
-    <div class="container">
-        <div class="page active" id="page-feed">
-            <div id="feed"></div>
-        </div>
-    </div>
-
-    <!-- ===== МОДАЛКА ВХОДА ===== -->
-    <div class="modal" id="loginModal">
-        <div class="modal-box">
-            <h3>Вход</h3>
-            <input type="text" id="nameInput" placeholder="Ваше имя">
-            <div class="modal-actions">
-                <button class="btn-save" onclick="loginWithName()">Войти</button>
-            </div>
-        </div>
-    </div>
-
 </div>
 
-<!-- ===== СКРИПТЫ ===== -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<!-- ===== МОДАЛКА ВХОДА ===== -->
+<div class="modal open" id="loginModal">
+    <div class="modal-box">
+        <h2>Вход</h2>
+        <input type="text" id="nameInput" placeholder="Введите имя">
+        <button onclick="login()">Войти</button>
+    </div>
+</div>
 
 <script>
 // ================================================================
-// FIREBASE
+// ГЛАВНАЯ ФУНКЦИЯ - ОБНОВЛЕНИЕ ШАПКИ
 // ================================================================
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const auth = firebase.auth();
-const SITE = 'default';
 
-// ================================================================
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-// ================================================================
-let USER = null;
-let USER_UID = null;
-let currentTrack = 0;
-let isPlaying = false;
-let audio = new Audio();
-
-// ================================================================
-// ШАПКА - ОБНОВЛЕНИЕ ИМЕНИ
-// ================================================================
 function updateTopbar() {
-    let name = localStorage.getItem('dc_u_') || localStorage.getItem('dc_u_default') || USER || 'Гость';
-    document.getElementById('topName').textContent = name;
-    document.getElementById('topAvatarLetter').textContent = name === 'Гость' ? '?' : name.charAt(0).toUpperCase();
+    // Берем имя из localStorage
+    var name = localStorage.getItem('myName');
+    
+    if (name) {
+        document.getElementById('username').textContent = name;
+        document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+    } else {
+        document.getElementById('username').textContent = 'Гость';
+        document.getElementById('avatar').textContent = '?';
+    }
 }
 
 // ================================================================
-// ВХОД
+// ВХОД - СОХРАНЯЕМ ИМЯ
 // ================================================================
-window.loginWithName = function() {
-    let input = document.getElementById('nameInput');
-    if (!input) return;
-    let name = input.value.trim();
-    if (!name) { alert('Введите имя'); return; }
+
+function login() {
+    var input = document.getElementById('nameInput');
+    var name = input.value.trim();
     
-    USER = name;
-    USER_UID = 'user_' + Date.now();
-    localStorage.setItem('dc_u_', name);
-    localStorage.setItem('dc_u_default', name);
-    localStorage.setItem('dc_uid_', USER_UID);
+    if (!name) {
+        alert('Введите имя!');
+        return;
+    }
     
+    // Сохраняем в localStorage
+    localStorage.setItem('myName', name);
+    
+    // Закрываем модалку
     document.getElementById('loginModal').classList.remove('open');
+    
+    // Обновляем шапку
     updateTopbar();
-    if (typeof loadFeed === 'function') loadFeed();
-};
+}
 
 // ================================================================
 // ВЫХОД
 // ================================================================
-window.logout = function() {
+
+function logout() {
     if (!confirm('Выйти?')) return;
-    localStorage.removeItem('dc_u_');
-    localStorage.removeItem('dc_u_default');
-    localStorage.removeItem('dc_uid_');
-    USER = null;
-    USER_UID = null;
-    document.getElementById('topName').textContent = 'Гость';
-    document.getElementById('topAvatarLetter').textContent = '?';
+    localStorage.removeItem('myName');
+    updateTopbar();
     document.getElementById('loginModal').classList.add('open');
-};
-
-// ================================================================
-// ПЛЕЕР
-// ================================================================
-const tracks = [
-    { name: 'Track 1', artist: 'PLAYER Likee', url: '/music/track1.mp3' },
-    { name: 'Track 2', artist: 'PLAYER Likee', url: '/music/track2.mp3' },
-    { name: 'Track 3', artist: 'PLAYER Likee', url: '/music/track3.mp3' }
-];
-
-window.togglePlayer = function() {
-    document.getElementById('playerDrawer').classList.toggle('open');
-};
-
-window.togglePlay = function() {
-    if (isPlaying) {
-        audio.pause();
-        document.getElementById('playBtn').textContent = '▶';
-    } else {
-        if (!audio.src) {
-            loadTrack(currentTrack);
-        }
-        audio.play();
-        document.getElementById('playBtn').textContent = '⏸';
-    }
-    isPlaying = !isPlaying;
-};
-
-function loadTrack(index) {
-    let track = tracks[index];
-    if (!track) return;
-    audio.src = track.url;
-    document.getElementById('trackName').textContent = track.name;
-    document.getElementById('trackArtist').textContent = track.artist;
-    audio.load();
-    audio.play();
-    isPlaying = true;
-    document.getElementById('playBtn').textContent = '⏸';
-}
-
-window.nextTrack = function() {
-    currentTrack = (currentTrack + 1) % tracks.length;
-    loadTrack(currentTrack);
-};
-
-window.prevTrack = function() {
-    currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
-    loadTrack(currentTrack);
-};
-
-window.seekTrack = function(e) {
-    let bar = e.currentTarget;
-    let rect = bar.getBoundingClientRect();
-    let x = (e.clientX - rect.left) / rect.width;
-    audio.currentTime = x * audio.duration;
-};
-
-audio.addEventListener('timeupdate', function() {
-    let progress = (audio.currentTime / audio.duration) * 100;
-    document.getElementById('progressFill').style.width = progress + '%';
-    document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
-    document.getElementById('totalTime').textContent = formatTime(audio.duration);
-});
-
-function formatTime(seconds) {
-    if (!seconds) return '00:00';
-    let m = Math.floor(seconds / 60);
-    let s = Math.floor(seconds % 60);
-    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
 // ================================================================
-// ЗАГРУЗКА
+// ЗАГРУЗКА СТРАНИЦЫ
 // ================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    let saved = localStorage.getItem('dc_u_') || localStorage.getItem('dc_u_default');
-    if (saved) {
-        USER = saved;
-        USER_UID = localStorage.getItem('dc_uid_') || null;
-        updateTopbar();
-    } else {
-        document.getElementById('loginModal').classList.add('open');
-    }
-    
-    // Обновляем шапку каждые 2 секунды
-    setInterval(updateTopbar, 2000);
-});
+
+// Проверяем есть ли имя при загрузке
+var savedName = localStorage.getItem('myName');
+
+if (savedName) {
+    // Имя есть - закрываем модалку и обновляем шапку
+    document.getElementById('loginModal').classList.remove('open');
+    updateTopbar();
+} else {
+    // Имени нет - показываем модалку
+    document.getElementById('loginModal').classList.add('open');
+}
+
+// Обновляем шапку каждые 2 секунды (на случай если что-то сбросилось)
+setInterval(updateTopbar, 2000);
+
+console.log('✅ Всё работает! Имя:', localStorage.getItem('myName') || 'Гость');
 </script>
 
 </body>
