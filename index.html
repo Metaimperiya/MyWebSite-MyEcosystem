@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>METAIMPERIYA</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: Arial; background:#f0f2f5; }
@@ -46,17 +49,13 @@
             color:#fff; border:none; border-radius:6px;
             font-size:16px; cursor:pointer;
         }
-        .modal-box button:hover { background:#1558b0; }
-        .menu-btn { background:none; border:none; font-size:24px; cursor:pointer; }
         .menu-dots { background:none; border:none; font-size:20px; cursor:pointer; }
     </style>
 </head>
 <body>
 
-<!-- ===== ШАПКА ===== -->
 <div class="topbar" id="topbar">
     <div>
-        <button class="menu-btn">☰</button>
         <span class="logo">METAIMPERIYA 🏴‍☠️</span>
     </div>
     <div class="right">
@@ -66,7 +65,6 @@
     </div>
 </div>
 
-<!-- ===== МОДАЛКА ВХОДА ===== -->
 <div class="modal open" id="loginModal">
     <div class="modal-box">
         <h2>Вход</h2>
@@ -77,76 +75,117 @@
 
 <script>
 // ================================================================
-// ГЛАВНАЯ ФУНКЦИЯ - ОБНОВЛЕНИЕ ШАПКИ
+// FIREBASE КОНФИГ
 // ================================================================
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+const SITE = 'default';
 
-function updateTopbar() {
-    // Берем имя из localStorage
-    var name = localStorage.getItem('myName');
-    
+// ================================================================
+// ОБНОВЛЕНИЕ ШАПКИ
+// ================================================================
+function updateTopbar(name) {
     if (name) {
         document.getElementById('username').textContent = name;
         document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+        localStorage.setItem('dc_u_', name);
     } else {
-        document.getElementById('username').textContent = 'Гость';
-        document.getElementById('avatar').textContent = '?';
+        var saved = localStorage.getItem('dc_u_');
+        if (saved) {
+            document.getElementById('username').textContent = saved;
+            document.getElementById('avatar').textContent = saved.charAt(0).toUpperCase();
+        } else {
+            document.getElementById('username').textContent = 'Гость';
+            document.getElementById('avatar').textContent = '?';
+        }
     }
 }
 
 // ================================================================
-// ВХОД - СОХРАНЯЕМ ИМЯ
+// ВХОД
 // ================================================================
-
 function login() {
     var input = document.getElementById('nameInput');
     var name = input.value.trim();
+    if (!name) { alert('Введите имя'); return; }
     
-    if (!name) {
-        alert('Введите имя!');
-        return;
-    }
+    var uid = 'user_' + Date.now();
     
-    // Сохраняем в localStorage
-    localStorage.setItem('myName', name);
+    // Сохраняем в Firebase
+    db.ref('sites/' + SITE + '/users/' + uid).set({
+        name: name,
+        uid: uid,
+        lastLogin: Date.now()
+    });
     
-    // Закрываем модалку
+    // Сохраняем локально
+    localStorage.setItem('dc_u_', name);
+    localStorage.setItem('dc_uid_', uid);
+    
     document.getElementById('loginModal').classList.remove('open');
-    
-    // Обновляем шапку
-    updateTopbar();
+    updateTopbar(name);
 }
 
 // ================================================================
 // ВЫХОД
 // ================================================================
-
 function logout() {
     if (!confirm('Выйти?')) return;
-    localStorage.removeItem('myName');
-    updateTopbar();
+    localStorage.removeItem('dc_u_');
+    localStorage.removeItem('dc_uid_');
+    document.getElementById('username').textContent = 'Гость';
+    document.getElementById('avatar').textContent = '?';
     document.getElementById('loginModal').classList.add('open');
 }
 
 // ================================================================
-// ЗАГРУЗКА СТРАНИЦЫ
+// ВОССТАНОВЛЕНИЕ ИЗ FIREBASE
 // ================================================================
-
-// Проверяем есть ли имя при загрузке
-var savedName = localStorage.getItem('myName');
-
-if (savedName) {
-    // Имя есть - закрываем модалку и обновляем шапку
-    document.getElementById('loginModal').classList.remove('open');
-    updateTopbar();
-} else {
-    // Имени нет - показываем модалку
-    document.getElementById('loginModal').classList.add('open');
+function restoreFromFirebase() {
+    var savedUid = localStorage.getItem('dc_uid_');
+    if (savedUid) {
+        db.ref('sites/' + SITE + '/users/' + savedUid + '/name').once('value')
+            .then(function(snap) {
+                var name = snap.val();
+                if (name) {
+                    localStorage.setItem('dc_u_', name);
+                    updateTopbar(name);
+                    document.getElementById('loginModal').classList.remove('open');
+                }
+            });
+    }
 }
 
-// Обновляем шапку каждые 2 секунды (на случай если что-то сбросилось)
-setInterval(updateTopbar, 2000);
-
-console.log('✅ Всё работает! Имя:', localStorage.getItem('myName') || 'Гость');
+// ================================================================
+// ЗАГРУЗКА
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    var savedName = localStorage.getItem('dc_u_');
+    if (savedName) {
+        updateTopbar(savedName);
+        document.getElementById('loginModal').classList.remove('open');
+    } else {
+        restoreFromFirebase();
+    }
+    
+    setInterval(function() {
+        var name = localStorage.getItem('dc_u_');
+        if (name) {
+            document.getElementById('username').textContent = name;
+            document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+        }
+    }, 2000);
+});
 </script>
 
 </body>
