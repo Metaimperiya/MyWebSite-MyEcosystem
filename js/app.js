@@ -83,7 +83,6 @@ window.goToHome = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
-    // Перенаправляем на главную страницу
     window.location.href = '/';
 };
 
@@ -93,7 +92,6 @@ window.goToFeed = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
-    // Если мы на foto.html или другой странице — переходим на главную
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/';
         return;
