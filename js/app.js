@@ -5,7 +5,10 @@
 // ===== ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ =====
 
 window.goToUserPage = function() {
+    console.log('🔵 goToUserPage вызвана!');
+    
     if (!USER_UID) {
+        console.log('❌ Нет USER_UID, открываем окно входа');
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return;
@@ -13,12 +16,15 @@ window.goToUserPage = function() {
     
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
         var slug = snap.val();
+        console.log('🔵 Получен slug:', slug);
+        
         if (slug) {
             window.location.href = '/' + slug + '/';
         } else {
             window.location.href = '/player-likee/';
         }
-    }, function() {
+    }).catch(function(err) {
+        console.error('❌ Ошибка получения slug:', err);
         window.location.href = '/player-likee/';
     });
 };
@@ -34,14 +40,21 @@ function updateUI() {
 
     if (USER && USER_UID) {
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
-            var dbName = snap.val() || USER || 'Гость';
-            if (name && name.textContent !== dbName) {
-                name.textContent = dbName;
+            var dbName = snap.val() || USER;
+            
+            if (dbName && dbName !== 'Гость' && dbName !== 'Anonymous') {
+                if (name) name.textContent = dbName;
+                if (sName) sName.textContent = dbName;
+                localStorage.setItem('dc_u_' + SITE, dbName);
+            } else {
+                if (USER && USER !== 'Гость' && USER !== 'Anonymous') {
+                    if (name) name.textContent = USER;
+                    if (sName) sName.textContent = USER;
+                } else {
+                    if (name) name.textContent = '';
+                    if (sName) sName.textContent = '';
+                }
             }
-            if (sName && sName.textContent !== dbName) {
-                sName.textContent = dbName;
-            }
-            localStorage.setItem('dc_u_' + SITE, dbName);
         });
         
         renderAvatar(USER_UID, topAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
@@ -59,8 +72,8 @@ function updateUI() {
     } else {
         if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
         if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
-        if (name) name.textContent = 'Гость';
-        if (sName) sName.textContent = 'Гость';
+        if (name) name.textContent = '';
+        if (sName) sName.textContent = '';
         if (dot) dot.classList.remove('active');
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
@@ -621,6 +634,8 @@ function openPage(pageId) {
 window.openPage = openPage;
 
 // ================================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ================================================================
 
 var originalUpdateUI = updateUI || function() {};
 updateUI = function() {
@@ -644,32 +659,3 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUI();
     }
 });
-
-// ================================================================
-// ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ ПОЛЬЗОВАТЕЛЯ
-// ================================================================
-
-window.goToUserPage = function() {
-    console.log('🔵 goToUserPage вызвана!');
-    
-    if (!USER_UID) {
-        console.log('❌ Нет USER_UID, открываем окно входа');
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
-    
-    db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
-        var slug = snap.val();
-        console.log('🔵 Получен slug:', slug);
-        
-        if (slug) {
-            window.location.href = '/' + slug + '/';
-        } else {
-            window.location.href = '/player-likee/';
-        }
-    }).catch(function(err) {
-        console.error('❌ Ошибка получения slug:', err);
-        window.location.href = '/player-likee/';
-    });
-};
