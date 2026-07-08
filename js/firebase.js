@@ -3,7 +3,7 @@
 // ================================================================
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCgVLnz4l6wHwSbKv3G5vZ5XZVjQvPcXt0",  // <-- НОВЫЙ РАБОЧИЙ КЛЮЧ
+    apiKey: "AIzaSyCgVLnz4l6wHwSbKv3G5vZ5XZVjQvPcXt0",
     authDomain: "metaimperiya-5f020.firebaseapp.com",
     databaseURL: "https://metaimperiya-5f020-default-rtdb.firebaseio.com",
     projectId: "metaimperiya-5f020",
