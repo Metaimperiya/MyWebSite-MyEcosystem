@@ -8,15 +8,15 @@
         <button class="close-btn" onclick="closeSidebar()">✕</button>
     </div>
     <div class="sidebar-user">
-        <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
+        <div class="avatar-wrap" id="sAvatar" onclick="goToUserPage()"><span class="letter">?</span></div>
         <div>
-            <div class="name" id="sName">Гость</div>
+            <div class="name" id="sName" onclick="goToUserPage()">Гость</div>
             <div class="status">онлайн</div>
         </div>
     </div>
     <div class="sidebar-nav main-nav">
         <div class="nav-item active" onclick="goToHome();closeSidebar()">🏠 Главная</div>
-        <div class="nav-item" onclick="window.location.href='/player-likee';closeSidebar()">⭐ Моя страница</div>
+        <div class="nav-item" onclick="goToUserPage();closeSidebar()">⭐ Моя страница</div>
         <div class="nav-item" onclick="goToProfile();closeSidebar()">👤 Профиль</div>
         <div class="nav-item" onclick="goToPeople();closeSidebar()">👥 Люди</div>
         <div class="nav-item" onclick="goToGroups();closeSidebar()">💬 Сообщества</div>
