@@ -8,13 +8,24 @@ function loadProfile() {
     
     db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
         var u = snap.val() || {};
-        document.getElementById('profileName').textContent = u.name || USER || 'Гость';
-        document.getElementById('profileBio').textContent = u.bio || 'Привет!';
+        var userName = u.name || USER || 'Гость';
+        var userBio = u.bio || 'Привет!';
+        
+        document.getElementById('profileName').textContent = userName;
+        document.getElementById('profileBio').textContent = userBio;
+        
+        if (uid === USER_UID && u.name && u.name !== USER) {
+            USER = u.name;
+            localStorage.setItem('dc_u_' + SITE, USER);
+            var topName = document.getElementById('topName');
+            var sName = document.getElementById('sName');
+            if (topName) topName.textContent = USER;
+            if (sName) sName.textContent = USER;
+        }
+        
         var avatar = document.getElementById('profileAvatar');
         renderAvatar(uid, avatar, (u.name || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
-        
-        // Делаем статистику кликабельной
         makeStatsClickable(uid);
         loadProfileLink(uid);
     });
@@ -168,7 +179,6 @@ function showProfileActions(uid) {
     actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
     
     if (uid === USER_UID) {
-        // ===== СВОЙ ПРОФИЛЬ =====
         var wrapper = document.createElement('div');
         wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;justify-content:center;';
         
@@ -209,11 +219,9 @@ function showProfileActions(uid) {
         return;
     }
     
-    // ===== ЧУЖОЙ ПРОФИЛЬ =====
     var wrapper = document.createElement('div');
     wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
     
-    // Кнопка "В друзьях / Добавить"
     var mainBtn = document.createElement('button');
     mainBtn.id = 'friendActionBtn';
     mainBtn.className = 'friend-btn add';
@@ -221,7 +229,6 @@ function showProfileActions(uid) {
     mainBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;';
     wrapper.appendChild(mainBtn);
     
-    // Кнопка "Написать"
     var msgBtn = document.createElement('button');
     msgBtn.className = 'friend-btn';
     msgBtn.textContent = '💬 Написать';
@@ -231,7 +238,6 @@ function showProfileActions(uid) {
     msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
     wrapper.appendChild(msgBtn);
     
-    // Три точки
     var dotsBtn = document.createElement('button');
     dotsBtn.className = 'profile-dots-btn';
     dotsBtn.textContent = '⋮';
