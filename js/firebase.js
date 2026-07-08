@@ -1,16 +1,15 @@
 // ================================================================
-// FIREBASE ИНИЦИАЛИЗАЦИЯ — ИСПРАВЛЕННЫЙ API КЛЮЧ
+// FIREBASE ИНИЦИАЛИЗАЦИЯ — ПРАВИЛЬНЫЙ ПРОЕКТ
 // ================================================================
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCgVLnz4l6wHwSbKv3G5vZ5XZVjQvPcXt0",
-    authDomain: "metaimperiya-5f020.firebaseapp.com",
-    databaseURL: "https://metaimperiya-5f020-default-rtdb.firebaseio.com",
-    projectId: "metaimperiya-5f020",
-    storageBucket: "metaimperiya-5f020.firebasestorage.app",
-    messagingSenderId: "529665265108",
-    appId: "1:529665265108:web:653f0a530a0712a2c95790",
-    measurementId: "G-DJXJT4Z93S"
+  apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
+  authDomain: "myecosystem-e6414.firebaseapp.com",
+  databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
+  projectId: "myecosystem-e6414",
+  storageBucket: "myecosystem-e6414.firebasestorage.app",
+  messagingSenderId: "426302111033",
+  appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
 };
 
 // Инициализация Firebase
