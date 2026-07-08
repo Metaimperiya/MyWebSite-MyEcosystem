@@ -28,11 +28,13 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
+        <!-- ===== СТРАНИЦА С ПРОФИЛЕМ ===== -->
         <div class="page active" id="page-page">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
             </div>
             
+            <!-- ===== ПРОФИЛЬ ===== -->
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar"><span class="letter">P</span></div>
                 <div class="name" id="profileName">PLAYER Likee</div>
@@ -45,6 +47,7 @@
                 <div id="profileActions"></div>
             </div>
 
+            <!-- ===== ССЫЛКА (IFRAME) ===== -->
             <div class="link-section" id="linkSection">
                 <div class="link-input-wrap">
                     <input type="text" id="profileLinkInput" placeholder="Вставьте ссылку для встраивания...">
@@ -59,15 +62,46 @@
                 </div>
             </div>
 
+            <!-- ===== ДРУЗЬЯ ===== -->
             <div class="friends-section" id="friendsSection" style="display:none;">
                 <h4>🤝 Друзья <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
                 <div class="friend-list" id="friendList"></div>
             </div>
 
+            <!-- ===== ФОРМА ПОСТА ===== -->
+            <div class="card" style="margin-top:8px;">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInputProfile">📎 Фото</label>
+                        <button class="btn-submit" onclick="submitProfilePost()">📤 Опубликовать</button>
+                        <button class="btn-cancel" onclick="clearProfilePostForm()">Очистить</button>
+                    </div>
+                    <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBoxProfile">
+                        <img id="previewImgProfile"><span id="previewNameProfile"></span>
+                        <button class="remove-pic" onclick="removeProfileImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ПОСТЫ ===== -->
             <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
             <div id="profilePosts"></div>
         </div>
 
+        <!-- ===== ЧАТ ===== -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
@@ -140,7 +174,7 @@
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Загружаем профиль ТОЛЬКО ПОСЛЕ авторизации
+                        // ЗАГРУЖАЕМ ПРОФИЛЬ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
                         if (USER_UID && typeof loadProfile === 'function') {
                             VIEWING_USER = USER_UID;
                             loadProfile();
@@ -172,24 +206,21 @@
 })();
 
 // ================================================================
-// АВТОРИЗАЦИЯ — ГЛАВНЫЙ ИСТОЧНИК ИСТИНЫ
+// АВТОРИЗАЦИЯ
 // ================================================================
 
-// Слушаем изменения авторизации
 auth.onAuthStateChanged(function(user) {
     if (user) {
         USER_UID = user.uid;
         USER = user.displayName || user.email || 'User';
         localStorage.setItem('dc_u_' + SITE, USER);
-        
         var avatarUrl = user.photoURL || null;
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
         
-        // Обновляем UI
         if (typeof updateUI === 'function') updateUI();
         
-        // Загружаем профиль ТЕКУЩЕГО пользователя
+        // ЗАГРУЖАЕМ ПРОФИЛЬ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
         VIEWING_USER = USER_UID;
         if (typeof loadProfile === 'function') {
             setTimeout(function() {
@@ -200,26 +231,11 @@ auth.onAuthStateChanged(function(user) {
         console.log('✅ Авторизован как:', USER);
     } else {
         console.log('⏳ Не авторизован');
-        // Показываем гостя
         var nameEl = document.getElementById('profileName');
         var bioEl = document.getElementById('profileBio');
         if (nameEl) nameEl.textContent = 'Гость';
         if (bioEl) bioEl.textContent = 'Войдите, чтобы увидеть профиль';
         if (typeof updateUI === 'function') updateUI();
-    }
-});
-
-// ================================================================
-// ЗАГРУЗКА ПРИ ОБНОВЛЕНИИ СТРАНИЦЫ
-// ================================================================
-
-window.addEventListener('load', function() {
-    // Если пользователь уже авторизован — загружаем профиль
-    if (USER_UID && typeof loadProfile === 'function') {
-        VIEWING_USER = USER_UID;
-        setTimeout(function() {
-            loadProfile();
-        }, 500);
     }
 });
 </script>
