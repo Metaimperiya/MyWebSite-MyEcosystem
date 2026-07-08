@@ -5,7 +5,7 @@
 // ===== ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ =====
 
 window.goToUserPage = function() {
-    console.log('🔵 goToUserPage вызвана!');
+    console.log('🔵 goToUserPage вызвана! USER_UID:', USER_UID);
     
     if (!USER_UID) {
         console.log('❌ Нет USER_UID, открываем окно входа');
@@ -14,18 +14,22 @@ window.goToUserPage = function() {
         return;
     }
     
+    // ПОЛУЧАЕМ SLUG ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
         var slug = snap.val();
-        console.log('🔵 Получен slug:', slug);
+        console.log('🔵 Получен slug пользователя:', slug);
         
         if (slug) {
+            // ЕСЛИ ЕСТЬ SLUG — ПЕРЕХОДИМ НА НЕГО
             window.location.href = '/' + slug + '/';
         } else {
-            window.location.href = '/player-likee/';
+            // ЕСЛИ НЕТ SLUG — ПЕРЕХОДИМ ПО UID
+            window.location.href = '/user/' + USER_UID + '/';
         }
     }).catch(function(err) {
         console.error('❌ Ошибка получения slug:', err);
-        window.location.href = '/player-likee/';
+        // FALLBACK — ПО UID
+        window.location.href = '/user/' + USER_UID + '/';
     });
 };
 
