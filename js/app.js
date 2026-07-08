@@ -2,29 +2,66 @@
 // ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
+// ===== ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ =====
+
+window.goToUserPage = function() {
+    if (!USER_UID) {
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return;
+    }
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
+        var slug = snap.val();
+        if (slug) {
+            window.location.href = '/' + slug + '/';
+        } else {
+            window.location.href = '/player-likee/';
+        }
+    }, function() {
+        window.location.href = '/player-likee/';
+    });
+};
+
 // ===== ОБНОВЛЕНИЕ UI =====
 
 function updateUI() {
-    const topAvatar = document.getElementById('topAvatar');
-    const sAvatar = document.getElementById('sAvatar');
-    const name = document.getElementById('topName');
-    const sName = document.getElementById('sName');
-    const dot = document.getElementById('adminDot');
+    var topAvatar = document.getElementById('topAvatar');
+    var sAvatar = document.getElementById('sAvatar');
+    var name = document.getElementById('topName');
+    var sName = document.getElementById('sName');
+    var dot = document.getElementById('adminDot');
 
     if (USER && USER_UID) {
-        name.textContent = USER;
-        sName.textContent = USER;
-        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-        if (isAdmin) dot.classList.add('active');
-        else dot.classList.remove('active');
+        db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
+            var dbName = snap.val() || USER || 'Гость';
+            if (name && name.textContent !== dbName) {
+                name.textContent = dbName;
+            }
+            if (sName && sName.textContent !== dbName) {
+                sName.textContent = dbName;
+            }
+            localStorage.setItem('dc_u_' + SITE, dbName);
+        });
+        
+        renderAvatar(USER_UID, topAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
+        renderAvatar(USER_UID, sAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
+        
+        isAdmin = ADMIN_UIDS.includes(USER_UID);
+        if (isAdmin) {
+            if (dot) dot.classList.add('active');
+            localStorage.setItem('dc_admin_' + SITE, 'true');
+        } else {
+            if (dot) dot.classList.remove('active');
+            localStorage.removeItem('dc_admin_' + SITE);
+        }
         updateAdminMenu();
     } else {
-        topAvatar.innerHTML = '<span class="letter">?</span>';
-        sAvatar.innerHTML = '<span class="letter">?</span>';
-        name.textContent = 'Гость';
-        sName.textContent = 'Гость';
-        dot.classList.remove('active');
+        if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
+        if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
+        if (name) name.textContent = 'Гость';
+        if (sName) sName.textContent = 'Гость';
+        if (dot) dot.classList.remove('active');
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
     }
@@ -38,7 +75,7 @@ function getUserAvatar(uid, callback) {
         return;
     }
     db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', function(snap) {
-        const url = snap.val() || null;
+        var url = snap.val() || null;
         if (!avatarCache) avatarCache = {};
         avatarCache[uid] = url;
         callback(url);
@@ -78,22 +115,20 @@ function setActivePage(pageId) {
 
 // ===== КНОПКА "ГЛАВНАЯ" В САЙДБАРЕ =====
 window.goToHome = function() {
-    if (!USER) { 
+    if (!USER) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
-        return; 
+        return;
     }
-    // Перенаправляем на главную страницу
     window.location.href = '/';
 };
 
 window.goToFeed = function() {
-    if (!USER) { 
+    if (!USER) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
-        return; 
+        return;
     }
-    // Если мы на foto.html или другой странице — переходим на главную
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/';
         return;
@@ -109,10 +144,10 @@ window.goToFeed = function() {
 };
 
 window.goToProfile = function() {
-    if (!USER) { 
+    if (!USER) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
-        return; 
+        return;
     }
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/?page=profile';
@@ -130,10 +165,10 @@ window.goToProfile = function() {
 };
 
 window.goToPeople = function() {
-    if (!USER) { 
+    if (!USER) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
-        return; 
+        return;
     }
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/?page=people';
@@ -150,10 +185,10 @@ window.goToPeople = function() {
 };
 
 window.goToGroups = function() {
-    if (!USER) { 
+    if (!USER) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
-        return; 
+        return;
     }
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/?page=groups';
@@ -603,3 +638,9 @@ setTimeout(function() {
 }, 500);
 
 setInterval(updateNotifBadge, 5000);
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (USER_UID) {
+        updateUI();
+    }
+});
