@@ -356,7 +356,7 @@ function openPage(pageId) {
 
 window.openPage = openPage;
 
-// Переопределяем goToProfile для работы на /player-likee/
+// ===== ПЕРЕОПРЕДЕЛЯЕМ goToProfile ДЛЯ РАБОТЫ НА /player-likee/ =====
 var originalGoToProfile = window.goToProfile;
 window.goToProfile = function() {
     if (!USER) { 
@@ -364,6 +364,17 @@ window.goToProfile = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
+    
+    // Если мы на странице /player-likee/ — показываем профиль текущего пользователя
+    if (window.location.pathname.includes('/player-likee')) {
+        VIEWING_USER = USER_UID;
+        if (typeof loadProfile === 'function') {
+            loadProfile();
+        }
+        return;
+    }
+    
+    // Если на главной — открываем профиль
     VIEWING_USER = null;
     openPage('profile');
     document.getElementById('chatView').classList.remove('active');
@@ -373,60 +384,6 @@ window.goToProfile = function() {
     }
     CURRENT_ROOM = null;
     if (typeof loadProfile === 'function') loadProfile();
-};
-
-// Переопределяем goToFeed для работы на /player-likee/
-var originalGoToFeed = window.goToFeed;
-window.goToFeed = function() {
-    if (!USER) { 
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    openPage('feed');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadFeed === 'function') loadFeed();
-};
-
-// Переопределяем goToPeople для работы на /player-likee/
-var originalGoToPeople = window.goToPeople;
-window.goToPeople = function() {
-    if (!USER) { 
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    openPage('people');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadPeople === 'function') loadPeople();
-};
-
-// Переопределяем goToGroups для работы на /player-likee/
-var originalGoToGroups = window.goToGroups;
-window.goToGroups = function() {
-    if (!USER) { 
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    openPage('groups');
-    document.getElementById('chatView').classList.remove('active');
-    if (chatUnsub) {
-        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-        chatUnsub = null;
-    }
-    CURRENT_ROOM = null;
-    if (typeof loadGroups === 'function') loadGroups();
 };
 </script>
 
