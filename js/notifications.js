@@ -71,10 +71,8 @@ function renderNotifications(notifications, keys) {
             textDisplay = '💬 ' + n.text;
         }
         
-        // 👇 ПРОВЕРЯЕМ СТАТУС ДРУЖБЫ ДЛЯ ЗАЯВОК
         var isFriendRequest = (n.type === 'friend_request' && n.fromUid && n.fromUid !== USER_UID);
         
-        // 👇 КНОПКИ ДЛЯ ЗАЯВОК
         var actionsHtml = '';
         if (isFriendRequest) {
             var friendCheck = localStorage.getItem('fs_' + USER_UID + '_' + n.fromUid);
@@ -94,7 +92,6 @@ function renderNotifications(notifications, keys) {
             }
         }
         
-        // 👇 ТРИ ТОЧКИ ДЛЯ УДАЛЕНИЯ
         var menuHtml = `
             <div style="position:relative;display:inline-block;margin-left:auto;flex-shrink:0;">
                 <button onclick="event.stopPropagation();toggleNotifMenu('${k}')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted-text);padding:0 4px;line-height:1;">⋮</button>
@@ -141,7 +138,6 @@ window.toggleNotifMenu = function(notifId) {
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 };
 
-// Закрываем меню при клике вне
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.notif-item')) {
         document.querySelectorAll('.notif-item .dropdown-menu').forEach(function(el) {
