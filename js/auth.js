@@ -1,168 +1,77 @@
 // ================================================================
-// АВТОРИЗАЦИЯ
+// СОХРАНЕНИЕ ИМЕНИ
 // ================================================================
 
-// ===== GOOGLE-КНОПКА (ПОДКЛЮЧАЕМ ТОЛЬКО КОГДА ОНА ПОЯВИТСЯ) =====
-function initGoogleButton() {
-    var btn = document.getElementById('googleBtn');
-    if (btn) {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('🔵 Google-вход нажат');
-            auth.signInWithPopup(provider)
-                .then(function(result) {
-                    console.log('✅ Google-вход успешен:', result.user.displayName);
-                })
-                .catch(function(err) {
-                    console.error('❌ Ошибка:', err);
-                    if (err.code === 'auth/popup-blocked') {
-                        alert('Разрешите попапы для этого сайта');
-                        auth.signInWithRedirect(provider);
-                    } else {
-                        alert('Ошибка: ' + err.message);
-                    }
-                });
-        });
-        console.log('✅ Google-кнопка подключена');
-        return true;
-    }
-    return false;
+function setUserName(name) {
+    if (!name) return;
+    localStorage.setItem('dc_u_', name);
+    localStorage.setItem('dc_u_default', name);
+    window.USER = name;
+    
+    // Обновляем шапку сразу
+    var el = document.getElementById('topName');
+    if (el) el.textContent = name;
+    var av = document.getElementById('topAvatarLetter');
+    if (av) av.textContent = name.charAt(0).toUpperCase();
 }
 
-// Пробуем подключить Google-кнопку
-document.addEventListener('DOMContentLoaded', function() {
-    if (!initGoogleButton()) {
-        setTimeout(initGoogleButton, 1500);
-        setTimeout(initGoogleButton, 3000);
-    }
-});
+// ================================================================
+// ВХОД ПО ИМЕНИ
+// ================================================================
 
-// ===== ВХОД ПО ИМЕНИ =====
 window.loginWithName = function() {
     var input = document.getElementById('nameInput');
-    if (!input) { alert('Ошибка'); return; }
-    var n = input.value.trim();
-    if (!n) { alert('Введите имя'); return; }
+    if (!input) return;
+    var name = input.value.trim();
+    if (!name) { alert('Введите имя'); return; }
     
-    auth.signInAnonymously().then(function() {
-        USER = n.slice(0, 24);
-        USER_UID = 'anon_' + Date.now();
-        localStorage.setItem('dc_u_' + SITE, USER);
-        
-        db.ref('sites/' + SITE + '/users/' + USER_UID).update({
-            name: USER, email: 'anon@anon.com', uid: USER_UID, lastLogin: Date.now()
-        });
-        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
-            name: USER, email: 'anon@anon.com', uid: USER_UID, lastLogin: Date.now()
-        });
-        
-        document.getElementById('loginModal').classList.remove('open');
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof loadFeed === 'function') loadFeed();
-        if (typeof loadGroups === 'function') loadGroups();
-        if (typeof loadPeople === 'function') loadPeople();
-        if (typeof loadProfile === 'function') loadProfile();
-        if (typeof loadNotifications === 'function') loadNotifications();
-        if (typeof loadFriendRequests === 'function') loadFriendRequests();
-    }).catch(function(e) { alert('Ошибка: ' + e.message); });
-};
-
-// ===== ЗАКРЫТЬ ВХОД =====
-window.closeLogin = function() {
+    setUserName(name);
+    
+    var uid = 'user_' + Date.now();
+    localStorage.setItem('dc_uid_', uid);
+    window.USER_UID = uid;
+    
     var modal = document.getElementById('loginModal');
     if (modal) modal.classList.remove('open');
-};
-
-// ===== ВЫХОД =====
-window.logout = function() {
-    if (!confirm('Выйти из профиля?')) return;
-    if (notifUnsub) { try { notifUnsub(); } catch(e) {} notifUnsub = null; }
     
-    auth.signOut().then(function() {
-        localStorage.removeItem('dc_u_' + SITE);
-        localStorage.removeItem('dc_admin_' + SITE);
-        USER = null; USER_UID = null; isAdmin = false;
-        
-        var feed = document.getElementById('feed');
-        if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
-        var dot = document.getElementById('adminDot');
-        if (dot) dot.classList.remove('active');
-        if (typeof closeSidebar === 'function') closeSidebar();
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
-    }).catch(function(e) { alert('Ошибка: ' + e.message); });
+    if (typeof loadFeed === 'function') loadFeed();
+    if (typeof updateUI === 'function') updateUI();
 };
 
-// ===== СОХРАНЕННЫЕ ПРОФИЛИ =====
-function loadSavedProfiles() {
-    try { SAVED_PROFILES = JSON.parse(localStorage.getItem('dc_profiles_' + SITE) || '[]'); } 
-    catch(e) { SAVED_PROFILES = []; }
-}
-function saveProfileToList(uid, name, email, avatarUrl) {
-    var existing = SAVED_PROFILES.find(function(p) { return p.uid === uid; });
-    if (!existing) {
-        SAVED_PROFILES.push({ uid: uid, name: name, email: email || 'anon', avatarUrl: avatarUrl || null, lastUsed: Date.now() });
-    } else {
-        existing.name = name; existing.email = email || 'anon'; existing.avatarUrl = avatarUrl || null; existing.lastUsed = Date.now();
-    }
-    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-}
-function removeSavedProfile(uid) {
-    if (!confirm('Удалить сохраненный профиль?')) return;
-    SAVED_PROFILES = SAVED_PROFILES.filter(function(p) { return p.uid !== uid; });
-    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-}
-function loginWithSavedProfile(uid) {
-    var profile = SAVED_PROFILES.find(function(p) { return p.uid === uid; });
-    if (!profile) return;
-    auth.signInAnonymously().then(function() {
-        USER = profile.name; USER_UID = uid; localStorage.setItem('dc_u_' + SITE, USER);
-        db.ref('sites/' + SITE + '/users/' + uid).update({ name: profile.name, email: profile.email || 'anon', uid: uid, lastLogin: Date.now() });
-        db.ref('sites/' + SITE + '/all_users/' + uid).set({ name: profile.name, email: profile.email || 'anon', uid: uid, lastLogin: Date.now() });
-        profile.lastUsed = Date.now();
-        localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-        document.getElementById('loginModal').classList.remove('open');
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof loadFeed === 'function') loadFeed();
-        if (typeof loadGroups === 'function') loadGroups();
-        if (typeof loadPeople === 'function') loadPeople();
-        if (typeof loadProfile === 'function') loadProfile();
-        if (typeof loadNotifications === 'function') loadNotifications();
-        if (typeof loadFriendRequests === 'function') loadFriendRequests();
-    }).catch(function(e) { alert('Ошибка: ' + e.message); });
-}
+// ================================================================
+// ВЫХОД
+// ================================================================
 
-// ===== AUTH STATE =====
-auth.onAuthStateChanged(function(user) {
-    if (user) {
-        USER_UID = user.uid;
-        USER = user.displayName || user.email || 'User';
-        localStorage.setItem('dc_u_' + SITE, USER);
-        var avatarUrl = user.photoURL || null;
-        if (!avatarCache) avatarCache = {};
-        avatarCache[USER_UID] = avatarUrl;
-        db.ref('sites/' + SITE + '/users/' + USER_UID).update({
-            name: USER, email: user.email || 'anon', uid: USER_UID, lastLogin: Date.now(), avatarUrl: avatarUrl
-        });
-        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
-            name: USER, email: user.email || 'anon', uid: USER_UID, lastLogin: Date.now(), avatarUrl: avatarUrl
-        });
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.remove('open');
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof loadFeed === 'function') loadFeed();
-        if (typeof loadGroups === 'function') loadGroups();
-        if (typeof loadPeople === 'function') loadPeople();
-        if (typeof loadProfile === 'function') loadProfile();
-        if (typeof loadNotifications === 'function') loadNotifications();
-        if (typeof loadFriendRequests === 'function') loadFriendRequests();
-    } else {
-        USER = null; USER_UID = null;
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
+window.logout = function() {
+    if (!confirm('Выйти?')) return;
+    localStorage.removeItem('dc_u_');
+    localStorage.removeItem('dc_u_default');
+    localStorage.removeItem('dc_uid_');
+    window.USER = null;
+    window.USER_UID = null;
+    
+    document.getElementById('topName').textContent = 'Гость';
+    document.getElementById('topAvatarLetter').textContent = '?';
+    
+    var modal = document.getElementById('loginModal');
+    if (modal) modal.classList.add('open');
+};
+
+// ================================================================
+// ВОССТАНОВЛЕНИЕ ПРИ ЗАГРУЗКЕ
+// ================================================================
+
+(function() {
+    var name = localStorage.getItem('dc_u_') || localStorage.getItem('dc_u_default');
+    if (name) {
+        window.USER = name;
+        setTimeout(function() {
+            var el = document.getElementById('topName');
+            if (el) el.textContent = name;
+            var av = document.getElementById('topAvatarLetter');
+            if (av) av.textContent = name.charAt(0).toUpperCase();
+        }, 100);
     }
-});
+})();
+
+console.log('✅ auth.js загружен');
