@@ -1,53 +1,38 @@
 // ================================================================
-// НАСТРОЙКА FIREBASE
+// FIREBASE ИНИЦИАЛИЗАЦИЯ
 // ================================================================
 
-const FB_CONFIG = {
-    apiKey: "AIzaSyDCx2wLK2EZJOrUNoXEdWDlYY0e8cOHhtY",
-    authDomain: "myecosystem-e6414.firebaseapp.com",
-    databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
-    projectId: "myecosystem-e6414",
-    storageBucket: "myecosystem-e6414.firebasestorage.app",
-    messagingSenderId: "426302111033",
-    appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
+const firebaseConfig = {
+    apiKey: "AIzaSyB3vzLp7Hj5KRLOU3LWdh2zPajRWsFDMfI",
+    authDomain: "metaimperiya-5f020.firebaseapp.com",
+    databaseURL: "https://metaimperiya-5f020-default-rtdb.firebaseio.com",
+    projectId: "metaimperiya-5f020",
+    storageBucket: "metaimperiya-5f020.firebasestorage.app",
+    messagingSenderId: "529665265108",
+    appId: "1:529665265108:web:653f0a530a0712a2c95790",
+    measurementId: "G-DJXJT4Z93S"
 };
 
-firebase.initializeApp(FB_CONFIG);
+firebase.initializeApp(firebaseConfig);
+
 const db = firebase.database();
 const auth = firebase.auth();
 const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// ================================================================
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-// ================================================================
+const SITE = 'metaimperiya';
 
-const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
-
-// Админы (можно добавлять UID)
-const ADMIN_UIDS = [
-    "ayXehcol9FgAQU6tZuup7aSaRoV2",
-    "pWB0nGVvVXc4je6466ss7IwBm9G2",
-    "ANR62p3qcjOe2ALsdVvJHUNCCV42"
-];
-
-let isAdmin = false;
 let USER = null;
 let USER_UID = null;
+let isAdmin = false;
 let VIEWING_USER = null;
 let SAVED_PROFILES = [];
 let avatarCache = {};
-let chatUnsub = null;
+let currentLang = 'ru';
 let notifUnsub = null;
-let currentTab = 'feed';
-let activeStatToggle = null;
+let chatUnsub = null;
 let CURRENT_ROOM = null;
-let friendListeners = {};
-let activeRequests = new Map();
-let currentFrameSize = 'small';
 let EDITING_ID = null;
-let pendingImage = null;
-let pendingImageFile = null;
 
 // ================================================================
 // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
@@ -55,18 +40,133 @@ let pendingImageFile = null;
 
 function esc(str) {
     if (!str) return '';
-    return String(str).replace(/[&<>"]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        if (m === '"') return '&quot;';
-        return m;
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ================================================================
+// СТАТУС ДРУЗЕЙ — ЭТОЙ ФУНКЦИИ НЕ ХВАТАЛО!
+// ================================================================
+
+function getFriendStatusRealtime(myUid, targetUid, callback) {
+    if (!myUid || !targetUid) { callback('none'); return; }
+    if (myUid === targetUid) { callback('self'); return; }
+    
+    var friendRef = db.ref('sites/' + SITE + '/friends/' + myUid + '/' + targetUid);
+    var requestRef = db.ref('sites/' + SITE + '/friend_requests/' + myUid + '/' + targetUid);
+    var receivedRef = db.ref('sites/' + SITE + '/friend_requests/' + targetUid + '/' + myUid);
+    
+    friendRef.once('value', function(fSnap) {
+        if (fSnap.val() === true) {
+            localStorage.setItem('fs_' + myUid + '_' + targetUid, 'friend');
+            callback('friend');
+            return;
+        }
+        
+        requestRef.once('value', function(rSnap) {
+            if (rSnap.val() === true) {
+                localStorage.setItem('fs_' + myUid + '_' + targetUid, 'pending_sent');
+                callback('pending_sent');
+                return;
+            }
+            
+            receivedRef.once('value', function(recSnap) {
+                if (recSnap.val() === true) {
+                    localStorage.setItem('fs_' + myUid + '_' + targetUid, 'pending_received');
+                    callback('pending_received');
+                    return;
+                }
+                
+                localStorage.removeItem('fs_' + myUid + '_' + targetUid);
+                callback('none');
+            });
+        });
     });
 }
 
-function formatTime(seconds) {
-    if (!seconds || isNaN(seconds)) return '0:00';
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return min + ':' + (sec < 10 ? '0' : '') + sec;
+// ================================================================
+// ДРУЗЬЯ — ОТПРАВКА, ПРИНЯТИЕ, УДАЛЕНИЕ
+// ================================================================
+
+function sendFriendRequest(targetUid) {
+    if (!USER_UID || targetUid === USER_UID) return;
+    
+    db.ref('sites/' + SITE + '/friend_requests/' + targetUid + '/' + USER_UID).set(true);
+    sendNotification(targetUid, {
+        type: 'friend_request',
+        from: USER_UID,
+        text: USER + ' хочет добавить вас в друзья',
+        timestamp: Date.now()
+    });
+    updateFriendButton(targetUid);
 }
+
+function cancelFriendRequest(targetUid) {
+    if (!USER_UID) return;
+    db.ref('sites/' + SITE + '/friend_requests/' + targetUid + '/' + USER_UID).remove();
+    updateFriendButton(targetUid);
+}
+
+function acceptFriendRequest(fromUid) {
+    if (!USER_UID) return;
+    
+    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + fromUid).set(true);
+    db.ref('sites/' + SITE + '/friends/' + fromUid + '/' + USER_UID).set(true);
+    db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + fromUid).remove();
+    db.ref('sites/' + SITE + '/friend_requests/' + fromUid + '/' + USER_UID).remove();
+    localStorage.setItem('fs_' + USER_UID + '_' + fromUid, 'friend');
+    
+    sendNotification(fromUid, {
+        type: 'friend_accepted',
+        from: USER_UID,
+        text: USER + ' принял(а) ваш запрос в друзья',
+        timestamp: Date.now()
+    });
+    
+    updateFriendButton(fromUid);
+    loadNotifications();
+}
+
+function declineFriendRequest(fromUid) {
+    if (!USER_UID) return;
+    db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + fromUid).remove();
+    db.ref('sites/' + SITE + '/friend_requests/' + fromUid + '/' + USER_UID).remove();
+    updateFriendButton(fromUid);
+}
+
+function removeFriend(targetUid) {
+    if (!USER_UID || !confirm('Удалить из друзей?')) return;
+    
+    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).remove();
+    db.ref('sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID).remove();
+    localStorage.removeItem('fs_' + USER_UID + '_' + targetUid);
+    updateFriendButton(targetUid);
+}
+
+// ================================================================
+// УВЕДОМЛЕНИЯ
+// ================================================================
+
+function sendNotification(targetUid, data) {
+    if (!USER_UID || !targetUid || targetUid === USER_UID) return;
+    var ref = db.ref('sites/' + SITE + '/notifications/' + targetUid).push();
+    ref.set({
+        ...data,
+        fromName: USER,
+        fromUid: USER_UID,
+        read: false,
+        timestamp: Date.now()
+    });
+}
+
+// ================================================================
+// ЭКСПОРТ ДЛЯ ДРУГИХ ФАЙЛОВ
+// ================================================================
+
+window.getFriendStatusRealtime = getFriendStatusRealtime;
+window.sendFriendRequest = sendFriendRequest;
+window.cancelFriendRequest = cancelFriendRequest;
+window.acceptFriendRequest = acceptFriendRequest;
+window.declineFriendRequest = declineFriendRequest;
+window.removeFriend = removeFriend;
+window.sendNotification = sendNotification;
+window.esc = esc;
