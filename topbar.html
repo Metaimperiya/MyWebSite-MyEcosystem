@@ -1,114 +1,43 @@
-<!-- ===== ВЕРХНЯЯ ПАНЕЛЬ ===== -->
 <header class="topbar" id="topbar">
     <div class="left">
         <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <span class="logo" onclick="goToFeed()">
-            METAIMPERIYA 🏴‍☠️
-        </span>
+        <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
     </div>
-    <div class="center"></div>
     <div class="right">
-        <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge" class="badge"></span></button>
-        <button class="notif-btn" onclick="openNotifications()" title="Уведомления">🔔 <span id="notifBadge" class="badge"></span></button>
-        <div class="avatar-wrap" id="topAvatar" onclick="window.location.href='/player-likee'">
-            <span class="letter" id="topAvatarLetter">?</span>
-        </div>
-        <span class="username" id="topName" onclick="window.location.href='/player-likee'">Гость</span>
-        <span id="adminDot" class="admin-dot" style="display:none;"></span>
+        <button class="chat-btn" onclick="openChatList()">💬 <span id="chatBadge"></span></button>
+        <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
+        <div class="avatar-wrap" id="topAvatar"><span class="letter" id="topAvatarLetter">?</span></div>
+        <span class="username" id="topName">Гость</span>
         <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
-        
-        <!-- ВЫПАДАЮЩЕЕ МЕНЮ -->
         <div id="settingsMenu" class="settings-dropdown">
             <div class="settings-item" onclick="toggleTheme()">🌓 Тема</div>
-            <div class="settings-item" onclick="toggleLanguage()" id="langDisplay">Русский</div>
-            <div class="settings-divider"></div>
-            <div class="settings-item" onclick="openAdminChats()" id="adminChatsMenuItem" style="display:none;">👑 Админ-чаты</div>
-            <div class="settings-item danger" onclick="logoutUser()">🚪 Выйти</div>
+            <div class="settings-item" onclick="toggleLanguage()">🌐 Язык</div>
+            <div class="settings-item danger" onclick="logout()">🚪 Выйти</div>
         </div>
     </div>
 </header>
 
-<!-- ===== СКРИПТ ДЛЯ ОБНОВЛЕНИЯ ШАПКИ ===== -->
 <script>
+// ================================================================
+// БЫСТРОЕ ОБНОВЛЕНИЕ ШАПКИ
+// ================================================================
 (function() {
-    console.log('🔥 ТОПБАР ЗАГРУЖЕН');
-    
-    function updateTopbar() {
-        var name = localStorage.getItem('dc_u_default') || 
-                   localStorage.getItem('dc_u_') || 
+    function update() {
+        var name = localStorage.getItem('dc_u_') || 
+                   localStorage.getItem('dc_u_default') || 
                    window.USER || 
-                   null;
+                   'Гость';
         
-        var uid = localStorage.getItem('dc_uid_default') || 
-                  localStorage.getItem('dc_uid_') || 
-                  window.USER_UID || 
-                  null;
+        var el = document.getElementById('topName');
+        if (el) el.textContent = name;
         
-        console.log('📦 Имя:', name, 'UID:', uid);
-        
-        // Обновляем имя
-        var topName = document.getElementById('topName');
-        if (topName) {
-            topName.textContent = name || 'Гость';
-            console.log('✅ topName:', topName.textContent);
-        }
-        
-        // Обновляем аватар
-        var topAvatarLetter = document.getElementById('topAvatarLetter');
-        if (topAvatarLetter && name) {
-            topAvatarLetter.textContent = name.charAt(0).toUpperCase();
-            console.log('✅ Буква:', topAvatarLetter.textContent);
-        }
-        
-        // Обновляем сайдбар
-        var sName = document.getElementById('sName');
-        if (sName) {
-            sName.textContent = name || 'Гость';
-        }
-        
-        var sAvatar = document.getElementById('sAvatar');
-        if (sAvatar && name) {
-            var letterSpan = sAvatar.querySelector('.letter');
-            if (letterSpan) {
-                letterSpan.textContent = name.charAt(0).toUpperCase();
-            }
-        }
-        
-        // Админ-точка
-        var adminDot = document.getElementById('adminDot');
-        if (adminDot) {
-            var isAdmin = localStorage.getItem('dc_admin_default') === 'true' || 
-                         localStorage.getItem('dc_admin_') === 'true' ||
-                         window.isAdmin === true;
-            
-            if (isAdmin) {
-                adminDot.classList.add('active');
-                adminDot.style.display = 'inline-block';
-            } else {
-                adminDot.classList.remove('active');
-                adminDot.style.display = 'none';
-            }
-        }
+        var av = document.getElementById('topAvatarLetter');
+        if (av) av.textContent = name === 'Гость' ? '?' : name.charAt(0).toUpperCase();
     }
     
-    // Запускаем много раз
-    setTimeout(updateTopbar, 100);
-    setTimeout(updateTopbar, 300);
-    setTimeout(updateTopbar, 600);
-    setTimeout(updateTopbar, 1000);
-    
-    // Проверяем каждые 2 секунды
-    setInterval(function() {
-        var topName = document.getElementById('topName');
-        var name = localStorage.getItem('dc_u_default') || 
-                   localStorage.getItem('dc_u_') || 
-                   window.USER || 
-                   null;
-        
-        if (topName && name && topName.textContent === 'Гость') {
-            console.log('🔄 Меняем Гость на', name);
-            updateTopbar();
-        }
-    }, 2000);
+    update();
+    setTimeout(update, 200);
+    setTimeout(update, 500);
+    setInterval(update, 2000);
 })();
 </script>
