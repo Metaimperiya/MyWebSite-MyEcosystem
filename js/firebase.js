@@ -1,9 +1,9 @@
 // ================================================================
-// FIREBASE ИНИЦИАЛИЗАЦИЯ
+// FIREBASE ИНИЦИАЛИЗАЦИЯ — ИСПРАВЛЕННЫЙ API КЛЮЧ
 // ================================================================
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB3vzLp7Hj5KRLOU3LWdh2zPajRWsFDMfI",
+    apiKey: "AIzaSyCgVLnz4l6wHwSbKv3G5vZ5XZVjQvPcXt0",  // <-- НОВЫЙ РАБОЧИЙ КЛЮЧ
     authDomain: "metaimperiya-5f020.firebaseapp.com",
     databaseURL: "https://metaimperiya-5f020-default-rtdb.firebaseio.com",
     projectId: "metaimperiya-5f020",
@@ -20,7 +20,7 @@ const db = firebase.database();
 const auth = firebase.auth();
 const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account' }); // ВАЖНО!
+provider.setCustomParameters({ prompt: 'select_account' });
 
 const SITE = 'metaimperiya';
 
