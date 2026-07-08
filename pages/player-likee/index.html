@@ -25,10 +25,11 @@
     <div id="settingsContainer"></div>
     <div id="sidebarContainer"></div>
     <div id="modalsContainer"></div>
+    <div id="playerContainer"></div>
 
     <div class="container" id="mainContainer">
 
-        <div class="player-handle" id="playerHandle">
+        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
@@ -140,8 +141,8 @@
 
         <!-- ===== ФОТО-ЛЕНТА ===== -->
         <div class="page" id="page-foto">
-            <div class="container" style="padding-top:10px;">
-                <button onclick="window.location.href='/'">← Назад</button>
+            <div style="padding-top:10px;">
+                <button onclick="openPage('feed')" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;">← Назад</button>
                 <h1>📸 Фото</h1>
                 <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
 
@@ -176,6 +177,14 @@
             </div>
         </div>
 
+        <!-- ===== СТРАНИЦА ПОСТА ===== -->
+        <div class="page" id="postPage">
+            <div style="padding:6px 0;">
+                <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
+            </div>
+            <div id="postPageContainer"></div>
+        </div>
+
         <!-- ===== ЧАТ ===== -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()">← Назад</button>
@@ -187,17 +196,14 @@
             </div>
         </div>
 
-        <!-- ===== СТРАНИЦА ПОСТА ===== -->
-        <div class="page" id="postPage">
-            <div style="padding:6px 0;">
-                <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
-            </div>
-            <div id="postPageContainer"></div>
-        </div>
-
     </div>
 
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
+
+    <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
+        <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
+        <canvas id="visualizerCanvas"></canvas>
+    </div>
 
 </div>
 
@@ -230,7 +236,8 @@
         { id: 'topbarContainer', url: '/topbar.html' },
         { id: 'settingsContainer', url: '/settings.html' },
         { id: 'sidebarContainer', url: '/sidebar.html' },
-        { id: 'modalsContainer', url: '/modals.html' }
+        { id: 'modalsContainer', url: '/modals.html' },
+        { id: 'playerContainer', url: '/player.html' }
     ];
 
     let loaded = 0;
@@ -327,7 +334,6 @@ auth.onAuthStateChanged(function(user) {
 // НАВИГАЦИЯ
 // ================================================================
 
-// Функция открытия страниц на /player-likee/
 function openPage(pageId) {
     if (!pageId) return;
     
@@ -350,7 +356,7 @@ function openPage(pageId) {
 
 window.openPage = openPage;
 
-// Обновляем goToProfile для работы на /player-likee/
+// Переопределяем goToProfile для работы на /player-likee/
 var originalGoToProfile = window.goToProfile;
 window.goToProfile = function() {
     if (!USER) { 
@@ -367,6 +373,60 @@ window.goToProfile = function() {
     }
     CURRENT_ROOM = null;
     if (typeof loadProfile === 'function') loadProfile();
+};
+
+// Переопределяем goToFeed для работы на /player-likee/
+var originalGoToFeed = window.goToFeed;
+window.goToFeed = function() {
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
+    openPage('feed');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    if (typeof loadFeed === 'function') loadFeed();
+};
+
+// Переопределяем goToPeople для работы на /player-likee/
+var originalGoToPeople = window.goToPeople;
+window.goToPeople = function() {
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
+    openPage('people');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    if (typeof loadPeople === 'function') loadPeople();
+};
+
+// Переопределяем goToGroups для работы на /player-likee/
+var originalGoToGroups = window.goToGroups;
+window.goToGroups = function() {
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
+    openPage('groups');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    if (typeof loadGroups === 'function') loadGroups();
 };
 </script>
 
