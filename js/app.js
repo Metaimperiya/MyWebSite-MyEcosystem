@@ -2,8 +2,6 @@
 // ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
-// ===== ОБНОВЛЕНИЕ UI =====
-
 function updateUI() {
     const topAvatar = document.getElementById('topAvatar');
     const sAvatar = document.getElementById('sAvatar');
@@ -30,8 +28,6 @@ function updateUI() {
     }
 }
 
-// ===== АВАТАРКИ =====
-
 function getUserAvatar(uid, callback) {
     if (avatarCache && avatarCache[uid]) {
         callback(avatarCache[uid]);
@@ -56,8 +52,6 @@ function renderAvatar(uid, container, letter) {
     });
 }
 
-// ===== НАВИГАЦИЯ =====
-
 function setActivePage(pageId) {
     document.querySelectorAll('.page').forEach(function(el) {
         el.classList.remove('active');
@@ -76,7 +70,6 @@ function setActivePage(pageId) {
     if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
 }
 
-// ===== КНОПКА "ГЛАВНАЯ" В САЙДБАРЕ =====
 window.goToHome = function() {
     if (!USER) { 
         var loginModal = document.getElementById('loginModal');
@@ -167,8 +160,6 @@ window.goToGroups = function() {
     if (typeof loadGroups === 'function') loadGroups();
 };
 
-// ===== САЙДБАР =====
-
 window.toggleSidebar = function() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('show');
@@ -178,8 +169,6 @@ window.closeSidebar = function() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('overlay').classList.remove('show');
 };
-
-// ===== АККОРДЕОН =====
 
 window.toggleAccordion = function(header) {
     var item = header.parentElement;
@@ -206,8 +195,6 @@ window.toggleAccordion = function(header) {
     }
 };
 
-// ===== РАЗМЕР ФРЕЙМА =====
-
 window.setFrameSize = function(size) {
     currentFrameSize = size;
     document.querySelectorAll('.frame-size-btn').forEach(function(btn) {
@@ -222,8 +209,6 @@ window.setFrameSize = function(size) {
     }
 };
 
-// ===== ТЕМА =====
-
 window.toggleTheme = function() {
     var currentTheme = document.documentElement.getAttribute('data-theme');
     var newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
@@ -236,8 +221,6 @@ window.toggleTheme = function() {
     var savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 })();
-
-// ===== РЕДАКТОР =====
 
 window.formatText = function(type) {
     var editor = document.getElementById('postEditor');
@@ -308,10 +291,7 @@ window.insertLink = function() {
     }
 };
 
-// ================================================================
-// СПИСОК ЧАТОВ
-// ================================================================
-
+// ===== ЧАТЫ =====
 window.openChatList = function() {
     if (!USER_UID) {
         alert('Войдите!');
@@ -380,10 +360,7 @@ function loadChatList() {
     });
 }
 
-// ================================================================
-// ИНДИКАТОР НАБОРА
-// ================================================================
-
+// ===== ИНДИКАТОР НАБОРА =====
 var typingTimeout = null;
 
 function setupTypingIndicator(chatId) {
@@ -421,10 +398,7 @@ function setupTypingIndicator(chatId) {
     });
 }
 
-// ================================================================
-// АДМИН-ПАНЕЛЬ
-// ================================================================
-
+// ===== АДМИН-ПАНЕЛЬ =====
 window.openAdminChats = function() {
     if (!isAdmin) {
         alert('Только для администратора!');
@@ -509,10 +483,7 @@ function updateAdminMenu() {
     }
 }
 
-// ================================================================
-// ЯЗЫК
-// ================================================================
-
+// ===== ЯЗЫК =====
 if (typeof toggleLanguage === 'undefined') {
     window.toggleLanguage = function() {
         var newLang = currentLang === 'ru' ? 'en' : 'ru';
@@ -526,10 +497,6 @@ function updateLangDisplay() {
         display.textContent = currentLang === 'ru' ? 'Русский' : 'English';
     }
 }
-
-// ================================================================
-// ОБНОВЛЕНИЕ БЕЙДЖИКА УВЕДОМЛЕНИЙ
-// ================================================================
 
 function updateNotifBadge() {
     if (!USER_UID) return;
@@ -546,10 +513,6 @@ function updateNotifBadge() {
         }
     });
 }
-
-// ================================================================
-// ОТКРЫТИЕ СТРАНИЦ (SPA)
-// ================================================================
 
 function openPage(pageId) {
     if (!pageId) return;
@@ -582,8 +545,6 @@ function openPage(pageId) {
 }
 
 window.openPage = openPage;
-
-// ================================================================
 
 var originalUpdateUI = updateUI || function() {};
 updateUI = function() {
