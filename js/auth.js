@@ -46,9 +46,12 @@ window.loginWithName = function() {
         USER_UID = 'anon_' + Date.now();
         localStorage.setItem('dc_u_' + SITE, USER);
         
+        // ===== ГЕНЕРИРУЕМ SLUG ДЛЯ КАЖДОГО ПОЛЬЗОВАТЕЛЯ =====
         var slug = null;
         if (USER.toLowerCase().includes('player')) {
             slug = 'player-likee';
+        } else {
+            slug = USER.toLowerCase().replace(/[^a-z0-9]/g, '-');
         }
         
         db.ref('sites/' + SITE + '/users/' + USER_UID).update({
@@ -140,6 +143,8 @@ function loginWithSavedProfile(uid) {
         var slug = null;
         if (USER.toLowerCase().includes('player')) {
             slug = 'player-likee';
+        } else {
+            slug = USER.toLowerCase().replace(/[^a-z0-9]/g, '-');
         }
         
         db.ref('sites/' + SITE + '/users/' + uid).update({
@@ -181,6 +186,8 @@ auth.onAuthStateChanged(function(user) {
         var slug = null;
         if (USER && USER.toLowerCase().includes('player')) {
             slug = 'player-likee';
+        } else {
+            slug = USER.toLowerCase().replace(/[^a-z0-9]/g, '-');
         }
         
         db.ref('sites/' + SITE + '/users/' + USER_UID).update({
