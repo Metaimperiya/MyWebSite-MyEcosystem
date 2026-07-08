@@ -4,10 +4,7 @@
 
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
-    if (!uid) {
-        console.warn('❌ Нет UID для загрузки профиля');
-        return;
-    }
+    if (!uid) return;
     
     // Сначала обновляем имя из глобального состояния
     const userName = window.currentUser || USER;
