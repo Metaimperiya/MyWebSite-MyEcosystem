@@ -10,19 +10,21 @@ function updateUI() {
     const dot = document.getElementById('adminDot');
 
     if (USER && USER_UID) {
-        name.textContent = USER;
-        sName.textContent = USER;
-        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
-        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
-        if (isAdmin) dot.classList.add('active');
-        else dot.classList.remove('active');
+        if (name) name.textContent = USER;
+        if (sName) sName.textContent = USER;
+        if (topAvatar) renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+        if (sAvatar) renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
+        if (dot) {
+            if (isAdmin) dot.classList.add('active');
+            else dot.classList.remove('active');
+        }
         updateAdminMenu();
     } else {
-        topAvatar.innerHTML = '<span class="letter">?</span>';
-        sAvatar.innerHTML = '<span class="letter">?</span>';
-        name.textContent = 'Гость';
-        sName.textContent = 'Гость';
-        dot.classList.remove('active');
+        if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
+        if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
+        if (name) name.textContent = 'Гость';
+        if (sName) sName.textContent = 'Гость';
+        if (dot) dot.classList.remove('active');
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
     }
@@ -484,13 +486,6 @@ function updateAdminMenu() {
 }
 
 // ===== ЯЗЫК =====
-if (typeof toggleLanguage === 'undefined') {
-    window.toggleLanguage = function() {
-        var newLang = currentLang === 'ru' ? 'en' : 'ru';
-        setLanguage(newLang);
-    };
-}
-
 function updateLangDisplay() {
     var display = document.getElementById('langDisplay');
     if (display) {
