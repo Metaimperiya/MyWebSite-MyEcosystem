@@ -2,8 +2,6 @@
 // УВЕДОМЛЕНИЯ — С УДАЛЕНИЕМ И АВТООБНОВЛЕНИЕМ СТАТУСА ДРУЗЕЙ
 // ================================================================
 
-// ===== 1. ОТПРАВКА УВЕДОМЛЕНИЯ =====
-
 function sendNotification(targetUid, data) {
     if (!USER_UID || !targetUid || targetUid === USER_UID) return;
     var ref = db.ref('sites/' + SITE + '/notifications/' + targetUid).push();
@@ -15,8 +13,6 @@ function sendNotification(targetUid, data) {
         timestamp: Date.now()
     });
 }
-
-// ===== 2. ЗАГРУЗКА УВЕДОМЛЕНИЙ =====
 
 function loadNotifications() {
     if (!USER_UID) return;
@@ -45,8 +41,6 @@ function loadNotifications() {
         }
     });
 }
-
-// ===== 3. РЕНДЕР УВЕДОМЛЕНИЙ =====
 
 function renderNotifications(notifications, keys) {
     var container = document.getElementById('notificationsList');
@@ -116,16 +110,12 @@ function renderNotifications(notifications, keys) {
     container.innerHTML = html;
 }
 
-// ===== 4. УДАЛЕНИЕ УВЕДОМЛЕНИЯ =====
-
 window.deleteNotification = function(notifId) {
     if (!USER_UID) return;
     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + notifId).remove();
     var menu = document.getElementById('notifMenu_' + notifId);
     if (menu) menu.style.display = 'none';
 };
-
-// ===== 5. ОТКРЫТИЕ/ЗАКРЫТИЕ МЕНЮ УВЕДОМЛЕНИЯ =====
 
 window.toggleNotifMenu = function(notifId) {
     var menu = document.getElementById('notifMenu_' + notifId);
@@ -145,8 +135,6 @@ document.addEventListener('click', function(e) {
         });
     }
 });
-
-// ===== 6. ОБРАБОТКА КЛИКА ПО УВЕДОМЛЕНИЮ =====
 
 function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
     if (!USER_UID || !fromUid) return;
@@ -187,8 +175,6 @@ function handleNotifClick(notifId, fromUid, type, chatId, postId, postType) {
     viewUser(fromUid);
 }
 
-// ===== 7. ОТКРЫТИЕ МОДАЛКИ =====
-
 window.openNotifications = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
     document.getElementById('notificationsModal').classList.add('open');
@@ -201,13 +187,9 @@ window.openNotifications = function() {
     });
 };
 
-// ===== 8. ЗАКРЫТИЕ МОДАЛКИ =====
-
 window.closeNotifications = function() {
     document.getElementById('notificationsModal').classList.remove('open');
 };
-
-// ===== 9. СТИЛИ =====
 
 var style = document.createElement('style');
 style.textContent = `
@@ -269,8 +251,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// ===== 10. ОТКРЫТИЕ СТРАНИЦЫ ПОСТА =====
-
 function openPostPage(postId, type) {
     window.CURRENT_POST_ID = postId;
     window.CURRENT_POST_TYPE = type;
@@ -311,8 +291,6 @@ function openPostPage(postId, type) {
         }, 500);
     });
 }
-
-// ===== 11. ЗАКРЫТИЕ СТРАНИЦЫ ПОСТА =====
 
 window.closePostPage = function() {
     document.getElementById('postPage').classList.remove('active');
