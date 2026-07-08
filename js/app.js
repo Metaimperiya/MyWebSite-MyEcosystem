@@ -644,3 +644,32 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUI();
     }
 });
+
+// ================================================================
+// ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ ПОЛЬЗОВАТЕЛЯ
+// ================================================================
+
+window.goToUserPage = function() {
+    console.log('🔵 goToUserPage вызвана!');
+    
+    if (!USER_UID) {
+        console.log('❌ Нет USER_UID, открываем окно входа');
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return;
+    }
+    
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
+        var slug = snap.val();
+        console.log('🔵 Получен slug:', slug);
+        
+        if (slug) {
+            window.location.href = '/' + slug + '/';
+        } else {
+            window.location.href = '/player-likee/';
+        }
+    }).catch(function(err) {
+        console.error('❌ Ошибка получения slug:', err);
+        window.location.href = '/player-likee/';
+    });
+};
