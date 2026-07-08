@@ -13,8 +13,6 @@ function loadProfile() {
         var avatar = document.getElementById('profileAvatar');
         renderAvatar(uid, avatar, (u.name || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
-        
-        // Делаем статистику кликабельной
         makeStatsClickable(uid);
         loadProfileLink(uid);
     });
@@ -157,7 +155,7 @@ window.toggleIframe = function() {
 };
 
 // ================================================================
-// КНОПКИ В ПРОФИЛЕ — КРАСИВО ПОД ОПИСАНИЕМ
+// КНОПКИ В ПРОФИЛЕ
 // ================================================================
 
 function showProfileActions(uid) {
@@ -168,7 +166,6 @@ function showProfileActions(uid) {
     actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
     
     if (uid === USER_UID) {
-        // ===== СВОЙ ПРОФИЛЬ =====
         var wrapper = document.createElement('div');
         wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;justify-content:center;';
         
@@ -209,11 +206,9 @@ function showProfileActions(uid) {
         return;
     }
     
-    // ===== ЧУЖОЙ ПРОФИЛЬ =====
     var wrapper = document.createElement('div');
     wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
     
-    // Кнопка "В друзьях / Добавить"
     var mainBtn = document.createElement('button');
     mainBtn.id = 'friendActionBtn';
     mainBtn.className = 'friend-btn add';
@@ -221,7 +216,6 @@ function showProfileActions(uid) {
     mainBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;';
     wrapper.appendChild(mainBtn);
     
-    // Кнопка "Написать"
     var msgBtn = document.createElement('button');
     msgBtn.className = 'friend-btn';
     msgBtn.textContent = '💬 Написать';
@@ -231,7 +225,6 @@ function showProfileActions(uid) {
     msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
     wrapper.appendChild(msgBtn);
     
-    // Три точки
     var dotsBtn = document.createElement('button');
     dotsBtn.className = 'profile-dots-btn';
     dotsBtn.textContent = '⋮';
@@ -603,3 +596,25 @@ window.uploadAvatar = function() {
     };
     input.click();
 };
+
+// ================================================================
+// ЗАГРУЗКА ОБЩЕЙ ЛЕНТЫ НА ПЕРСОНАЛЬНОЙ СТРАНИЦЕ
+// ================================================================
+
+function loadPersonalFeed() {
+    var container = document.getElementById('feed');
+    if (!container) return;
+    
+    if (window.location.pathname.includes('player-likee')) {
+        if (typeof loadFeed === 'function') {
+            loadFeed();
+        }
+    }
+}
+
+// Загружаем ленту при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.pathname.includes('player-likee')) {
+        setTimeout(loadPersonalFeed, 500);
+    }
+});
