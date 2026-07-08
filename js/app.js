@@ -1,5 +1,5 @@
 // ================================================================
-// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ — ПОЛНАЯ ВЕРСИЯ
+// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
 function updateUI() {
@@ -107,10 +107,17 @@ window.goToProfile = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/?page=profile';
+    
+    // Если мы на странице /player-likee/ — показываем профиль текущего пользователя
+    if (window.location.pathname.includes('/player-likee')) {
+        VIEWING_USER = USER_UID;
+        if (typeof loadProfile === 'function') {
+            loadProfile();
+        }
         return;
     }
+    
+    // Если на главной — открываем профиль
     VIEWING_USER = null;
     setActivePage('profile');
     document.getElementById('chatView').classList.remove('active');
@@ -553,10 +560,6 @@ setTimeout(function() {
 }, 500);
 
 setInterval(updateNotifBadge, 5000);
-
-// ================================================================
-// ЭКСПОРТ
-// ================================================================
 
 window.updateUI = updateUI;
 window.renderAvatar = renderAvatar;
