@@ -4,15 +4,22 @@
 
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
-    if (!uid) return;
+    if (!uid) {
+        console.warn('⚠️ Нет UID для загрузки профиля');
+        return;
+    }
+    
+    console.log('📥 Загружаем профиль для UID:', uid);
     
     db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
         var u = snap.val() || {};
         var userName = u.name || USER || 'Гость';
         var userBio = u.bio || 'Привет!';
         
-        document.getElementById('profileName').textContent = userName;
-        document.getElementById('profileBio').textContent = userBio;
+        var nameEl = document.getElementById('profileName');
+        var bioEl = document.getElementById('profileBio');
+        if (nameEl) nameEl.textContent = userName;
+        if (bioEl) bioEl.textContent = userBio;
         
         if (uid === USER_UID && u.name && u.name !== USER) {
             USER = u.name;
@@ -125,9 +132,12 @@ function loadProfileLink(uid) {
     db.ref('sites/' + SITE + '/users/' + uid + '/profileLink').once('value', function(snap) {
         var link = snap.val();
         if (link) {
-            document.getElementById('profileLinkInput').value = link;
-            document.getElementById('profileIframe').src = link;
-            document.getElementById('profileIframeWrap').style.display = 'block';
+            var input = document.getElementById('profileLinkInput');
+            var iframe = document.getElementById('profileIframe');
+            var wrap = document.getElementById('profileIframeWrap');
+            if (input) input.value = link;
+            if (iframe) iframe.src = link;
+            if (wrap) wrap.style.display = 'block';
         }
     });
 }
@@ -135,10 +145,14 @@ function loadProfileLink(uid) {
 window.saveProfileLink = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
     var input = document.getElementById('profileLinkInput');
+    if (!input) return;
     var link = input.value.trim();
     
+    var wrap = document.getElementById('profileIframeWrap');
+    var iframe = document.getElementById('profileIframe');
+    
     if (!link) {
-        document.getElementById('profileIframeWrap').style.display = 'none';
+        if (wrap) wrap.style.display = 'none';
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').remove();
         return;
     }
@@ -148,22 +162,25 @@ window.saveProfileLink = function() {
     }
     
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').set(link);
-    document.getElementById('profileIframe').src = link;
-    document.getElementById('profileIframeWrap').style.display = 'block';
+    if (iframe) iframe.src = link;
+    if (wrap) wrap.style.display = 'block';
     alert('✅ Ссылка сохранена!');
 };
 
 window.toggleIframe = function() {
     var wrap = document.getElementById('profileIframeWrap');
+    if (!wrap) return;
     var btn = wrap.querySelector('.iframe-header button');
     var iframe = document.getElementById('profileIframe');
     
+    if (!iframe) return;
+    
     if (iframe.style.display === 'none') {
         iframe.style.display = 'block';
-        btn.textContent = '🔼 Свернуть';
+        if (btn) btn.textContent = '🔼 Свернуть';
     } else {
         iframe.style.display = 'none';
-        btn.textContent = '🔽 Развернуть';
+        if (btn) btn.textContent = '🔽 Развернуть';
     }
 };
 
@@ -173,6 +190,7 @@ window.toggleIframe = function() {
 
 function showProfileActions(uid) {
     var actions = document.getElementById('profileActions');
+    if (!actions) return;
     if (!uid) return;
     
     actions.innerHTML = '';
@@ -233,7 +251,13 @@ function showProfileActions(uid) {
     msgBtn.className = 'friend-btn';
     msgBtn.textContent = '💬 Написать';
     msgBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;background:#1877f2;color:#fff;';
-    msgBtn.onclick = function() { openPrivateChat(uid); };
+    msgBtn.onclick = function() { 
+        if (typeof openPrivateChat === 'function') {
+            openPrivateChat(uid); 
+        } else {
+            alert('Функция чата не загружена');
+        }
+    };
     msgBtn.onmouseover = function() { this.style.background = '#4a9eff'; };
     msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
     wrapper.appendChild(msgBtn);
@@ -265,15 +289,17 @@ function showProfileActions(uid) {
     fillProfileMenu(uid, menu);
     updateFriendButton(uid);
     
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).on('value', function() {
-        updateFriendButton(uid);
-        fillProfileMenu(uid, document.getElementById('profileMenu'));
-    });
-    
-    db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).on('value', function() {
-        updateFriendButton(uid);
-        fillProfileMenu(uid, document.getElementById('profileMenu'));
-    });
+    if (USER_UID) {
+        db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).on('value', function() {
+            updateFriendButton(uid);
+            fillProfileMenu(uid, document.getElementById('profileMenu'));
+        });
+        
+        db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).on('value', function() {
+            updateFriendButton(uid);
+            fillProfileMenu(uid, document.getElementById('profileMenu'));
+        });
+    }
 }
 
 // ================================================================
@@ -304,6 +330,10 @@ function fillOwnProfileMenu(uid, menu) {
 
 function fillProfileMenu(uid, menu) {
     if (!menu) return;
+    if (!USER_UID) {
+        menu.innerHTML = '<div class="profile-menu-item" style="color:var(--muted-text);">Войдите для действий</div>';
+        return;
+    }
     
     var status = getCachedFriendStatus(USER_UID, uid);
     
@@ -352,19 +382,24 @@ function fillProfileMenu(uid, menu) {
 function handleProfileMenuAction(action, uid) {
     switch(action) {
         case 'addFriend':
-            sendFriendRequest(uid);
+            if (typeof sendFriendRequest === 'function') sendFriendRequest(uid);
+            else alert('Функция не загружена');
             break;
         case 'cancelRequest':
-            cancelFriendRequest(uid);
+            if (typeof cancelFriendRequest === 'function') cancelFriendRequest(uid);
+            else alert('Функция не загружена');
             break;
         case 'acceptRequest':
-            acceptFriendRequest(uid);
+            if (typeof acceptFriendRequest === 'function') acceptFriendRequest(uid);
+            else alert('Функция не загружена');
             break;
         case 'declineRequest':
-            declineFriendRequest(uid);
+            if (typeof declineFriendRequest === 'function') declineFriendRequest(uid);
+            else alert('Функция не загружена');
             break;
         case 'removeFriend':
-            removeFriend(uid);
+            if (typeof removeFriend === 'function') removeFriend(uid);
+            else alert('Функция не загружена');
             break;
         case 'unsubscribe':
             alert('🔕 Подписка отменена (заглушка)');
@@ -431,6 +466,12 @@ function updateFriendButton(uid) {
     
     btn.style.display = 'inline-block';
     
+    if (typeof getFriendStatusRealtime !== 'function') {
+        btn.textContent = '❌ Ошибка';
+        btn.className = 'friend-btn add';
+        return;
+    }
+    
     getFriendStatusRealtime(USER_UID, uid, function(status) {
         if (status === 'friend') {
             btn.textContent = '🤝 В друзьях';
@@ -449,7 +490,13 @@ function updateFriendButton(uid) {
         } else {
             btn.textContent = '➕ Добавить в друзья';
             btn.className = 'friend-btn add';
-            btn.onclick = function() { sendFriendRequest(uid); };
+            btn.onclick = function() { 
+                if (typeof sendFriendRequest === 'function') {
+                    sendFriendRequest(uid); 
+                } else {
+                    alert('Функция не загружена');
+                }
+            };
         }
     });
 }
@@ -544,10 +591,19 @@ function loadSubscriptions(uid) {
 // ================================================================
 
 window.viewUser = function(uid) {
-    if (uid === USER_UID) { goToProfile(); return; }
+    if (uid === USER_UID) { 
+        if (typeof goToProfile === 'function') {
+            goToProfile(); 
+        }
+        return; 
+    }
     VIEWING_USER = uid;
-    setActivePage('profile');
-    loadProfile();
+    if (typeof setActivePage === 'function') {
+        setActivePage('profile');
+    }
+    if (typeof loadProfile === 'function') {
+        loadProfile();
+    }
 };
 
 // ================================================================
@@ -555,28 +611,35 @@ window.viewUser = function(uid) {
 // ================================================================
 
 window.openEditProfile = function() {
-    document.getElementById('editName').value = USER || '';
-    document.getElementById('editBio').value = '';
-    document.getElementById('editProfileModal').classList.add('open');
+    var nameInput = document.getElementById('editName');
+    var bioInput = document.getElementById('editBio');
+    var modal = document.getElementById('editProfileModal');
+    if (nameInput) nameInput.value = USER || '';
+    if (bioInput) bioInput.value = '';
+    if (modal) modal.classList.add('open');
 };
 
 window.closeEditProfile = function() {
-    document.getElementById('editProfileModal').classList.remove('open');
+    var modal = document.getElementById('editProfileModal');
+    if (modal) modal.classList.remove('open');
 };
 
 window.saveProfile = function() {
-    var name = document.getElementById('editName').value.trim();
-    var bio = document.getElementById('editBio').value.trim();
+    var nameInput = document.getElementById('editName');
+    var bioInput = document.getElementById('editBio');
+    if (!nameInput) { alert('Ошибка'); return; }
+    var name = nameInput.value.trim();
+    var bio = bioInput ? bioInput.value.trim() : '';
     if (!name) { alert('Введите имя'); return; }
     
     USER = name;
     localStorage.setItem('dc_u_' + SITE, USER);
     db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
     db.ref('sites/' + SITE + '/all_users/' + USER_UID).update({ name: USER, bio: bio });
-    updateUI();
+    if (typeof updateUI === 'function') updateUI();
     closeEditProfile();
-    loadProfile();
-    loadFeed();
+    if (typeof loadProfile === 'function') loadProfile();
+    if (typeof loadFeed === 'function') loadFeed();
 };
 
 // ================================================================
@@ -601,11 +664,27 @@ window.uploadAvatar = function() {
             db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
             if (!avatarCache) avatarCache = {};
             avatarCache[USER_UID] = url;
-            updateUI();
-            loadProfile();
-            loadFeed();
+            if (typeof updateUI === 'function') updateUI();
+            if (typeof loadProfile === 'function') loadProfile();
+            if (typeof loadFeed === 'function') loadFeed();
             alert('✅ Аватарка обновлена!');
         });
     };
     input.click();
 };
+
+// ================================================================
+// ЭКСПОРТ ФУНКЦИЙ
+// ================================================================
+
+window.loadProfile = loadProfile;
+window.viewUser = viewUser;
+window.toggleFriendsList = toggleFriendsList;
+window.uploadAvatar = uploadAvatar;
+window.openEditProfile = openEditProfile;
+window.closeEditProfile = closeEditProfile;
+window.saveProfile = saveProfile;
+window.toggleProfileMenu = toggleProfileMenu;
+window.closeProfileMenu = closeProfileMenu;
+window.saveProfileLink = saveProfileLink;
+window.toggleIframe = toggleIframe;
