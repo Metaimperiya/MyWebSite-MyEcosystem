@@ -18,6 +18,14 @@
     ],
     "rewrites": [
       {
+        "source": "/player-likee/**",
+        "destination": "/player-likee.html"
+      },
+      {
+        "source": "/user/**",
+        "destination": "/user-profile.html"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
