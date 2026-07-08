@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
     <title>PLAYER Likee — METAIMPERIYA</title>
     <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA. Посты, фото, общение.">
     <meta name="keywords" content="PLAYER Likee, METAIMPERIYA, персональная страница">
@@ -41,8 +42,8 @@
             <!-- ===== ПРОФИЛЬ ===== -->
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar"><span class="letter">P</span></div>
-                <div class="name">PLAYER Likee</div>
-                <div class="bio">Администратор METAIMPERIYA</div>
+                <div class="name" id="profileName">PLAYER Likee</div>
+                <div class="bio" id="profileBio">Администратор METAIMPERIYA</div>
                 <div class="profile-stats">
                     <span>🤝 Друзья: <span id="friendsCount">0</span></span>
                     <span>👀 Подписчики: <span id="subscribersCount">0</span></span>
@@ -127,11 +128,18 @@
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Загружаем посты
-                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-                        VIEWING_USER = MY_UID;
-                        if (typeof loadProfile === 'function') {
-                            loadProfile();
+                        // ===== ЗАГРУЖАЕМ ПРОФИЛЬ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ =====
+                        if (USER_UID) {
+                            VIEWING_USER = USER_UID;
+                            if (typeof loadProfile === 'function') {
+                                loadProfile();
+                            }
+                        } else {
+                            // Если не авторизован, показываем заглушку
+                            var nameEl = document.getElementById('profileName');
+                            var bioEl = document.getElementById('profileBio');
+                            if (nameEl) nameEl.textContent = 'Гость';
+                            if (bioEl) bioEl.textContent = 'Войдите, чтобы увидеть профиль';
                         }
                     }, 500);
                 }
@@ -149,10 +157,16 @@
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        var MY_UID = 'ANR62p3qcjOe2ALsdVvJHUNCCV42';
-                        VIEWING_USER = MY_UID;
-                        if (typeof loadProfile === 'function') {
-                            loadProfile();
+                        if (USER_UID) {
+                            VIEWING_USER = USER_UID;
+                            if (typeof loadProfile === 'function') {
+                                loadProfile();
+                            }
+                        } else {
+                            var nameEl = document.getElementById('profileName');
+                            var bioEl = document.getElementById('profileBio');
+                            if (nameEl) nameEl.textContent = 'Гость';
+                            if (bioEl) bioEl.textContent = 'Войдите, чтобы увидеть профиль';
                         }
                     }, 500);
                 }
@@ -161,9 +175,10 @@
 })();
 
 // ================================================================
-// АВТОРИЗАЦИЯ
+// АВТОРИЗАЦИЯ — СИНХРОНИЗАЦИЯ
 // ================================================================
 
+// Слушаем изменения авторизации
 auth.onAuthStateChanged(function(user) {
     if (user) {
         USER_UID = user.uid;
@@ -172,10 +187,27 @@ auth.onAuthStateChanged(function(user) {
         var avatarUrl = user.photoURL || null;
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
+        
+        // Обновляем UI
         if (typeof updateUI === 'function') updateUI();
+        
+        // Загружаем профиль текущего пользователя
+        VIEWING_USER = USER_UID;
+        if (typeof loadProfile === 'function') {
+            setTimeout(function() {
+                loadProfile();
+            }, 300);
+        }
+        
         console.log('✅ Авторизован как:', USER);
     } else {
         console.log('⏳ Не авторизован');
+        // Показываем гостя
+        var nameEl = document.getElementById('profileName');
+        var bioEl = document.getElementById('profileBio');
+        if (nameEl) nameEl.textContent = 'Гость';
+        if (bioEl) bioEl.textContent = 'Войдите, чтобы увидеть профиль';
+        if (typeof updateUI === 'function') updateUI();
     }
 });
 </script>
