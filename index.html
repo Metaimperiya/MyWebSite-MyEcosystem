@@ -174,6 +174,14 @@
             </div>
         </div>
 
+        <!-- ===== СТРАНИЦА ПОЛЬЗОВАТЕЛЯ ===== -->
+        <div class="page" id="page-page" style="display:none;">
+            <div style="padding:6px 0;">
+                <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
+            </div>
+            <div id="pageContainer"></div>
+        </div>
+
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
@@ -214,6 +222,7 @@
 <script src="js/chat.js"></script>
 <script src="js/notifications.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/page.js"></script>
 
 <script>
 // ================================================================
@@ -428,6 +437,17 @@ window.submitFotoPost = function() {
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
+                        
+                        // Загружаем страницу если открыта /pages/...
+                        var path = window.location.pathname;
+                        if (path.includes('/pages/')) {
+                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
+                            if (slug && typeof loadPage === 'function') {
+                                setTimeout(function() {
+                                    loadPage(slug);
+                                }, 300);
+                            }
+                        }
                     }, 500);
                 }
             })
@@ -448,6 +468,16 @@ window.submitFotoPost = function() {
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
+                        
+                        var path = window.location.pathname;
+                        if (path.includes('/pages/')) {
+                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
+                            if (slug && typeof loadPage === 'function') {
+                                setTimeout(function() {
+                                    loadPage(slug);
+                                }, 300);
+                            }
+                        }
                     }, 500);
                 }
             });

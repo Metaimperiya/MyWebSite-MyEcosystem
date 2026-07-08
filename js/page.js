@@ -1,605 +1,401 @@
 // ================================================================
-// ПРОФИЛЬ — ПОЛНАЯ ВЕРСИЯ
+// СТРАНИЦЫ — ПОЛНОЦЕННЫЕ СТРАНИЦЫ ПОЛЬЗОВАТЕЛЕЙ
 // ================================================================
 
-function loadProfile() {
-    var uid = VIEWING_USER || USER_UID;
-    if (!uid) return;
-    
-    db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
-        var u = snap.val() || {};
-        document.getElementById('profileName').textContent = u.name || USER || 'Гость';
-        document.getElementById('profileBio').textContent = u.bio || 'Привет!';
-        var avatar = document.getElementById('profileAvatar');
-        renderAvatar(uid, avatar, (u.name || '?').charAt(0).toUpperCase());
-        showProfileActions(uid);
-        
-        // Делаем статистику кликабельной
-        makeStatsClickable(uid);
-        loadProfileLink(uid);
-    });
-    
-    loadFriends(uid);
-    loadSubscribers(uid);
-    loadSubscriptions(uid);
-    loadProfilePosts(uid);
-}
+var pageListener = null;
+var CURRENT_PAGE_UID = null;
+var pageSubscribers = {};
 
-// ================================================================
-// ЗАГРУЗКА ПОСТОВ В ПРОФИЛЕ
-// ================================================================
-
-function loadProfilePosts(uid) {
-    var container = document.getElementById('profilePosts');
+// ===== ЗАГРУЗКА СТРАНИЦЫ =====
+function loadPage(slug) {
+    var container = document.getElementById('pageContainer');
     if (!container) {
-        console.warn('❌ profilePosts не найден в DOM');
+        console.warn('⚠️ pageContainer не найден');
         return;
     }
-    
-    container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
-    
-    var postsRef = db.ref('sites/' + SITE + '/user_posts/' + uid);
-    
-    postsRef.orderByChild('timestamp').on('value', function(snap) {
-        container.innerHTML = '';
+
+    if (!USER_UID) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы просматривать страницы</div>';
+        return;
+    }
+
+    showLoading(container);
+
+    // Ищем страницу по слагу во всех типах
+    var types = ['profiles', 'pages', 'groups'];
+    var found = false;
+
+    types.forEach(function(type) {
+        if (found) return;
+        db.ref('sites/' + SITE + '/pages/' + type).orderByChild('slug').equalTo(slug).once('value', function(snap) {
+            var data = snap.val();
+            if (data) {
+                found = true;
+                var pageUid = Object.keys(data)[0];
+                var pageData = data[pageUid];
+                pageData.type = type;
+                pageData.uid = pageUid;
+                CURRENT_PAGE_UID = pageUid;
+                renderPage(container, pageData);
+            }
+        });
+    });
+
+    // Если страница не найдена через 2 секунды
+    setTimeout(function() {
+        if (!found && container.innerHTML.includes('Загрузка')) {
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#e74c3c;">❌ Страница не найдена</div>';
+        }
+    }, 2000);
+}
+
+// ===== РЕНДЕР СТРАНИЦЫ =====
+function renderPage(container, pageData) {
+    var isOwner = (pageData.ownerUid === USER_UID);
+    var isSubscribed = pageSubscribers[pageData.uid] === true;
+
+    var avatarHtml = pageData.avatarUrl 
+        ? '<img src="' + pageData.avatarUrl + '" />' 
+        : '<span class="letter">' + (pageData.name || '?').charAt(0).toUpperCase() + '</span>';
+
+    var roleLabel = '';
+    if (pageData.role === 'admin') roleLabel = '👑 Администратор';
+    else if (pageData.role === 'moderator') roleLabel = '🛡️ Модератор';
+    else if (pageData.role === 'premium') roleLabel = '💎 Премиум';
+    else if (pageData.role === 'freelancer') roleLabel = '💼 Фрилансер';
+    else roleLabel = '👤 Пользователь';
+
+    var html = `
+        <div class="page-header" style="background:var(--card-bg);border-radius:12px;padding:16px;margin-bottom:8px;border:1px solid var(--border-color);">
+            ${pageData.coverUrl ? '<div style="width:100%;height:120px;border-radius:8px;overflow:hidden;margin-bottom:10px;background:var(--input-bg);"><img src="' + pageData.coverUrl + '" style="width:100%;height:100%;object-fit:cover;" /></div>' : ''}
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:56px;height:56px;border-radius:50%;overflow:hidden;background:var(--avatar-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    ${avatarHtml}
+                </div>
+                <div style="flex:1;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span style="font-size:1.1rem;font-weight:700;color:var(--text-color);">${esc(pageData.name || 'Без названия')}</span>
+                        <span style="font-size:0.55rem;background:var(--input-bg);padding:2px 10px;border-radius:12px;color:var(--text-secondary);">${roleLabel}</span>
+                    </div>
+                    <div style="font-size:0.65rem;color:var(--muted-text);">${esc(pageData.description || 'Нет описания')}</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;font-size:0.6rem;color:var(--muted-text);">
+                <span>📝 <span id="pagePostCount">0</span> постов</span>
+                <span>👥 <span id="pageSubscriberCount">0</span> подписчиков</span>
+                <span>👁️ <span id="pageViewCount">0</span> просмотров</span>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap;">
+                ${!isOwner ? `
+                    <button onclick="togglePageSubscribe('${pageData.uid}')" style="padding:4px 16px;border:none;border-radius:16px;font-weight:600;cursor:pointer;font-size:0.6rem;background:${isSubscribed ? 'var(--input-bg)' : 'var(--link-color)'};color:${isSubscribed ? 'var(--text-secondary)' : '#fff'};">
+                        ${isSubscribed ? '✅ Подписан' : '➕ Подписаться'}
+                    </button>
+                ` : `
+                    <button onclick="openEditPage()" style="padding:4px 16px;border:none;border-radius:16px;font-weight:600;cursor:pointer;font-size:0.6rem;background:var(--input-bg);color:var(--text-secondary);">✏️ Редактировать страницу</button>
+                `}
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Загружаем посты страницы
+    loadPagePosts(pageData.uid);
+    loadPageSubscribers(pageData.uid);
+    loadPageViews(pageData.uid);
+
+    // Если владелец — показываем форму поста
+    if (isOwner) {
+        var formHtml = `
+            <div class="card" style="margin-top:8px;">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditorPage" class="post-editor" placeholder="Что нового на странице?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInputPage">📎 Фото</label>
+                        <button class="btn-submit" onclick="submitPagePost()">📤 Опубликовать</button>
+                        <button class="btn-cancel" onclick="clearPagePostForm()">Очистить</button>
+                    </div>
+                    <input type="file" id="fileInputPage" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBoxPage">
+                        <img id="previewImgPage"><span id="previewNamePage"></span>
+                        <button class="remove-pic" onclick="removePageImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', formHtml);
+    }
+
+    // Добавляем контейнер для постов
+    var postsHtml = `<div id="pagePosts"></div>`;
+    container.insertAdjacentHTML('beforeend', postsHtml);
+
+    // Загружаем посты
+    loadPagePosts(pageData.uid);
+}
+
+// ===== ЗАГРУЗКА ПОСТОВ СТРАНИЦЫ =====
+function loadPagePosts(pageUid) {
+    var el = document.getElementById('pagePosts');
+    if (!el) return;
+
+    if (pageListener) {
+        db.ref('sites/' + SITE + '/page_posts/' + pageUid).off('value', pageListener);
+        pageListener = null;
+    }
+
+    pageListener = function(snap) {
         var data = snap.val() || {};
         var keys = Object.keys(data).sort(function(a, b) {
             return (data[b].timestamp || 0) - (data[a].timestamp || 0);
         });
-        
+
         if (!keys.length) {
-            container.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.65rem;">📝 Нет постов. Напишите что-нибудь!</div>';
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Нет постов на странице</div>';
+            var countEl = document.getElementById('pagePostCount');
+            if (countEl) countEl.textContent = '0';
             return;
         }
-        
+
+        var countEl = document.getElementById('pagePostCount');
+        if (countEl) countEl.textContent = keys.length;
+
+        el.innerHTML = '';
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            var postEl = renderPost(p, 'profile');
-            if (postEl) container.appendChild(postEl);
+            var postEl = renderPost(p, 'page');
+            if (postEl) el.appendChild(postEl);
         });
-    }, function(error) {
-        console.error('❌ Ошибка загрузки постов:', error);
-        container.innerHTML = '<div style="text-align:center;padding:12px;color:#e74c3c;font-size:0.65rem;">❌ Ошибка загрузки постов</div>';
-    });
-}
-
-// ================================================================
-// КЛИКАБЕЛЬНАЯ СТАТИСТИКА
-// ================================================================
-
-function makeStatsClickable(uid) {
-    var friendsCount = document.getElementById('friendsCount');
-    var subscribersCount = document.getElementById('subscribersCount');
-    var subscriptionsCount = document.getElementById('subscriptionsCount');
-    
-    if (friendsCount) {
-        friendsCount.style.cursor = 'pointer';
-        friendsCount.style.color = 'var(--link-color)';
-        friendsCount.onclick = function() { toggleFriendsList(); };
-    }
-    if (subscribersCount) {
-        subscribersCount.style.cursor = 'pointer';
-        subscribersCount.style.color = 'var(--link-color)';
-        subscribersCount.onclick = function() { alert('👀 Подписчики: ' + (document.getElementById('subscribersCount')?.textContent || '0')); };
-    }
-    if (subscriptionsCount) {
-        subscriptionsCount.style.cursor = 'pointer';
-        subscriptionsCount.style.color = 'var(--link-color)';
-        subscriptionsCount.onclick = function() { alert('📌 Подписки: ' + (document.getElementById('subscriptionsCount')?.textContent || '0')); };
-    }
-}
-
-// ================================================================
-// ПОКАЗ/СКРЫТИЕ СПИСКА ДРУЗЕЙ
-// ================================================================
-
-window.toggleFriendsList = function() {
-    var section = document.getElementById('friendsSection');
-    if (!section) return;
-    
-    if (section.style.display === 'none') {
-        section.style.display = 'block';
-        loadFriends(VIEWING_USER || USER_UID);
-    } else {
-        section.style.display = 'none';
-    }
-};
-
-// ================================================================
-// ССЫЛКА В ПРОФИЛЕ (IFRAME)
-// ================================================================
-
-function loadProfileLink(uid) {
-    db.ref('sites/' + SITE + '/users/' + uid + '/profileLink').once('value', function(snap) {
-        var link = snap.val();
-        if (link) {
-            document.getElementById('profileLinkInput').value = link;
-            document.getElementById('profileIframe').src = link;
-            document.getElementById('profileIframeWrap').style.display = 'block';
-        }
-    });
-}
-
-window.saveProfileLink = function() {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    var input = document.getElementById('profileLinkInput');
-    var link = input.value.trim();
-    
-    if (!link) {
-        document.getElementById('profileIframeWrap').style.display = 'none';
-        db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').remove();
-        return;
-    }
-    
-    if (!link.startsWith('http://') && !link.startsWith('https://')) {
-        link = 'https://' + link;
-    }
-    
-    db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').set(link);
-    document.getElementById('profileIframe').src = link;
-    document.getElementById('profileIframeWrap').style.display = 'block';
-    alert('✅ Ссылка сохранена!');
-};
-
-window.toggleIframe = function() {
-    var wrap = document.getElementById('profileIframeWrap');
-    var btn = wrap.querySelector('.iframe-header button');
-    var iframe = document.getElementById('profileIframe');
-    
-    if (iframe.style.display === 'none') {
-        iframe.style.display = 'block';
-        btn.textContent = '🔼 Свернуть';
-    } else {
-        iframe.style.display = 'none';
-        btn.textContent = '🔽 Развернуть';
-    }
-};
-
-// ================================================================
-// КНОПКИ В ПРОФИЛЕ — КРАСИВО ПОД ОПИСАНИЕМ
-// ================================================================
-
-function showProfileActions(uid) {
-    var actions = document.getElementById('profileActions');
-    if (!uid) return;
-    
-    actions.innerHTML = '';
-    actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
-    
-    if (uid === USER_UID) {
-        // ===== СВОЙ ПРОФИЛЬ =====
-        var wrapper = document.createElement('div');
-        wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;justify-content:center;';
-        
-        var editBtn = document.createElement('button');
-        editBtn.className = 'friend-btn add';
-        editBtn.textContent = '✏️ Редактировать профиль';
-        editBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;background:var(--link-color);color:#fff;transition:0.2s;';
-        editBtn.onclick = function() { openEditProfile(); };
-        editBtn.onmouseover = function() { this.style.background = 'var(--link-hover)'; };
-        editBtn.onmouseout = function() { this.style.background = 'var(--link-color)'; };
-        wrapper.appendChild(editBtn);
-        
-        var dotsBtn = document.createElement('button');
-        dotsBtn.className = 'profile-dots-btn';
-        dotsBtn.textContent = '⋮';
-        dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 8px;border-radius:50%;transition:0.2s;line-height:1;';
-        dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
-        dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
-        dotsBtn.onclick = function(e) {
-            e.stopPropagation();
-            toggleProfileMenu(uid);
-        };
-        wrapper.appendChild(dotsBtn);
-        
-        actions.appendChild(wrapper);
-        
-        var menuContainer = document.createElement('div');
-        menuContainer.style.cssText = 'position:relative;width:100%;';
-        actions.appendChild(menuContainer);
-        
-        var menu = document.createElement('div');
-        menu.id = 'profileMenu';
-        menu.className = 'profile-dropdown-menu';
-        menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
-        menuContainer.appendChild(menu);
-        
-        fillOwnProfileMenu(uid, menu);
-        return;
-    }
-    
-    // ===== ЧУЖОЙ ПРОФИЛЬ =====
-    var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
-    
-    // Кнопка "В друзьях / Добавить"
-    var mainBtn = document.createElement('button');
-    mainBtn.id = 'friendActionBtn';
-    mainBtn.className = 'friend-btn add';
-    mainBtn.textContent = 'Загрузка...';
-    mainBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;';
-    wrapper.appendChild(mainBtn);
-    
-    // Кнопка "Написать"
-    var msgBtn = document.createElement('button');
-    msgBtn.className = 'friend-btn';
-    msgBtn.textContent = '💬 Написать';
-    msgBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;background:#1877f2;color:#fff;';
-    msgBtn.onclick = function() { openPrivateChat(uid); };
-    msgBtn.onmouseover = function() { this.style.background = '#4a9eff'; };
-    msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
-    wrapper.appendChild(msgBtn);
-    
-    // Три точки
-    var dotsBtn = document.createElement('button');
-    dotsBtn.className = 'profile-dots-btn';
-    dotsBtn.textContent = '⋮';
-    dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;border-radius:50%;transition:0.2s;line-height:1;';
-    dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
-    dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
-    dotsBtn.onclick = function(e) {
-        e.stopPropagation();
-        toggleProfileMenu(uid);
     };
-    wrapper.appendChild(dotsBtn);
-    
-    actions.appendChild(wrapper);
-    
-    var menuContainer = document.createElement('div');
-    menuContainer.style.cssText = 'position:relative;width:100%;';
-    actions.appendChild(menuContainer);
-    
-    var menu = document.createElement('div');
-    menu.id = 'profileMenu';
-    menu.className = 'profile-dropdown-menu';
-    menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
-    menuContainer.appendChild(menu);
-    
-    fillProfileMenu(uid, menu);
-    updateFriendButton(uid);
-    
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).on('value', function() {
-        updateFriendButton(uid);
-        fillProfileMenu(uid, document.getElementById('profileMenu'));
-    });
-    
-    db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).on('value', function() {
-        updateFriendButton(uid);
-        fillProfileMenu(uid, document.getElementById('profileMenu'));
+
+    db.ref('sites/' + SITE + '/page_posts/' + pageUid).orderByChild('timestamp').on('value', pageListener);
+}
+
+// ===== ЗАГРУЗКА ПОДПИСЧИКОВ =====
+function loadPageSubscribers(pageUid) {
+    db.ref('sites/' + SITE + '/page_subscribers/' + pageUid).on('value', function(snap) {
+        var data = snap.val() || {};
+        var count = Object.keys(data).length;
+        var countEl = document.getElementById('pageSubscriberCount');
+        if (countEl) countEl.textContent = count;
+
+        if (USER_UID) {
+            pageSubscribers[pageUid] = data[USER_UID] === true;
+        }
     });
 }
 
-// ================================================================
-// МЕНЮ ДЛЯ СВОЕГО ПРОФИЛЯ
-// ================================================================
+// ===== ЗАГРУЗКА ПРОСМОТРОВ =====
+function loadPageViews(pageUid) {
+    db.ref('sites/' + SITE + '/page_views/' + pageUid).on('value', function(snap) {
+        var data = snap.val() || {};
+        var count = Object.keys(data).length;
+        var countEl = document.getElementById('pageViewCount');
+        if (countEl) countEl.textContent = count;
+    });
 
-function fillOwnProfileMenu(uid, menu) {
-    if (!menu) return;
-    
-    var html = '';
-    html += '<div class="profile-menu-item" onclick="openEditProfile();closeProfileMenu();">✏️ Редактировать профиль</div>';
-    html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-    html += '<div class="profile-menu-item" onclick="uploadAvatar();closeProfileMenu();">📷 Сменить аватар</div>';
-    html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-    html += '<div class="profile-menu-item" onclick="goToFeed();closeProfileMenu();">🏠 На главную</div>';
-    
-    if (isAdmin) {
-        html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-        html += '<div class="profile-menu-item" style="color:#e67e22;" onclick="openAdminChats();closeProfileMenu();">🏴‍☠️ Все чаты</div>';
+    if (pageUid !== USER_UID) {
+        db.ref('sites/' + SITE + '/page_views/' + pageUid + '/' + USER_UID).set(Date.now());
     }
-    
-    menu.innerHTML = html;
 }
 
-// ================================================================
-// ЗАПОЛНЕНИЕ МЕНЮ ДЛЯ ЧУЖОГО ПРОФИЛЯ
-// ================================================================
+// ===== ПОДПИСКА НА СТРАНИЦУ =====
+window.togglePageSubscribe = function(pageUid) {
+    if (!USER_UID) { alert('Войдите!'); return; }
+    if (pageUid === USER_UID) { alert('Нельзя подписаться на себя'); return; }
 
-function fillProfileMenu(uid, menu) {
-    if (!menu) return;
-    
-    var status = getCachedFriendStatus(USER_UID, uid);
-    
-    var items = [];
-    
-    if (status === 'friend') {
-        items.push({ label: '⭐ В избранное', action: 'addFavorite', icon: '⭐' });
-        items.push({ label: '📝 Редактировать список друзей', action: 'editFriendList', icon: '📝' });
-        items.push({ label: '🔕 Отменить подписку', action: 'unsubscribe', icon: '🔕' });
-        items.push({ label: '🗑 Удалить из друзей', action: 'removeFriend', icon: '🗑', danger: true });
-    } else if (status === 'pending_sent') {
-        items.push({ label: '⏳ Отменить заявку', action: 'cancelRequest', icon: '⏳' });
-    } else if (status === 'pending_received') {
-        items.push({ label: '✅ Принять заявку', action: 'acceptRequest', icon: '✅' });
-        items.push({ label: '❌ Отклонить заявку', action: 'declineRequest', icon: '❌' });
+    var isSubscribed = pageSubscribers[pageUid] === true;
+    var ref = db.ref('sites/' + SITE + '/page_subscribers/' + pageUid + '/' + USER_UID);
+
+    if (isSubscribed) {
+        ref.remove();
+        pageSubscribers[pageUid] = false;
     } else {
-        items.push({ label: '➕ Добавить в друзья', action: 'addFriend', icon: '➕' });
+        ref.set(true);
+        pageSubscribers[pageUid] = true;
     }
-    
-    var html = '';
-    items.forEach(function(item, index) {
-        var dangerClass = item.danger ? ' style="color:var(--danger);"' : '';
-        html += '<div class="profile-menu-item" data-action="' + item.action + '"' + dangerClass + '>';
-        html += item.icon + ' ' + item.label;
-        html += '</div>';
-        if (index < items.length - 1) {
-            html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-        }
-    });
-    
-    menu.innerHTML = html;
-    
-    menu.querySelectorAll('.profile-menu-item').forEach(function(el) {
-        el.onclick = function() {
-            var action = this.dataset.action;
-            handleProfileMenuAction(action, uid);
-            closeProfileMenu();
-        };
-    });
-}
 
-// ================================================================
-// ОБРАБОТКА ДЕЙСТВИЙ МЕНЮ
-// ================================================================
-
-function handleProfileMenuAction(action, uid) {
-    switch(action) {
-        case 'addFriend':
-            sendFriendRequest(uid);
-            break;
-        case 'cancelRequest':
-            cancelFriendRequest(uid);
-            break;
-        case 'acceptRequest':
-            acceptFriendRequest(uid);
-            break;
-        case 'declineRequest':
-            declineFriendRequest(uid);
-            break;
-        case 'removeFriend':
-            removeFriend(uid);
-            break;
-        case 'unsubscribe':
-            alert('🔕 Подписка отменена (заглушка)');
-            break;
-        case 'editFriendList':
-            alert('📝 Редактирование списка друзей (заглушка)');
-            break;
-        case 'addFavorite':
-            alert('⭐ Добавлено в избранное (заглушка)');
-            break;
-        default:
-            break;
-    }
-}
-
-// ================================================================
-// ОТКРЫТИЕ/ЗАКРЫТИЕ МЕНЮ
-// ================================================================
-
-function toggleProfileMenu(uid) {
-    var menu = document.getElementById('profileMenu');
-    if (!menu) return;
-    
-    var isOpen = menu.style.display === 'block';
-    
-    document.querySelectorAll('.profile-dropdown-menu').forEach(function(el) {
-        el.style.display = 'none';
-    });
-    
-    if (!isOpen) {
-        menu.style.display = 'block';
-        if (uid === USER_UID) {
-            fillOwnProfileMenu(uid, menu);
+    var btn = document.querySelector('[onclick="togglePageSubscribe(\'' + pageUid + '\')"]');
+    if (btn) {
+        if (pageSubscribers[pageUid]) {
+            btn.textContent = '✅ Подписан';
+            btn.style.background = 'var(--input-bg)';
+            btn.style.color = 'var(--text-secondary)';
         } else {
-            fillProfileMenu(uid, menu);
+            btn.textContent = '➕ Подписаться';
+            btn.style.background = 'var(--link-color)';
+            btn.style.color = '#fff';
         }
     }
+};
+
+// ===== ОТПРАВКА ПОСТА НА СТРАНИЦУ =====
+var pendingPageImageFile = null;
+
+function getPageEditorText() {
+    var editor = document.getElementById('postEditorPage');
+    if (!editor) return '';
+    return editor.innerHTML;
 }
 
-function closeProfileMenu() {
-    document.querySelectorAll('.profile-dropdown-menu').forEach(function(el) {
-        el.style.display = 'none';
-    });
+function clearPagePostForm() {
+    var editor = document.getElementById('postEditorPage');
+    if (editor) editor.innerHTML = '';
+    pendingPageImageFile = null;
+    var preview = document.getElementById('previewBoxPage');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputPage');
+    if (input) input.value = '';
 }
 
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('#profileActions')) {
-        closeProfileMenu();
+function removePageImage() {
+    pendingPageImageFile = null;
+    var preview = document.getElementById('previewBoxPage');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputPage');
+    if (input) input.value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var fileInput = document.getElementById('fileInputPage');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Только изображения!');
+                this.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Максимум 5 МБ');
+                this.value = '';
+                return;
+            }
+
+            pendingPageImageFile = file;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                var img = document.getElementById('previewImgPage');
+                var name = document.getElementById('previewNamePage');
+                var box = document.getElementById('previewBoxPage');
+                if (img) img.src = ev.target.result;
+                if (name) name.textContent = file.name.slice(0, 16);
+                if (box) box.classList.add('visible');
+            };
+            reader.readAsDataURL(file);
+        });
     }
 });
 
-// ================================================================
-// ОБНОВЛЕНИЕ КНОПКИ В РЕАЛЬНОМ ВРЕМЕНИ
-// ================================================================
-
-function updateFriendButton(uid) {
-    var btn = document.getElementById('friendActionBtn');
-    if (!btn) return;
-    
-    if (uid === USER_UID) {
-        btn.style.display = 'none';
+window.submitPagePost = function() {
+    if (!USER_UID || !CURRENT_PAGE_UID) {
+        alert('Ошибка: страница не найдена');
         return;
     }
+
+    if (CURRENT_PAGE_UID !== USER_UID) {
+        alert('Только владелец страницы может публиковать посты');
+        return;
+    }
+
+    var text = getPageEditorText().trim();
+    if (!text && !pendingPageImageFile) {
+        alert('Введите текст или добавьте фото');
+        return;
+    }
+
+    var hashtags = extractHashtags(text);
     
-    btn.style.display = 'inline-block';
-    
-    getFriendStatusRealtime(USER_UID, uid, function(status) {
-        if (status === 'friend') {
-            btn.textContent = '🤝 В друзьях';
-            btn.className = 'friend-btn friend';
-            btn.onclick = function() { toggleProfileMenu(uid); };
-        } else if (status === 'pending_sent') {
-            btn.textContent = '⏳ Запрос отправлен';
-            btn.className = 'friend-btn pending';
-            btn.onclick = function() { toggleProfileMenu(uid); };
-        } else if (status === 'pending_received') {
-            btn.textContent = '📩 Заявка получена';
-            btn.className = 'friend-btn received';
-            btn.onclick = function() { toggleProfileMenu(uid); };
-        } else if (status === 'self') {
-            btn.style.display = 'none';
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
+        var avatarUrl = avatarSnap.val() || null;
+        
+        var postData = {
+            author: USER,
+            authorUid: USER_UID,
+            authorAvatar: avatarUrl,
+            text: text || '📷',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            reposts: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            frameSize: 'small',
+            edited: false,
+            img: null,
+            repost: null,
+            deleted: null,
+            deletedAt: null,
+            pageUid: CURRENT_PAGE_UID
+        };
+
+        var savePost = function(imgData) {
+            if (imgData) postData.img = imgData;
+            
+            db.ref('sites/' + SITE + '/page_posts/' + CURRENT_PAGE_UID).push(postData);
+            clearPagePostForm();
+            loadPagePosts(CURRENT_PAGE_UID);
+        };
+
+        if (pendingPageImageFile) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                savePost(e.target.result);
+            };
+            reader.readAsDataURL(pendingPageImageFile);
         } else {
-            btn.textContent = '➕ Добавить в друзья';
-            btn.className = 'friend-btn add';
-            btn.onclick = function() { sendFriendRequest(uid); };
+            savePost(null);
         }
     });
-}
+};
 
-// ================================================================
-// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ СТАТУСА
-// ================================================================
-
-function getCachedFriendStatus(myUid, targetUid) {
-    var status = 'none';
-    var friendCheck = localStorage.getItem('fs_' + myUid + '_' + targetUid);
-    if (friendCheck === 'friend') return 'friend';
-    if (friendCheck === 'pending_sent') return 'pending_sent';
-    if (friendCheck === 'pending_received') return 'pending_received';
-    return 'none';
-}
-
-// ================================================================
-// ЗАГРУЗКА ДРУЗЕЙ
-// ================================================================
-
-function loadFriends(uid) {
-    if (!uid) return;
+// ===== РЕДАКТИРОВАНИЕ СТРАНИЦЫ =====
+window.openEditPage = function() {
+    if (!CURRENT_PAGE_UID || CURRENT_PAGE_UID !== USER_UID) return;
     
-    db.ref('sites/' + SITE + '/friends/' + uid).on('value', function(snap) {
+    db.ref('sites/' + SITE + '/pages/profiles/' + CURRENT_PAGE_UID).once('value', function(snap) {
         var data = snap.val() || {};
-        var keys = Object.keys(data).filter(function(k) { return data[k] === true; });
-        
-        var countEl = document.getElementById('friendsCount');
-        if (countEl) countEl.textContent = keys.length;
-        
-        var el = document.getElementById('friendList');
-        if (!el) return;
-        
-        if (!keys.length) {
-            el.innerHTML = '<span style="color:#bbb;font-size:0.55rem;">Нет друзей</span>';
-            return;
-        }
-        
-        var html = '';
-        var loaded = 0;
-        keys.forEach(function(k) {
-            db.ref('sites/' + SITE + '/users/' + k).once('value', function(usnap) {
-                var u = usnap.val() || {};
-                var name = u.name || 'Аноним';
-                var letter = name.charAt(0).toUpperCase();
-                html += '<span class="friend-item" onclick="viewUser(\'' + k + '\')">';
-                html += '<span class="avatar-wrap" id="fava-' + k + '"><span class="letter">' + letter + '</span></span> ';
-                html += esc(name);
-                html += '</span>';
-                loaded++;
-                if (loaded === keys.length) {
-                    el.innerHTML = html;
-                    keys.forEach(function(k2) {
-                        var el2 = document.getElementById('fava-' + k2);
-                        if (el2) renderAvatar(k2, el2, '?');
-                    });
-                }
-            });
-        });
+        document.getElementById('editPageName').value = data.name || '';
+        document.getElementById('editPageDesc').value = data.description || '';
+        document.getElementById('editPageModal').classList.add('open');
     });
-}
+};
 
-// ================================================================
-// ЗАГРУЗКА ПОДПИСЧИКОВ
-// ================================================================
+window.closeEditPage = function() {
+    document.getElementById('editPageModal').classList.remove('open');
+};
 
-function loadSubscribers(uid) {
-    if (!uid) return;
-    db.ref('sites/' + SITE + '/subscribers/' + uid).on('value', function(snap) {
-        var data = snap.val() || {};
-        var countEl = document.getElementById('subscribersCount');
-        if (countEl) countEl.textContent = Object.keys(data).length;
+window.savePage = function() {
+    if (!CURRENT_PAGE_UID || CURRENT_PAGE_UID !== USER_UID) return;
+
+    var name = document.getElementById('editPageName').value.trim();
+    var desc = document.getElementById('editPageDesc').value.trim();
+
+    if (!name) { alert('Введите название страницы'); return; }
+
+    db.ref('sites/' + SITE + '/pages/profiles/' + CURRENT_PAGE_UID).update({
+        name: name,
+        description: desc,
+        updatedAt: Date.now()
+    }).then(function() {
+        closeEditPage();
+        alert('✅ Страница обновлена!');
+        loadPage('player-likee');
     });
-}
-
-// ================================================================
-// ЗАГРУЗКА ПОДПИСОК
-// ================================================================
-
-function loadSubscriptions(uid) {
-    if (!uid) return;
-    db.ref('sites/' + SITE + '/subscriptions/' + uid).on('value', function(snap) {
-        var data = snap.val() || {};
-        var countEl = document.getElementById('subscriptionsCount');
-        if (countEl) countEl.textContent = Object.keys(data).length;
-    });
-}
-
-// ================================================================
-// ПРОСМОТР ПОЛЬЗОВАТЕЛЯ
-// ================================================================
-
-window.viewUser = function(uid) {
-    if (uid === USER_UID) { goToProfile(); return; }
-    VIEWING_USER = uid;
-    setActivePage('profile');
-    loadProfile();
-};
-
-// ================================================================
-// РЕДАКТИРОВАНИЕ ПРОФИЛЯ
-// ================================================================
-
-window.openEditProfile = function() {
-    document.getElementById('editName').value = USER || '';
-    document.getElementById('editBio').value = '';
-    document.getElementById('editProfileModal').classList.add('open');
-};
-
-window.closeEditProfile = function() {
-    document.getElementById('editProfileModal').classList.remove('open');
-};
-
-window.saveProfile = function() {
-    var name = document.getElementById('editName').value.trim();
-    var bio = document.getElementById('editBio').value.trim();
-    if (!name) { alert('Введите имя'); return; }
-    
-    USER = name;
-    localStorage.setItem('dc_u_' + SITE, USER);
-    db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
-    db.ref('sites/' + SITE + '/all_users/' + USER_UID).update({ name: USER, bio: bio });
-    updateUI();
-    closeEditProfile();
-    loadProfile();
-    loadFeed();
-};
-
-// ================================================================
-// ЗАГРУЗКА АВАТАРА
-// ================================================================
-
-window.uploadAvatar = function() {
-    if (!USER_UID) { alert('Сначала войдите!'); return; }
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = function(e) {
-        var file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
-        
-        var ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
-        ref.put(file).then(function(snap) {
-            return snap.ref.getDownloadURL();
-        }).then(function(url) {
-            db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(url);
-            db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(url);
-            if (!avatarCache) avatarCache = {};
-            avatarCache[USER_UID] = url;
-            updateUI();
-            loadProfile();
-            loadFeed();
-            alert('✅ Аватарка обновлена!');
-        });
-    };
-    input.click();
 };
