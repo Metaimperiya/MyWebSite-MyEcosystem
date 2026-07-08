@@ -76,27 +76,11 @@ function setActivePage(pageId) {
     if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
 }
 
-// ===== КНОПКА "ГЛАВНАЯ" В САЙДБАРЕ =====
-window.goToHome = function() {
-    if (!USER) { 
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return; 
-    }
-    // Перенаправляем на главную страницу
-    window.location.href = '/';
-};
-
 window.goToFeed = function() {
     if (!USER) { 
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return; 
-    }
-    // Если мы на foto.html или другой странице — переходим на главную
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/';
-        return;
     }
     setActivePage('feed');
     document.getElementById('chatView').classList.remove('active');
@@ -108,25 +92,20 @@ window.goToFeed = function() {
     if (typeof loadFeed === 'function') loadFeed();
 };
 
-window.goToProfile = function() {
+window.goToGroups = function() {
     if (!USER) { 
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/?page=profile';
-        return;
-    }
-    VIEWING_USER = null;
-    setActivePage('profile');
+    setActivePage('groups');
     document.getElementById('chatView').classList.remove('active');
     if (chatUnsub) {
         if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    if (typeof loadProfile === 'function') loadProfile();
+    if (typeof loadGroups === 'function') loadGroups();
 };
 
 window.goToPeople = function() {
@@ -134,10 +113,6 @@ window.goToPeople = function() {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return; 
-    }
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/?page=people';
-        return;
     }
     setActivePage('people');
     document.getElementById('chatView').classList.remove('active');
@@ -149,24 +124,21 @@ window.goToPeople = function() {
     if (typeof loadPeople === 'function') loadPeople();
 };
 
-window.goToGroups = function() {
+window.goToProfile = function() {
     if (!USER) { 
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-        window.location.href = '/?page=groups';
-        return;
-    }
-    setActivePage('groups');
+    VIEWING_USER = null;
+    setActivePage('profile');
     document.getElementById('chatView').classList.remove('active');
     if (chatUnsub) {
         if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
-    if (typeof loadGroups === 'function') loadGroups();
+    if (typeof loadProfile === 'function') loadProfile();
 };
 
 // ===== САЙДБАР =====
@@ -567,6 +539,7 @@ function openPage(pageId) {
         page.classList.add('active');
         console.log('✅ Открыта страница:', pageId);
         
+        // Загружаем фото-ленту если открыта страница foto
         if (pageId === 'foto') {
             setTimeout(function() {
                 if (typeof loadFotoFeed === 'function') {
@@ -597,9 +570,11 @@ updateUI = function() {
     }, 200);
 };
 
+// Вызываем при загрузке
 setTimeout(function() {
     updateLangDisplay();
     updateNotifBadge();
 }, 500);
 
+// Обновляем бейджик каждые 5 секунд
 setInterval(updateNotifBadge, 5000);
