@@ -2,729 +2,241 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex, nofollow">
-    <title>METAIMPERIYA — Социальная платформа</title>
-    <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
-    <meta name="theme-color" content="#1877f2">
-
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAIMPERIYA</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
 
-<div class="app" id="app">
+<div id="app">
 
-    <div id="topbarContainer"></div>
-    <div id="settingsContainer"></div>
-    <div id="sidebarContainer"></div>
-    <div id="playerContainer"></div>
-    <div id="modalsContainer"></div>
-
-    <div class="container" id="mainContainer">
-
-        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
-            <div class="handle-bar"></div>
-            <div class="handle-label">🎵 ПЛЕЕР</div>
+    <!-- ===== ШАПКА ===== -->
+    <header class="topbar" id="topbar">
+        <div class="left">
+            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+            <span class="logo" onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
         </div>
-
-        <!-- ===== ГЛАВНАЯ ЛЕНТА ===== -->
-        <div class="page active" id="page-feed">
-            <div class="card">
-                <div class="post-form">
-                    <div class="editor-toolbar">
-                        <button onclick="formatText('bold')"><b>B</b></button>
-                        <button onclick="formatText('italic')"><i>I</i></button>
-                        <button onclick="formatText('underline')"><u>U</u></button>
-                        <button onclick="formatText('strike')"><s>S</s></button>
-                        <button onclick="formatText('h1')">H1</button>
-                        <button onclick="formatText('h2')">H2</button>
-                        <button onclick="formatText('quote')">"</button>
-                        <button onclick="formatText('code')">&lt;/&gt;</button>
-                        <button onclick="insertLink()">🔗</button>
-                    </div>
-                    <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
-                    <div class="post-actions" style="margin-top:6px;">
-                        <label class="file-label" for="fileInput">📎 Фото</label>
-                        <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
-                        <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
-                    </div>
-                    <input type="file" id="fileInput" accept="image/*" class="hidden">
-                    <div class="preview-box" id="previewBox">
-                        <img id="previewImg"><span id="previewName"></span>
-                        <button class="remove-pic" onclick="removeImage()">✕</button>
-                    </div>
-                </div>
-            </div>
-            <div id="feed"></div>
-        </div>
-
-        <div class="page" id="page-groups">
-            <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
-        </div>
-
-        <div class="page" id="page-people">
-            <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
-        </div>
-
-        <div class="page" id="page-profile">
-            <div class="profile-header">
-                <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
-                <div class="name" id="profileName" data-i18n="guest">Гость</div>
-                <div class="bio" id="profileBio" data-i18n="setup_profile">Настройте профиль</div>
-                <div class="profile-stats">
-                    <span>🤝 <span data-i18n="friends">Друзья</span>: <span id="friendsCount" class="stat-clickable">0</span></span>
-                    <span>👀 <span data-i18n="subscribers">Подписчики</span>: <span id="subscribersCount" class="stat-clickable">0</span></span>
-                    <span>📌 <span data-i18n="subscriptions">Подписки</span>: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
-                </div>
-                <div class="profile-actions" id="profileActions"></div>
-            </div>
-
-            <div class="link-section" id="linkSection">
-                <div class="link-input-wrap">
-                    <input type="text" id="profileLinkInput" data-i18n-placeholder="enter_link" placeholder="Вставьте ссылку для встраивания...">
-                    <button onclick="saveProfileLink()">➡️</button>
-                </div>
-                <div class="profile-iframe-wrap" id="profileIframeWrap" style="display:none;">
-                    <div class="iframe-header">
-                        <span data-i18n="embedded_page">📄 Встроенная страница</span>
-                        <button onclick="toggleIframe()" data-i18n="collapse">🔼 Свернуть</button>
-                    </div>
-                    <iframe id="profileIframe" src="" class="profile-iframe"></iframe>
-                </div>
-            </div>
-
-            <div class="friends-section" id="friendsSection" style="display:none;">
-                <h4>🤝 <span data-i18n="friends">Друзья</span> <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
-                <div class="friend-list" id="friendList"></div>
-            </div>
-
-            <div class="card" style="margin-top:8px;">
-                <div class="post-form">
-                    <div class="editor-toolbar">
-                        <button onclick="formatText('bold')"><b>B</b></button>
-                        <button onclick="formatText('italic')"><i>I</i></button>
-                        <button onclick="formatText('underline')"><u>U</u></button>
-                        <button onclick="formatText('strike')"><s>S</s></button>
-                        <button onclick="formatText('h1')">H1</button>
-                        <button onclick="formatText('h2')">H2</button>
-                        <button onclick="formatText('quote')">"</button>
-                        <button onclick="formatText('code')">&lt;/&gt;</button>
-                        <button onclick="insertLink()">🔗</button>
-                    </div>
-                    <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
-                    <div class="post-actions" style="margin-top:6px;">
-                        <label class="file-label" for="fileInputProfile">📎 <span data-i18n="photo">Фото</span></label>
-                        <button class="btn-submit" onclick="submitProfilePost()">📤 <span data-i18n="publish">Опубликовать</span></button>
-                        <button class="btn-cancel" onclick="clearProfilePostForm()"><span data-i18n="clear">Очистить</span></button>
-                    </div>
-                    <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
-                    <div class="preview-box" id="previewBoxProfile">
-                        <img id="previewImgProfile"><span id="previewNameProfile"></span>
-                        <button class="remove-pic" onclick="removeProfileImage()">✕</button>
-                    </div>
-                </div>
-            </div>
-
-            <h4 style="margin:10px 0 6px;" data-i18n="my_posts">📰 Мои посты</h4>
-            <div id="profilePosts"></div>
-        </div>
-
-        <!-- ===== ФОТО-ЛЕНТА ===== -->
-        <div class="page" id="page-foto" style="display:none;">
-            <div class="container" style="padding-top:10px;">
-                <button onclick="window.location.href='/'">← Назад</button>
-                <h1>📸 Фото</h1>
-                <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
-
-                <div class="card" style="margin-top:10px;">
-                    <div class="post-form">
-                        <div class="editor-toolbar">
-                            <button onclick="formatText('bold')"><b>B</b></button>
-                            <button onclick="formatText('italic')"><i>I</i></button>
-                            <button onclick="formatText('underline')"><u>U</u></button>
-                            <button onclick="formatText('strike')"><s>S</s></button>
-                            <button onclick="formatText('h1')">H1</button>
-                            <button onclick="formatText('h2')">H2</button>
-                            <button onclick="formatText('quote')">"</button>
-                            <button onclick="formatText('code')">&lt;/&gt;</button>
-                            <button onclick="insertLink()">🔗</button>
-                        </div>
-                        <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что нового в мире фото?"></div>
-                        <div class="post-actions" style="margin-top:6px;">
-                            <label class="file-label" for="fileInputFoto">📎 Фото</label>
-                            <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
-                            <button class="btn-cancel" onclick="clearFotoPostForm()">Очистить</button>
-                        </div>
-                        <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
-                        <div class="preview-box" id="previewBoxFoto">
-                            <img id="previewImgFoto"><span id="previewNameFoto"></span>
-                            <button class="remove-pic" onclick="removeFotoImage()">✕</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="fotoFeed"></div>
+        <div class="right">
+            <div class="avatar-wrap" id="topAvatar"><span class="letter" id="topAvatarLetter">?</span></div>
+            <span class="username" id="topName">Гость</span>
+            <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
+            <div id="settingsMenu" class="settings-dropdown">
+                <div class="settings-item" onclick="logout()">🚪 Выйти</div>
             </div>
         </div>
+    </header>
 
-        <!-- ===== СТРАНИЦА ПОЛЬЗОВАТЕЛЯ ===== -->
-        <div class="page" id="page-page" style="display:none;">
-            <div style="padding:6px 0;">
-                <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
-            </div>
-            <div id="pageContainer"></div>
-        </div>
-
-        <div class="chat-view" id="chatView">
-            <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
-            <div class="chat-messages" id="chatMessages"></div>
-            <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" data-i18n-placeholder="message" placeholder="Сообщение...">
-                <button onclick="sendChatMessage()">→</button>
-            </div>
-        </div>
-
-        <div class="page" id="postPage">
-            <div style="padding:6px 0;">
-                <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
-            </div>
-            <div id="postPageContainer"></div>
-        </div>
-
+    <!-- ===== ПЛЕЕР ===== -->
+    <div class="player-handle" onclick="togglePlayer()">
+        <div class="handle-bar"></div>
+        <div class="handle-label">🎵 ПЛЕЕР</div>
     </div>
 
-    <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
+    <div class="player-drawer" id="playerDrawer">
+        <div class="player-content">
+            <div class="player-track-info">
+                <div class="player-track-name" id="trackName">Нет трека</div>
+                <div class="player-artist" id="trackArtist">PLAYER Likee</div>
+            </div>
+            <div class="player-controls">
+                <button class="player-btn" onclick="prevTrack()">⏮</button>
+                <button class="player-btn play-large" onclick="togglePlay()" id="playBtn">▶</button>
+                <button class="player-btn" onclick="nextTrack()">⏭</button>
+            </div>
+            <div class="player-progress">
+                <div class="player-progress-bar" onclick="seekTrack(event)">
+                    <div class="player-progress-fill" id="progressFill" style="width:0%"></div>
+                </div>
+                <div class="player-time">
+                    <span id="currentTime">00:00</span>
+                    <span id="totalTime">00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
-        <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
-        <canvas id="visualizerCanvas"></canvas>
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+    <div class="container">
+        <div class="page active" id="page-feed">
+            <div id="feed"></div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА ВХОДА ===== -->
+    <div class="modal" id="loginModal">
+        <div class="modal-box">
+            <h3>Вход</h3>
+            <input type="text" id="nameInput" placeholder="Ваше имя">
+            <div class="modal-actions">
+                <button class="btn-save" onclick="loginWithName()">Войти</button>
+            </div>
+        </div>
     </div>
 
 </div>
 
-<script src="js/firebase.js"></script>
-<script src="js/lang.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/player.js"></script>
-<script src="js/app.js"></script>
-<script src="js/feed.js"></script>
-<script src="js/profile.js"></script>
-<script src="js/friends.js"></script>
-<script src="js/groups.js"></script>
-<script src="js/chat.js"></script>
-<script src="js/notifications.js"></script>
-<script src="js/admin.js"></script>
-<script src="js/page.js"></script>
+<!-- ===== СКРИПТЫ ===== -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
 <script>
 // ================================================================
-// 100% РАБОЧЕЕ ОБНОВЛЕНИЕ ШАПКИ - ГЛАВНЫЙ ФИКС
+// FIREBASE
 // ================================================================
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+const SITE = 'default';
 
-(function() {
-    console.log('🔥 ГЛАВНЫЙ ФИКС ШАПКИ ЗАПУЩЕН');
-    
-    function updateTopbarForce(name) {
-        if (!name) {
-            name = localStorage.getItem('dc_u_default') || 
-                   localStorage.getItem('dc_u_') || 
-                   window.USER || 
-                   'Гость';
-        }
-        
-        console.log('👤 Устанавливаем имя:', name);
-        
-        // Обновляем шапку
-        var topName = document.getElementById('topName');
-        if (topName) {
-            topName.textContent = name;
-        }
-        
-        var topAvatar = document.getElementById('topAvatar');
-        if (topAvatar) {
-            var letter = name.charAt(0).toUpperCase();
-            topAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
-        }
-        
-        // Обновляем сайдбар
-        var sName = document.getElementById('sName');
-        if (sName) {
-            sName.textContent = name;
-        }
-        
-        var sAvatar = document.getElementById('sAvatar');
-        if (sAvatar) {
-            var letter2 = name.charAt(0).toUpperCase();
-            sAvatar.innerHTML = '<span class="letter">' + letter2 + '</span>';
-        }
-        
-        // Сохраняем в глобальные переменные
-        window.USER = name;
-        
-        console.log('✅ Шапка обновлена на:', name);
-    }
-    
-    // Запускаем сразу
-    updateTopbarForce();
-    
-    // Запускаем с задержками
-    setTimeout(function() { updateTopbarForce(); }, 200);
-    setTimeout(function() { updateTopbarForce(); }, 500);
-    setTimeout(function() { updateTopbarForce(); }, 1000);
-    setTimeout(function() { updateTopbarForce(); }, 2000);
-    
-    // Проверяем каждые 2 секунды
-    setInterval(function() {
-        var topName = document.getElementById('topName');
-        var name = localStorage.getItem('dc_u_default') || 
-                   localStorage.getItem('dc_u_') || 
-                   window.USER || 
-                   null;
-        
-        if (topName && name && topName.textContent === 'Гость') {
-            console.log('🔄 Меняем Гость на', name);
-            updateTopbarForce(name);
-        }
-        
-        if (topName && name && topName.textContent !== 'Гость' && topName.textContent !== name) {
-            console.log('🔄 Обновляем имя на', name);
-            updateTopbarForce(name);
-        }
-    }, 2000);
-    
-    // Следим за изменениями DOM
-    var observer = new MutationObserver(function() {
-        var topName = document.getElementById('topName');
-        var name = localStorage.getItem('dc_u_default') || 
-                   localStorage.getItem('dc_u_') || 
-                   window.USER || 
-                   null;
-        
-        if (topName && name && topName.textContent === 'Гость') {
-            console.log('🔄 Observer: меняем Гость на', name);
-            updateTopbarForce(name);
-        }
-    });
-    
-    try {
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        console.log('✅ Observer запущен');
-    } catch(e) {}
-    
-    // Глобальная функция для ручного вызова
-    window.updateMyTopbar = function(name) {
-        if (!name) {
-            name = prompt('Введите ваш никнейм:');
-        }
-        if (name) {
-            localStorage.setItem('dc_u_default', name);
-            localStorage.setItem('dc_u_', name);
-            updateTopbarForce(name);
-        }
-    };
-    
-    console.log('✅ ГЛАВНЫЙ ФИКС ЗАВЕРШЁН!');
-})();
+// ================================================================
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ================================================================
+let USER = null;
+let USER_UID = null;
+let currentTrack = 0;
+let isPlaying = false;
+let audio = new Audio();
 
-// Фото-лента
-var fotoFeedListener = null;
-var pendingFotoImage = null;
-var pendingFotoImageFile = null;
-
-function getFotoEditorText() {
-    var editor = document.getElementById('postEditorFoto');
-    if (!editor) return '';
-    return editor.innerHTML;
+// ================================================================
+// ШАПКА - ОБНОВЛЕНИЕ ИМЕНИ
+// ================================================================
+function updateTopbar() {
+    let name = localStorage.getItem('dc_u_') || localStorage.getItem('dc_u_default') || USER || 'Гость';
+    document.getElementById('topName').textContent = name;
+    document.getElementById('topAvatarLetter').textContent = name === 'Гость' ? '?' : name.charAt(0).toUpperCase();
 }
 
-function clearFotoPostForm() {
-    var editor = document.getElementById('postEditorFoto');
-    if (editor) editor.innerHTML = '';
-    pendingFotoImage = null;
-    pendingFotoImageFile = null;
-    var preview = document.getElementById('previewBoxFoto');
-    if (preview) preview.classList.remove('visible');
-    var input = document.getElementById('fileInputFoto');
-    if (input) input.value = '';
-}
-
-function removeFotoImage() {
-    pendingFotoImage = null;
-    pendingFotoImageFile = null;
-    var preview = document.getElementById('previewBoxFoto');
-    if (preview) preview.classList.remove('visible');
-    var input = document.getElementById('fileInputFoto');
-    if (input) input.value = '';
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var fileInput = document.getElementById('fileInputFoto');
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            var file = e.target.files[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) {
-                alert('Только изображения!');
-                this.value = '';
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Максимум 5 МБ');
-                this.value = '';
-                return;
-            }
-
-            pendingFotoImageFile = file;
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                pendingFotoImage = ev.target.result;
-                var img = document.getElementById('previewImgFoto');
-                var name = document.getElementById('previewNameFoto');
-                var box = document.getElementById('previewBoxFoto');
-                if (img) img.src = pendingFotoImage;
-                if (name) name.textContent = file.name.slice(0, 16);
-                if (box) box.classList.add('visible');
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-});
-
-function loadFotoFeed() {
-    var el = document.getElementById('fotoFeed');
-    if (!el) return;
-
-    if (!USER || !USER_UID) {
-        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
-        return;
-    }
-
-    if (fotoFeedListener) {
-        db.ref('sites/' + SITE + '/foto_posts').off('value', fotoFeedListener);
-        fotoFeedListener = null;
-    }
-
-    fotoFeedListener = function(snap) {
-        var data = snap.val() || {};
-        var keys = Object.keys(data).sort(function(a, b) {
-            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
-        });
-
-        if (!keys.length) {
-            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока нет фото-постов. Будьте первым!</div>';
-            return;
-        }
-
-        el.innerHTML = '';
-
-        keys.forEach(function(k) {
-            var p = data[k];
-            p.id = k;
-            var postEl = renderPost(p, 'foto');
-            if (postEl) {
-                el.appendChild(postEl);
-            }
-        });
-    };
-
-    db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
-}
-
-window.submitFotoPost = function() {
-    if (!USER || !USER_UID) {
-        alert('Войдите, чтобы опубликовать пост!');
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
-
-    var text = getFotoEditorText().trim();
-    if (!text && !pendingFotoImageFile) {
-        alert('Введите текст или добавьте фото');
-        return;
-    }
-
-    var hashtags = extractHashtags(text);
+// ================================================================
+// ВХОД
+// ================================================================
+window.loginWithName = function() {
+    let input = document.getElementById('nameInput');
+    if (!input) return;
+    let name = input.value.trim();
+    if (!name) { alert('Введите имя'); return; }
     
-    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
-        var avatarUrl = avatarSnap.val() || null;
-        
-        var postData = {
-            author: USER,
-            authorUid: USER_UID,
-            authorAvatar: avatarUrl,
-            text: text || '📷',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: Date.now(),
-            likes: 0,
-            commentCount: 0,
-            reposts: 0,
-            hashtags: hashtags,
-            marquee: null,
-            link: null,
-            buttons: [],
-            frameSize: 'small',
-            edited: false,
-            img: null,
-            repost: null,
-            deleted: null,
-            deletedAt: null
-        };
-
-        var savePost = function(imgData) {
-            if (imgData) postData.img = imgData;
-            
-            db.ref('sites/' + SITE + '/foto_posts').push(postData);
-            clearFotoPostForm();
-            
-            setTimeout(function() {
-                loadFotoFeed();
-            }, 100);
-        };
-
-        if (pendingFotoImageFile) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                savePost(e.target.result);
-            };
-            reader.readAsDataURL(pendingFotoImageFile);
-        } else {
-            savePost(null);
-        }
-    });
+    USER = name;
+    USER_UID = 'user_' + Date.now();
+    localStorage.setItem('dc_u_', name);
+    localStorage.setItem('dc_u_default', name);
+    localStorage.setItem('dc_uid_', USER_UID);
+    
+    document.getElementById('loginModal').classList.remove('open');
+    updateTopbar();
+    if (typeof loadFeed === 'function') loadFeed();
 };
 
 // ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ
+// ВЫХОД
 // ================================================================
-
-(function() {
-    const components = [
-        { id: 'topbarContainer', url: 'topbar.html' },
-        { id: 'settingsContainer', url: 'settings.html' },
-        { id: 'sidebarContainer', url: 'sidebar.html' },
-        { id: 'modalsContainer', url: 'modals.html' },
-        { id: 'playerContainer', url: 'player.html' }
-    ];
-
-    let loaded = 0;
-    const total = components.length;
-
-    components.forEach(function(comp) {
-        const container = document.getElementById(comp.id);
-        if (!container) return;
-
-        fetch(comp.url)
-            .then(response => {
-                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
-                return response.text();
-            })
-            .then(html => {
-                container.innerHTML = html;
-                loaded++;
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены!');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        var urlParams = new URLSearchParams(window.location.search);
-                        var page = urlParams.get('page');
-                        if (page) {
-                            openPage(page);
-                        }
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                        if (typeof initAudio === 'function') initAudio();
-                        
-                        // Обновляем шапку после загрузки
-                        setTimeout(function() {
-                            var name = localStorage.getItem('dc_u_default') || 
-                                       localStorage.getItem('dc_u_') || 
-                                       window.USER || 
-                                       'Гость';
-                            var topName = document.getElementById('topName');
-                            if (topName) topName.textContent = name;
-                            var topAvatar = document.getElementById('topAvatar');
-                            if (topAvatar) {
-                                topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
-                            }
-                        }, 200);
-                        
-                        var path = window.location.pathname;
-                        if (path.includes('/pages/')) {
-                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
-                            if (slug && typeof loadPage === 'function') {
-                                setTimeout(function() {
-                                    loadPage(slug);
-                                }, 300);
-                            }
-                        }
-                    }, 500);
-                }
-            })
-            .catch(err => {
-                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
-                container.innerHTML = `<div style="display:none;"></div>`;
-                loaded++;
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены (с ошибками)');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        var urlParams = new URLSearchParams(window.location.search);
-                        var page = urlParams.get('page');
-                        if (page) {
-                            openPage(page);
-                        }
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                        if (typeof initAudio === 'function') initAudio();
-                        
-                        setTimeout(function() {
-                            var name = localStorage.getItem('dc_u_default') || 
-                                       localStorage.getItem('dc_u_') || 
-                                       window.USER || 
-                                       'Гость';
-                            var topName = document.getElementById('topName');
-                            if (topName) topName.textContent = name;
-                            var topAvatar = document.getElementById('topAvatar');
-                            if (topAvatar) {
-                                topAvatar.innerHTML = '<span class="letter">' + name.charAt(0).toUpperCase() + '</span>';
-                            }
-                        }, 200);
-                        
-                        var path = window.location.pathname;
-                        if (path.includes('/pages/')) {
-                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
-                            if (slug && typeof loadPage === 'function') {
-                                setTimeout(function() {
-                                    loadPage(slug);
-                                }, 300);
-                            }
-                        }
-                    }, 500);
-                }
-            });
-    });
-})();
+window.logout = function() {
+    if (!confirm('Выйти?')) return;
+    localStorage.removeItem('dc_u_');
+    localStorage.removeItem('dc_u_default');
+    localStorage.removeItem('dc_uid_');
+    USER = null;
+    USER_UID = null;
+    document.getElementById('topName').textContent = 'Гость';
+    document.getElementById('topAvatarLetter').textContent = '?';
+    document.getElementById('loginModal').classList.add('open');
+};
 
 // ================================================================
-// АВТО-СКРЫТИЕ ШАПКИ
+// ПЛЕЕР
 // ================================================================
+const tracks = [
+    { name: 'Track 1', artist: 'PLAYER Likee', url: '/music/track1.mp3' },
+    { name: 'Track 2', artist: 'PLAYER Likee', url: '/music/track2.mp3' },
+    { name: 'Track 3', artist: 'PLAYER Likee', url: '/music/track3.mp3' }
+];
 
-(function() {
-    var lastScrollY = 0;
-    var topbar = document.getElementById('topbar');
-    var playerHandle = document.getElementById('playerHandle');
-    var playerDrawer = document.getElementById('playerDrawer');
-    var isPlayerOpen = false;
-    var ticking = false;
+window.togglePlayer = function() {
+    document.getElementById('playerDrawer').classList.toggle('open');
+};
 
-    function waitForTopbar() {
-        topbar = document.getElementById('topbar');
-        if (!topbar) {
-            setTimeout(waitForTopbar, 200);
-            return;
+window.togglePlay = function() {
+    if (isPlaying) {
+        audio.pause();
+        document.getElementById('playBtn').textContent = '▶';
+    } else {
+        if (!audio.src) {
+            loadTrack(currentTrack);
         }
-        console.log('✅ Топбар найден, авто-скрытие работает');
+        audio.play();
+        document.getElementById('playBtn').textContent = '⏸';
     }
-    waitForTopbar();
+    isPlaying = !isPlaying;
+};
 
-    function checkPlayerState() {
-        if (playerDrawer) {
-            isPlayerOpen = playerDrawer.classList.contains('open');
-        }
+function loadTrack(index) {
+    let track = tracks[index];
+    if (!track) return;
+    audio.src = track.url;
+    document.getElementById('trackName').textContent = track.name;
+    document.getElementById('trackArtist').textContent = track.artist;
+    audio.load();
+    audio.play();
+    isPlaying = true;
+    document.getElementById('playBtn').textContent = '⏸';
+}
+
+window.nextTrack = function() {
+    currentTrack = (currentTrack + 1) % tracks.length;
+    loadTrack(currentTrack);
+};
+
+window.prevTrack = function() {
+    currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+    loadTrack(currentTrack);
+};
+
+window.seekTrack = function(e) {
+    let bar = e.currentTarget;
+    let rect = bar.getBoundingClientRect();
+    let x = (e.clientX - rect.left) / rect.width;
+    audio.currentTime = x * audio.duration;
+};
+
+audio.addEventListener('timeupdate', function() {
+    let progress = (audio.currentTime / audio.duration) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+    document.getElementById('totalTime').textContent = formatTime(audio.duration);
+});
+
+function formatTime(seconds) {
+    if (!seconds) return '00:00';
+    let m = Math.floor(seconds / 60);
+    let s = Math.floor(seconds % 60);
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+// ================================================================
+// ЗАГРУЗКА
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    let saved = localStorage.getItem('dc_u_') || localStorage.getItem('dc_u_default');
+    if (saved) {
+        USER = saved;
+        USER_UID = localStorage.getItem('dc_uid_') || null;
+        updateTopbar();
+    } else {
+        document.getElementById('loginModal').classList.add('open');
     }
-
-    function updateHeader() {
-        var currentScrollY = window.scrollY;
-        checkPlayerState();
-
-        if (isPlayerOpen) {
-            showAll();
-            lastScrollY = currentScrollY;
-            return;
-        }
-
-        if (currentScrollY < lastScrollY || currentScrollY < 30) {
-            showAll();
-        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
-            hideAll();
-        }
-
-        lastScrollY = currentScrollY;
-    }
-
-    function showAll() {
-        if (topbar) {
-            topbar.style.transform = 'translateY(0)';
-            topbar.style.opacity = '1';
-        }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(0)';
-            playerHandle.style.opacity = '1';
-        }
-    }
-
-    function hideAll() {
-        if (topbar) {
-            topbar.style.transform = 'translateY(-100%)';
-            topbar.style.opacity = '0';
-            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(-100%)';
-            playerHandle.style.opacity = '0';
-            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }
-    }
-
-    window.addEventListener('scroll', function() {
-        if (!ticking) {
-            window.requestAnimationFrame(function() {
-                updateHeader();
-                ticking = false;
-            });
-            ticking = true;
-        }
-    }, { passive: true });
-
-    if (playerDrawer) {
-        var observer = new MutationObserver(function() {
-            checkPlayerState();
-            if (isPlayerOpen) {
-                showAll();
-            }
-        });
-        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
-    }
-
-    if (playerHandle) {
-        playerHandle.addEventListener('click', function() {
-            setTimeout(function() {
-                checkPlayerState();
-                if (isPlayerOpen) {
-                    showAll();
-                }
-            }, 150);
-        });
-    }
-
-    console.log('✅ Авто-скрытие шапки включено!');
-})();
-
-console.log('✅ index.html полностью загружен');
+    
+    // Обновляем шапку каждые 2 секунды
+    setInterval(updateTopbar, 2000);
+});
 </script>
 
 </body>
