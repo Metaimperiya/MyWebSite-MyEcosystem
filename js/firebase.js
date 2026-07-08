@@ -24,7 +24,6 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
 
-// Админы (можно добавлять UID)
 const ADMIN_UIDS = [
     "ayXehcol9FgAQU6tZuup7aSaRoV2",
     "pWB0nGVvVXc4je6466ss7IwBm9G2",
@@ -48,6 +47,8 @@ let currentFrameSize = 'small';
 let EDITING_ID = null;
 let pendingImage = null;
 let pendingImageFile = null;
+let currentLang = 'ru';
+let translations = {};
 
 // ================================================================
 // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
