@@ -2,11 +2,10 @@
 // АВТОРИЗАЦИЯ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
-// ===== GOOGLE-КНОПКА — ИСПРАВЛЕННАЯ =====
+// ===== GOOGLE-КНОПКА — С ПРОВЕРКОЙ API КЛЮЧА =====
 function initGoogleButton() {
     var btn = document.getElementById('googleBtn');
     if (btn) {
-        // Удаляем старые обработчики, чтобы не было дублей
         var newBtn = btn.cloneNode(true);
         btn.parentNode.replaceChild(newBtn, btn);
         
@@ -14,13 +13,18 @@ function initGoogleButton() {
             e.preventDefault();
             console.log('🔵 Google-вход нажат');
             
+            // Проверяем API ключ
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'AIzaSyB3vzLp7Hj5KRLOU3LWdh2zPajRWsFDMfI') {
+                alert('❌ Ошибка: API ключ Firebase недействителен. Проверьте firebase.js');
+                console.error('❌ Невалидный API ключ!');
+                return;
+            }
+            
             auth.signInWithPopup(provider)
                 .then(function(result) {
                     console.log('✅ Google-вход успешен:', result.user.displayName);
-                    // Закрываем модалку после успешного входа
                     var loginModal = document.getElementById('loginModal');
                     if (loginModal) loginModal.classList.remove('open');
-                    // Обновляем UI
                     setTimeout(function() {
                         if (typeof updateUI === 'function') updateUI();
                         if (typeof loadFeed === 'function') loadFeed();
@@ -34,12 +38,14 @@ function initGoogleButton() {
                         auth.signInWithRedirect(provider);
                     } else if (err.code === 'auth/cancelled-popup-request') {
                         console.log('Попап был закрыт, пробуем снова');
-                        // Повторно открываем попап через 500ms
                         setTimeout(function() {
                             auth.signInWithPopup(provider).catch(function(e) {
                                 console.error('Повторная ошибка:', e);
                             });
                         }, 500);
+                    } else if (err.code === 'auth/api-key-not-valid') {
+                        alert('❌ Ошибка: API ключ Firebase недействителен. Пожалуйста, проверьте настройки Firebase.');
+                        console.error('❌ Невалидный API ключ!');
                     } else {
                         alert('Ошибка входа: ' + err.message);
                     }
