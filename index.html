@@ -1,191 +1,593 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>METAIMPERIYA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>METAIMPERIYA — Социальная платформа</title>
+    <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
+    <meta name="theme-color" content="#1877f2">
+
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: Arial; background:#f0f2f5; }
-        .topbar {
-            background:#fff;
-            padding:10px 16px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            border-bottom:1px solid #ddd;
-            position:sticky;
-            top:0;
-            z-index:999;
-        }
-        .logo { font-weight:bold; font-size:18px; color:#1877f2; cursor:pointer; }
-        .right { display:flex; align-items:center; gap:10px; }
-        .avatar {
-            width:32px; height:32px; border-radius:50%;
-            background:#1877f2; color:#fff;
-            display:flex; align-items:center; justify-content:center;
-            font-weight:bold; font-size:16px;
-        }
-        .username { font-weight:600; font-size:14px; }
-        .modal {
-            display:none; position:fixed; top:0; left:0; right:0; bottom:0;
-            background:rgba(0,0,0,0.5); z-index:9999;
-            justify-content:center; align-items:center;
-        }
-        .modal.open { display:flex; }
-        .modal-box {
-            background:#fff; padding:30px; border-radius:12px;
-            width:300px; text-align:center;
-        }
-        .modal-box input {
-            width:100%; padding:10px; margin:10px 0;
-            border:1px solid #ddd; border-radius:6px;
-            font-size:16px;
-        }
-        .modal-box button {
-            width:100%; padding:10px; background:#1877f2;
-            color:#fff; border:none; border-radius:6px;
-            font-size:16px; cursor:pointer;
-        }
-        .menu-dots { background:none; border:none; font-size:20px; cursor:pointer; }
-    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
 
-<div class="topbar" id="topbar">
-    <div>
-        <span class="logo">METAIMPERIYA 🏴‍☠️</span>
+<div class="app" id="app">
+
+    <div id="topbarContainer"></div>
+    <div id="settingsContainer"></div>
+    <div id="sidebarContainer"></div>
+    <div id="playerContainer"></div>
+    <div id="modalsContainer"></div>
+
+    <div class="container" id="mainContainer">
+
+        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
+            <div class="handle-bar"></div>
+            <div class="handle-label">🎵 ПЛЕЕР</div>
+        </div>
+
+        <!-- ===== ГЛАВНАЯ ЛЕНТА ===== -->
+        <div class="page active" id="page-feed">
+            <div class="card">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInput">📎 Фото</label>
+                        <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                        <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBox">
+                        <img id="previewImg"><span id="previewName"></span>
+                        <button class="remove-pic" onclick="removeImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+            <div id="feed"></div>
+        </div>
+
+        <div class="page" id="page-groups">
+            <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
+        </div>
+
+        <div class="page" id="page-people">
+            <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
+        </div>
+
+        <div class="page" id="page-profile">
+            <div class="profile-header">
+                <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
+                <div class="name" id="profileName" data-i18n="guest">Гость</div>
+                <div class="bio" id="profileBio" data-i18n="setup_profile">Настройте профиль</div>
+                <div class="profile-stats">
+                    <span>🤝 <span data-i18n="friends">Друзья</span>: <span id="friendsCount" class="stat-clickable">0</span></span>
+                    <span>👀 <span data-i18n="subscribers">Подписчики</span>: <span id="subscribersCount" class="stat-clickable">0</span></span>
+                    <span>📌 <span data-i18n="subscriptions">Подписки</span>: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
+                </div>
+                <div class="profile-actions" id="profileActions"></div>
+            </div>
+
+            <div class="link-section" id="linkSection">
+                <div class="link-input-wrap">
+                    <input type="text" id="profileLinkInput" data-i18n-placeholder="enter_link" placeholder="Вставьте ссылку для встраивания...">
+                    <button onclick="saveProfileLink()">➡️</button>
+                </div>
+                <div class="profile-iframe-wrap" id="profileIframeWrap" style="display:none;">
+                    <div class="iframe-header">
+                        <span data-i18n="embedded_page">📄 Встроенная страница</span>
+                        <button onclick="toggleIframe()" data-i18n="collapse">🔼 Свернуть</button>
+                    </div>
+                    <iframe id="profileIframe" src="" class="profile-iframe"></iframe>
+                </div>
+            </div>
+
+            <div class="friends-section" id="friendsSection" style="display:none;">
+                <h4>🤝 <span data-i18n="friends">Друзья</span> <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
+                <div class="friend-list" id="friendList"></div>
+            </div>
+
+            <div class="card" style="margin-top:8px;">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInputProfile">📎 <span data-i18n="photo">Фото</span></label>
+                        <button class="btn-submit" onclick="submitProfilePost()">📤 <span data-i18n="publish">Опубликовать</span></button>
+                        <button class="btn-cancel" onclick="clearProfilePostForm()"><span data-i18n="clear">Очистить</span></button>
+                    </div>
+                    <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBoxProfile">
+                        <img id="previewImgProfile"><span id="previewNameProfile"></span>
+                        <button class="remove-pic" onclick="removeProfileImage()">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin:10px 0 6px;" data-i18n="my_posts">📰 Мои посты</h4>
+            <div id="profilePosts"></div>
+        </div>
+
+        <!-- ===== ФОТО-ЛЕНТА ===== -->
+        <div class="page" id="page-foto" style="display:none;">
+            <div class="container" style="padding-top:10px;">
+                <button onclick="window.location.href='/'">← Назад</button>
+                <h1>📸 Фото</h1>
+                <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
+
+                <div class="card" style="margin-top:10px;">
+                    <div class="post-form">
+                        <div class="editor-toolbar">
+                            <button onclick="formatText('bold')"><b>B</b></button>
+                            <button onclick="formatText('italic')"><i>I</i></button>
+                            <button onclick="formatText('underline')"><u>U</u></button>
+                            <button onclick="formatText('strike')"><s>S</s></button>
+                            <button onclick="formatText('h1')">H1</button>
+                            <button onclick="formatText('h2')">H2</button>
+                            <button onclick="formatText('quote')">"</button>
+                            <button onclick="formatText('code')">&lt;/&gt;</button>
+                            <button onclick="insertLink()">🔗</button>
+                        </div>
+                        <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что нового в мире фото?"></div>
+                        <div class="post-actions" style="margin-top:6px;">
+                            <label class="file-label" for="fileInputFoto">📎 Фото</label>
+                            <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
+                            <button class="btn-cancel" onclick="clearFotoPostForm()">Очистить</button>
+                        </div>
+                        <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
+                        <div class="preview-box" id="previewBoxFoto">
+                            <img id="previewImgFoto"><span id="previewNameFoto"></span>
+                            <button class="remove-pic" onclick="removeFotoImage()">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fotoFeed"></div>
+            </div>
+        </div>
+
+        <!-- ===== СТРАНИЦА ПОЛЬЗОВАТЕЛЯ ===== -->
+        <div class="page" id="page-page" style="display:none;">
+            <div style="padding:6px 0;">
+                <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
+            </div>
+            <div id="pageContainer"></div>
+        </div>
+
+        <div class="chat-view" id="chatView">
+            <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" data-i18n-placeholder="message" placeholder="Сообщение...">
+                <button onclick="sendChatMessage()">→</button>
+            </div>
+        </div>
+
+        <div class="page" id="postPage">
+            <div style="padding:6px 0;">
+                <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
+            </div>
+            <div id="postPageContainer"></div>
+        </div>
+
     </div>
-    <div class="right">
-        <div class="avatar" id="avatar">?</div>
-        <span class="username" id="username">Гость</span>
-        <button class="menu-dots" onclick="logout()">⋮</button>
+
+    <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
+
+    <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
+        <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
+        <canvas id="visualizerCanvas"></canvas>
     </div>
+
 </div>
 
-<div class="modal open" id="loginModal">
-    <div class="modal-box">
-        <h2>Вход</h2>
-        <input type="text" id="nameInput" placeholder="Введите имя">
-        <button onclick="login()">Войти</button>
-    </div>
-</div>
+<script src="js/firebase.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/player.js"></script>
+<script src="js/app.js"></script>
+<script src="js/feed.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/friends.js"></script>
+<script src="js/groups.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/page.js"></script>
 
 <script>
 // ================================================================
-// FIREBASE КОНФИГ
+// ФОТО-ЛЕНТА — ИСПОЛЬЗУЕТ ОБЩИЙ renderPost() ИЗ feed.js
 // ================================================================
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const auth = firebase.auth();
-const SITE = 'default';
 
-// ================================================================
-// ОБНОВЛЕНИЕ ШАПКИ
-// ================================================================
-function updateTopbar(name) {
-    if (name) {
-        document.getElementById('username').textContent = name;
-        document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
-        localStorage.setItem('dc_u_', name);
-    } else {
-        var saved = localStorage.getItem('dc_u_');
-        if (saved) {
-            document.getElementById('username').textContent = saved;
-            document.getElementById('avatar').textContent = saved.charAt(0).toUpperCase();
-        } else {
-            document.getElementById('username').textContent = 'Гость';
-            document.getElementById('avatar').textContent = '?';
-        }
+var fotoFeedListener = null;
+var pendingFotoImage = null;
+var pendingFotoImageFile = null;
+
+function getFotoEditorText() {
+    var editor = document.getElementById('postEditorFoto');
+    if (!editor) return '';
+    return editor.innerHTML;
+}
+
+function clearFotoPostForm() {
+    var editor = document.getElementById('postEditorFoto');
+    if (editor) editor.innerHTML = '';
+    pendingFotoImage = null;
+    pendingFotoImageFile = null;
+    var preview = document.getElementById('previewBoxFoto');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputFoto');
+    if (input) input.value = '';
+}
+
+function removeFotoImage() {
+    pendingFotoImage = null;
+    pendingFotoImageFile = null;
+    var preview = document.getElementById('previewBoxFoto');
+    if (preview) preview.classList.remove('visible');
+    var input = document.getElementById('fileInputFoto');
+    if (input) input.value = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var fileInput = document.getElementById('fileInputFoto');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Только изображения!');
+                this.value = '';
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Максимум 5 МБ');
+                this.value = '';
+                return;
+            }
+
+            pendingFotoImageFile = file;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                pendingFotoImage = ev.target.result;
+                var img = document.getElementById('previewImgFoto');
+                var name = document.getElementById('previewNameFoto');
+                var box = document.getElementById('previewBoxFoto');
+                if (img) img.src = pendingFotoImage;
+                if (name) name.textContent = file.name.slice(0, 16);
+                if (box) box.classList.add('visible');
+            };
+            reader.readAsDataURL(file);
+        });
     }
+});
+
+function loadFotoFeed() {
+    var el = document.getElementById('fotoFeed');
+    if (!el) return;
+
+    if (!USER || !USER_UID) {
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
+        return;
+    }
+
+    if (fotoFeedListener) {
+        db.ref('sites/' + SITE + '/foto_posts').off('value', fotoFeedListener);
+        fotoFeedListener = null;
+    }
+
+    fotoFeedListener = function(snap) {
+        var data = snap.val() || {};
+        var keys = Object.keys(data).sort(function(a, b) {
+            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
+        });
+
+        if (!keys.length) {
+            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока нет фото-постов. Будьте первым!</div>';
+            return;
+        }
+
+        el.innerHTML = '';
+
+        keys.forEach(function(k) {
+            var p = data[k];
+            p.id = k;
+            var postEl = renderPost(p, 'foto');
+            if (postEl) {
+                el.appendChild(postEl);
+            }
+        });
+    };
+
+    db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
 }
 
-// ================================================================
-// ВХОД
-// ================================================================
-function login() {
-    var input = document.getElementById('nameInput');
-    var name = input.value.trim();
-    if (!name) { alert('Введите имя'); return; }
+window.submitFotoPost = function() {
+    if (!USER || !USER_UID) {
+        alert('Войдите, чтобы опубликовать пост!');
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return;
+    }
+
+    var text = getFotoEditorText().trim();
+    if (!text && !pendingFotoImageFile) {
+        alert('Введите текст или добавьте фото');
+        return;
+    }
+
+    var hashtags = extractHashtags(text);
     
-    var uid = 'user_' + Date.now();
-    
-    // Сохраняем в Firebase
-    db.ref('sites/' + SITE + '/users/' + uid).set({
-        name: name,
-        uid: uid,
-        lastLogin: Date.now()
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
+        var avatarUrl = avatarSnap.val() || null;
+        
+        var postData = {
+            author: USER,
+            authorUid: USER_UID,
+            authorAvatar: avatarUrl,
+            text: text || '📷',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            timestamp: Date.now(),
+            likes: 0,
+            commentCount: 0,
+            reposts: 0,
+            hashtags: hashtags,
+            marquee: null,
+            link: null,
+            buttons: [],
+            frameSize: 'small',
+            edited: false,
+            img: null,
+            repost: null,
+            deleted: null,
+            deletedAt: null
+        };
+
+        var savePost = function(imgData) {
+            if (imgData) postData.img = imgData;
+            
+            db.ref('sites/' + SITE + '/foto_posts').push(postData);
+            clearFotoPostForm();
+            
+            setTimeout(function() {
+                loadFotoFeed();
+            }, 100);
+        };
+
+        if (pendingFotoImageFile) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                savePost(e.target.result);
+            };
+            reader.readAsDataURL(pendingFotoImageFile);
+        } else {
+            savePost(null);
+        }
     });
-    
-    // Сохраняем локально
-    localStorage.setItem('dc_u_', name);
-    localStorage.setItem('dc_uid_', uid);
-    
-    document.getElementById('loginModal').classList.remove('open');
-    updateTopbar(name);
-}
+};
 
 // ================================================================
-// ВЫХОД
+// ЗАГРУЗКА КОМПОНЕНТОВ
 // ================================================================
-function logout() {
-    if (!confirm('Выйти?')) return;
-    localStorage.removeItem('dc_u_');
-    localStorage.removeItem('dc_uid_');
-    document.getElementById('username').textContent = 'Гость';
-    document.getElementById('avatar').textContent = '?';
-    document.getElementById('loginModal').classList.add('open');
-}
 
-// ================================================================
-// ВОССТАНОВЛЕНИЕ ИЗ FIREBASE
-// ================================================================
-function restoreFromFirebase() {
-    var savedUid = localStorage.getItem('dc_uid_');
-    if (savedUid) {
-        db.ref('sites/' + SITE + '/users/' + savedUid + '/name').once('value')
-            .then(function(snap) {
-                var name = snap.val();
-                if (name) {
-                    localStorage.setItem('dc_u_', name);
-                    updateTopbar(name);
-                    document.getElementById('loginModal').classList.remove('open');
+(function() {
+    const components = [
+        { id: 'topbarContainer', url: 'topbar.html' },
+        { id: 'settingsContainer', url: 'settings.html' },
+        { id: 'sidebarContainer', url: 'sidebar.html' },
+        { id: 'modalsContainer', url: 'modals.html' },
+        { id: 'playerContainer', url: 'player.html' }
+    ];
+
+    let loaded = 0;
+    const total = components.length;
+
+    components.forEach(function(comp) {
+        const container = document.getElementById(comp.id);
+        if (!container) return;
+
+        fetch(comp.url)
+            .then(response => {
+                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                return response.text();
+            })
+            .then(html => {
+                container.innerHTML = html;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены!');
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') translatePage();
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var page = urlParams.get('page');
+                        if (page) {
+                            openPage(page);
+                        }
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof initAudio === 'function') initAudio();
+                        
+                        // Загружаем страницу если открыта /pages/...
+                        var path = window.location.pathname;
+                        if (path.includes('/pages/')) {
+                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
+                            if (slug && typeof loadPage === 'function') {
+                                setTimeout(function() {
+                                    loadPage(slug);
+                                }, 300);
+                            }
+                        }
+                    }, 500);
+                }
+            })
+            .catch(err => {
+                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                container.innerHTML = `<div style="display:none;"></div>`;
+                loaded++;
+                if (loaded === total) {
+                    console.log('✅ Все компоненты загружены (с ошибками)');
+                    setTimeout(function() {
+                        if (typeof translatePage === 'function') translatePage();
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var page = urlParams.get('page');
+                        if (page) {
+                            openPage(page);
+                        }
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadNotifications === 'function') loadNotifications();
+                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                        if (typeof initAudio === 'function') initAudio();
+                        
+                        var path = window.location.pathname;
+                        if (path.includes('/pages/')) {
+                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
+                            if (slug && typeof loadPage === 'function') {
+                                setTimeout(function() {
+                                    loadPage(slug);
+                                }, 300);
+                            }
+                        }
+                    }, 500);
                 }
             });
-    }
-}
+    });
+})();
 
 // ================================================================
-// ЗАГРУЗКА
+// АВТО-СКРЫТИЕ ШАПКИ
 // ================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    var savedName = localStorage.getItem('dc_u_');
-    if (savedName) {
-        updateTopbar(savedName);
-        document.getElementById('loginModal').classList.remove('open');
-    } else {
-        restoreFromFirebase();
-    }
-    
-    setInterval(function() {
-        var name = localStorage.getItem('dc_u_');
-        if (name) {
-            document.getElementById('username').textContent = name;
-            document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+
+(function() {
+    var lastScrollY = 0;
+    var topbar = document.getElementById('topbar');
+    var playerHandle = document.getElementById('playerHandle');
+    var playerDrawer = document.getElementById('playerDrawer');
+    var isPlayerOpen = false;
+    var ticking = false;
+
+    function waitForTopbar() {
+        topbar = document.getElementById('topbar');
+        if (!topbar) {
+            setTimeout(waitForTopbar, 200);
+            return;
         }
-    }, 2000);
-});
+        console.log('✅ Топбар найден, авто-скрытие работает');
+    }
+    waitForTopbar();
+
+    function checkPlayerState() {
+        if (playerDrawer) {
+            isPlayerOpen = playerDrawer.classList.contains('open');
+        }
+    }
+
+    function updateHeader() {
+        var currentScrollY = window.scrollY;
+        checkPlayerState();
+
+        if (isPlayerOpen) {
+            showAll();
+            lastScrollY = currentScrollY;
+            return;
+        }
+
+        if (currentScrollY < lastScrollY || currentScrollY < 30) {
+            showAll();
+        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
+            hideAll();
+        }
+
+        lastScrollY = currentScrollY;
+    }
+
+    function showAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(0)';
+            topbar.style.opacity = '1';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(0)';
+            playerHandle.style.opacity = '1';
+        }
+    }
+
+    function hideAll() {
+        if (topbar) {
+            topbar.style.transform = 'translateY(-100%)';
+            topbar.style.opacity = '0';
+            topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+        if (playerHandle) {
+            playerHandle.style.transform = 'translateY(-100%)';
+            playerHandle.style.opacity = '0';
+            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        }
+    }
+
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                updateHeader();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+
+    if (playerDrawer) {
+        var observer = new MutationObserver(function() {
+            checkPlayerState();
+            if (isPlayerOpen) {
+                showAll();
+            }
+        });
+        observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (playerHandle) {
+        playerHandle.addEventListener('click', function() {
+            setTimeout(function() {
+                checkPlayerState();
+                if (isPlayerOpen) {
+                    showAll();
+                }
+            }, 150);
+        });
+    }
+
+    console.log('✅ Авто-скрытие шапки включено!');
+})();
 </script>
 
 </body>
