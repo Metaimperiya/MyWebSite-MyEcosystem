@@ -1,287 +1,235 @@
 // ================================================================
-// ПЕРЕВОД НА ДВА ЯЗЫКА — С АВТООПРЕДЕЛЕНИЕМ
+// АВТОРИЗАЦИЯ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
-const LANGUAGES = {
-    ru: {
-        app_name: 'METAIMPERIYA',
-        menu: 'Меню',
-        messages: 'Сообщения',
-        profile: 'Профиль',
-        settings: 'Настройки',
-        logout: 'Выйти',
-        theme: 'Тема',
-        privacy: 'Приватность',
-        help: 'Помощь',
-        feed: 'Лента',
-        what_new: 'Что у вас нового?',
-        photo: 'Фото',
-        publish: 'Опубликовать',
-        clear: 'Очистить',
-        empty_feed: 'Пока пусто',
-        login_to_see: 'Войдите, чтобы видеть ленту',
-        guest: 'Гость',
-        setup_profile: 'Настройте профиль',
-        edit_profile: 'Редактировать профиль',
-        change_avatar: 'Сменить аватар',
-        go_home: 'На главную',
-        friends: 'Друзья',
-        subscribers: 'Подписчики',
-        subscriptions: 'Подписки',
-        no_posts: '📝 Нет постов. Напишите что-нибудь!',
-        loading: 'Загрузка...',
-        my_posts: 'Мои посты',
-        friends_title: '🤝 Друзья',
-        no_friends: 'Нет друзей',
-        enter_link: 'Вставьте ссылку для встраивания...',
-        embedded_page: 'Встроенная страница',
-        collapse: 'Свернуть',
-        expand: 'Развернуть',
-        link_saved: '✅ Ссылка сохранена!',
-        avatar_updated: '✅ Аватарка обновлена!',
-        groups: 'Группы',
-        create_group: 'Создать группу',
-        new_group: 'Новая группа',
-        group_name: 'Название...',
-        create: 'Создать',
-        people: 'Люди',
-        all_users: 'Все пользователи',
-        add_friend: '➕ Добавить в друзья',
-        already_friends: '🤝 В друзьях',
-        request_sent: '⏳ Запрос отправлен',
-        request_received: '📩 Заявка получена',
-        accept: 'Принять',
-        decline: 'Отклонить',
-        remove_from_friends: 'Удалить из друзей',
-        chat: 'Чат',
-        back: 'Назад',
-        message: 'Сообщение...',
-        no_messages: 'Сообщений нет',
-        delete_message: 'Удалить сообщение',
-        chat_list_empty: '🤝 Добавьте друзей, чтобы начать общение',
-        cannot_write_self: 'Нельзя писать себе',
-        notifications: 'Уведомления',
-        no_notifications: 'Нет уведомлений',
-        admin: 'Админ',
-        admin_password: 'Пароль...',
-        admin_login: 'Войти',
-        all_chats: 'Все чаты',
-        no_chats: 'Нет личных чатов',
-        edit_post: '✏️ Редактировать',
-        delete_post: '🗑 Удалить',
-        restore_post: '↩️ Восстановить',
-        post_deleted: '🗑 Пост удален',
-        enter_link_placeholder: 'Введите ссылку:',
-        link_text: 'ссылка',
-        login_title: '👤 Вход',
-        login_google: 'Войти через Google',
-        or: 'или',
-        enter_name_placeholder: 'Введите имя...',
-        cancel: 'Отмена',
-        login: 'Войти',
-        player: 'ПЛЕЕР',
-        playlist: 'Плейлист',
-        download: 'Скачать',
-        visualizer: 'Визуализация',
-        online: 'онлайн',
-        edit: 'Редактировать',
-        delete: 'Удалить',
-        save: 'Сохранить',
-        close: 'Закрыть',
-        confirm: 'Подтвердить',
-        post_updated: '✅ Пост обновлён!',
-        repost_created: '✅ Репост создан!',
-        search: 'Поиск',
-        add: 'Добавить',
-        remove: 'Удалить',
-    },
-    en: {
-        app_name: 'METAIMPERIYA',
-        menu: 'Menu',
-        messages: 'Messages',
-        profile: 'Profile',
-        settings: 'Settings',
-        logout: 'Logout',
-        theme: 'Theme',
-        privacy: 'Privacy',
-        help: 'Help',
-        feed: 'Feed',
-        what_new: "What's new?",
-        photo: 'Photo',
-        publish: 'Publish',
-        clear: 'Clear',
-        empty_feed: 'Nothing yet',
-        login_to_see: 'Login to see feed',
-        guest: 'Guest',
-        setup_profile: 'Set up your profile',
-        edit_profile: 'Edit profile',
-        change_avatar: 'Change avatar',
-        go_home: 'Go home',
-        friends: 'Friends',
-        subscribers: 'Followers',
-        subscriptions: 'Following',
-        no_posts: '📝 No posts. Write something!',
-        loading: 'Loading...',
-        my_posts: 'My posts',
-        friends_title: '🤝 Friends',
-        no_friends: 'No friends',
-        enter_link: 'Enter a link to embed...',
-        embedded_page: 'Embedded page',
-        collapse: 'Collapse',
-        expand: 'Expand',
-        link_saved: '✅ Link saved!',
-        avatar_updated: '✅ Avatar updated!',
-        groups: 'Groups',
-        create_group: 'Create group',
-        new_group: 'New group',
-        group_name: 'Name...',
-        create: 'Create',
-        people: 'People',
-        all_users: 'All users',
-        add_friend: '➕ Add friend',
-        already_friends: '🤝 Friends',
-        request_sent: '⏳ Request sent',
-        request_received: '📩 Request received',
-        accept: 'Accept',
-        decline: 'Decline',
-        remove_from_friends: 'Remove from friends',
-        chat: 'Chat',
-        back: 'Back',
-        message: 'Message...',
-        no_messages: 'No messages',
-        delete_message: 'Delete message',
-        chat_list_empty: '🤝 Add friends to start chatting',
-        cannot_write_self: "Can't write to yourself",
-        notifications: 'Notifications',
-        no_notifications: 'No notifications',
-        admin: 'Admin',
-        admin_password: 'Password...',
-        admin_login: 'Login',
-        all_chats: 'All chats',
-        no_chats: 'No private chats',
-        edit_post: '✏️ Edit',
-        delete_post: '🗑 Delete',
-        restore_post: '↩️ Restore',
-        post_deleted: '🗑 Post deleted',
-        enter_link_placeholder: 'Enter link:',
-        link_text: 'link',
-        login_title: '👤 Login',
-        login_google: 'Login with Google',
-        or: 'or',
-        enter_name_placeholder: 'Enter name...',
-        cancel: 'Cancel',
-        login: 'Login',
-        player: 'PLAYER',
-        playlist: 'Playlist',
-        download: 'Download',
-        visualizer: 'Visualizer',
-        online: 'online',
-        edit: 'Edit',
-        delete: 'Delete',
-        save: 'Save',
-        close: 'Close',
-        confirm: 'Confirm',
-        post_updated: '✅ Post updated!',
-        repost_created: '✅ Repost created!',
-        search: 'Search',
-        add: 'Add',
-        remove: 'Remove',
+function initGoogleButton() {
+    var btn = document.getElementById('googleBtn');
+    if (btn) {
+        var newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔵 Google-вход нажат');
+            
+            auth.signInWithPopup(provider)
+                .then(function(result) {
+                    console.log('✅ Google-вход успешен:', result.user.displayName);
+                    var loginModal = document.getElementById('loginModal');
+                    if (loginModal) loginModal.classList.remove('open');
+                    setTimeout(function() {
+                        if (typeof updateUI === 'function') updateUI();
+                        if (typeof loadFeed === 'function') loadFeed();
+                        if (typeof loadProfile === 'function') loadProfile();
+                    }, 300);
+                })
+                .catch(function(err) {
+                    console.error('❌ Ошибка Google-входа:', err);
+                    if (err.code === 'auth/popup-blocked') {
+                        alert('Разрешите попапы для этого сайта');
+                        auth.signInWithRedirect(provider);
+                    } else if (err.code === 'auth/cancelled-popup-request') {
+                        console.log('Попап был закрыт, пробуем снова');
+                        setTimeout(function() {
+                            auth.signInWithPopup(provider).catch(function(e) {
+                                console.error('Повторная ошибка:', e);
+                            });
+                        }, 500);
+                    } else {
+                        alert('Ошибка входа: ' + err.message);
+                    }
+                });
+        });
+        console.log('✅ Google-кнопка подключена');
+        return true;
     }
-};
-
-// ================================================================
-// АВТООПРЕДЕЛЕНИЕ ЯЗЫКА
-// ================================================================
-
-function getBrowserLang() {
-    var lang = navigator.language || navigator.userLanguage || 'ru';
-    if (lang.startsWith('en')) {
-        return 'en';
-    }
-    return 'ru';
+    return false;
 }
-
-// ИСПОЛЬЗУЕМ currentLang ИЗ firebase.js, НЕ ОБЪЯВЛЯЕМ ЗАНОВО!
-// currentLang уже объявлен в firebase.js
-if (typeof currentLang === 'undefined') {
-    var currentLang = localStorage.getItem('lang') || getBrowserLang();
-} else {
-    currentLang = localStorage.getItem('lang') || getBrowserLang();
-}
-
-// ================================================================
-// ФУНКЦИИ ПЕРЕВОДА
-// ================================================================
-
-function t(key) {
-    return LANGUAGES[currentLang]?.[key] || key;
-}
-
-function setLanguage(lang) {
-    if (LANGUAGES[lang]) {
-        currentLang = lang;
-        localStorage.setItem('lang', lang);
-        translatePage();
-        updateLangDisplay();
-    }
-}
-
-function translatePage() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        const translation = t(key);
-        if (translation !== key) {
-            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                if (el.getAttribute('data-i18n-placeholder')) {
-                    el.placeholder = translation;
-                }
-            } else if (el.tagName === 'BUTTON') {
-                // Для кнопок с иконками не меняем текст
-            } else {
-                el.textContent = translation;
-            }
-        }
-    });
-    
-    document.title = t('app_name') + ' — ' + (currentLang === 'ru' ? 'Социальная платформа' : 'Social Platform');
-}
-
-function updateLangDisplay() {
-    var display = document.getElementById('langDisplay');
-    if (display) {
-        display.textContent = currentLang === 'ru' ? 'Русский' : 'English';
-    }
-}
-
-// ================================================================
-// ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
-// ================================================================
-
-window.toggleLanguage = function() {
-    var newLang = currentLang === 'ru' ? 'en' : 'ru';
-    setLanguage(newLang);
-};
-
-// ================================================================
-// АВТОПЕРЕВОД ПРИ ЗАГРУЗКЕ
-// ================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        translatePage();
-        updateLangDisplay();
-    }, 500);
+    if (!initGoogleButton()) {
+        setTimeout(initGoogleButton, 1000);
+        setTimeout(initGoogleButton, 2000);
+        setTimeout(initGoogleButton, 3000);
+    }
 });
 
-window.addEventListener('load', function() {
-    setTimeout(function() {
-        translatePage();
-        updateLangDisplay();
-    }, 300);
-});
+window.loginWithName = function() {
+    var input = document.getElementById('nameInput');
+    if (!input) { alert('Ошибка'); return; }
+    var n = input.value.trim();
+    if (!n) { alert('Введите имя'); return; }
+    
+    auth.signInAnonymously().then(function() {
+        var tempName = n.slice(0, 24);
+        var tempUid = 'anon_' + Date.now();
+        
+        return db.ref('sites/' + SITE + '/users/' + tempUid).update({
+            name: tempName,
+            email: 'anon@anon.com',
+            uid: tempUid,
+            lastLogin: Date.now()
+        }).then(function() {
+            return db.ref('sites/' + SITE + '/all_users/' + tempUid).set({
+                name: tempName,
+                email: 'anon@anon.com',
+                uid: tempUid,
+                lastLogin: Date.now()
+            });
+        }).then(function() {
+            USER = tempName;
+            USER_UID = tempUid;
+            localStorage.setItem('dc_u_' + SITE, USER);
+            
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.remove('open');
+            
+            setTimeout(function() {
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof loadFeed === 'function') loadFeed();
+                if (typeof loadGroups === 'function') loadGroups();
+                if (typeof loadPeople === 'function') loadPeople();
+                if (typeof loadProfile === 'function') loadProfile();
+                if (typeof loadNotifications === 'function') loadNotifications();
+                if (typeof loadFriendRequests === 'function') loadFriendRequests();
+            }, 300);
+        });
+    }).catch(function(e) { 
+        alert('Ошибка входа: ' + e.message); 
+    });
+};
 
-// Делаем функции глобальными
-window.t = t;
-window.setLanguage = setLanguage;
-window.translatePage = translatePage;
-window.updateLangDisplay = updateLangDisplay;
+window.closeLogin = function() {
+    var modal = document.getElementById('loginModal');
+    if (modal) modal.classList.remove('open');
+};
+
+window.logout = function() {
+    if (!confirm('Выйти из профиля?')) return;
+    if (notifUnsub) { try { notifUnsub(); } catch(e) {} notifUnsub = null; }
+    
+    auth.signOut().then(function() {
+        localStorage.removeItem('dc_u_' + SITE);
+        localStorage.removeItem('dc_admin_' + SITE);
+        USER = null;
+        USER_UID = null;
+        isAdmin = false;
+        
+        var feed = document.getElementById('feed');
+        if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
+        var dot = document.getElementById('adminDot');
+        if (dot) dot.classList.remove('active');
+        if (typeof closeSidebar === 'function') closeSidebar();
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
+    }).catch(function(e) { 
+        alert('Ошибка выхода: ' + e.message); 
+    });
+};
+
+function loadSavedProfiles() {
+    try { SAVED_PROFILES = JSON.parse(localStorage.getItem('dc_profiles_' + SITE) || '[]'); } 
+    catch(e) { SAVED_PROFILES = []; }
+}
+
+function loginWithSavedProfile(uid) {
+    var profile = SAVED_PROFILES.find(function(p) { return p.uid === uid; });
+    if (!profile) return;
+    
+    auth.signInAnonymously().then(function() {
+        USER = profile.name;
+        USER_UID = uid;
+        localStorage.setItem('dc_u_' + SITE, USER);
+        
+        return db.ref('sites/' + SITE + '/users/' + uid).update({
+            name: profile.name,
+            email: profile.email || 'anon',
+            uid: uid,
+            lastLogin: Date.now()
+        }).then(function() {
+            return db.ref('sites/' + SITE + '/all_users/' + uid).set({
+                name: profile.name,
+                email: profile.email || 'anon',
+                uid: uid,
+                lastLogin: Date.now()
+            });
+        }).then(function() {
+            profile.lastUsed = Date.now();
+            localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.remove('open');
+            
+            setTimeout(function() {
+                if (typeof updateUI === 'function') updateUI();
+                if (typeof loadFeed === 'function') loadFeed();
+                if (typeof loadGroups === 'function') loadGroups();
+                if (typeof loadPeople === 'function') loadPeople();
+                if (typeof loadProfile === 'function') loadProfile();
+                if (typeof loadNotifications === 'function') loadNotifications();
+                if (typeof loadFriendRequests === 'function') loadFriendRequests();
+            }, 300);
+        });
+    }).catch(function(e) { 
+        alert('Ошибка входа: ' + e.message); 
+    });
+}
+
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        USER_UID = user.uid;
+        
+        db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
+            var dbName = snap.val();
+            
+            if (dbName) {
+                USER = dbName;
+                localStorage.setItem('dc_u_' + SITE, USER);
+            } else {
+                USER = user.displayName || user.email || 'User';
+                localStorage.setItem('dc_u_' + SITE, USER);
+                
+                db.ref('sites/' + SITE + '/users/' + USER_UID).update({
+                    name: USER,
+                    email: user.email || 'anon',
+                    uid: USER_UID,
+                    lastLogin: Date.now()
+                });
+                db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
+                    name: USER,
+                    email: user.email || 'anon',
+                    uid: USER_UID,
+                    lastLogin: Date.now()
+                });
+            }
+            
+            var avatarUrl = user.photoURL || null;
+            if (!avatarCache) avatarCache = {};
+            avatarCache[USER_UID] = avatarUrl;
+            
+            if (avatarUrl) {
+                db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').set(avatarUrl);
+                db.ref('sites/' + SITE + '/all_users/' + USER_UID + '/avatarUrl').set(avatarUrl);
+            }
+            
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.remove('open');
+            
+            if (typeof updateUI === 'function') updateUI();
+            if (typeof loadFeed === 'function') loadFeed();
+            if (typeof loadGroups === 'function') loadGroups();
+            if (typeof loadPeople === 'function') loadPeople();
+            if (typeof loadProfile === 'function') loadProfile();
+            if (typeof loadNotifications === 'function') loadNotifications();
+            if (typeof loadFriendRequests === 'function') loadFriendRequests();
+        });
+    } else {
+        USER = null;
+        USER_UID = null;
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
+    }
+});
