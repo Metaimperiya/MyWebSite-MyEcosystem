@@ -13,12 +13,14 @@ const firebaseConfig = {
     measurementId: "G-DJXJT4Z93S"
 };
 
+// Инициализация Firebase
 firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 const auth = firebase.auth();
 const storage = firebase.storage();
 const provider = new firebase.auth.GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' }); // ВАЖНО!
 
 const SITE = 'metaimperiya';
 
@@ -44,7 +46,7 @@ function esc(str) {
 }
 
 // ================================================================
-// СТАТУС ДРУЗЕЙ — ЭТОЙ ФУНКЦИИ НЕ ХВАТАЛО!
+// СТАТУС ДРУЗЕЙ
 // ================================================================
 
 function getFriendStatusRealtime(myUid, targetUid, callback) {
@@ -84,7 +86,7 @@ function getFriendStatusRealtime(myUid, targetUid, callback) {
 }
 
 // ================================================================
-// ДРУЗЬЯ — ОТПРАВКА, ПРИНЯТИЕ, УДАЛЕНИЕ
+// ДРУЗЬЯ
 // ================================================================
 
 function sendFriendRequest(targetUid) {
@@ -159,7 +161,7 @@ function sendNotification(targetUid, data) {
 }
 
 // ================================================================
-// ЭКСПОРТ ДЛЯ ДРУГИХ ФАЙЛОВ
+// ЭКСПОРТ
 // ================================================================
 
 window.getFriendStatusRealtime = getFriendStatusRealtime;
