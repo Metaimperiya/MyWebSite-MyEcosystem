@@ -6,15 +6,22 @@ function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
     if (!uid) return;
     
+    // Сначала обновляем имя из глобального состояния
+    const userName = window.currentUser || USER;
+    const nameEl = document.getElementById('profileName');
+    if (nameEl && userName) {
+        nameEl.textContent = userName;
+    }
+    
     db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
         var u = snap.val() || {};
-        document.getElementById('profileName').textContent = u.name || USER || 'Гость';
+        var displayName = u.name || userName || USER || 'Гость';
+        document.getElementById('profileName').textContent = displayName;
         document.getElementById('profileBio').textContent = u.bio || 'Привет!';
         var avatar = document.getElementById('profileAvatar');
-        renderAvatar(uid, avatar, (u.name || '?').charAt(0).toUpperCase());
+        renderAvatar(uid, avatar, (displayName || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
         
-        // Делаем статистику кликабельной
         makeStatsClickable(uid);
         loadProfileLink(uid);
     });
