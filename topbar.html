@@ -10,8 +10,9 @@
     <div class="right">
         <button class="chat-btn" onclick="openChatList()" title="Сообщения">💬 <span id="chatBadge"></span></button>
         <button class="notif-btn" onclick="openNotifications()">🔔 <span id="notifBadge"></span></button>
-        <div class="avatar-wrap" id="topAvatar" onclick="window.location.href='/player-likee'"><span class="letter">?</span></div>
-        <span class="username" id="topName" onclick="window.location.href='/player-likee'">Гость</span>
+        <!-- ===== ИСПРАВЛЕНО: ВМЕСТО /player-likee СТОИТ goToProfile() ===== -->
+        <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()"><span class="letter">?</span></div>
+        <span class="username" id="topName" onclick="goToProfile()">Гость</span>
         <button class="menu-dots" onclick="toggleSettingsMenu()">⋮</button>
     </div>
 </header>
