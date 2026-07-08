@@ -1471,6 +1471,54 @@ body {
 }
 
 /* ================================================================
+   ТРИ ТОЧКИ В ПРОФИЛЕ (ПРАВЫЙ ВЕРХНИЙ УГОЛ)
+   ================================================================ */
+
+.profile-dots-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: 0.2s;
+    line-height: 1;
+}
+
+.profile-dots-btn:hover {
+    background: var(--input-bg);
+    color: var(--link-color);
+}
+
+.profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 180px;
+    padding: 4px 0;
+    z-index: 100;
+    margin-top: 4px;
+}
+
+.profile-dropdown-menu .profile-menu-item {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: 0.15s;
+}
+
+.profile-dropdown-menu .profile-menu-item:hover {
+    background: var(--input-bg);
+}
+
+/* ================================================================
    ССЫЛКА В ПРОФИЛЕ (IFRAME)
    ================================================================ */
 
@@ -1576,6 +1624,54 @@ body {
 }
 
 /* ================================================================
+   ТРИ ТОЧКИ В ПРОФИЛЕ (ПРАВЫЙ ВЕРХНИЙ УГОЛ)
+   ================================================================ */
+
+.profile-dots-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: 0.2s;
+    line-height: 1;
+}
+
+.profile-dots-btn:hover {
+    background: var(--input-bg);
+    color: var(--link-color);
+}
+
+.profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 180px;
+    padding: 4px 0;
+    z-index: 100;
+    margin-top: 4px;
+}
+
+.profile-dropdown-menu .profile-menu-item {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: 0.15s;
+}
+
+.profile-dropdown-menu .profile-menu-item:hover {
+    background: var(--input-bg);
+}
+
+/* ================================================================
    ДРУЗЬЯ (СКРЫТЫЙ БЛОК)
    ================================================================ */
 
@@ -1634,54 +1730,4 @@ body {
 .lang-btn:hover {
     background: var(--input-bg);
     color: var(--link-color);
-}
-
-/* ================================================================
-   ИМЯ В ТОПБАРЕ - СИНИЙ ЦВЕТ (ДОБАВЛЕНО)
-   ================================================================ */
-
-#topName {
-    color: #1877f2 !important;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-#topName:hover {
-    color: #4a9eff !important;
-}
-
-[data-theme="dark"] #topName {
-    color: #4599ff !important;
-}
-
-[data-theme="dark"] #topName:hover {
-    color: #6ab0ff !important;
-}
-
-/* ================================================================
-   ИМЯ В САЙДБАРЕ - СИНИЙ ЦВЕТ (УЖЕ БЫЛО, НО ДОБАВЛЯЮ ДЛЯ УВЕРЕННОСТИ)
-   ================================================================ */
-
-.sidebar .sidebar-user .name {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #1877f2 !important;
-}
-
-[data-theme="dark"] .sidebar .sidebar-user .name {
-    color: #4599ff !important;
-}
-
-/* ================================================================
-   ИМЯ В ПРОФИЛЕ - СИНИЙ ЦВЕТ (УЖЕ БЫЛО, НО ДОБАВЛЯЮ ДЛЯ УВЕРЕННОСТИ)
-   ================================================================ */
-
-.profile-header .name {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #1877f2 !important;
-}
-
-[data-theme="dark"] .profile-header .name {
-    color: #4599ff !important;
 }

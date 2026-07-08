@@ -11,14 +11,11 @@ function updateUI() {
     const sName = document.getElementById('sName');
     const dot = document.getElementById('adminDot');
 
-    const userName = window.currentUser || USER;
-    const userUid = window.currentUserUid || USER_UID;
-
-    if (userName && userUid) {
-        name.textContent = userName;
-        sName.textContent = userName;
-        renderAvatar(userUid, topAvatar, userName.charAt(0).toUpperCase());
-        renderAvatar(userUid, sAvatar, userName.charAt(0).toUpperCase());
+    if (USER && USER_UID) {
+        name.textContent = USER;
+        sName.textContent = USER;
+        renderAvatar(USER_UID, topAvatar, USER.charAt(0).toUpperCase());
+        renderAvatar(USER_UID, sAvatar, USER.charAt(0).toUpperCase());
         if (isAdmin) dot.classList.add('active');
         else dot.classList.remove('active');
         updateAdminMenu();
@@ -32,34 +29,6 @@ function updateUI() {
         if (item) item.style.display = 'none';
     }
 }
-
-// ===== ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ИМЕНИ =====
-function refreshUserName() {
-    const userName = window.currentUser || USER;
-    const userUid = window.currentUserUid || USER_UID;
-    
-    const nameEl = document.getElementById('topName');
-    const sNameEl = document.getElementById('sName');
-    const profileNameEl = document.getElementById('profileName');
-    
-    if (userName) {
-        if (nameEl) nameEl.textContent = userName;
-        if (sNameEl) sNameEl.textContent = userName;
-        if (profileNameEl) profileNameEl.textContent = userName;
-    }
-}
-
-// Обновляем updateUI
-const originalUpdateUI = updateUI || function() {};
-updateUI = function() {
-    originalUpdateUI();
-    refreshUserName();
-    setTimeout(function() {
-        if (typeof translatePage === 'function') translatePage();
-        updateLangDisplay();
-        updateNotifBadge();
-    }, 100);
-};
 
 // ===== АВАТАРКИ =====
 
@@ -114,6 +83,7 @@ window.goToHome = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
+    // Перенаправляем на главную страницу
     window.location.href = '/';
 };
 
@@ -123,6 +93,7 @@ window.goToFeed = function() {
         if (loginModal) loginModal.classList.add('open');
         return; 
     }
+    // Если мы на foto.html или другой странице — переходим на главную
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/';
         return;
