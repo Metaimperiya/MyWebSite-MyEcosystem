@@ -118,8 +118,8 @@ const LANGUAGES = {
         change_avatar: 'Change avatar',
         go_home: 'Go home',
         friends: 'Friends',
-        subscribers: 'Subscribers',
-        subscriptions: 'Subscriptions',
+        subscribers: 'Followers',
+        subscriptions: 'Following',
         no_posts: '📝 No posts. Write something!',
         loading: 'Loading...',
         my_posts: 'My posts',
@@ -201,7 +201,13 @@ function getBrowserLang() {
     return 'ru';
 }
 
-let currentLang = localStorage.getItem('lang') || getBrowserLang();
+// ИСПОЛЬЗУЕМ currentLang ИЗ firebase.js, НЕ ОБЪЯВЛЯЕМ ЗАНОВО!
+// currentLang уже объявлен в firebase.js
+if (typeof currentLang === 'undefined') {
+    var currentLang = localStorage.getItem('lang') || getBrowserLang();
+} else {
+    currentLang = localStorage.getItem('lang') || getBrowserLang();
+}
 
 // ================================================================
 // ФУНКЦИИ ПЕРЕВОДА
@@ -273,3 +279,9 @@ window.addEventListener('load', function() {
         updateLangDisplay();
     }, 300);
 });
+
+// Делаем функции глобальными
+window.t = t;
+window.setLanguage = setLanguage;
+window.translatePage = translatePage;
+window.updateLangDisplay = updateLangDisplay;
