@@ -23,10 +23,6 @@ function loadProfile() {
     loadProfilePosts(uid);
 }
 
-// ================================================================
-// ЗАГРУЗКА ПОСТОВ В ПРОФИЛЕ
-// ================================================================
-
 function loadProfilePosts(uid) {
     var container = document.getElementById('profilePosts');
     if (!container) {
@@ -62,10 +58,6 @@ function loadProfilePosts(uid) {
     });
 }
 
-// ================================================================
-// КЛИКАБЕЛЬНАЯ СТАТИСТИКА
-// ================================================================
-
 function makeStatsClickable(uid) {
     var friendsCount = document.getElementById('friendsCount');
     var subscribersCount = document.getElementById('subscribersCount');
@@ -88,10 +80,6 @@ function makeStatsClickable(uid) {
     }
 }
 
-// ================================================================
-// ПОКАЗ/СКРЫТИЕ СПИСКА ДРУЗЕЙ
-// ================================================================
-
 window.toggleFriendsList = function() {
     var section = document.getElementById('friendsSection');
     if (!section) return;
@@ -103,10 +91,6 @@ window.toggleFriendsList = function() {
         section.style.display = 'none';
     }
 };
-
-// ================================================================
-// ССЫЛКА В ПРОФИЛЕ (IFRAME)
-// ================================================================
 
 function loadProfileLink(uid) {
     db.ref('sites/' + SITE + '/users/' + uid + '/profileLink').once('value', function(snap) {
@@ -153,10 +137,6 @@ window.toggleIframe = function() {
         btn.textContent = '🔽 Развернуть';
     }
 };
-
-// ================================================================
-// КНОПКИ В ПРОФИЛЕ
-// ================================================================
 
 function showProfileActions(uid) {
     var actions = document.getElementById('profileActions');
@@ -263,10 +243,6 @@ function showProfileActions(uid) {
     });
 }
 
-// ================================================================
-// МЕНЮ ДЛЯ СВОЕГО ПРОФИЛЯ
-// ================================================================
-
 function fillOwnProfileMenu(uid, menu) {
     if (!menu) return;
     
@@ -284,10 +260,6 @@ function fillOwnProfileMenu(uid, menu) {
     
     menu.innerHTML = html;
 }
-
-// ================================================================
-// ЗАПОЛНЕНИЕ МЕНЮ ДЛЯ ЧУЖОГО ПРОФИЛЯ
-// ================================================================
 
 function fillProfileMenu(uid, menu) {
     if (!menu) return;
@@ -332,10 +304,6 @@ function fillProfileMenu(uid, menu) {
     });
 }
 
-// ================================================================
-// ОБРАБОТКА ДЕЙСТВИЙ МЕНЮ
-// ================================================================
-
 function handleProfileMenuAction(action, uid) {
     switch(action) {
         case 'addFriend':
@@ -366,10 +334,6 @@ function handleProfileMenuAction(action, uid) {
             break;
     }
 }
-
-// ================================================================
-// ОТКРЫТИЕ/ЗАКРЫТИЕ МЕНЮ
-// ================================================================
 
 function toggleProfileMenu(uid) {
     var menu = document.getElementById('profileMenu');
@@ -402,10 +366,6 @@ document.addEventListener('click', function(e) {
         closeProfileMenu();
     }
 });
-
-// ================================================================
-// ОБНОВЛЕНИЕ КНОПКИ В РЕАЛЬНОМ ВРЕМЕНИ
-// ================================================================
 
 function updateFriendButton(uid) {
     var btn = document.getElementById('friendActionBtn');
@@ -441,10 +401,6 @@ function updateFriendButton(uid) {
     });
 }
 
-// ================================================================
-// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ СТАТУСА
-// ================================================================
-
 function getCachedFriendStatus(myUid, targetUid) {
     var status = 'none';
     var friendCheck = localStorage.getItem('fs_' + myUid + '_' + targetUid);
@@ -453,10 +409,6 @@ function getCachedFriendStatus(myUid, targetUid) {
     if (friendCheck === 'pending_received') return 'pending_received';
     return 'none';
 }
-
-// ================================================================
-// ЗАГРУЗКА ДРУЗЕЙ
-// ================================================================
 
 function loadFriends(uid) {
     if (!uid) return;
@@ -500,10 +452,6 @@ function loadFriends(uid) {
     });
 }
 
-// ================================================================
-// ЗАГРУЗКА ПОДПИСЧИКОВ
-// ================================================================
-
 function loadSubscribers(uid) {
     if (!uid) return;
     db.ref('sites/' + SITE + '/subscribers/' + uid).on('value', function(snap) {
@@ -512,10 +460,6 @@ function loadSubscribers(uid) {
         if (countEl) countEl.textContent = Object.keys(data).length;
     });
 }
-
-// ================================================================
-// ЗАГРУЗКА ПОДПИСОК
-// ================================================================
 
 function loadSubscriptions(uid) {
     if (!uid) return;
@@ -526,20 +470,12 @@ function loadSubscriptions(uid) {
     });
 }
 
-// ================================================================
-// ПРОСМОТР ПОЛЬЗОВАТЕЛЯ
-// ================================================================
-
 window.viewUser = function(uid) {
     if (uid === USER_UID) { goToProfile(); return; }
     VIEWING_USER = uid;
     setActivePage('profile');
     loadProfile();
 };
-
-// ================================================================
-// РЕДАКТИРОВАНИЕ ПРОФИЛЯ
-// ================================================================
 
 window.openEditProfile = function() {
     document.getElementById('editName').value = USER || '';
@@ -565,10 +501,6 @@ window.saveProfile = function() {
     loadProfile();
     loadFeed();
 };
-
-// ================================================================
-// ЗАГРУЗКА АВАТАРА
-// ================================================================
 
 window.uploadAvatar = function() {
     if (!USER_UID) { alert('Сначала войдите!'); return; }
@@ -597,10 +529,6 @@ window.uploadAvatar = function() {
     input.click();
 };
 
-// ================================================================
-// ЗАГРУЗКА ОБЩЕЙ ЛЕНТЫ НА ПЕРСОНАЛЬНОЙ СТРАНИЦЕ
-// ================================================================
-
 function loadPersonalFeed() {
     var container = document.getElementById('feed');
     if (!container) return;
@@ -612,7 +540,6 @@ function loadPersonalFeed() {
     }
 }
 
-// Загружаем ленту при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('player-likee')) {
         setTimeout(loadPersonalFeed, 500);
