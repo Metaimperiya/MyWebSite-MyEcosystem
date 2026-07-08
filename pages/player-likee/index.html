@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="index, follow">
     <title>PLAYER Likee — METAIMPERIYA</title>
-    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA">
+    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA. Посты, фото, общение, друзья.">
+    <meta name="keywords" content="PLAYER Likee, METAIMPERIYA, персональная страница, профиль, социальная сеть">
+    <meta property="og:title" content="PLAYER Likee — METAIMPERIYA">
+    <meta property="og:description" content="Персональная страница PLAYER Likee на METAIMPERIYA">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.metaimperiya.com/player-likee/">
     <link rel="canonical" href="https://www.metaimperiya.com/player-likee/">
 
     <link rel="stylesheet" href="/css/style.css">
@@ -28,13 +33,39 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== СТРАНИЦА С ПРОФИЛЕМ ===== -->
-        <div class="page active" id="page-page">
-            <div style="padding:6px 0;">
-                <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
+        <!-- ===== ГЛАВНАЯ ЛЕНТА ===== -->
+        <div class="page active" id="page-feed">
+            <div class="card">
+                <div class="post-form">
+                    <div class="editor-toolbar">
+                        <button onclick="formatText('bold')"><b>B</b></button>
+                        <button onclick="formatText('italic')"><i>I</i></button>
+                        <button onclick="formatText('underline')"><u>U</u></button>
+                        <button onclick="formatText('strike')"><s>S</s></button>
+                        <button onclick="formatText('h1')">H1</button>
+                        <button onclick="formatText('h2')">H2</button>
+                        <button onclick="formatText('quote')">"</button>
+                        <button onclick="formatText('code')">&lt;/&gt;</button>
+                        <button onclick="insertLink()">🔗</button>
+                    </div>
+                    <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                    <div class="post-actions" style="margin-top:6px;">
+                        <label class="file-label" for="fileInput">📎 Фото</label>
+                        <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                        <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" class="hidden">
+                    <div class="preview-box" id="previewBox">
+                        <img id="previewImg"><span id="previewName"></span>
+                        <button class="remove-pic" onclick="removeImage()">✕</button>
+                    </div>
+                </div>
             </div>
-            
-            <!-- ===== ПРОФИЛЬ ===== -->
+            <div id="feed"></div>
+        </div>
+
+        <!-- ===== СТРАНИЦА ПРОФИЛЯ ===== -->
+        <div class="page" id="page-profile">
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar"><span class="letter">P</span></div>
                 <div class="name" id="profileName">PLAYER Likee</div>
@@ -47,7 +78,6 @@
                 <div id="profileActions"></div>
             </div>
 
-            <!-- ===== ССЫЛКА (IFRAME) ===== -->
             <div class="link-section" id="linkSection">
                 <div class="link-input-wrap">
                     <input type="text" id="profileLinkInput" placeholder="Вставьте ссылку для встраивания...">
@@ -62,13 +92,11 @@
                 </div>
             </div>
 
-            <!-- ===== ДРУЗЬЯ ===== -->
             <div class="friends-section" id="friendsSection" style="display:none;">
                 <h4>🤝 Друзья <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
                 <div class="friend-list" id="friendList"></div>
             </div>
 
-            <!-- ===== ФОРМА ПОСТА ===== -->
             <div class="card" style="margin-top:8px;">
                 <div class="post-form">
                     <div class="editor-toolbar">
@@ -96,9 +124,56 @@
                 </div>
             </div>
 
-            <!-- ===== ПОСТЫ ===== -->
             <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
             <div id="profilePosts"></div>
+        </div>
+
+        <!-- ===== ЛЮДИ ===== -->
+        <div class="page" id="page-people">
+            <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
+        </div>
+
+        <!-- ===== ГРУППЫ ===== -->
+        <div class="page" id="page-groups">
+            <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
+        </div>
+
+        <!-- ===== ФОТО-ЛЕНТА ===== -->
+        <div class="page" id="page-foto">
+            <div class="container" style="padding-top:10px;">
+                <button onclick="window.location.href='/'">← Назад</button>
+                <h1>📸 Фото</h1>
+                <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
+
+                <div class="card" style="margin-top:10px;">
+                    <div class="post-form">
+                        <div class="editor-toolbar">
+                            <button onclick="formatText('bold')"><b>B</b></button>
+                            <button onclick="formatText('italic')"><i>I</i></button>
+                            <button onclick="formatText('underline')"><u>U</u></button>
+                            <button onclick="formatText('strike')"><s>S</s></button>
+                            <button onclick="formatText('h1')">H1</button>
+                            <button onclick="formatText('h2')">H2</button>
+                            <button onclick="formatText('quote')">"</button>
+                            <button onclick="formatText('code')">&lt;/&gt;</button>
+                            <button onclick="insertLink()">🔗</button>
+                        </div>
+                        <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что нового в мире фото?"></div>
+                        <div class="post-actions" style="margin-top:6px;">
+                            <label class="file-label" for="fileInputFoto">📎 Фото</label>
+                            <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
+                            <button class="btn-cancel" onclick="clearFotoPostForm()">Очистить</button>
+                        </div>
+                        <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
+                        <div class="preview-box" id="previewBoxFoto">
+                            <img id="previewImgFoto"><span id="previewNameFoto"></span>
+                            <button class="remove-pic" onclick="removeFotoImage()">✕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fotoFeed"></div>
+            </div>
         </div>
 
         <!-- ===== ЧАТ ===== -->
@@ -110,6 +185,14 @@
                 <input type="text" id="chatInput" placeholder="Сообщение...">
                 <button onclick="sendChatMessage()">→</button>
             </div>
+        </div>
+
+        <!-- ===== СТРАНИЦА ПОСТА ===== -->
+        <div class="page" id="postPage">
+            <div style="padding:6px 0;">
+                <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
+            </div>
+            <div id="postPageContainer"></div>
         </div>
 
     </div>
@@ -173,8 +256,8 @@
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
+                        if (typeof loadFeed === 'function') loadFeed();
                         
-                        // ЗАГРУЖАЕМ ПРОФИЛЬ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
                         if (USER_UID && typeof loadProfile === 'function') {
                             VIEWING_USER = USER_UID;
                             loadProfile();
@@ -194,6 +277,7 @@
                         if (typeof loadNotifications === 'function') loadNotifications();
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
+                        if (typeof loadFeed === 'function') loadFeed();
                         
                         if (USER_UID && typeof loadProfile === 'function') {
                             VIEWING_USER = USER_UID;
@@ -219,8 +303,8 @@ auth.onAuthStateChanged(function(user) {
         avatarCache[USER_UID] = avatarUrl;
         
         if (typeof updateUI === 'function') updateUI();
+        if (typeof loadFeed === 'function') loadFeed();
         
-        // ЗАГРУЖАЕМ ПРОФИЛЬ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
         VIEWING_USER = USER_UID;
         if (typeof loadProfile === 'function') {
             setTimeout(function() {
@@ -238,6 +322,52 @@ auth.onAuthStateChanged(function(user) {
         if (typeof updateUI === 'function') updateUI();
     }
 });
+
+// ================================================================
+// НАВИГАЦИЯ
+// ================================================================
+
+// Функция открытия страниц на /player-likee/
+function openPage(pageId) {
+    if (!pageId) return;
+    
+    document.querySelectorAll('.page').forEach(function(el) {
+        el.style.display = 'none';
+        el.classList.remove('active');
+    });
+    
+    var page = document.getElementById('page-' + pageId);
+    if (page) {
+        page.style.display = 'block';
+        page.classList.add('active');
+        console.log('✅ Открыта страница:', pageId);
+        
+        if (pageId === 'foto' && typeof loadFotoFeed === 'function') {
+            setTimeout(loadFotoFeed, 300);
+        }
+    }
+}
+
+window.openPage = openPage;
+
+// Обновляем goToProfile для работы на /player-likee/
+var originalGoToProfile = window.goToProfile;
+window.goToProfile = function() {
+    if (!USER) { 
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        return; 
+    }
+    VIEWING_USER = null;
+    openPage('profile');
+    document.getElementById('chatView').classList.remove('active');
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    if (typeof loadProfile === 'function') loadProfile();
+};
 </script>
 
 </body>
