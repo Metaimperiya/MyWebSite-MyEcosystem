@@ -5,12 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
     <title>PLAYER Likee — METAIMPERIYA</title>
-    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA. Посты, фото, общение.">
-    <meta name="keywords" content="PLAYER Likee, METAIMPERIYA, персональная страница">
-    <meta property="og:title" content="PLAYER Likee — METAIMPERIYA">
-    <meta property="og:description" content="Персональная страница PLAYER Likee на METAIMPERIYA">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.metaimperiya.com/player-likee/">
+    <meta name="description" content="PLAYER Likee — персональная страница на METAIMPERIYA">
     <link rel="canonical" href="https://www.metaimperiya.com/player-likee/">
 
     <link rel="stylesheet" href="/css/style.css">
@@ -33,13 +28,11 @@
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== СТРАНИЦА С РЕАЛЬНЫМ КОНТЕНТОМ ===== -->
         <div class="page active" id="page-page">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
             </div>
             
-            <!-- ===== ПРОФИЛЬ ===== -->
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar"><span class="letter">P</span></div>
                 <div class="name" id="profileName">PLAYER Likee</div>
@@ -49,9 +42,28 @@
                     <span>👀 Подписчики: <span id="subscribersCount">0</span></span>
                     <span>📌 Подписки: <span id="subscriptionsCount">0</span></span>
                 </div>
+                <div id="profileActions"></div>
             </div>
 
-            <!-- ===== ПОСТЫ ===== -->
+            <div class="link-section" id="linkSection">
+                <div class="link-input-wrap">
+                    <input type="text" id="profileLinkInput" placeholder="Вставьте ссылку для встраивания...">
+                    <button onclick="saveProfileLink()">➡️</button>
+                </div>
+                <div class="profile-iframe-wrap" id="profileIframeWrap" style="display:none;">
+                    <div class="iframe-header">
+                        <span>📄 Встроенная страница</span>
+                        <button onclick="toggleIframe()">🔼 Свернуть</button>
+                    </div>
+                    <iframe id="profileIframe" src="" class="profile-iframe"></iframe>
+                </div>
+            </div>
+
+            <div class="friends-section" id="friendsSection" style="display:none;">
+                <h4>🤝 Друзья <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
+                <div class="friend-list" id="friendList"></div>
+            </div>
+
             <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
             <div id="profilePosts"></div>
         </div>
@@ -128,18 +140,10 @@
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // ===== ЗАГРУЖАЕМ ПРОФИЛЬ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ =====
-                        if (USER_UID) {
+                        // Загружаем профиль ТОЛЬКО ПОСЛЕ авторизации
+                        if (USER_UID && typeof loadProfile === 'function') {
                             VIEWING_USER = USER_UID;
-                            if (typeof loadProfile === 'function') {
-                                loadProfile();
-                            }
-                        } else {
-                            // Если не авторизован, показываем заглушку
-                            var nameEl = document.getElementById('profileName');
-                            var bioEl = document.getElementById('profileBio');
-                            if (nameEl) nameEl.textContent = 'Гость';
-                            if (bioEl) bioEl.textContent = 'Войдите, чтобы увидеть профиль';
+                            loadProfile();
                         }
                     }, 500);
                 }
@@ -157,16 +161,9 @@
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        if (USER_UID) {
+                        if (USER_UID && typeof loadProfile === 'function') {
                             VIEWING_USER = USER_UID;
-                            if (typeof loadProfile === 'function') {
-                                loadProfile();
-                            }
-                        } else {
-                            var nameEl = document.getElementById('profileName');
-                            var bioEl = document.getElementById('profileBio');
-                            if (nameEl) nameEl.textContent = 'Гость';
-                            if (bioEl) bioEl.textContent = 'Войдите, чтобы увидеть профиль';
+                            loadProfile();
                         }
                     }, 500);
                 }
@@ -175,7 +172,7 @@
 })();
 
 // ================================================================
-// АВТОРИЗАЦИЯ — СИНХРОНИЗАЦИЯ
+// АВТОРИЗАЦИЯ — ГЛАВНЫЙ ИСТОЧНИК ИСТИНЫ
 // ================================================================
 
 // Слушаем изменения авторизации
@@ -184,6 +181,7 @@ auth.onAuthStateChanged(function(user) {
         USER_UID = user.uid;
         USER = user.displayName || user.email || 'User';
         localStorage.setItem('dc_u_' + SITE, USER);
+        
         var avatarUrl = user.photoURL || null;
         if (!avatarCache) avatarCache = {};
         avatarCache[USER_UID] = avatarUrl;
@@ -191,7 +189,7 @@ auth.onAuthStateChanged(function(user) {
         // Обновляем UI
         if (typeof updateUI === 'function') updateUI();
         
-        // Загружаем профиль текущего пользователя
+        // Загружаем профиль ТЕКУЩЕГО пользователя
         VIEWING_USER = USER_UID;
         if (typeof loadProfile === 'function') {
             setTimeout(function() {
@@ -208,6 +206,20 @@ auth.onAuthStateChanged(function(user) {
         if (nameEl) nameEl.textContent = 'Гость';
         if (bioEl) bioEl.textContent = 'Войдите, чтобы увидеть профиль';
         if (typeof updateUI === 'function') updateUI();
+    }
+});
+
+// ================================================================
+// ЗАГРУЗКА ПРИ ОБНОВЛЕНИИ СТРАНИЦЫ
+// ================================================================
+
+window.addEventListener('load', function() {
+    // Если пользователь уже авторизован — загружаем профиль
+    if (USER_UID && typeof loadProfile === 'function') {
+        VIEWING_USER = USER_UID;
+        setTimeout(function() {
+            loadProfile();
+        }, 500);
     }
 });
 </script>
