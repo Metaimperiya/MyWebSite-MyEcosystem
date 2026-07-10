@@ -137,13 +137,9 @@
     <script src="/load-components.js"></script>
 
     <script>
-        // ================================================================
-        // ЗАГРУЗКА ПРОФИЛЯ ЕВА-МАРИИ
-        // ================================================================
+        var slug = 'eva-maria';
         
         function loadProfile() {
-            var slug = 'eva-maria';
-            
             db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(slug).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
@@ -151,7 +147,6 @@
                 if (keys.length > 0) {
                     var uid = keys[0];
                     var userData = users[uid];
-                    console.log('🔵 Загружен профиль Eva-Maria:', userData);
                     
                     document.title = userData.name + ' | METAIMPERIYA';
                     document.getElementById('profileName').textContent = userData.name || 'Eva-Maria';
@@ -161,7 +156,7 @@
                     renderAvatar(uid, avatar, (userData.name || '?').charAt(0).toUpperCase());
                     
                     loadStats(uid);
-                    loadUserFeed(uid);
+                    loadFeed(uid);
                 }
             });
         }
@@ -182,7 +177,7 @@
             });
         }
         
-        function loadUserFeed(uid) {
+        function loadFeed(uid) {
             var container = document.getElementById('feed');
             if (!container) return;
             
@@ -216,9 +211,9 @@
                 return;
             }
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
-                var slug = snap.val();
-                if (slug) {
-                    window.location.href = '/' + slug + '/';
+                var s = snap.val();
+                if (s) {
+                    window.location.href = '/' + s + '/';
                 } else {
                     window.location.href = '/user/' + USER_UID + '/';
                 }
