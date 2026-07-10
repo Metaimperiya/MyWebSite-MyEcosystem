@@ -1,17 +1,67 @@
 // ================================================================
-// ПРОФИЛЬ — ПОЛНАЯ ВЕРСИЯ
+// ПРОФИЛЬ — БЕЗ ГОСТЯ
 // ================================================================
 
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
-    if (!uid) return;
     
+    // ЕСЛИ НЕТ ПОЛЬЗОВАТЕЛЯ — ПОКАЗЫВАЕМ КНОПКУ ВХОДА
+    if (!uid) {
+        var nameEl = document.getElementById('profileName');
+        var bioEl = document.getElementById('profileBio');
+        var avatarEl = document.getElementById('profileAvatar');
+        
+        if (nameEl) {
+            nameEl.textContent = '👤 Войдите';
+            nameEl.style.display = 'block';
+        }
+        if (bioEl) {
+            bioEl.textContent = 'Нажмите на аватар для входа';
+            bioEl.style.display = 'block';
+        }
+        if (avatarEl) {
+            avatarEl.innerHTML = '<span class="letter" style="cursor:pointer;font-size:24px;" onclick="document.getElementById(\'loginModal\').classList.add(\'open\')">🔑</span>';
+        }
+        
+        var postsContainer = document.getElementById('profilePosts');
+        if (postsContainer) postsContainer.innerHTML = '';
+        
+        return;
+    }
+
     db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
         var u = snap.val() || {};
-        document.getElementById('profileName').textContent = u.name || USER || 'Гость';
-        document.getElementById('profileBio').textContent = u.bio || 'Привет!';
-        var avatar = document.getElementById('profileAvatar');
-        renderAvatar(uid, avatar, (u.name || '?').charAt(0).toUpperCase());
+        
+        var nameEl = document.getElementById('profileName');
+        var bioEl = document.getElementById('profileBio');
+        var avatarEl = document.getElementById('profileAvatar');
+        
+        // ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН В БАЗЕ
+        if (!u.name) {
+            if (nameEl) {
+                nameEl.textContent = '👤 Пользователь не найден';
+                nameEl.style.display = 'block';
+            }
+            if (bioEl) {
+                bioEl.textContent = 'Возможно, профиль удалён';
+                bioEl.style.display = 'block';
+            }
+            if (avatarEl) {
+                avatarEl.innerHTML = '<span class="letter">?</span>';
+            }
+            return;
+        }
+        
+        // ПОКАЗЫВАЕМ ПРОФИЛЬ
+        if (nameEl) {
+            nameEl.textContent = u.name;
+            nameEl.style.display = 'block';
+        }
+        if (bioEl) {
+            bioEl.textContent = u.bio || 'Привет!';
+            bioEl.style.display = 'block';
+        }
+        renderAvatar(uid, avatarEl, (u.name || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
         makeStatsClickable(uid);
         loadProfileLink(uid);
@@ -25,10 +75,7 @@ function loadProfile() {
 
 function loadProfilePosts(uid) {
     var container = document.getElementById('profilePosts');
-    if (!container) {
-        console.warn('❌ profilePosts не найден в DOM');
-        return;
-    }
+    if (!container) return;
     
     container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
     
