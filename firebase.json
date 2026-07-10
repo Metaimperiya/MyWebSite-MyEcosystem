@@ -1,14 +1,4 @@
 {
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "storage": {
-    "rules": "storage.rules"
-  },
-  "database": {
-    "rules": "database.rules.json"
-  },
   "hosting": {
     "public": ".",
     "ignore": [
@@ -35,6 +25,10 @@
       },
       {
         "source": "/user/**",
+        "destination": "/pages/user/index.html"
+      },
+      {
+        "source": "/**/!(*.*)",
         "destination": "/pages/user/index.html"
       },
       {
