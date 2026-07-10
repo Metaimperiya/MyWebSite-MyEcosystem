@@ -1,5 +1,5 @@
 // ================================================================
-// АВТОРИЗАЦИЯ — ПОЛНАЯ ВЕРСИЯ
+// АВТОРИЗАЦИЯ — ТОЛЬКО REDIRECT (БЕЗ ПОПАПОВ)
 // ================================================================
 
 function initGoogleButton() {
@@ -9,25 +9,10 @@ function initGoogleButton() {
             e.preventDefault();
             console.log('🔵 Google-вход нажат');
             
-            // ПЫТАЕМСЯ ЧЕРЕЗ POPUP, ЕСЛИ НЕ ПОЛУЧАЕТСЯ — REDIRECT
-            auth.signInWithPopup(provider)
-                .then(function(result) {
-                    console.log('✅ Google-вход успешен:', result.user.displayName);
-                })
-                .catch(function(err) {
-                    console.error('❌ Ошибка:', err);
-                    if (err.code === 'auth/popup-blocked') {
-                        alert('Разрешите попапы для этого сайта');
-                        auth.signInWithRedirect(provider);
-                    } else if (err.code === 'auth/unauthorized-domain') {
-                        alert('⚠️ Добавьте этот домен в Firebase Console → Authentication → Sign-in methods → Authorized domains');
-                        auth.signInWithRedirect(provider);
-                    } else {
-                        alert('Ошибка: ' + err.message);
-                    }
-                });
+            // 👇 ПРОСТО ПЕРЕКИДЫВАЕТ НА GOOGLE, БЕЗ ВСПЛЫВАЮЩИХ ОКОН
+            auth.signInWithRedirect(provider);
         });
-        console.log('✅ Google-кнопка подключена');
+        console.log('✅ Google-кнопка подключена (Redirect)');
         return true;
     }
     return false;
@@ -43,20 +28,19 @@ document.addEventListener('DOMContentLoaded', function() {
 // ===== ОБРАБОТКА ВОЗВРАТА ПОСЛЕ REDIRECT =====
 auth.getRedirectResult().then(function(result) {
     if (result.user) {
-        console.log('✅ Google-вход через Redirect успешен:', result.user.displayName);
-        // ОБНОВЛЯЕМ UI
+        console.log('✅ Google-вход успешен:', result.user.displayName);
         if (typeof updateUI === 'function') updateUI();
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
     }
 }).catch(function(error) {
-    console.error('❌ Ошибка Redirect входа:', error);
+    console.error('❌ Ошибка входа:', error);
     if (error.code === 'auth/unauthorized-domain') {
         alert('⚠️ Добавьте этот домен в Firebase Console → Authentication → Sign-in methods → Authorized domains');
     }
 });
 
-// ===== АНОНИМНЫЙ ВХОД ПО ИМЕНИ =====
+// ===== АНОНИМНЫЙ ВХОД ПО ИМЕНИ (ЕСЛИ НУЖЕН) =====
 window.loginWithName = function() {
     var input = document.getElementById('nameInput');
     if (!input) { alert('Ошибка'); return; }
@@ -157,44 +141,10 @@ function removeSavedProfile(uid) {
 function loginWithSavedProfile(uid) {
     var profile = SAVED_PROFILES.find(function(p) { return p.uid === uid; });
     if (!profile) return;
-    auth.signInAnonymously().then(function() {
-        USER = profile.name;
-        USER_UID = uid;
-        localStorage.setItem('dc_u_' + SITE, USER);
-        
-        var slug = null;
-        if (USER.toLowerCase().includes('player')) {
-            slug = 'player-likee';
-        } else {
-            slug = USER.toLowerCase().replace(/[^a-z0-9]/g, '-');
-            if (slug.length > 30) slug = slug.slice(0, 30);
-        }
-        
-        db.ref('sites/' + SITE + '/users/' + uid).update({
-            name: profile.name,
-            email: profile.email || 'anon',
-            uid: uid,
-            lastLogin: Date.now(),
-            slug: slug
-        });
-        db.ref('sites/' + SITE + '/all_users/' + uid).set({
-            name: profile.name,
-            email: profile.email || 'anon',
-            uid: uid,
-            lastLogin: Date.now(),
-            slug: slug
-        });
-        profile.lastUsed = Date.now();
-        localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
-        document.getElementById('loginModal').classList.remove('open');
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof loadFeed === 'function') loadFeed();
-        if (typeof loadGroups === 'function') loadGroups();
-        if (typeof loadPeople === 'function') loadPeople();
-        if (typeof loadProfile === 'function') loadProfile();
-        if (typeof loadNotifications === 'function') loadNotifications();
-        if (typeof loadFriendRequests === 'function') loadFriendRequests();
-    }).catch(function(e) { alert('Ошибка: ' + e.message); });
+    
+    // ПРОСТО ОТКРЫВАЕМ МОДАЛКУ С GOOGLE-ВХОДОМ
+    alert('👆 Нажмите "Войти через Google"');
+    document.getElementById('loginModal').classList.add('open');
 }
 
 // ===== AUTH STATE =====
@@ -250,7 +200,7 @@ auth.onAuthStateChanged(function(user) {
     }
 });
 
-// ===== ПРИНУДИТЕЛЬНОЕ ОТКРЫТИЕ МОДАЛКИ =====
+// ===== ОТКРЫВАЕМ МОДАЛКУ, ЕСЛИ НЕТ ПОЛЬЗОВАТЕЛЯ =====
 (function() {
     if (!USER_UID) {
         setTimeout(function() {
@@ -260,4 +210,4 @@ auth.onAuthStateChanged(function(user) {
     }
 })();
 
-console.log('✅ Google Auth настроен (Popup + Redirect fallback)');
+console.log('✅ Google Auth настроен (только Redirect, без попапов)');
