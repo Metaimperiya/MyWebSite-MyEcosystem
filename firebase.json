@@ -19,11 +19,23 @@
     "rewrites": [
       {
         "source": "/player-likee/**",
-        "destination": "/player-likee.html"
+        "destination": "/pages/player-likee/index.html"
+      },
+      {
+        "source": "/jobs-moscow-ru/**",
+        "destination": "/pages/jobs-moscow-ru/index.html"
+      },
+      {
+        "source": "/eva-maria/**",
+        "destination": "/pages/eva-maria/index.html"
+      },
+      {
+        "source": "/vse-rabotniki/**",
+        "destination": "/pages/vse-rabotniki/index.html"
       },
       {
         "source": "/user/**",
-        "destination": "/user-profile.html"
+        "destination": "/pages/user/index.html"
       },
       {
         "source": "**",
