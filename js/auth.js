@@ -1,5 +1,5 @@
 // ================================================================
-// АВТОРИЗАЦИЯ — ТОЛЬКО GOOGLE REDIRECT (БЕЗ ПОПАПОВ И АНОНИМА)
+// АВТОРИЗАЦИЯ — ТОЛЬКО GOOGLE REDIRECT (БЕЗ АВТО-ВСПЛЫВАНИЯ)
 // ================================================================
 
 function initGoogleButton() {
@@ -8,7 +8,6 @@ function initGoogleButton() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             console.log('🔵 Google-вход нажат');
-            // ПРОСТО ПЕРЕКИДЫВАЕТ НА GOOGLE, БЕЗ ВСПЛЫВАЮЩИХ ОКОН
             auth.signInWithRedirect(provider);
         });
         console.log('✅ Google-кнопка подключена (Redirect)');
@@ -47,6 +46,12 @@ window.closeLogin = function() {
     if (modal) modal.classList.remove('open');
 };
 
+// ===== ОТКРЫТИЕ МОДАЛКИ ВРУЧНУЮ (ПО ЖЕЛАНИЮ) =====
+window.openLoginModal = function() {
+    var modal = document.getElementById('loginModal');
+    if (modal) modal.classList.add('open');
+};
+
 // ===== ВЫХОД =====
 window.logout = function() {
     if (!confirm('Выйти из профиля?')) return;
@@ -65,8 +70,7 @@ window.logout = function() {
             var dot = document.getElementById('adminDot');
             if (dot) dot.classList.remove('active');
             if (typeof closeSidebar === 'function') closeSidebar();
-            var loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.classList.add('open');
+            // НЕ ОТКРЫВАЕМ МОДАЛКУ АВТОМАТИЧЕСКИ!
             if (typeof updateUI === 'function') updateUI();
         })
         .catch(function(e) { alert('Ошибка: ' + e.message); });
@@ -119,19 +123,12 @@ auth.onAuthStateChanged(function(user) {
         USER = null;
         USER_UID = null;
         var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
+        if (loginModal) loginModal.classList.remove('open'); // 👈 ЗАКРЫВАЕМ, А НЕ ОТКРЫВАЕМ!
         if (typeof updateUI === 'function') updateUI();
     }
 });
 
-// ===== ОТКРЫВАЕМ МОДАЛКУ, ЕСЛИ НЕТ ПОЛЬЗОВАТЕЛЯ =====
-(function() {
-    if (!USER_UID) {
-        setTimeout(function() {
-            var loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.classList.add('open');
-        }, 500);
-    }
-})();
+// ===== ❌ УБРАЛ АВТО-ОТКРЫТИЕ МОДАЛКИ! =====
+// ТЕПЕРЬ ОКНО НЕ ВЫСКАКИВАЕТ АВТОМАТИЧЕСКИ!
 
-console.log('✅ Google Auth настроен (только Redirect, без попапов, без анонима)');
+console.log('✅ Google Auth настроен (окно НЕ выскакивает автоматически)');
