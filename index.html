@@ -8,10 +8,11 @@
     <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
     <meta name="theme-color" content="#1877f2">
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <!-- ===== FIREBASE SDK 10.12.0 (ПОСЛЕДНЯЯ ВЕРСИЯ) ===== -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
@@ -21,6 +22,7 @@
 
 <div class="app" id="app">
 
+    <!-- ===== КОНТЕЙНЕРЫ ДЛЯ КОМПОНЕНТОВ ===== -->
     <div id="topbarContainer"></div>
     <div id="settingsContainer"></div>
     <div id="sidebarContainer"></div>
@@ -29,12 +31,15 @@
 
     <div class="container" id="mainContainer">
 
+        <!-- ===== ПЛЕЕР ===== -->
         <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
             <div class="handle-bar"></div>
             <div class="handle-label">🎵 ПЛЕЕР</div>
         </div>
 
-        <!-- ===== ГЛАВНАЯ ЛЕНТА ===== -->
+        <!-- ============================================================ -->
+        <!-- ГЛАВНАЯ ЛЕНТА -->
+        <!-- ============================================================ -->
         <div class="page active" id="page-feed">
             <div class="card">
                 <div class="post-form">
@@ -65,15 +70,23 @@
             <div id="feed"></div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ГРУППЫ -->
+        <!-- ============================================================ -->
         <div class="page" id="page-groups">
             <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ЛЮДИ -->
+        <!-- ============================================================ -->
         <div class="page" id="page-people">
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
 
-        <!-- ===== ПРОФИЛЬ — БЕЗ ГОСТЯ ===== -->
+        <!-- ============================================================ -->
+        <!-- ПРОФИЛЬ — БЕЗ ГОСТЯ -->
+        <!-- ============================================================ -->
         <div class="page" id="page-profile">
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
@@ -137,7 +150,9 @@
             <div id="profilePosts"></div>
         </div>
 
-        <!-- ===== ФОТО-ЛЕНТА ===== -->
+        <!-- ============================================================ -->
+        <!-- ФОТО-ЛЕНТА -->
+        <!-- ============================================================ -->
         <div class="page" id="page-foto" style="display:none;">
             <div class="container" style="padding-top:10px;">
                 <button onclick="window.location.href='/'">← Назад</button>
@@ -175,7 +190,9 @@
             </div>
         </div>
 
-        <!-- ===== СТРАНИЦА ПОЛЬЗОВАТЕЛЯ ===== -->
+        <!-- ============================================================ -->
+        <!-- СТРАНИЦА ПОЛЬЗОВАТЕЛЯ -->
+        <!-- ============================================================ -->
         <div class="page" id="page-page" style="display:none;">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
@@ -183,6 +200,9 @@
             <div id="pageContainer"></div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- ЧАТ -->
+        <!-- ============================================================ -->
         <div class="chat-view" id="chatView">
             <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
             <div class="chat-messages" id="chatMessages"></div>
@@ -193,6 +213,9 @@
             </div>
         </div>
 
+        <!-- ============================================================ -->
+        <!-- СТРАНИЦА ПОСТА -->
+        <!-- ============================================================ -->
         <div class="page" id="postPage">
             <div style="padding:6px 0;">
                 <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
@@ -202,8 +225,10 @@
 
     </div>
 
+    <!-- ===== АДМИН-ДОТ ===== -->
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
+    <!-- ===== ВИЗУАЛИЗАТОР ===== -->
     <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
         <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
         <canvas id="visualizerCanvas"></canvas>
@@ -211,10 +236,12 @@
 
 </div>
 
+<!-- ============================================================ -->
+<!-- СКРИПТЫ -->
+<!-- ============================================================ -->
 <script src="js/firebase.js"></script>
 <script src="js/lang.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/player.js"></script>
 <script src="js/app.js"></script>
 <script src="js/feed.js"></script>
 <script src="js/profile.js"></script>
@@ -227,7 +254,7 @@
 
 <script>
 // ================================================================
-// ФОТО-ЛЕНТА — ИСПОЛЬЗУЕТ ОБЩИЙ renderPost() ИЗ feed.js
+// ФОТО-ЛЕНТА
 // ================================================================
 
 var fotoFeedListener = null;
