@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль пользователя | METAIMPERIYA</title>
+    <meta name="description" content="Профиль пользователя в METAIMPERIYA.">
+    <meta property="og:title" content="Профиль пользователя | METAIMPERIYA">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/dark-theme.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dark-theme.css">
     
     <style>
         .profile-page {
@@ -20,7 +24,6 @@
             padding: 20px;
             background: var(--card-bg);
             border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
         .profile-page .profile-header {
             display: flex;
@@ -99,9 +102,8 @@
         <div id="topbarContainer"></div>
         <div id="sidebarContainer"></div>
         <div id="settingsContainer"></div>
-        <div id="playerContainer"></div>
 
-        <main class="main-content">
+        <main>
             <div class="profile-page" id="userProfile">
                 <div class="profile-header">
                     <div class="profile-avatar" id="profileAvatar"><span class="letter">?</span></div>
@@ -118,20 +120,21 @@
             </div>
             <div class="feed-container">
                 <h2 class="feed-title">🌐 Лента</h2>
-                <div id="feed"></div>
+                <div id="feed"><div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div></div>
             </div>
         </main>
 
+        <div id="playerContainer"></div>
         <div id="modalsContainer"></div>
     </div>
 
-    <script src="/firebase.js"></script>
-    <script src="/auth.js"></script>
-    <script src="/app.js"></script>
-    <script src="/profile.js"></script>
-    <script src="/notifications.js"></script>
-    <script src="/lang.js"></script>
-    <script src="/load-components.js"></script>
+    <script src="/js/firebase.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/profile.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/lang.js"></script>
+    <script src="/js/load-components.js"></script>
 
     <script>
         function getUidFromUrl() {
@@ -152,7 +155,6 @@
             
             db.ref('sites/' + SITE + '/users/' + CURRENT_UID).once('value', function(snap) {
                 var userData = snap.val() || {};
-                
                 if (!userData.name) {
                     document.getElementById('profileName').textContent = 'Пользователь не найден';
                     document.getElementById('profileBio').textContent = 'Такого профиля не существует';
@@ -191,20 +193,17 @@
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
             
-            container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка...</div>';
-            
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>';
             db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
                 container.innerHTML = '';
                 var data = snap.val() || {};
                 var keys = Object.keys(data).sort(function(a, b) {
                     return (data[b].timestamp || 0) - (data[a].timestamp || 0);
                 });
-                
                 if (!keys.length) {
                     container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет постов</div>';
                     return;
                 }
-                
                 keys.forEach(function(k) {
                     var post = data[k];
                     post.id = k;
