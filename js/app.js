@@ -14,7 +14,6 @@ window.goToUserPage = function() {
         return;
     }
     
-    // ПОЛУЧАЕМ SLUG ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
         var slug = snap.val();
         console.log('🔵 Получен slug пользователя:', slug);
@@ -30,7 +29,7 @@ window.goToUserPage = function() {
     });
 };
 
-// ===== ОБНОВЛЕНИЕ UI — ПОДТЯГИВАЕМ ЛОГИН =====
+// ===== ОБНОВЛЕНИЕ UI =====
 
 function updateUI() {
     var topAvatar = document.getElementById('topAvatar');
@@ -40,22 +39,27 @@ function updateUI() {
     var dot = document.getElementById('adminDot');
 
     if (USER && USER_UID) {
-        // ПОДТЯГИВАЕМ ИМЯ ИЗ БАЗЫ
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
             var dbName = snap.val() || USER;
-            console.log('🔵 Имя из базы:', dbName);
             
-            // ПОКАЗЫВАЕМ ИМЯ В ТОПБАРЕ И САЙДБАРЕ
-            if (name) name.textContent = dbName;
-            if (sName) sName.textContent = dbName;
-            localStorage.setItem('dc_u_' + SITE, dbName);
+            if (dbName && dbName !== 'Гость' && dbName !== 'Anonymous') {
+                if (name) name.textContent = dbName;
+                if (sName) sName.textContent = dbName;
+                localStorage.setItem('dc_u_' + SITE, dbName);
+            } else {
+                if (USER && USER !== 'Гость' && USER !== 'Anonymous') {
+                    if (name) name.textContent = USER;
+                    if (sName) sName.textContent = USER;
+                } else {
+                    if (name) name.textContent = '';
+                    if (sName) sName.textContent = '';
+                }
+            }
         });
         
-        // АВАТАРКИ
         renderAvatar(USER_UID, topAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
         renderAvatar(USER_UID, sAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
         
-        // АДМИН
         isAdmin = ADMIN_UIDS.includes(USER_UID);
         if (isAdmin) {
             if (dot) dot.classList.add('active');
