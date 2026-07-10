@@ -129,4 +129,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('✅ Google Auth настроен (окно НЕ выскакивает автоматически)');
 
-}); // 👈 ЗАКРЫТИЕ DOMContentLoaded
+});
