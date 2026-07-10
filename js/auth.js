@@ -1,5 +1,5 @@
 // ================================================================
-// АВТОРИЗАЦИЯ
+// АВТОРИЗАЦИЯ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
 function initGoogleButton() {
@@ -8,6 +8,8 @@ function initGoogleButton() {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             console.log('🔵 Google-вход нажат');
+            
+            // ПЫТАЕМСЯ ЧЕРЕЗ POPUP, ЕСЛИ НЕ ПОЛУЧАЕТСЯ — REDIRECT
             auth.signInWithPopup(provider)
                 .then(function(result) {
                     console.log('✅ Google-вход успешен:', result.user.displayName);
@@ -16,6 +18,9 @@ function initGoogleButton() {
                     console.error('❌ Ошибка:', err);
                     if (err.code === 'auth/popup-blocked') {
                         alert('Разрешите попапы для этого сайта');
+                        auth.signInWithRedirect(provider);
+                    } else if (err.code === 'auth/unauthorized-domain') {
+                        alert('⚠️ Добавьте этот домен в Firebase Console → Authentication → Sign-in methods → Authorized domains');
                         auth.signInWithRedirect(provider);
                     } else {
                         alert('Ошибка: ' + err.message);
@@ -35,6 +40,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ===== ОБРАБОТКА ВОЗВРАТА ПОСЛЕ REDIRECT =====
+auth.getRedirectResult().then(function(result) {
+    if (result.user) {
+        console.log('✅ Google-вход через Redirect успешен:', result.user.displayName);
+        // ОБНОВЛЯЕМ UI
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadProfile === 'function') loadProfile();
+    }
+}).catch(function(error) {
+    console.error('❌ Ошибка Redirect входа:', error);
+    if (error.code === 'auth/unauthorized-domain') {
+        alert('⚠️ Добавьте этот домен в Firebase Console → Authentication → Sign-in methods → Authorized domains');
+    }
+});
+
+// ===== АНОНИМНЫЙ ВХОД ПО ИМЕНИ =====
 window.loginWithName = function() {
     var input = document.getElementById('nameInput');
     if (!input) { alert('Ошибка'); return; }
@@ -175,6 +197,7 @@ function loginWithSavedProfile(uid) {
     }).catch(function(e) { alert('Ошибка: ' + e.message); });
 }
 
+// ===== AUTH STATE =====
 auth.onAuthStateChanged(function(user) {
     if (user) {
         USER_UID = user.uid;
@@ -226,3 +249,15 @@ auth.onAuthStateChanged(function(user) {
         if (typeof loadSavedProfiles === 'function') loadSavedProfiles();
     }
 });
+
+// ===== ПРИНУДИТЕЛЬНОЕ ОТКРЫТИЕ МОДАЛКИ =====
+(function() {
+    if (!USER_UID) {
+        setTimeout(function() {
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.add('open');
+        }, 500);
+    }
+})();
+
+console.log('✅ Google Auth настроен (Popup + Redirect fallback)');
