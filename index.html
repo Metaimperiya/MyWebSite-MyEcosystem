@@ -73,11 +73,12 @@
             <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
         </div>
 
+        <!-- ===== ПРОФИЛЬ — БЕЗ ГОСТЯ ===== -->
         <div class="page" id="page-profile">
             <div class="profile-header">
                 <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
-                <div class="name" id="profileName" data-i18n="guest">Гость</div>
-                <div class="bio" id="profileBio" data-i18n="setup_profile">Настройте профиль</div>
+                <div class="name" id="profileName" style="display:none;"></div>
+                <div class="bio" id="profileBio" style="display:none;"></div>
                 <div class="profile-stats">
                     <span>🤝 <span data-i18n="friends">Друзья</span>: <span id="friendsCount" class="stat-clickable">0</span></span>
                     <span>👀 <span data-i18n="subscribers">Подписчики</span>: <span id="subscribersCount" class="stat-clickable">0</span></span>
@@ -438,7 +439,6 @@ window.submitFotoPost = function() {
                         if (typeof updateNotifBadge === 'function') updateNotifBadge();
                         if (typeof initAudio === 'function') initAudio();
                         
-                        // Загружаем страницу если открыта /pages/...
                         var path = window.location.pathname;
                         if (path.includes('/pages/')) {
                             var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
