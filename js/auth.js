@@ -70,13 +70,12 @@ window.logout = function() {
             var dot = document.getElementById('adminDot');
             if (dot) dot.classList.remove('active');
             if (typeof closeSidebar === 'function') closeSidebar();
-            // НЕ ОТКРЫВАЕМ МОДАЛКУ АВТОМАТИЧЕСКИ!
             if (typeof updateUI === 'function') updateUI();
         })
         .catch(function(e) { alert('Ошибка: ' + e.message); });
 };
 
-// ===== AUTH STATE =====
+// ===== AUTH STATE — ТОЛЬКО ДЛЯ ПРОВЕРКИ, БЕЗ ОТКРЫТИЯ МОДАЛКИ =====
 auth.onAuthStateChanged(function(user) {
     if (user) {
         USER_UID = user.uid;
@@ -123,12 +122,12 @@ auth.onAuthStateChanged(function(user) {
         USER = null;
         USER_UID = null;
         var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.remove('open'); // 👈 ЗАКРЫВАЕМ, А НЕ ОТКРЫВАЕМ!
+        if (loginModal) loginModal.classList.remove('open'); // 👈 НЕ ОТКРЫВАЕМ!
         if (typeof updateUI === 'function') updateUI();
     }
 });
 
-// ===== ❌ УБРАЛ АВТО-ОТКРЫТИЕ МОДАЛКИ! =====
+// ===== ❌ УДАЛИЛ АВТО-ОТКРЫТИЕ МОДАЛКИ! =====
 // ТЕПЕРЬ ОКНО НЕ ВЫСКАКИВАЕТ АВТОМАТИЧЕСКИ!
 
 console.log('✅ Google Auth настроен (окно НЕ выскакивает автоматически)');
