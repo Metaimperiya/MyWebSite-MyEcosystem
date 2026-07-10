@@ -24,11 +24,10 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
 const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
 
-// ===== АДМИНЫ — ДОБАВЛЕНЫ ВСЕ! =====
 const ADMIN_UIDS = [
-    "ayXehcol9FgAQU6tZuup7aSaRoV2",      // PLAYER Likee (старый)
-    "ANR62p3qcjOe2ALsdVvJHUNCCV42",      // PLAYER Likee (новый)
-    "pWB0nGVvVXc4je6466ss7IwBm9G2"       // Jobs Moscow
+    "ayXehcol9FgAQU6tZuup7aSaRoV2",
+    "ANR62p3qcjOe2ALsdVvJHUNCCV42",
+    "pWB0nGVvVXc4je6466ss7IwBm9G2"
 ];
 
 let isAdmin = false;
