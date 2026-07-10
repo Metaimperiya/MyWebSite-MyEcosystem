@@ -4,27 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLAYER Likee | METAIMPERIYA</title>
-    <meta name="description" content="Страница PLAYER Likee в социальной сети METAIMPERIYA">
     
-    <!-- ===== FIREBASE ===== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- ===== СТИЛИ ===== -->
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/dark-theme.css">
     
-    <!-- ===== МЕТА-ТЕГИ ДЛЯ SEO ===== -->
-    <meta property="og:title" content="PLAYER Likee | METAIMPERIYA">
-    <meta property="og:description" content="Страница PLAYER Likee в социальной сети METAIMPERIYA">
-    <meta property="og:type" content="website">
-    <meta name="robots" content="index, follow">
-    
     <style>
-        /* СТИЛИ СПЕЦИАЛЬНО ДЛЯ ЭТОЙ СТРАНИЦЫ */
-        .profile-header-large {
+        .profile-page {
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
@@ -32,26 +22,26 @@
             border-radius: 16px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
         }
-        .profile-header-large .profile-info {
+        .profile-page .profile-header {
             display: flex;
             align-items: center;
             gap: 20px;
         }
-        .profile-header-large .profile-avatar {
-            width: 100px;
-            height: 100px;
+        .profile-page .profile-avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             overflow: hidden;
             flex-shrink: 0;
             border: 3px solid var(--link-color);
         }
-        .profile-header-large .profile-avatar img {
+        .profile-page .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .profile-header-large .profile-avatar .letter {
-            font-size: 48px;
+        .profile-page .profile-avatar .letter {
+            font-size: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -60,29 +50,26 @@
             background: var(--input-bg);
             color: var(--text-primary);
         }
-        .profile-header-large .profile-name {
-            font-size: 28px;
+        .profile-page .profile-name {
+            font-size: 24px;
             font-weight: 700;
             margin: 0;
         }
-        .profile-header-large .profile-bio {
+        .profile-page .profile-bio {
             color: var(--text-secondary);
-            font-size: 16px;
+            font-size: 14px;
             margin: 4px 0 0 0;
         }
-        .profile-header-large .profile-stats {
+        .profile-page .profile-stats {
             display: flex;
-            gap: 30px;
+            gap: 20px;
             margin-top: 12px;
             padding-top: 12px;
             border-top: 1px solid var(--border-color);
         }
-        .profile-header-large .profile-stats span {
+        .profile-page .profile-stats span {
             cursor: pointer;
             color: var(--link-color);
-        }
-        .profile-header-large .profile-stats span:hover {
-            text-decoration: underline;
         }
         .feed-container {
             max-width: 800px;
@@ -94,22 +81,13 @@
             margin-bottom: 16px;
             color: var(--text-primary);
         }
-        /* АДАПТИВ */
         @media (max-width: 600px) {
-            .profile-header-large .profile-info {
+            .profile-page .profile-header {
                 flex-direction: column;
                 text-align: center;
             }
-            .profile-header-large .profile-avatar {
-                width: 80px;
-                height: 80px;
-            }
-            .profile-header-large .profile-name {
-                font-size: 22px;
-            }
-            .profile-header-large .profile-stats {
+            .profile-page .profile-stats {
                 justify-content: center;
-                gap: 16px;
                 flex-wrap: wrap;
             }
         }
@@ -117,53 +95,36 @@
 </head>
 <body>
 
-    <!-- ===== ВСТАВЛЯЕМ ВСЕ КОМПОНЕНТЫ ===== -->
     <div id="app">
-        <!-- ТОПБАР -->
         <div id="topbarContainer"></div>
-        
-        <!-- САЙДБАР -->
         <div id="sidebarContainer"></div>
-        
-        <!-- НАСТРОЙКИ -->
         <div id="settingsContainer"></div>
-        
-        <!-- ПЛЕЕР -->
         <div id="playerContainer"></div>
 
-        <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
-        <main class="main-content" id="mainContent">
-            
-            <!-- ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ -->
-            <div class="profile-header-large" id="userProfileHeader">
-                <div class="profile-info">
-                    <div class="profile-avatar" id="profileAvatarLarge">
-                        <span class="letter">?</span>
-                    </div>
+        <main class="main-content">
+            <div class="profile-page" id="userProfile">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profileAvatar"><span class="letter">?</span></div>
                     <div>
-                        <h1 class="profile-name" id="profileNameLarge">Загрузка...</h1>
-                        <p class="profile-bio" id="profileBioLarge">Привет!</p>
+                        <h1 class="profile-name" id="profileName">Загрузка...</h1>
+                        <p class="profile-bio" id="profileBio">Привет!</p>
                     </div>
                 </div>
                 <div class="profile-stats">
-                    <span id="friendsCountLarge">👥 0</span>
-                    <span id="subscribersCountLarge">👀 0</span>
-                    <span id="subscriptionsCountLarge">📌 0</span>
+                    <span id="friendsCount">👥 0</span>
+                    <span id="subscribersCount">👀 0</span>
+                    <span id="subscriptionsCount">📌 0</span>
                 </div>
             </div>
-
-            <!-- ЛЕНТА -->
             <div class="feed-container">
                 <h2 class="feed-title">🌐 Лента</h2>
                 <div id="feed"></div>
             </div>
         </main>
 
-        <!-- МОДАЛКИ -->
         <div id="modalsContainer"></div>
     </div>
 
-    <!-- ===== СКРИПТЫ ===== -->
     <script src="/firebase.js"></script>
     <script src="/auth.js"></script>
     <script src="/app.js"></script>
@@ -173,115 +134,93 @@
     <script src="/load-components.js"></script>
 
     <script>
-        // ================================================================
-        // ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ
-        // ================================================================
-        
-        function loadUserProfile() {
-            var slug = 'player-likee';
-            
-            db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(slug).once('value', function(snap) {
+        var SLUG = 'player-likee';
+        var CURRENT_UID = null;
+
+        function loadProfile() {
+            db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
                 
                 if (keys.length > 0) {
-                    var uid = keys[0];
-                    var userData = users[uid];
+                    CURRENT_UID = keys[0];
+                    var userData = users[CURRENT_UID];
                     
-                    document.getElementById('profileNameLarge').textContent = userData.name || 'PLAYER Likee';
-                    document.getElementById('profileBioLarge').textContent = userData.bio || 'Администратор METAIMPERIYA';
+                    document.title = userData.name + ' | METAIMPERIYA';
+                    document.getElementById('profileName').textContent = userData.name || 'PLAYER Likee';
+                    document.getElementById('profileBio').textContent = userData.bio || 'Привет!';
                     
-                    var avatar = document.getElementById('profileAvatarLarge');
-                    renderAvatar(uid, avatar, (userData.name || '?').charAt(0).toUpperCase());
+                    var avatar = document.getElementById('profileAvatar');
+                    renderAvatar(CURRENT_UID, avatar, (userData.name || '?').charAt(0).toUpperCase());
                     
-                    // СТАТИСТИКА
-                    loadStats(uid);
+                    loadStats();
+                    loadFeed();
                 }
             });
         }
-        
-        function loadStats(uid) {
-            // ДРУЗЬЯ
-            db.ref('sites/' + SITE + '/friends/' + uid).once('value', function(snap) {
+
+        function loadStats() {
+            db.ref('sites/' + SITE + '/friends/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
                 var count = Object.keys(data).filter(function(k) { return data[k] === true; }).length;
-                document.getElementById('friendsCountLarge').textContent = '👥 ' + count;
+                document.getElementById('friendsCount').textContent = '👥 ' + count;
             });
-            
-            // ПОДПИСЧИКИ
-            db.ref('sites/' + SITE + '/subscribers/' + uid).once('value', function(snap) {
+            db.ref('sites/' + SITE + '/subscribers/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
-                document.getElementById('subscribersCountLarge').textContent = '👀 ' + Object.keys(data).length;
+                document.getElementById('subscribersCount').textContent = '👀 ' + Object.keys(data).length;
             });
-            
-            // ПОДПИСКИ
-            db.ref('sites/' + SITE + '/subscriptions/' + uid).once('value', function(snap) {
+            db.ref('sites/' + SITE + '/subscriptions/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
-                document.getElementById('subscriptionsCountLarge').textContent = '📌 ' + Object.keys(data).length;
+                document.getElementById('subscriptionsCount').textContent = '📌 ' + Object.keys(data).length;
             });
         }
-        
-        // ================================================================
-        // ЗАГРУЗКА ЛЕНТЫ
-        // ================================================================
-        
-        function loadPersonalFeed() {
+
+        function loadFeed() {
             var container = document.getElementById('feed');
-            if (!container) return;
+            if (!container || !CURRENT_UID) return;
             
-            container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка ленты...</div>';
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка...</div>';
             
-            // ЗАГРУЖАЕМ ЛЕНТУ ИЗ user_posts
-            db.ref('sites/' + SITE + '/user_posts').once('value', function(snap) {
-                var allPosts = snap.val() || {};
-                var keys = Object.keys(allPosts);
-                var posts = [];
-                
-                keys.forEach(function(uid) {
-                    var userPosts = allPosts[uid] || {};
-                    Object.keys(userPosts).forEach(function(postId) {
-                        var post = userPosts[postId];
-                        post.id = postId;
-                        post.uid = uid;
-                        posts.push(post);
-                    });
+            db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
+                container.innerHTML = '';
+                var data = snap.val() || {};
+                var keys = Object.keys(data).sort(function(a, b) {
+                    return (data[b].timestamp || 0) - (data[a].timestamp || 0);
                 });
                 
-                posts.sort(function(a, b) {
-                    return (b.timestamp || 0) - (a.timestamp || 0);
-                });
-                
-                if (!posts.length) {
+                if (!keys.length) {
                     container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет постов</div>';
                     return;
                 }
                 
-                container.innerHTML = '';
-                posts.forEach(function(post) {
+                keys.forEach(function(k) {
+                    var post = data[k];
+                    post.id = k;
                     var postEl = renderPost(post, 'feed');
                     if (postEl) container.appendChild(postEl);
                 });
             });
         }
-        
-        // ================================================================
-        // ИНИЦИАЛИЗАЦИЯ
-        // ================================================================
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔵 Страница /player-likee/ загружена!');
-            
-            setTimeout(function() {
-                loadUserProfile();
-                loadPersonalFeed();
-            }, 800);
-        });
-        
-        // ПЕРЕОПРЕДЕЛЯЕМ goToUserPage ДЛЯ ЭТОЙ СТРАНИЦЫ
+
         window.goToUserPage = function() {
-            console.log('🔵 goToUserPage вызвана на /player-likee/');
-            // ОСТАЕМСЯ НА ЭТОЙ СТРАНИЦЕ
+            if (!USER_UID) {
+                var loginModal = document.getElementById('loginModal');
+                if (loginModal) loginModal.classList.add('open');
+                return;
+            }
+            db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
+                var slug = snap.val();
+                if (slug) {
+                    window.location.href = '/' + slug + '/';
+                } else {
+                    window.location.href = '/user/' + USER_UID + '/';
+                }
+            });
         };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(loadProfile, 500);
+        });
     </script>
 </body>
 </html>
