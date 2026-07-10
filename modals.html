@@ -1,24 +1,25 @@
-<!-- ===== МОДАЛКИ ===== -->
+<!-- ===== МОДАЛКИ — ТОЛЬКО GOOGLE, БЕЗ ГОСТЯ ===== -->
+
+<!-- ===== МОДАЛКА ВХОДА (ТОЛЬКО GOOGLE) ===== -->
 <div class="modal" id="loginModal">
     <div class="modal-box">
         <h3>👤 Вход</h3>
         <button class="google-btn" id="googleBtn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> Войти через Google
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Войти через Google
         </button>
-        <div class="divider">или</div>
-        <input type="text" id="nameInput" placeholder="Введите имя...">
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeLogin()">Отмена</button>
-            <button class="btn-save" onclick="loginWithName()">Войти</button>
+        <div style="margin-top:8px;font-size:0.6rem;color:#888;text-align:center;">Только авторизованные пользователи</div>
+        <div class="modal-actions" style="margin-top:8px;">
+            <button class="btn-cancel" onclick="closeLogin()" style="width:100%;">Закрыть</button>
         </div>
     </div>
 </div>
 
+<!-- ===== РЕДАКТИРОВАНИЕ ПРОФИЛЯ ===== -->
 <div class="modal" id="editProfileModal">
     <div class="modal-box">
         <h3>✏️ Редактировать профиль</h3>
         <input type="text" id="editName" placeholder="Имя">
-        <textarea id="editBio" placeholder="О себе..."></textarea>
+        <textarea id="editBio" placeholder="О себе..." rows="3"></textarea>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeEditProfile()">Отмена</button>
             <button class="btn-save" onclick="saveProfile()">Сохранить</button>
@@ -26,11 +27,12 @@
     </div>
 </div>
 
+<!-- ===== РЕДАКТИРОВАНИЕ ПОСТА ===== -->
 <div class="modal" id="editModal">
     <div class="modal-box">
         <h3>✏️ Редактировать пост</h3>
         <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
-        <textarea id="editText" placeholder="📝 Текст поста"></textarea>
+        <textarea id="editText" placeholder="📝 Текст поста" rows="3"></textarea>
         <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
         <div class="frame-size-toggle">
             <span class="label">📐 Размер фрейма:</span>
@@ -47,10 +49,11 @@
             <button class="btn-save" onclick="saveEdit()">💾 Сохранить</button>
             <button class="btn-cancel" onclick="closeEdit()">✕ Отмена</button>
         </div>
-        <button onclick="deleteEditPost()" style="width:100%;padding:3px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
+        <button onclick="deleteEditPost()" style="width:100%;padding:4px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
     </div>
 </div>
 
+<!-- ===== СОЗДАНИЕ ГРУППЫ ===== -->
 <div class="modal" id="createRoomModal">
     <div class="modal-box">
         <h3>📝 Новая группа</h3>
@@ -62,6 +65,7 @@
     </div>
 </div>
 
+<!-- ===== АДМИН-ПАНЕЛЬ ===== -->
 <div class="modal" id="adminModal">
     <div class="modal-box">
         <h3>🏴‍☠️ Админ</h3>
@@ -74,6 +78,7 @@
     </div>
 </div>
 
+<!-- ===== УВЕДОМЛЕНИЯ ===== -->
 <div class="modal" id="notificationsModal">
     <div class="modal-box">
         <h3>🔔 Уведомления <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeNotifications()">✕</button></h3>
@@ -100,17 +105,30 @@
     <div class="modal-box">
         <h3>💬 Сообщения <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeChatList()">✕</button></h3>
         <div id="chatListContainer">
-            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">Загрузка...</div>
+            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>
         </div>
     </div>
 </div>
 
-<!-- ===== АДМИН-ПАНЕЛЬ ЧАТОВ ===== -->
+<!-- ===== АДМИН-ЧАТЫ ===== -->
 <div class="modal" id="adminChatsModal">
     <div class="modal-box">
         <h3>🏴‍☠️ Все чаты (админ) <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeAdminChats()">✕</button></h3>
         <div id="adminChatsList">
-            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">Загрузка...</div>
+            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== РЕДАКТИРОВАНИЕ СТРАНИЦЫ ===== -->
+<div class="modal" id="editPageModal">
+    <div class="modal-box">
+        <h3>✏️ Редактировать страницу</h3>
+        <input type="text" id="editPageName" placeholder="Название страницы">
+        <textarea id="editPageDesc" placeholder="Описание страницы" rows="3"></textarea>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeEditPage()">Отмена</button>
+            <button class="btn-save" onclick="savePage()">Сохранить</button>
         </div>
     </div>
 </div>
