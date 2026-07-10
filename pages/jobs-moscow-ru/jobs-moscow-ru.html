@@ -15,7 +15,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/dark-theme.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/mobile.css">
     
     <style>
         .jobs-header {
@@ -80,9 +81,6 @@
             color: var(--link-color);
             font-size: 14px;
         }
-        .jobs-stats span:hover {
-            text-decoration: underline;
-        }
         .jobs-content {
             max-width: 800px;
             margin: 20px auto;
@@ -115,6 +113,99 @@
             margin-bottom: 16px;
             color: var(--text-primary);
         }
+        .post {
+            background: var(--post-bg);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        .post .author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .post .author .avatar-wrap {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--avatar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .post .author .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post .author .avatar-wrap .letter {
+            color: var(--avatar-text);
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+        .post .author .name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--link-color);
+            cursor: pointer;
+        }
+        .post .author .time {
+            color: var(--muted-text);
+            font-size: 0.5rem;
+            margin-left: auto;
+        }
+        .post .text {
+            margin: 4px 0;
+            word-break: break-word;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+        .post .post-img {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin: 4px 0;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            background: var(--input-bg);
+        }
+        .post .stats {
+            display: flex;
+            gap: 12px;
+            font-size: 0.65rem;
+            color: var(--muted-text);
+            border-top: 1px solid var(--border-color);
+            padding-top: 6px;
+            margin-top: 4px;
+        }
+        .post .stats button {
+            background: none;
+            border: none;
+            color: var(--muted-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 16px;
+            transition: 0.2s;
+        }
+        .post .stats button:hover {
+            background: var(--input-bg);
+            color: var(--link-color);
+        }
+        .post .stats button.liked {
+            color: var(--link-color);
+        }
         @media (max-width: 600px) {
             .jobs-header h1 { font-size: 24px; }
             .jobs-stats { gap: 16px; flex-wrap: wrap; }
@@ -123,206 +214,224 @@
 </head>
 <body>
 
-    <div id="app">
-        <div id="topbarContainer"></div>
-        <div id="sidebarContainer"></div>
-        <div id="settingsContainer"></div>
+<div id="app">
+    <div id="topbarContainer"></div>
+    <div id="settingsContainer"></div>
+    <div id="sidebarContainer"></div>
+    <div id="modalsContainer"></div>
+    <div id="playerContainer"></div>
 
-        <main>
-            <div class="jobs-header" id="profileHeader">
-                <div class="profile-avatar" id="profileAvatar"><span class="letter">J</span></div>
-                <h1 id="profileName">Jobs Moscow</h1>
-                <p id="profileBio">Вакансии и работа в Москве</p>
-                <span class="jobs-badge">💼 Работа в Москве</span>
+    <main>
+        <div class="jobs-header" id="profileHeader">
+            <div class="profile-avatar" id="profileAvatar"><span class="letter">J</span></div>
+            <h1 id="profileName">Jobs Moscow</h1>
+            <p id="profileBio">Вакансии и работа в Москве</p>
+            <span class="jobs-badge">💼 Работа в Москве</span>
+        </div>
+
+        <div class="jobs-stats">
+            <span id="friendsCount">👥 0</span>
+            <span id="subscribersCount">👀 0</span>
+            <span id="subscriptionsCount">📌 0</span>
+        </div>
+
+        <div class="jobs-content">
+            <div class="jobs-card">
+                <h3>🔥 Свежие вакансии</h3>
+                <p>Здесь будут твои посты и объявления о работе.</p>
             </div>
-
-            <div class="jobs-stats">
-                <span id="friendsCount">👥 0</span>
-                <span id="subscribersCount">👀 0</span>
-                <span id="subscriptionsCount">📌 0</span>
+            <div class="jobs-card">
+                <h3>📊 Статистика</h3>
+                <p>Подписчики: <span id="subCount">0</span> | Просмотры: <span id="viewCount">0</span></p>
             </div>
-
-            <div class="jobs-content">
-                <div class="jobs-card">
-                    <h3>🔥 Свежие вакансии</h3>
-                    <p>Здесь будут твои посты и объявления о работе.</p>
-                </div>
-                <div class="jobs-card">
-                    <h3>📊 Статистика</h3>
-                    <p>Подписчики: <span id="subCount">0</span> | Просмотры: <span id="viewCount">0</span></p>
-                </div>
-                <div class="jobs-card">
-                    <h3>📍 Город</h3>
-                    <p>Москва, Россия</p>
-                </div>
+            <div class="jobs-card">
+                <h3>📍 Город</h3>
+                <p>Москва, Россия</p>
             </div>
+        </div>
 
-            <div class="feed-container">
-                <h2 class="feed-title">🌐 Лента вакансий</h2>
-                <div id="feed"><div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div></div>
-            </div>
-        </main>
+        <div class="feed-container">
+            <h2 class="feed-title">🌐 Лента вакансий</h2>
+            <div id="feed"><div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div></div>
+        </div>
+    </main>
+</div>
 
-        <div id="playerContainer"></div>
-        <div id="modalsContainer"></div>
-    </div>
+<!-- ===== ВСЕ СКРИПТЫ ===== -->
+<script src="/js/firebase.js"></script>
+<script src="/js/lang.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/player.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/feed.js"></script>
+<script src="/js/profile.js"></script>
+<script src="/js/friends.js"></script>
+<script src="/js/groups.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/admin.js"></script>
+<script src="/js/page.js"></script>
 
-    <!-- ===== ВСЕ СКРИПТЫ ===== -->
-    <script src="/js/firebase.js"></script>
-    <script src="/js/lang.js"></script>
-    <script src="/js/auth.js"></script>
-    <script src="/js/player.js"></script>
-    <script src="/js/app.js"></script>
-    <script src="/js/feed.js"></script>
-    <script src="/js/profile.js"></script>
-    <script src="/js/friends.js"></script>
-    <script src="/js/groups.js"></script>
-    <script src="/js/chat.js"></script>
-    <script src="/js/notifications.js"></script>
-    <script src="/js/admin.js"></script>
-    <script src="/js/page.js"></script>
-    <script src="/js/load-components.js"></script>
+<script>
+    var SLUG = 'jobs-moscow-ru';
+    var CURRENT_UID = null;
 
-    <script>
-        var SLUG = 'jobs-moscow-ru';
-        var CURRENT_UID = null;
+    function loadProfile() {
+        console.log('🔵 Загружаем профиль Jobs Moscow...');
+        
+        db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
+            var users = snap.val() || {};
+            var keys = Object.keys(users);
+            
+            if (keys.length > 0) {
+                CURRENT_UID = keys[0];
+                var userData = users[CURRENT_UID];
+                console.log('✅ Найден пользователь:', userData);
+                
+                document.getElementById('profileName').textContent = userData.name || 'Jobs Moscow';
+                document.getElementById('profileBio').textContent = userData.bio || 'Вакансии и работа в Москве';
+                
+                var avatar = document.getElementById('profileAvatar');
+                renderAvatar(CURRENT_UID, avatar, (userData.name || 'J').charAt(0).toUpperCase());
+                
+                loadStats();
+                loadFeed();
+            } else {
+                console.error('❌ Пользователь с slug ' + SLUG + ' не найден');
+                // СОЗДАЁМ АВТОМАТИЧЕСКИ
+                var uid = 'jobs-moscow-' + Date.now();
+                var newUser = {
+                    name: 'Jobs Moscow',
+                    bio: 'Вакансии и работа в Москве',
+                    slug: 'jobs-moscow-ru',
+                    avatarUrl: null,
+                    createdAt: Date.now()
+                };
+                db.ref('sites/' + SITE + '/users/' + uid).set(newUser);
+                db.ref('sites/' + SITE + '/all_users/' + uid).set(newUser);
+                console.log('✅ Создан пользователь:', uid);
+                setTimeout(loadProfile, 500);
+            }
+        });
+    }
 
-        function loadProfile() {
-            console.log('🔵 Загружаем профиль Jobs Moscow...');
-            db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
-                var users = snap.val() || {};
-                var keys = Object.keys(users);
-                if (keys.length > 0) {
-                    CURRENT_UID = keys[0];
-                    var userData = users[CURRENT_UID];
-                    console.log('✅ Найден пользователь:', userData);
-                    
-                    document.getElementById('profileName').textContent = userData.name || 'Jobs Moscow';
-                    document.getElementById('profileBio').textContent = userData.bio || 'Вакансии и работа в Москве';
-                    
-                    var avatar = document.getElementById('profileAvatar');
-                    renderAvatar(CURRENT_UID, avatar, (userData.name || 'J').charAt(0).toUpperCase());
-                    
-                    loadStats();
-                    loadFeed();
-                } else {
-                    console.error('❌ Пользователь с slug ' + SLUG + ' не найден');
-                }
+    function loadStats() {
+        if (!CURRENT_UID) return;
+        db.ref('sites/' + SITE + '/friends/' + CURRENT_UID).once('value', function(snap) {
+            var data = snap.val() || {};
+            var count = Object.keys(data).filter(function(k) { return data[k] === true; }).length;
+            document.getElementById('friendsCount').textContent = '👥 ' + count;
+        });
+        db.ref('sites/' + SITE + '/subscribers/' + CURRENT_UID).once('value', function(snap) {
+            var data = snap.val() || {};
+            var count = Object.keys(data).length;
+            document.getElementById('subscribersCount').textContent = '👀 ' + count;
+            document.getElementById('subCount').textContent = count;
+        });
+        db.ref('sites/' + SITE + '/subscriptions/' + CURRENT_UID).once('value', function(snap) {
+            var data = snap.val() || {};
+            document.getElementById('subscriptionsCount').textContent = '📌 ' + Object.keys(data).length;
+        });
+    }
+
+    function loadFeed() {
+        var container = document.getElementById('feed');
+        if (!container || !CURRENT_UID) return;
+        
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>';
+        
+        db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
+            container.innerHTML = '';
+            var data = snap.val() || {};
+            var keys = Object.keys(data).sort(function(a, b) {
+                return (data[b].timestamp || 0) - (data[a].timestamp || 0);
             });
-        }
-
-        function loadStats() {
-            db.ref('sites/' + SITE + '/friends/' + CURRENT_UID).once('value', function(snap) {
-                var data = snap.val() || {};
-                var count = Object.keys(data).filter(function(k) { return data[k] === true; }).length;
-                document.getElementById('friendsCount').textContent = '👥 ' + count;
-            });
-            db.ref('sites/' + SITE + '/subscribers/' + CURRENT_UID).once('value', function(snap) {
-                var data = snap.val() || {};
-                var count = Object.keys(data).length;
-                document.getElementById('subscribersCount').textContent = '👀 ' + count;
-                document.getElementById('subCount').textContent = count;
-            });
-            db.ref('sites/' + SITE + '/subscriptions/' + CURRENT_UID).once('value', function(snap) {
-                var data = snap.val() || {};
-                document.getElementById('subscriptionsCount').textContent = '📌 ' + Object.keys(data).length;
-            });
-        }
-
-        function loadFeed() {
-            var container = document.getElementById('feed');
-            if (!container || !CURRENT_UID) return;
-            container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>';
-            db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
-                container.innerHTML = '';
-                var data = snap.val() || {};
-                var keys = Object.keys(data).sort(function(a, b) {
-                    return (data[b].timestamp || 0) - (data[a].timestamp || 0);
-                });
-                if (!keys.length) {
-                    container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет вакансий. Создайте первую!</div>';
-                    return;
-                }
-                keys.forEach(function(k) {
-                    var post = data[k];
-                    post.id = k;
-                    var postEl = renderPost(post, 'feed');
-                    if (postEl) container.appendChild(postEl);
-                });
-            });
-        }
-
-        window.goToUserPage = function() {
-            if (!USER_UID) {
-                var loginModal = document.getElementById('loginModal');
-                if (loginModal) loginModal.classList.add('open');
+            
+            if (!keys.length) {
+                container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет вакансий. Создайте первую!</div>';
                 return;
             }
-            db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
-                var slug = snap.val();
-                if (slug) {
-                    window.location.href = '/' + slug + '/';
-                } else {
-                    window.location.href = '/user/' + USER_UID + '/';
-                }
+            
+            keys.forEach(function(k) {
+                var post = data[k];
+                post.id = k;
+                var postEl = renderPost(post, 'feed');
+                if (postEl) container.appendChild(postEl);
             });
-        };
+        });
+    }
 
-        // ===== ЗАГРУЗКА КОМПОНЕНТОВ =====
-        (function() {
-            const components = [
-                { id: 'topbarContainer', url: '/topbar.html' },
-                { id: 'settingsContainer', url: '/settings.html' },
-                { id: 'sidebarContainer', url: '/sidebar.html' },
-                { id: 'modalsContainer', url: '/modals.html' },
-                { id: 'playerContainer', url: '/player.html' }
-            ];
+    window.goToUserPage = function() {
+        if (!USER_UID) {
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.add('open');
+            return;
+        }
+        db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
+            var slug = snap.val();
+            if (slug) {
+                window.location.href = '/' + slug + '/';
+            } else {
+                window.location.href = '/user/' + USER_UID + '/';
+            }
+        });
+    };
 
-            let loaded = 0;
-            const total = components.length;
+    // ===== ЗАГРУЗКА КОМПОНЕНТОВ =====
+    (function() {
+        const components = [
+            { id: 'topbarContainer', url: '/topbar.html' },
+            { id: 'settingsContainer', url: '/settings.html' },
+            { id: 'sidebarContainer', url: '/sidebar.html' },
+            { id: 'modalsContainer', url: '/modals.html' },
+            { id: 'playerContainer', url: '/player.html' }
+        ];
 
-            components.forEach(function(comp) {
-                const container = document.getElementById(comp.id);
-                if (!container) return;
+        let loaded = 0;
+        const total = components.length;
 
-                fetch(comp.url)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
-                        return response.text();
-                    })
-                    .then(html => {
-                        container.innerHTML = html;
-                        loaded++;
-                        if (loaded === total) {
-                            console.log('✅ Все компоненты загружены!');
-                            setTimeout(function() {
-                                if (typeof translatePage === 'function') translatePage();
-                                if (typeof updateUI === 'function') updateUI();
-                                if (typeof loadNotifications === 'function') loadNotifications();
-                                if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                                if (typeof initAudio === 'function') initAudio();
-                                loadProfile();
-                            }, 500);
-                        }
-                    })
-                    .catch(err => {
-                        console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
-                        container.innerHTML = `<div style="display:none;"></div>`;
-                        loaded++;
-                        if (loaded === total) {
-                            console.log('✅ Все компоненты загружены (с ошибками)');
-                            setTimeout(function() {
-                                if (typeof translatePage === 'function') translatePage();
-                                if (typeof updateUI === 'function') updateUI();
-                                if (typeof loadNotifications === 'function') loadNotifications();
-                                if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                                if (typeof initAudio === 'function') initAudio();
-                                loadProfile();
-                            }, 500);
-                        }
-                    });
-            });
-        })();
-    </script>
+        components.forEach(function(comp) {
+            const container = document.getElementById(comp.id);
+            if (!container) return;
+
+            fetch(comp.url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                    return response.text();
+                })
+                .then(html => {
+                    container.innerHTML = html;
+                    loaded++;
+                    if (loaded === total) {
+                        console.log('✅ Все компоненты загружены!');
+                        setTimeout(function() {
+                            if (typeof translatePage === 'function') translatePage();
+                            if (typeof updateUI === 'function') updateUI();
+                            if (typeof loadNotifications === 'function') loadNotifications();
+                            if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                            if (typeof initAudio === 'function') initAudio();
+                            loadProfile();
+                        }, 500);
+                    }
+                })
+                .catch(err => {
+                    console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                    container.innerHTML = `<div style="display:none;"></div>`;
+                    loaded++;
+                    if (loaded === total) {
+                        console.log('✅ Все компоненты загружены (с ошибками)');
+                        setTimeout(function() {
+                            if (typeof translatePage === 'function') translatePage();
+                            if (typeof updateUI === 'function') updateUI();
+                            if (typeof loadNotifications === 'function') loadNotifications();
+                            if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                            if (typeof initAudio === 'function') initAudio();
+                            loadProfile();
+                        }, 500);
+                    }
+                });
+        });
+    })();
+</script>
 </body>
 </html>
