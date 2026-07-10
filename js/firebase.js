@@ -22,7 +22,9 @@ const provider = new firebase.auth.GoogleAuthProvider();
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ================================================================
 
-const SITE = (window.location.hostname || 'local').replace(/\./g, '_');
+// 👇 ЖЁСТКО ЗАДАЁМ ИМЯ САЙТА В БАЗЕ ДАННЫХ
+// ТЕПЕРЬ НА ЛЮБОМ ДОМЕНЕ БУДЕТ ИСПОЛЬЗОВАТЬСЯ ОДНА И ТА ЖЕ ПАПКА!
+const SITE = 'myecosystem-e6414_web_app';
 
 const ADMIN_UIDS = [
     "ayXehcol9FgAQU6tZuup7aSaRoV2",
@@ -71,3 +73,5 @@ function formatTime(seconds) {
     const sec = Math.floor(seconds % 60);
     return min + ':' + (sec < 10 ? '0' : '') + sec;
 }
+
+console.log('✅ Firebase настроен! SITE =', SITE);
