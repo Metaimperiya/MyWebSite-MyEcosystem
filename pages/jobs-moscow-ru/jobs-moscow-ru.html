@@ -108,10 +108,16 @@
     <script src="/load-components.js"></script>
 
     <script>
+        // ================================================================
+        // JOBS MOSCOW — УНИКАЛЬНЫЙ КОД
+        // ================================================================
+        
         var SLUG = 'jobs-moscow-ru';
         var CURRENT_UID = null;
 
         function loadJobsProfile() {
+            console.log('🔵 Загружаем профиль Jobs Moscow...');
+            
             db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
@@ -119,12 +125,28 @@
                 if (keys.length > 0) {
                     CURRENT_UID = keys[0];
                     var userData = users[CURRENT_UID];
-                    console.log('🔵 Загружен профиль Jobs Moscow:', userData);
+                    console.log('✅ Найден пользователь:', userData);
                     
+                    // ОБНОВЛЯЕМ ХЕДЕР
                     document.querySelector('.jobs-header h1').textContent = '💼 ' + (userData.name || 'Jobs Moscow');
                     document.querySelector('.jobs-header p').textContent = userData.bio || 'Вакансии и работа в Москве';
                     
+                    // ОБНОВЛЯЕМ ТОПБАР
+                    var topName = document.getElementById('topName');
+                    var topAvatar = document.getElementById('topAvatar');
+                    if (topName) topName.textContent = userData.name;
+                    if (topAvatar) renderAvatar(CURRENT_UID, topAvatar, userData.name.charAt(0).toUpperCase());
+                    
+                    // ОБНОВЛЯЕМ САЙДБАР
+                    var sName = document.getElementById('sName');
+                    var sAvatar = document.getElementById('sAvatar');
+                    if (sName) sName.textContent = userData.name;
+                    if (sAvatar) renderAvatar(CURRENT_UID, sAvatar, userData.name.charAt(0).toUpperCase());
+                    
+                    // ЗАГРУЖАЕМ ЛЕНТУ
                     loadJobsFeed();
+                } else {
+                    console.error('❌ Пользователь с slug ' + SLUG + ' не найден');
                 }
             });
         }
@@ -133,7 +155,7 @@
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
             
-            container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка...</div>';
+            container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>';
             
             db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
                 container.innerHTML = '';
