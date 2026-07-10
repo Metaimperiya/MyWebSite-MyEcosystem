@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Moscow | METAIMPERIYA</title>
     
-    <!-- FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- СТИЛИ -->
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/dark-theme.css">
     
@@ -76,13 +74,11 @@
         <div id="playerContainer"></div>
 
         <main>
-            <!-- УНИКАЛЬНЫЙ ХЕДЕР ДЛЯ JOBS MOSCOW -->
             <div class="jobs-header">
                 <h1>💼 Jobs Moscow</h1>
                 <p>Вакансии и работа в Москве</p>
             </div>
 
-            <!-- КОНТЕНТ -->
             <div class="jobs-content">
                 <div class="jobs-card">
                     <h3>🔥 Свежие вакансии</h3>
@@ -94,7 +90,6 @@
                 </div>
             </div>
 
-            <!-- ЛЕНТА -->
             <div class="feed-container">
                 <h2 class="feed-title">🌐 Лента</h2>
                 <div id="feed"></div>
@@ -104,7 +99,6 @@
         <div id="modalsContainer"></div>
     </div>
 
-    <!-- СКРИПТЫ -->
     <script src="/firebase.js"></script>
     <script src="/auth.js"></script>
     <script src="/app.js"></script>
@@ -114,67 +108,54 @@
     <script src="/load-components.js"></script>
 
     <script>
-        // ================================================================
-        // ЗАГРУЗКА ПРОФИЛЯ JOBS MOSCOW
-        // ================================================================
-        
+        var SLUG = 'jobs-moscow-ru';
+        var CURRENT_UID = null;
+
         function loadJobsProfile() {
-            var slug = 'jobs-moscow-ru';
-            
-            db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(slug).once('value', function(snap) {
+            db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
                 
                 if (keys.length > 0) {
-                    var uid = keys[0];
-                    var userData = users[uid];
+                    CURRENT_UID = keys[0];
+                    var userData = users[CURRENT_UID];
                     console.log('🔵 Загружен профиль Jobs Moscow:', userData);
                     
                     document.querySelector('.jobs-header h1').textContent = '💼 ' + (userData.name || 'Jobs Moscow');
                     document.querySelector('.jobs-header p').textContent = userData.bio || 'Вакансии и работа в Москве';
+                    
+                    loadJobsFeed();
                 }
             });
         }
-        
+
         function loadJobsFeed() {
             var container = document.getElementById('feed');
-            if (!container) return;
+            if (!container || !CURRENT_UID) return;
             
             container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка...</div>';
             
-            db.ref('sites/' + SITE + '/user_posts').once('value', function(snap) {
-                var allPosts = snap.val() || {};
-                var keys = Object.keys(allPosts);
-                var posts = [];
-                
-                keys.forEach(function(uid) {
-                    var userPosts = allPosts[uid] || {};
-                    Object.keys(userPosts).forEach(function(postId) {
-                        var post = userPosts[postId];
-                        post.id = postId;
-                        post.uid = uid;
-                        posts.push(post);
-                    });
+            db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
+                container.innerHTML = '';
+                var data = snap.val() || {};
+                var keys = Object.keys(data).sort(function(a, b) {
+                    return (data[b].timestamp || 0) - (data[a].timestamp || 0);
                 });
                 
-                posts.sort(function(a, b) {
-                    return (b.timestamp || 0) - (a.timestamp || 0);
-                });
-                
-                if (!posts.length) {
+                if (!keys.length) {
                     container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет постов</div>';
                     return;
                 }
                 
-                container.innerHTML = '';
-                posts.forEach(function(post) {
+                keys.forEach(function(k) {
+                    var post = data[k];
+                    post.id = k;
                     var postEl = renderPost(post, 'feed');
                     if (postEl) container.appendChild(postEl);
                 });
             });
         }
-        
-        // ПЕРЕОПРЕДЕЛЯЕМ goToUserPage
+
         window.goToUserPage = function() {
             if (!USER_UID) {
                 var loginModal = document.getElementById('loginModal');
@@ -190,12 +171,9 @@
                 }
             });
         };
-        
+
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                loadJobsProfile();
-                loadJobsFeed();
-            }, 500);
+            setTimeout(loadJobsProfile, 500);
         });
     </script>
 </body>
