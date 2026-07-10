@@ -38,6 +38,10 @@
         "destination": "/pages/user/index.html"
       },
       {
+        "source": "**/*.@(js|css|png|jpg|jpeg|gif|svg|ico|mp3|webmanifest|json)",
+        "destination": "/$1"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
