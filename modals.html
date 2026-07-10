@@ -1,134 +1,151 @@
-<!-- ===== МОДАЛКИ — ТОЛЬКО GOOGLE, БЕЗ ГОСТЯ ===== -->
+// ================================================================
+// АВТОРИЗАЦИЯ — ТОЛЬКО GOOGLE, БЕЗ ГОСТЕЙ
+// ================================================================
 
-<!-- ===== МОДАЛКА ВХОДА (ТОЛЬКО GOOGLE) ===== -->
-<div class="modal" id="loginModal">
-    <div class="modal-box">
-        <h3>👤 Вход</h3>
-        <button class="google-btn" id="googleBtn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Войти через Google
-        </button>
-        <div style="margin-top:8px;font-size:0.6rem;color:#888;text-align:center;">Только авторизованные пользователи</div>
-        <div class="modal-actions" style="margin-top:8px;">
-            <button class="btn-cancel" onclick="closeLogin()" style="width:100%;">Закрыть</button>
-        </div>
-    </div>
-</div>
+function initGoogleButton() {
+    var btn = document.getElementById('googleBtn');
+    if (btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('🔵 Google-вход нажат');
+            auth.signInWithPopup(provider)
+                .then(function(result) {
+                    console.log('✅ Google-вход успешен:', result.user.displayName);
+                })
+                .catch(function(err) {
+                    console.error('❌ Ошибка:', err);
+                    if (err.code === 'auth/popup-blocked') {
+                        alert('Разрешите попапы для этого сайта');
+                        auth.signInWithRedirect(provider);
+                    } else {
+                        alert('Ошибка: ' + err.message);
+                    }
+                });
+        });
+        console.log('✅ Google-кнопка подключена');
+        return true;
+    }
+    return false;
+}
 
-<!-- ===== РЕДАКТИРОВАНИЕ ПРОФИЛЯ ===== -->
-<div class="modal" id="editProfileModal">
-    <div class="modal-box">
-        <h3>✏️ Редактировать профиль</h3>
-        <input type="text" id="editName" placeholder="Имя">
-        <textarea id="editBio" placeholder="О себе..." rows="3"></textarea>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeEditProfile()">Отмена</button>
-            <button class="btn-save" onclick="saveProfile()">Сохранить</button>
-        </div>
-    </div>
-</div>
+document.addEventListener('DOMContentLoaded', function() {
+    if (!initGoogleButton()) {
+        setTimeout(initGoogleButton, 1500);
+        setTimeout(initGoogleButton, 3000);
+    }
+});
 
-<!-- ===== РЕДАКТИРОВАНИЕ ПОСТА ===== -->
-<div class="modal" id="editModal">
-    <div class="modal-box">
-        <h3>✏️ Редактировать пост</h3>
-        <input type="text" id="editMarquee" placeholder="📢 Бегущая строка">
-        <textarea id="editText" placeholder="📝 Текст поста" rows="3"></textarea>
-        <input type="url" id="editLink" placeholder="🔗 Ссылка (iframe)">
-        <div class="frame-size-toggle">
-            <span class="label">📐 Размер фрейма:</span>
-            <div class="btn-group">
-                <button type="button" id="frameSizeSmall" class="frame-size-btn active" onclick="setFrameSize('small')">📱 Обычный</button>
-                <button type="button" id="frameSizeLarge" class="frame-size-btn" onclick="setFrameSize('large')">🖥️ Широкий</button>
-            </div>
-        </div>
-        <input type="text" id="editHashtags" placeholder="#хештеги через пробел">
-        <div style="color:#888;font-size:0.6rem;margin:4px 0 2px;">🔘 Кнопки</div>
-        <div id="editButtonsContainer"></div>
-        <button class="btn-add" onclick="addEditBtn()">➕ Добавить кнопку</button>
-        <div class="modal-actions">
-            <button class="btn-save" onclick="saveEdit()">💾 Сохранить</button>
-            <button class="btn-cancel" onclick="closeEdit()">✕ Отмена</button>
-        </div>
-        <button onclick="deleteEditPost()" style="width:100%;padding:4px;background:#ffebee;color:#c62828;border:1px solid #e74c3c;border-radius:12px;margin-top:4px;cursor:pointer;font-weight:600;font-size:0.65rem;">🗑 Удалить пост</button>
-    </div>
-</div>
+window.closeLogin = function() {
+    var modal = document.getElementById('loginModal');
+    if (modal) modal.classList.remove('open');
+};
 
-<!-- ===== СОЗДАНИЕ ГРУППЫ ===== -->
-<div class="modal" id="createRoomModal">
-    <div class="modal-box">
-        <h3>📝 Новая группа</h3>
-        <input type="text" id="roomName" placeholder="Название...">
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeCreateRoom()">Отмена</button>
-            <button class="btn-save" onclick="createRoom()">Создать</button>
-        </div>
-    </div>
-</div>
+window.logout = function() {
+    if (!confirm('Выйти из профиля?')) return;
+    if (notifUnsub) { try { notifUnsub(); } catch(e) {} notifUnsub = null; }
+    
+    auth.signOut().then(function() {
+        localStorage.removeItem('dc_u_' + SITE);
+        localStorage.removeItem('dc_admin_' + SITE);
+        USER = null;
+        USER_UID = null;
+        isAdmin = false;
+        
+        var feed = document.getElementById('feed');
+        if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите через Google</div>';
+        var dot = document.getElementById('adminDot');
+        if (dot) dot.classList.remove('active');
+        if (typeof closeSidebar === 'function') closeSidebar();
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        if (typeof updateUI === 'function') updateUI();
+    }).catch(function(e) { alert('Ошибка: ' + e.message); });
+};
 
-<!-- ===== АДМИН-ПАНЕЛЬ ===== -->
-<div class="modal" id="adminModal">
-    <div class="modal-box">
-        <h3>🏴‍☠️ Админ</h3>
-        <input type="password" id="adminPass" placeholder="Пароль...">
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeAdminModal()">Отмена</button>
-            <button class="btn-save" onclick="checkAdmin()">Войти</button>
-            <button class="btn-save" onclick="createAdminPage()" style="background:#e67e22;color:#fff;border:none;border-radius:16px;padding:4px 14px;font-weight:600;cursor:pointer;font-size:0.7rem;">🚀 Создать страницу</button>
-        </div>
-    </div>
-</div>
+function loadSavedProfiles() {
+    try { SAVED_PROFILES = JSON.parse(localStorage.getItem('dc_profiles_' + SITE) || '[]'); }
+    catch(e) { SAVED_PROFILES = []; }
+}
 
-<!-- ===== УВЕДОМЛЕНИЯ ===== -->
-<div class="modal" id="notificationsModal">
-    <div class="modal-box">
-        <h3>🔔 Уведомления <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeNotifications()">✕</button></h3>
-        <div id="notificationsList"></div>
-    </div>
-</div>
+function saveProfileToList(uid, name, email, avatarUrl) {
+    var existing = SAVED_PROFILES.find(function(p) { return p.uid === uid; });
+    if (!existing) {
+        SAVED_PROFILES.push({ uid: uid, name: name, email: email || 'anon', avatarUrl: avatarUrl || null, lastUsed: Date.now() });
+    } else {
+        existing.name = name;
+        existing.email = email || 'anon';
+        existing.avatarUrl = avatarUrl || null;
+        existing.lastUsed = Date.now();
+    }
+    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+}
 
-<!-- ===== РЕПОСТ ===== -->
-<div class="modal" id="repostModal">
-    <div class="modal-box">
-        <h3>🔁 Репост</h3>
-        <input type="hidden" id="repostPostId">
-        <input type="hidden" id="repostType">
-        <textarea id="repostText" placeholder="Напишите что-нибудь (необязательно)..." rows="3"></textarea>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeRepost()">Отмена</button>
-            <button class="btn-save" onclick="submitRepost()">🔁 Репостнуть</button>
-        </div>
-    </div>
-</div>
+function removeSavedProfile(uid) {
+    if (!confirm('Удалить сохраненный профиль?')) return;
+    SAVED_PROFILES = SAVED_PROFILES.filter(function(p) { return p.uid !== uid; });
+    localStorage.setItem('dc_profiles_' + SITE, JSON.stringify(SAVED_PROFILES));
+}
 
-<!-- ===== СПИСОК ЧАТОВ ===== -->
-<div class="modal" id="chatListModal">
-    <div class="modal-box">
-        <h3>💬 Сообщения <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeChatList()">✕</button></h3>
-        <div id="chatListContainer">
-            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>
-        </div>
-    </div>
-</div>
+auth.onAuthStateChanged(function(user) {
+    if (user) {
+        USER_UID = user.uid;
+        USER = user.displayName || user.email || 'User';
+        localStorage.setItem('dc_u_' + SITE, USER);
+        var avatarUrl = user.photoURL || null;
+        if (!avatarCache) avatarCache = {};
+        avatarCache[USER_UID] = avatarUrl;
+        
+        var slug = null;
+        if (USER && USER.toLowerCase().includes('player')) {
+            slug = 'player-likee';
+        } else {
+            slug = USER.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            if (slug.length > 30) slug = slug.slice(0, 30);
+        }
+        
+        db.ref('sites/' + SITE + '/users/' + USER_UID).update({
+            name: USER,
+            email: user.email || 'anon',
+            uid: USER_UID,
+            lastLogin: Date.now(),
+            avatarUrl: avatarUrl,
+            slug: slug
+        });
+        db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
+            name: USER,
+            email: user.email || 'anon',
+            uid: USER_UID,
+            lastLogin: Date.now(),
+            avatarUrl: avatarUrl,
+            slug: slug
+        });
+        
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.remove('open');
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadGroups === 'function') loadGroups();
+        if (typeof loadPeople === 'function') loadPeople();
+        if (typeof loadProfile === 'function') loadProfile();
+        if (typeof loadNotifications === 'function') loadNotifications();
+        if (typeof loadFriendRequests === 'function') loadFriendRequests();
+    } else {
+        USER = null;
+        USER_UID = null;
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+        if (typeof updateUI === 'function') updateUI();
+    }
+});
 
-<!-- ===== АДМИН-ЧАТЫ ===== -->
-<div class="modal" id="adminChatsModal">
-    <div class="modal-box">
-        <h3>🏴‍☠️ Все чаты (админ) <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);float:right;" onclick="closeAdminChats()">✕</button></h3>
-        <div id="adminChatsList">
-            <div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>
-        </div>
-    </div>
-</div>
+// ===== ПРИНУДИТЕЛЬНОЕ ОТКРЫТИЕ МОДАЛКИ ВХОДА =====
+(function() {
+    if (!USER_UID) {
+        setTimeout(function() {
+            var loginModal = document.getElementById('loginModal');
+            if (loginModal) loginModal.classList.add('open');
+        }, 500);
+    }
+})();
 
-<!-- ===== РЕДАКТИРОВАНИЕ СТРАНИЦЫ ===== -->
-<div class="modal" id="editPageModal">
-    <div class="modal-box">
-        <h3>✏️ Редактировать страницу</h3>
-        <input type="text" id="editPageName" placeholder="Название страницы">
-        <textarea id="editPageDesc" placeholder="Описание страницы" rows="3"></textarea>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeEditPage()">Отмена</button>
-            <button class="btn-save" onclick="savePage()">Сохранить</button>
-        </div>
-    </div>
-</div>
+console.log('✅ Анонимный вход ОТКЛЮЧЕН! Только Google.');
