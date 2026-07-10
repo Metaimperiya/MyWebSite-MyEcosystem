@@ -128,29 +128,31 @@
         <div id="modalsContainer"></div>
     </div>
 
+    <!-- ===== ВСЕ СКРИПТЫ ===== -->
     <script src="/js/firebase.js"></script>
-    <script src="/js/auth.js"></script>
-    <script src="/js/app.js"></script>
-    <script src="/js/profile.js"></script>
-    <script src="/js/notifications.js"></script>
     <script src="/js/lang.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/player.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/feed.js"></script>
+    <script src="/js/profile.js"></script>
+    <script src="/js/friends.js"></script>
+    <script src="/js/groups.js"></script>
+    <script src="/js/chat.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/admin.js"></script>
+    <script src="/js/page.js"></script>
     <script src="/js/load-components.js"></script>
 
     <script>
-        // ================================================================
-        // ОПРЕДЕЛЕНИЕ ЧТО ПРИШЛО В URL: SLUG ИЛИ UID
-        // ================================================================
-        
         function getProfileIdentifier() {
             var path = window.location.pathname.replace(/^\/|\/$/g, '');
             var segments = path.split('/');
             
-            // ЕСЛИ ПУТЬ /user/UID/
             if (segments[0] === 'user' && segments[1]) {
                 return { type: 'uid', value: segments[1] };
             }
             
-            // ЕСЛИ ПУТЬ /slug/
             if (segments[0] && segments[0] !== 'index.html') {
                 return { type: 'slug', value: segments[0] };
             }
@@ -207,17 +209,6 @@
                 var avatar = document.getElementById('profileAvatar');
                 renderAvatar(uid, avatar, (userData.name || '?').charAt(0).toUpperCase());
                 
-                // ОБНОВЛЯЕМ ТОПБАР
-                var topName = document.getElementById('topName');
-                var topAvatar = document.getElementById('topAvatar');
-                if (topName) topName.textContent = userData.name;
-                if (topAvatar) renderAvatar(uid, topAvatar, userData.name.charAt(0).toUpperCase());
-                
-                var sName = document.getElementById('sName');
-                var sAvatar = document.getElementById('sAvatar');
-                if (sName) sName.textContent = userData.name;
-                if (sAvatar) renderAvatar(uid, sAvatar, userData.name.charAt(0).toUpperCase());
-                
                 loadStats();
                 loadFeed();
             });
@@ -242,7 +233,6 @@
         function loadFeed() {
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
-            
             container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>';
             db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
                 container.innerHTML = '';
@@ -278,10 +268,62 @@
                 }
             });
         };
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initProfilePage, 500);
-        });
+
+        // ===== ЗАГРУЗКА КОМПОНЕНТОВ =====
+        (function() {
+            const components = [
+                { id: 'topbarContainer', url: '/topbar.html' },
+                { id: 'settingsContainer', url: '/settings.html' },
+                { id: 'sidebarContainer', url: '/sidebar.html' },
+                { id: 'modalsContainer', url: '/modals.html' },
+                { id: 'playerContainer', url: '/player.html' }
+            ];
+
+            let loaded = 0;
+            const total = components.length;
+
+            components.forEach(function(comp) {
+                const container = document.getElementById(comp.id);
+                if (!container) return;
+
+                fetch(comp.url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
+                        return response.text();
+                    })
+                    .then(html => {
+                        container.innerHTML = html;
+                        loaded++;
+                        if (loaded === total) {
+                            console.log('✅ Все компоненты загружены!');
+                            setTimeout(function() {
+                                if (typeof translatePage === 'function') translatePage();
+                                if (typeof updateUI === 'function') updateUI();
+                                if (typeof loadNotifications === 'function') loadNotifications();
+                                if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                                if (typeof initAudio === 'function') initAudio();
+                                initProfilePage();
+                            }, 500);
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
+                        container.innerHTML = `<div style="display:none;"></div>`;
+                        loaded++;
+                        if (loaded === total) {
+                            console.log('✅ Все компоненты загружены (с ошибками)');
+                            setTimeout(function() {
+                                if (typeof translatePage === 'function') translatePage();
+                                if (typeof updateUI === 'function') updateUI();
+                                if (typeof loadNotifications === 'function') loadNotifications();
+                                if (typeof updateNotifBadge === 'function') updateNotifBadge();
+                                if (typeof initAudio === 'function') initAudio();
+                                initProfilePage();
+                            }, 500);
+                        }
+                    });
+            });
+        })();
     </script>
 </body>
 </html>
