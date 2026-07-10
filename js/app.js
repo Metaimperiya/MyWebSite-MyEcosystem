@@ -1,5 +1,5 @@
 // ================================================================
-// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
+// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ — БЕЗ ГОСТЯ
 // ================================================================
 
 // ===== ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ =====
@@ -47,13 +47,8 @@ function updateUI() {
                 if (sName) sName.textContent = dbName;
                 localStorage.setItem('dc_u_' + SITE, dbName);
             } else {
-                if (USER && USER !== 'Гость' && USER !== 'Anonymous') {
-                    if (name) name.textContent = USER;
-                    if (sName) sName.textContent = USER;
-                } else {
-                    if (name) name.textContent = '';
-                    if (sName) sName.textContent = '';
-                }
+                if (name) name.textContent = USER;
+                if (sName) sName.textContent = USER;
             }
         });
         
@@ -127,8 +122,9 @@ function setActivePage(pageId) {
 }
 
 // ===== КНОПКА "ГЛАВНАЯ" В САЙДБАРЕ =====
+
 window.goToHome = function() {
-    if (!USER) {
+    if (!USER_UID) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return;
@@ -137,7 +133,7 @@ window.goToHome = function() {
 };
 
 window.goToFeed = function() {
-    if (!USER) {
+    if (!USER_UID) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return;
@@ -157,7 +153,7 @@ window.goToFeed = function() {
 };
 
 window.goToProfile = function() {
-    if (!USER) {
+    if (!USER_UID) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return;
@@ -178,7 +174,7 @@ window.goToProfile = function() {
 };
 
 window.goToPeople = function() {
-    if (!USER) {
+    if (!USER_UID) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return;
@@ -198,7 +194,7 @@ window.goToPeople = function() {
 };
 
 window.goToGroups = function() {
-    if (!USER) {
+    if (!USER_UID) {
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
         return;
@@ -364,7 +360,7 @@ window.insertLink = function() {
 
 window.openChatList = function() {
     if (!USER_UID) {
-        alert('Войдите!');
+        alert('Войдите через Google!');
         return;
     }
     document.getElementById('chatListModal').classList.add('open');
