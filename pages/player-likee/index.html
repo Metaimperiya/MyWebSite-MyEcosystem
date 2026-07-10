@@ -52,6 +52,11 @@
             font-size: 32px;
             margin: 0;
         }
+        .player-header p {
+            font-size: 18px;
+            opacity: 0.8;
+            margin: 4px 0 0 0;
+        }
         .player-header .player-badge {
             display: inline-block;
             background: #ffcc00;
@@ -74,6 +79,9 @@
             cursor: pointer;
             color: var(--link-color);
             font-size: 14px;
+        }
+        .player-stats span:hover {
+            text-decoration: underline;
         }
         .player-content {
             max-width: 800px;
@@ -174,14 +182,18 @@
         var CURRENT_UID = null;
 
         function loadProfile() {
+            console.log('🔵 Загружаем профиль PLAYER Likee...');
             db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
                 if (keys.length > 0) {
                     CURRENT_UID = keys[0];
                     var userData = users[CURRENT_UID];
+                    console.log('✅ Найден пользователь:', userData);
+                    
                     document.getElementById('profileName').textContent = userData.name || 'PLAYER Likee';
                     document.getElementById('profileBio').textContent = userData.bio || 'Администратор METAIMPERIYA';
+                    
                     var avatar = document.getElementById('profileAvatar');
                     renderAvatar(CURRENT_UID, avatar, (userData.name || 'P').charAt(0).toUpperCase());
                     
@@ -197,6 +209,8 @@
                     
                     loadStats();
                     loadFeed();
+                } else {
+                    console.error('❌ Пользователь с slug ' + SLUG + ' не найден');
                 }
             });
         }
