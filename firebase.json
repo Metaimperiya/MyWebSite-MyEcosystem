@@ -1,26 +1,48 @@
-"rewrites": [
-  {
-    "source": "/player-likee/**",
-    "destination": "/pages/player-likee/index.html"
-  },
-  {
-    "source": "/jobs-moscow-ru/**",
-    "destination": "/pages/jobs-moscow-ru/jobs-moscow-ru.html"
-  },
-  {
-    "source": "/eva-maria/**",
-    "destination": "/pages/eva-maria/index.html"
-  },
-  {
-    "source": "/vse-rabotniki/**",
-    "destination": "/pages/vse-rabotniki/index.html"
-  },
-  {
-    "source": "/user/**",
-    "destination": "/pages/user/index.html"
-  },
-  {
-    "source": "**",
-    "destination": "/index.html"
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/player-likee/**",
+        "destination": "/pages/player-likee/index.html"
+      },
+      {
+        "source": "/jobs-moscow-ru/**",
+        "destination": "/pages/jobs-moscow-ru/jobs-moscow-ru.html"
+      },
+      {
+        "source": "/eva-maria/**",
+        "destination": "/pages/eva-maria/index.html"
+      },
+      {
+        "source": "/vse-rabotniki/**",
+        "destination": "/pages/vse-rabotniki/index.html"
+      },
+      {
+        "source": "/user/**",
+        "destination": "/pages/user/index.html"
+      },
+      {
+        "source": "/css/**",
+        "destination": "/css/$1"
+      },
+      {
+        "source": "/js/**",
+        "destination": "/js/$1"
+      },
+      {
+        "source": "**/*.@(js|css|png|jpg|jpeg|gif|svg|ico|mp3|webmanifest|json)",
+        "destination": "/$1"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
-]
+}
