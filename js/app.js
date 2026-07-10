@@ -1,23 +1,25 @@
 // ================================================================
-// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ — БЕЗ ГОСТЯ
+// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ — С ЖЕСТКОЙ ПРОВЕРКОЙ
 // ================================================================
 
-// ===== ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ =====
-
-window.goToUserPage = function() {
-    console.log('🔵 goToUserPage вызвана! USER_UID:', USER_UID);
-    
+// ===== ШЛАГБАУМ — ПРОВЕРКА ДОСТУПА =====
+function checkAccess() {
     if (!USER_UID) {
-        console.log('❌ Нет USER_UID, открываем окно входа');
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.add('open');
-        return;
+        console.log('⛔ Шлагбаум закрыт! Гость, иди нахуй!');
+        return false; // Доступ запрещен
     }
+    console.log('✅ Шлагбаум открыт! Проходи, братан!');
+    return true; // Доступ разрешен
+}
+
+// ===== ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ =====
+window.goToUserPage = function() {
+    if (!checkAccess()) return;
     
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
         var slug = snap.val();
-        console.log('🔵 Получен slug пользователя:', slug);
-        
         if (slug) {
             window.location.href = '/' + slug + '/';
         } else {
@@ -30,7 +32,6 @@ window.goToUserPage = function() {
 };
 
 // ===== ОБНОВЛЕНИЕ UI =====
-
 function updateUI() {
     var topAvatar = document.getElementById('topAvatar');
     var sAvatar = document.getElementById('sAvatar');
@@ -64,6 +65,11 @@ function updateUI() {
             localStorage.removeItem('dc_admin_' + SITE);
         }
         updateAdminMenu();
+        
+        // ПОКАЗЫВАЕМ КОНТЕНТ, СКРЫВАЕМ МОДАЛКУ
+        document.getElementById('mainContainer').style.display = 'block';
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.remove('open');
     } else {
         if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
         if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
@@ -72,11 +78,15 @@ function updateUI() {
         if (dot) dot.classList.remove('active');
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
+        
+        // СКРЫВАЕМ КОНТЕНТ, ПОКАЗЫВАЕМ МОДАЛКУ
+        document.getElementById('mainContainer').style.display = 'none';
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
     }
 }
 
 // ===== АВАТАРКИ =====
-
 function getUserAvatar(uid, callback) {
     if (avatarCache && avatarCache[uid]) {
         callback(avatarCache[uid]);
@@ -102,7 +112,6 @@ function renderAvatar(uid, container, letter) {
 }
 
 // ===== НАВИГАЦИЯ =====
-
 function setActivePage(pageId) {
     document.querySelectorAll('.page').forEach(function(el) {
         el.classList.remove('active');
@@ -122,22 +131,13 @@ function setActivePage(pageId) {
 }
 
 // ===== КНОПКА "ГЛАВНАЯ" В САЙДБАРЕ =====
-
 window.goToHome = function() {
-    if (!USER_UID) {
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
+    if (!checkAccess()) return;
     window.location.href = '/';
 };
 
 window.goToFeed = function() {
-    if (!USER_UID) {
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
+    if (!checkAccess()) return;
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/';
         return;
@@ -153,11 +153,7 @@ window.goToFeed = function() {
 };
 
 window.goToProfile = function() {
-    if (!USER_UID) {
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
+    if (!checkAccess()) return;
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/?page=profile';
         return;
@@ -174,11 +170,7 @@ window.goToProfile = function() {
 };
 
 window.goToPeople = function() {
-    if (!USER_UID) {
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
+    if (!checkAccess()) return;
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/?page=people';
         return;
@@ -194,11 +186,7 @@ window.goToPeople = function() {
 };
 
 window.goToGroups = function() {
-    if (!USER_UID) {
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
+    if (!checkAccess()) return;
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
         window.location.href = '/?page=groups';
         return;
@@ -214,8 +202,8 @@ window.goToGroups = function() {
 };
 
 // ===== САЙДБАР =====
-
 window.toggleSidebar = function() {
+    if (!checkAccess()) return;
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('show');
 };
@@ -226,7 +214,6 @@ window.closeSidebar = function() {
 };
 
 // ===== АККОРДЕОН =====
-
 window.toggleAccordion = function(header) {
     var item = header.parentElement;
     var body = item.querySelector('.accordion-body');
@@ -253,7 +240,6 @@ window.toggleAccordion = function(header) {
 };
 
 // ===== РАЗМЕР ФРЕЙМА =====
-
 window.setFrameSize = function(size) {
     currentFrameSize = size;
     document.querySelectorAll('.frame-size-btn').forEach(function(btn) {
@@ -269,7 +255,6 @@ window.setFrameSize = function(size) {
 };
 
 // ===== ТЕМА =====
-
 window.toggleTheme = function() {
     var currentTheme = document.documentElement.getAttribute('data-theme');
     var newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
@@ -284,7 +269,6 @@ window.toggleTheme = function() {
 })();
 
 // ===== РЕДАКТОР =====
-
 window.formatText = function(type) {
     var editor = document.getElementById('postEditor');
     if (!editor) return;
@@ -359,10 +343,7 @@ window.insertLink = function() {
 // ================================================================
 
 window.openChatList = function() {
-    if (!USER_UID) {
-        alert('Войдите через Google!');
-        return;
-    }
+    if (!checkAccess()) return;
     document.getElementById('chatListModal').classList.add('open');
     loadChatList();
 };
@@ -653,5 +634,12 @@ setInterval(updateNotifBadge, 5000);
 document.addEventListener('DOMContentLoaded', function() {
     if (USER_UID) {
         updateUI();
+    } else {
+        // СКРЫВАЕМ ВСЁ, ПОКАЗЫВАЕМ МОДАЛКУ
+        document.getElementById('mainContainer').style.display = 'none';
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
     }
 });
+
+console.log('✅ app.js загружен с жесткой проверкой доступа!');
