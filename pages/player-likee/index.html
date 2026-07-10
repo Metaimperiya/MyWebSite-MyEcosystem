@@ -137,6 +137,7 @@
         var SLUG = 'player-likee';
         var CURRENT_UID = null;
 
+        // ===== ЗАГРУЗКА ПРОФИЛЯ =====
         function loadProfile() {
             db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
@@ -146,6 +147,7 @@
                     CURRENT_UID = keys[0];
                     var userData = users[CURRENT_UID];
                     
+                    // ОБНОВЛЯЕМ ПРОФИЛЬ
                     document.title = userData.name + ' | METAIMPERIYA';
                     document.getElementById('profileName').textContent = userData.name || 'PLAYER Likee';
                     document.getElementById('profileBio').textContent = userData.bio || 'Привет!';
@@ -153,12 +155,30 @@
                     var avatar = document.getElementById('profileAvatar');
                     renderAvatar(CURRENT_UID, avatar, (userData.name || '?').charAt(0).toUpperCase());
                     
+                    // ОБНОВЛЯЕМ ТОПБАР И САЙДБАР
+                    updateTopbar(CURRENT_UID, userData.name);
+                    
                     loadStats();
                     loadFeed();
                 }
             });
         }
 
+        // ===== ОБНОВЛЕНИЕ ТОПБАРА И САЙДБАРА =====
+        function updateTopbar(uid, name) {
+            var topName = document.getElementById('topName');
+            var topAvatar = document.getElementById('topAvatar');
+            var sName = document.getElementById('sName');
+            var sAvatar = document.getElementById('sAvatar');
+            
+            if (topName) topName.textContent = name;
+            if (sName) sName.textContent = name;
+            
+            if (topAvatar) renderAvatar(uid, topAvatar, name.charAt(0).toUpperCase());
+            if (sAvatar) renderAvatar(uid, sAvatar, name.charAt(0).toUpperCase());
+        }
+
+        // ===== СТАТИСТИКА =====
         function loadStats() {
             db.ref('sites/' + SITE + '/friends/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
@@ -175,6 +195,7 @@
             });
         }
 
+        // ===== ЛЕНТА =====
         function loadFeed() {
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
@@ -202,6 +223,7 @@
             });
         }
 
+        // ===== ПЕРЕХОД НА СВОЮ СТРАНИЦУ =====
         window.goToUserPage = function() {
             if (!USER_UID) {
                 var loginModal = document.getElementById('loginModal');
