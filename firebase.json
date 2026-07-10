@@ -19,11 +19,11 @@
     "rewrites": [
       {
         "source": "/player-likee/**",
-        "destination": "/pages/player-likee/index.html"
+        "destination": "/player-likee.html"
       },
       {
         "source": "/jobs-moscow-ru/**",
-        "destination": "/pages/jobs-moscow-ru/index.html"
+        "destination": "/jobs-moscow-ru.html"
       },
       {
         "source": "/eva-maria/**",
