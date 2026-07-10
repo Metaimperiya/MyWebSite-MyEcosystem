@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя | METAIMPERIYA</title>
+    <title>Профиль | METAIMPERIYA</title>
     <meta name="description" content="Профиль пользователя в METAIMPERIYA.">
-    <meta property="og:title" content="Профиль пользователя | METAIMPERIYA">
+    <meta property="og:title" content="Профиль | METAIMPERIYA">
     <meta property="og:type" content="website">
     <meta name="robots" content="index, follow">
     
@@ -137,27 +137,66 @@
     <script src="/js/load-components.js"></script>
 
     <script>
-        function getUidFromUrl() {
-            var path = window.location.pathname;
-            var uid = path.replace('/user/', '').replace('/', '');
-            return uid;
+        // ================================================================
+        // ОПРЕДЕЛЕНИЕ ЧТО ПРИШЛО В URL: SLUG ИЛИ UID
+        // ================================================================
+        
+        function getProfileIdentifier() {
+            var path = window.location.pathname.replace(/^\/|\/$/g, '');
+            var segments = path.split('/');
+            
+            // ЕСЛИ ПУТЬ /user/UID/
+            if (segments[0] === 'user' && segments[1]) {
+                return { type: 'uid', value: segments[1] };
+            }
+            
+            // ЕСЛИ ПУТЬ /slug/
+            if (segments[0] && segments[0] !== 'index.html') {
+                return { type: 'slug', value: segments[0] };
+            }
+            
+            return null;
         }
-
+        
         var CURRENT_UID = null;
-
-        function loadProfile() {
-            CURRENT_UID = getUidFromUrl();
-            if (!CURRENT_UID) {
+        
+        function initProfilePage() {
+            var ident = getProfileIdentifier();
+            console.log('🔵 Определен идентификатор:', ident);
+            
+            if (!ident) {
                 document.getElementById('profileName').textContent = 'Ошибка';
-                document.getElementById('profileBio').textContent = 'Пользователь не найден';
+                document.getElementById('profileBio').textContent = 'Профиль не указан';
                 return;
             }
             
-            db.ref('sites/' + SITE + '/users/' + CURRENT_UID).once('value', function(snap) {
+            if (ident.type === 'uid') {
+                loadProfileDataByUid(ident.value);
+            } else if (ident.type === 'slug') {
+                db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(ident.value).once('value', function(snap) {
+                    var users = snap.val() || {};
+                    var keys = Object.keys(users);
+                    if (keys.length > 0) {
+                        var uid = keys[0];
+                        loadProfileDataByUid(uid);
+                    } else {
+                        console.error('❌ Пользователь с slug ' + ident.value + ' не найден');
+                        document.getElementById('profileName').textContent = 'Не найден';
+                        document.getElementById('profileBio').textContent = 'Пользователь не существует';
+                    }
+                });
+            }
+        }
+        
+        function loadProfileDataByUid(uid) {
+            CURRENT_UID = uid;
+            console.log('🔵 Загружаем данные для UID:', uid);
+            
+            db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
                 var userData = snap.val() || {};
                 if (!userData.name) {
-                    document.getElementById('profileName').textContent = 'Пользователь не найден';
-                    document.getElementById('profileBio').textContent = 'Такого профиля не существует';
+                    document.getElementById('profileName').textContent = 'Не найден';
+                    document.getElementById('profileBio').textContent = 'Пользователь не существует';
                     return;
                 }
                 
@@ -166,13 +205,24 @@
                 document.getElementById('profileBio').textContent = userData.bio || 'Привет!';
                 
                 var avatar = document.getElementById('profileAvatar');
-                renderAvatar(CURRENT_UID, avatar, (userData.name || '?').charAt(0).toUpperCase());
+                renderAvatar(uid, avatar, (userData.name || '?').charAt(0).toUpperCase());
+                
+                // ОБНОВЛЯЕМ ТОПБАР
+                var topName = document.getElementById('topName');
+                var topAvatar = document.getElementById('topAvatar');
+                if (topName) topName.textContent = userData.name;
+                if (topAvatar) renderAvatar(uid, topAvatar, userData.name.charAt(0).toUpperCase());
+                
+                var sName = document.getElementById('sName');
+                var sAvatar = document.getElementById('sAvatar');
+                if (sName) sName.textContent = userData.name;
+                if (sAvatar) renderAvatar(uid, sAvatar, userData.name.charAt(0).toUpperCase());
                 
                 loadStats();
                 loadFeed();
             });
         }
-
+        
         function loadStats() {
             db.ref('sites/' + SITE + '/friends/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
@@ -188,7 +238,7 @@
                 document.getElementById('subscriptionsCount').textContent = '📌 ' + Object.keys(data).length;
             });
         }
-
+        
         function loadFeed() {
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
@@ -212,7 +262,7 @@
                 });
             });
         }
-
+        
         window.goToUserPage = function() {
             if (!USER_UID) {
                 var loginModal = document.getElementById('loginModal');
@@ -228,9 +278,9 @@
                 }
             });
         };
-
+        
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(loadProfile, 500);
+            setTimeout(initProfilePage, 500);
         });
     </script>
 </body>
