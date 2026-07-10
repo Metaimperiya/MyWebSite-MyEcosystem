@@ -5,23 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLAYER Likee | METAIMPERIYA</title>
     
-    <!-- ===== SEO ===== -->
-    <meta name="description" content="PLAYER Likee — администратор METAIMPERIYA. Социальная платформа нового поколения.">
+    <meta name="description" content="PLAYER Likee — администратор METAIMPERIYA.">
     <meta property="og:title" content="PLAYER Likee | METAIMPERIYA">
-    <meta property="og:description" content="Администратор METAIMPERIYA">
     <meta property="og:type" content="website">
     <meta name="robots" content="index, follow">
     
+    <!-- ===== FIREBASE ===== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/dark-theme.css">
+    <!-- ===== СТИЛИ (АБСОЛЮТНЫЕ ПУТИ) ===== -->
+    <link rel="stylesheet" href="https://www.metaimperiya.com/style.css">
+    <link rel="stylesheet" href="https://www.metaimperiya.com/dark-theme.css">
     
     <style>
-        /* ===== УНИКАЛЬНЫЙ СТИЛЬ ДЛЯ PLAYER Likee (ФИОЛЕТОВЫЙ) ===== */
         .player-header {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: white;
@@ -79,9 +78,6 @@
             color: var(--link-color);
             font-size: 14px;
         }
-        .player-stats span:hover {
-            text-decoration: underline;
-        }
         .player-content {
             max-width: 800px;
             margin: 20px auto;
@@ -92,7 +88,6 @@
             padding: 16px 20px;
             border-radius: 12px;
             margin-bottom: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
             border-left: 4px solid #ffcc00;
         }
         .player-card h3 {
@@ -115,22 +110,15 @@
             margin-bottom: 16px;
             color: var(--text-primary);
         }
-        /* Стили для постов */
         .post-card {
             background: var(--card-bg);
             padding: 16px;
             border-radius: 12px;
             margin-bottom: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
         @media (max-width: 600px) {
-            .player-header h1 {
-                font-size: 24px;
-            }
-            .player-stats {
-                gap: 16px;
-                flex-wrap: wrap;
-            }
+            .player-header h1 { font-size: 24px; }
+            .player-stats { gap: 16px; flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -142,43 +130,33 @@
         <div id="settingsContainer"></div>
 
         <main>
-            <!-- ===== УНИКАЛЬНЫЙ ХЕДЕР PLAYER Likee ===== -->
             <div class="player-header" id="profileHeader">
-                <div class="profile-avatar" id="profileAvatar">
-                    <span class="letter">P</span>
-                </div>
+                <div class="profile-avatar" id="profileAvatar"><span class="letter">P</span></div>
                 <h1 id="profileName">PLAYER Likee</h1>
                 <p id="profileBio">Администратор METAIMPERIYA</p>
                 <span class="player-badge">⭐ Владелец платформы</span>
             </div>
 
-            <!-- ===== СТАТИСТИКА ===== -->
             <div class="player-stats">
                 <span id="friendsCount">👥 0</span>
                 <span id="subscribersCount">👀 0</span>
                 <span id="subscriptionsCount">📌 0</span>
             </div>
 
-            <!-- ===== УНИКАЛЬНЫЙ КОНТЕНТ PLAYER Likee ===== -->
             <div class="player-content">
                 <div class="player-card">
                     <h3>🎯 Обо мне</h3>
-                    <p>Администратор и основатель социальной платформы METAIMPERIYA.</p>
+                    <p>Администратор и основатель METAIMPERIYA.</p>
                 </div>
                 <div class="player-card">
                     <h3>💻 Проекты</h3>
                     <p>🌐 <a href="https://dominate-google-maps.vercel.app/" target="_blank">dominate-google-maps.vercel.app</a></p>
-                    <p>🏴‍☠️ <a href="/">METAIMPERIYA</a></p>
                 </div>
             </div>
 
-            <!-- ===== ЛЕНТА ===== -->
             <div class="feed-container">
                 <h2 class="feed-title">🌐 Моя лента</h2>
-                <div id="feed">
-                    <!-- Здесь будут посты из Firebase -->
-                    <div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>
-                </div>
+                <div id="feed"><div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div></div>
             </div>
         </main>
 
@@ -186,60 +164,43 @@
         <div id="modalsContainer"></div>
     </div>
 
-    <script src="/firebase.js"></script>
-    <script src="/auth.js"></script>
-    <script src="/app.js"></script>
-    <script src="/profile.js"></script>
-    <script src="/notifications.js"></script>
-    <script src="/lang.js"></script>
-    <script src="/load-components.js"></script>
+    <!-- ===== СКРИПТЫ (АБСОЛЮТНЫЕ ПУТИ) ===== -->
+    <script src="https://www.metaimperiya.com/firebase.js"></script>
+    <script src="https://www.metaimperiya.com/auth.js"></script>
+    <script src="https://www.metaimperiya.com/app.js"></script>
+    <script src="https://www.metaimperiya.com/profile.js"></script>
+    <script src="https://www.metaimperiya.com/notifications.js"></script>
+    <script src="https://www.metaimperiya.com/lang.js"></script>
+    <script src="https://www.metaimperiya.com/load-components.js"></script>
 
     <script>
-        // ================================================================
-        // PLAYER Likee — УНИКАЛЬНЫЙ КОД
-        // ================================================================
-        
         var SLUG = 'player-likee';
         var CURRENT_UID = null;
 
         function loadProfile() {
-            console.log('🔵 Загружаем профиль PLAYER Likee...');
-            
             db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
-                
                 if (keys.length > 0) {
                     CURRENT_UID = keys[0];
                     var userData = users[CURRENT_UID];
-                    console.log('✅ Найден пользователь:', userData);
-                    
-                    // ОБНОВЛЯЕМ ХЕДЕР
                     document.getElementById('profileName').textContent = userData.name || 'PLAYER Likee';
                     document.getElementById('profileBio').textContent = userData.bio || 'Администратор METAIMPERIYA';
-                    
                     var avatar = document.getElementById('profileAvatar');
                     renderAvatar(CURRENT_UID, avatar, (userData.name || 'P').charAt(0).toUpperCase());
                     
-                    // ОБНОВЛЯЕМ ТОПБАР
                     var topName = document.getElementById('topName');
                     var topAvatar = document.getElementById('topAvatar');
                     if (topName) topName.textContent = userData.name;
                     if (topAvatar) renderAvatar(CURRENT_UID, topAvatar, userData.name.charAt(0).toUpperCase());
                     
-                    // ОБНОВЛЯЕМ САЙДБАР
                     var sName = document.getElementById('sName');
                     var sAvatar = document.getElementById('sAvatar');
                     if (sName) sName.textContent = userData.name;
                     if (sAvatar) renderAvatar(CURRENT_UID, sAvatar, userData.name.charAt(0).toUpperCase());
                     
-                    // ЗАГРУЖАЕМ СТАТИСТИКУ
                     loadStats();
-                    
-                    // ЗАГРУЖАЕМ ЛЕНТУ
                     loadFeed();
-                } else {
-                    console.error('❌ Пользователь с slug ' + SLUG + ' не найден');
                 }
             });
         }
@@ -263,21 +224,17 @@
         function loadFeed() {
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
-            
             container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>';
-            
             db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
                 container.innerHTML = '';
                 var data = snap.val() || {};
                 var keys = Object.keys(data).sort(function(a, b) {
                     return (data[b].timestamp || 0) - (data[a].timestamp || 0);
                 });
-                
                 if (!keys.length) {
                     container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет постов. Напишите что-нибудь!</div>';
                     return;
                 }
-                
                 keys.forEach(function(k) {
                     var post = data[k];
                     post.id = k;
@@ -295,11 +252,8 @@
             }
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
                 var slug = snap.val();
-                if (slug) {
-                    window.location.href = '/' + slug + '/';
-                } else {
-                    window.location.href = '/user/' + USER_UID + '/';
-                }
+                if (slug) window.location.href = '/' + slug + '/';
+                else window.location.href = '/user/' + USER_UID + '/';
             });
         };
 
@@ -307,14 +261,5 @@
             setTimeout(loadProfile, 500);
         });
     </script>
-
-    <!-- ===== ДЛЯ ПОИСКОВИКОВ ===== -->
-    <noscript>
-        <div style="display:none;">
-            <h1>PLAYER Likee — администратор METAIMPERIYA</h1>
-            <p>Социальная платформа нового поколения</p>
-            <p>Администратор, разработчик, METAIMPERIYA</p>
-        </div>
-    </noscript>
 </body>
 </html>
