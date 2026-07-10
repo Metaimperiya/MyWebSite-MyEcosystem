@@ -21,26 +21,28 @@
     <link rel="stylesheet" href="/dark-theme.css">
     
     <style>
-        .profile-header {
+        /* ===== УНИКАЛЬНЫЙ СТИЛЬ ДЛЯ PLAYER Likee (ФИОЛЕТОВЫЙ) ===== */
+        .player-header {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: white;
             padding: 40px 20px;
             text-align: center;
+            border-bottom: 4px solid #ffcc00;
         }
-        .profile-header .profile-avatar {
+        .player-header .profile-avatar {
             width: 100px;
             height: 100px;
             border-radius: 50%;
             overflow: hidden;
             margin: 0 auto 12px;
-            border: 3px solid #fff;
+            border: 3px solid #ffcc00;
         }
-        .profile-header .profile-avatar img {
+        .player-header .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .profile-header .profile-avatar .letter {
+        .player-header .profile-avatar .letter {
             font-size: 48px;
             display: flex;
             align-items: center;
@@ -48,18 +50,23 @@
             width: 100%;
             height: 100%;
             background: #302b63;
-            color: #fff;
+            color: #ffcc00;
         }
-        .profile-header h1 {
+        .player-header h1 {
             font-size: 32px;
             margin: 0;
         }
-        .profile-header p {
-            font-size: 16px;
-            opacity: 0.8;
-            margin: 4px 0 0 0;
+        .player-header .player-badge {
+            display: inline-block;
+            background: #ffcc00;
+            color: #0f0c29;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 8px;
         }
-        .profile-stats {
+        .player-stats {
             display: flex;
             justify-content: center;
             gap: 30px;
@@ -67,31 +74,32 @@
             background: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
         }
-        .profile-stats span {
+        .player-stats span {
             cursor: pointer;
             color: var(--link-color);
             font-size: 14px;
         }
-        .profile-stats span:hover {
+        .player-stats span:hover {
             text-decoration: underline;
         }
-        .profile-content {
+        .player-content {
             max-width: 800px;
             margin: 20px auto;
             padding: 0 20px;
         }
-        .profile-card {
+        .player-card {
             background: var(--card-bg);
             padding: 16px 20px;
             border-radius: 12px;
             margin-bottom: 12px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            border-left: 4px solid #ffcc00;
         }
-        .profile-card h3 {
+        .player-card h3 {
             margin: 0 0 4px 0;
             color: var(--text-primary);
         }
-        .profile-card p {
+        .player-card p {
             margin: 0;
             color: var(--text-secondary);
             font-size: 14px;
@@ -115,64 +123,13 @@
             margin-bottom: 12px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
-        .post-card .post-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-        .post-card .post-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .post-card .post-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .post-card .post-avatar .letter {
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            background: var(--input-bg);
-            color: var(--text-primary);
-        }
-        .post-card .post-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .post-card .post-time {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-left: auto;
-        }
-        .post-card .post-text {
-            font-size: 14px;
-            line-height: 1.5;
-            margin: 8px 0;
-            word-wrap: break-word;
-        }
-        .post-card .post-image {
-            max-width: 100%;
-            border-radius: 8px;
-            margin: 8px 0;
-        }
         @media (max-width: 600px) {
-            .profile-header h1 {
+            .player-header h1 {
                 font-size: 24px;
             }
-            .profile-stats {
+            .player-stats {
                 gap: 16px;
                 flex-wrap: wrap;
-            }
-            .profile-stats span {
-                font-size: 12px;
             }
         }
     </style>
@@ -185,38 +142,43 @@
         <div id="settingsContainer"></div>
 
         <main>
-            <!-- ===== ХЕДЕР PLAYER Likee ===== -->
-            <div class="profile-header" id="profileHeader">
+            <!-- ===== УНИКАЛЬНЫЙ ХЕДЕР PLAYER Likee ===== -->
+            <div class="player-header" id="profileHeader">
                 <div class="profile-avatar" id="profileAvatar">
                     <span class="letter">P</span>
                 </div>
                 <h1 id="profileName">PLAYER Likee</h1>
                 <p id="profileBio">Администратор METAIMPERIYA</p>
+                <span class="player-badge">⭐ Владелец платформы</span>
             </div>
 
             <!-- ===== СТАТИСТИКА ===== -->
-            <div class="profile-stats">
+            <div class="player-stats">
                 <span id="friendsCount">👥 0</span>
                 <span id="subscribersCount">👀 0</span>
                 <span id="subscriptionsCount">📌 0</span>
             </div>
 
-            <!-- ===== КОНТЕНТ ===== -->
-            <div class="profile-content">
-                <div class="profile-card">
+            <!-- ===== УНИКАЛЬНЫЙ КОНТЕНТ PLAYER Likee ===== -->
+            <div class="player-content">
+                <div class="player-card">
                     <h3>🎯 Обо мне</h3>
-                    <p>Администратор социальной платформы METAIMPERIYA</p>
+                    <p>Администратор и основатель социальной платформы METAIMPERIYA.</p>
                 </div>
-                <div class="profile-card">
-                    <h3>🔗 Ссылки</h3>
+                <div class="player-card">
+                    <h3>💻 Проекты</h3>
                     <p>🌐 <a href="https://dominate-google-maps.vercel.app/" target="_blank">dominate-google-maps.vercel.app</a></p>
+                    <p>🏴‍☠️ <a href="/">METAIMPERIYA</a></p>
                 </div>
             </div>
 
             <!-- ===== ЛЕНТА ===== -->
             <div class="feed-container">
-                <h2 class="feed-title">🌐 Лента</h2>
-                <div id="feed"></div>
+                <h2 class="feed-title">🌐 Моя лента</h2>
+                <div id="feed">
+                    <!-- Здесь будут посты из Firebase -->
+                    <div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>
+                </div>
             </div>
         </main>
 
@@ -312,7 +274,7 @@
                 });
                 
                 if (!keys.length) {
-                    container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет постов</div>';
+                    container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет постов. Напишите что-нибудь!</div>';
                     return;
                 }
                 
