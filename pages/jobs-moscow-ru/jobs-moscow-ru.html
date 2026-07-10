@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Moscow | METAIMPERIYA</title>
-    
-    <!-- ===== SEO ===== -->
-    <meta name="description" content="Jobs Moscow — вакансии и работа в Москве. Социальная платформа METAIMPERIYA.">
+    <meta name="description" content="Jobs Moscow — вакансии и работа в Москве.">
     <meta property="og:title" content="Jobs Moscow | METAIMPERIYA">
-    <meta property="og:description" content="Вакансии и работа в Москве">
     <meta property="og:type" content="website">
     <meta name="robots" content="index, follow">
     
@@ -21,7 +18,6 @@
     <link rel="stylesheet" href="/dark-theme.css">
     
     <style>
-        /* ===== УНИКАЛЬНЫЙ СТИЛЬ ДЛЯ JOBS MOSCOW (СИНИЙ) ===== */
         .jobs-header {
             background: linear-gradient(135deg, #0c2340, #1a4a7a, #2a6bb0);
             color: white;
@@ -55,6 +51,11 @@
         .jobs-header h1 {
             font-size: 32px;
             margin: 0;
+        }
+        .jobs-header p {
+            font-size: 18px;
+            opacity: 0.8;
+            margin: 4px 0 0 0;
         }
         .jobs-header .jobs-badge {
             display: inline-block;
@@ -92,7 +93,6 @@
             padding: 16px 20px;
             border-radius: 12px;
             margin-bottom: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
             border-left: 4px solid #00d4ff;
         }
         .jobs-card h3 {
@@ -103,6 +103,13 @@
             margin: 0;
             color: var(--text-secondary);
             font-size: 14px;
+        }
+        .jobs-card a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+        .jobs-card a:hover {
+            text-decoration: underline;
         }
         .feed-container {
             max-width: 800px;
@@ -115,22 +122,16 @@
             margin-bottom: 16px;
             color: var(--text-primary);
         }
-        /* Стили для постов */
         .post-card {
             background: var(--card-bg);
             padding: 16px;
             border-radius: 12px;
             margin-bottom: 12px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
         @media (max-width: 600px) {
-            .jobs-header h1 {
-                font-size: 24px;
-            }
-            .jobs-stats {
-                gap: 16px;
-                flex-wrap: wrap;
-            }
+            .jobs-header h1 { font-size: 24px; }
+            .jobs-stats { gap: 16px; flex-wrap: wrap; }
+            .jobs-stats span { font-size: 12px; }
         }
     </style>
 </head>
@@ -142,24 +143,19 @@
         <div id="settingsContainer"></div>
 
         <main>
-            <!-- ===== УНИКАЛЬНЫЙ ХЕДЕР JOBS MOSCOW ===== -->
             <div class="jobs-header" id="profileHeader">
-                <div class="profile-avatar" id="profileAvatar">
-                    <span class="letter">J</span>
-                </div>
+                <div class="profile-avatar" id="profileAvatar"><span class="letter">J</span></div>
                 <h1 id="profileName">Jobs Moscow</h1>
                 <p id="profileBio">Вакансии и работа в Москве</p>
                 <span class="jobs-badge">💼 Работа в Москве</span>
             </div>
 
-            <!-- ===== СТАТИСТИКА ===== -->
             <div class="jobs-stats">
                 <span id="friendsCount">👥 0</span>
                 <span id="subscribersCount">👀 0</span>
                 <span id="subscriptionsCount">📌 0</span>
             </div>
 
-            <!-- ===== УНИКАЛЬНЫЙ КОНТЕНТ JOBS MOSCOW ===== -->
             <div class="jobs-content">
                 <div class="jobs-card">
                     <h3>🔥 Свежие вакансии</h3>
@@ -175,13 +171,9 @@
                 </div>
             </div>
 
-            <!-- ===== ЛЕНТА ===== -->
             <div class="feed-container">
                 <h2 class="feed-title">🌐 Лента вакансий</h2>
-                <div id="feed">
-                    <!-- Здесь будут посты из Firebase -->
-                    <div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>
-                </div>
+                <div id="feed"><div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div></div>
             </div>
         </main>
 
@@ -198,48 +190,36 @@
     <script src="/load-components.js"></script>
 
     <script>
-        // ================================================================
-        // JOBS MOSCOW — УНИКАЛЬНЫЙ КОД
-        // ================================================================
-        
         var SLUG = 'jobs-moscow-ru';
         var CURRENT_UID = null;
 
         function loadProfile() {
             console.log('🔵 Загружаем профиль Jobs Moscow...');
-            
             db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
-                
                 if (keys.length > 0) {
                     CURRENT_UID = keys[0];
                     var userData = users[CURRENT_UID];
                     console.log('✅ Найден пользователь:', userData);
                     
-                    // ОБНОВЛЯЕМ ХЕДЕР
                     document.getElementById('profileName').textContent = userData.name || 'Jobs Moscow';
                     document.getElementById('profileBio').textContent = userData.bio || 'Вакансии и работа в Москве';
                     
                     var avatar = document.getElementById('profileAvatar');
                     renderAvatar(CURRENT_UID, avatar, (userData.name || 'J').charAt(0).toUpperCase());
                     
-                    // ОБНОВЛЯЕМ ТОПБАР
                     var topName = document.getElementById('topName');
                     var topAvatar = document.getElementById('topAvatar');
                     if (topName) topName.textContent = userData.name;
                     if (topAvatar) renderAvatar(CURRENT_UID, topAvatar, userData.name.charAt(0).toUpperCase());
                     
-                    // ОБНОВЛЯЕМ САЙДБАР
                     var sName = document.getElementById('sName');
                     var sAvatar = document.getElementById('sAvatar');
                     if (sName) sName.textContent = userData.name;
                     if (sAvatar) renderAvatar(CURRENT_UID, sAvatar, userData.name.charAt(0).toUpperCase());
                     
-                    // ЗАГРУЖАЕМ СТАТИСТИКУ
                     loadStats();
-                    
-                    // ЗАГРУЖАЕМ ЛЕНТУ
                     loadFeed();
                 } else {
                     console.error('❌ Пользователь с slug ' + SLUG + ' не найден');
@@ -268,21 +248,17 @@
         function loadFeed() {
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
-            
             container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div>';
-            
             db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
                 container.innerHTML = '';
                 var data = snap.val() || {};
                 var keys = Object.keys(data).sort(function(a, b) {
                     return (data[b].timestamp || 0) - (data[a].timestamp || 0);
                 });
-                
                 if (!keys.length) {
                     container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет вакансий. Создайте первую!</div>';
                     return;
                 }
-                
                 keys.forEach(function(k) {
                     var post = data[k];
                     post.id = k;
@@ -312,14 +288,5 @@
             setTimeout(loadProfile, 500);
         });
     </script>
-
-    <!-- ===== ДЛЯ ПОИСКОВИКОВ ===== -->
-    <noscript>
-        <div style="display:none;">
-            <h1>Jobs Moscow — вакансии и работа в Москве</h1>
-            <p>Социальная платформа METAIMPERIYA</p>
-            <p>Вакансии, работа, Москва, трудоустройство</p>
-        </div>
-    </noscript>
 </body>
 </html>
