@@ -119,7 +119,7 @@ window.logout = function() {
         isAdmin = false;
         
         var feed = document.getElementById('feed');
-        if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
+        if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите через Google</div>';
         var dot = document.getElementById('adminDot');
         if (dot) dot.classList.remove('active');
         if (typeof closeSidebar === 'function') closeSidebar();
