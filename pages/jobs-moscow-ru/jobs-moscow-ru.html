@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLAYER Likee | METAIMPERIYA</title>
-    <meta name="description" content="PLAYER Likee — администратор METAIMPERIYA.">
-    <meta property="og:title" content="PLAYER Likee | METAIMPERIYA">
+    <title>Jobs Moscow | METAIMPERIYA</title>
+    <meta name="description" content="Jobs Moscow — вакансии и работа в Москве.">
+    <meta property="og:title" content="Jobs Moscow | METAIMPERIYA">
     <meta property="og:type" content="website">
     <meta name="robots" content="index, follow">
     
@@ -18,51 +18,56 @@
     <link rel="stylesheet" href="/css/dark-theme.css">
     
     <style>
-        .player-header {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        .jobs-header {
+            background: linear-gradient(135deg, #0c2340, #1a4a7a, #2a6bb0);
             color: white;
             padding: 40px 20px;
             text-align: center;
-            border-bottom: 4px solid #ffcc00;
+            border-bottom: 4px solid #00d4ff;
         }
-        .player-header .profile-avatar {
+        .jobs-header .profile-avatar {
             width: 100px;
             height: 100px;
             border-radius: 50%;
             overflow: hidden;
             margin: 0 auto 12px;
-            border: 3px solid #ffcc00;
+            border: 3px solid #00d4ff;
         }
-        .player-header .profile-avatar img {
+        .jobs-header .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .player-header .profile-avatar .letter {
+        .jobs-header .profile-avatar .letter {
             font-size: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
-            background: #302b63;
-            color: #ffcc00;
+            background: #1a4a7a;
+            color: #00d4ff;
         }
-        .player-header h1 {
+        .jobs-header h1 {
             font-size: 32px;
             margin: 0;
         }
-        .player-header .player-badge {
+        .jobs-header p {
+            font-size: 18px;
+            opacity: 0.8;
+            margin: 4px 0 0 0;
+        }
+        .jobs-header .jobs-badge {
             display: inline-block;
-            background: #ffcc00;
-            color: #0f0c29;
+            background: #00d4ff;
+            color: #0c2340;
             padding: 4px 16px;
             border-radius: 20px;
             font-size: 14px;
             font-weight: bold;
             margin-top: 8px;
         }
-        .player-stats {
+        .jobs-stats {
             display: flex;
             justify-content: center;
             gap: 30px;
@@ -70,28 +75,31 @@
             background: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
         }
-        .player-stats span {
+        .jobs-stats span {
             cursor: pointer;
             color: var(--link-color);
             font-size: 14px;
         }
-        .player-content {
+        .jobs-stats span:hover {
+            text-decoration: underline;
+        }
+        .jobs-content {
             max-width: 800px;
             margin: 20px auto;
             padding: 0 20px;
         }
-        .player-card {
+        .jobs-card {
             background: var(--card-bg);
             padding: 16px 20px;
             border-radius: 12px;
             margin-bottom: 12px;
-            border-left: 4px solid #ffcc00;
+            border-left: 4px solid #00d4ff;
         }
-        .player-card h3 {
+        .jobs-card h3 {
             margin: 0 0 4px 0;
             color: var(--text-primary);
         }
-        .player-card p {
+        .jobs-card p {
             margin: 0;
             color: var(--text-secondary);
             font-size: 14px;
@@ -114,8 +122,8 @@
             margin-bottom: 12px;
         }
         @media (max-width: 600px) {
-            .player-header h1 { font-size: 24px; }
-            .player-stats { gap: 16px; flex-wrap: wrap; }
+            .jobs-header h1 { font-size: 24px; }
+            .jobs-stats { gap: 16px; flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -127,32 +135,36 @@
         <div id="settingsContainer"></div>
 
         <main>
-            <div class="player-header" id="profileHeader">
-                <div class="profile-avatar" id="profileAvatar"><span class="letter">P</span></div>
-                <h1 id="profileName">PLAYER Likee</h1>
-                <p id="profileBio">Администратор METAIMPERIYA</p>
-                <span class="player-badge">⭐ Владелец платформы</span>
+            <div class="jobs-header" id="profileHeader">
+                <div class="profile-avatar" id="profileAvatar"><span class="letter">J</span></div>
+                <h1 id="profileName">Jobs Moscow</h1>
+                <p id="profileBio">Вакансии и работа в Москве</p>
+                <span class="jobs-badge">💼 Работа в Москве</span>
             </div>
 
-            <div class="player-stats">
+            <div class="jobs-stats">
                 <span id="friendsCount">👥 0</span>
                 <span id="subscribersCount">👀 0</span>
                 <span id="subscriptionsCount">📌 0</span>
             </div>
 
-            <div class="player-content">
-                <div class="player-card">
-                    <h3>🎯 Обо мне</h3>
-                    <p>Администратор и основатель социальной платформы METAIMPERIYA.</p>
+            <div class="jobs-content">
+                <div class="jobs-card">
+                    <h3>🔥 Свежие вакансии</h3>
+                    <p>Здесь будут твои посты и объявления о работе.</p>
                 </div>
-                <div class="player-card">
-                    <h3>💻 Проекты</h3>
-                    <p>🌐 <a href="https://dominate-google-maps.vercel.app/" target="_blank">dominate-google-maps.vercel.app</a></p>
+                <div class="jobs-card">
+                    <h3>📊 Статистика</h3>
+                    <p>Подписчики: <span id="subCount">0</span> | Просмотры: <span id="viewCount">0</span></p>
+                </div>
+                <div class="jobs-card">
+                    <h3>📍 Город</h3>
+                    <p>Москва, Россия</p>
                 </div>
             </div>
 
             <div class="feed-container">
-                <h2 class="feed-title">🌐 Моя лента</h2>
+                <h2 class="feed-title">🌐 Лента вакансий</h2>
                 <div id="feed"><div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка постов...</div></div>
             </div>
         </main>
@@ -170,20 +182,24 @@
     <script src="/js/load-components.js"></script>
 
     <script>
-        var SLUG = 'player-likee';
+        var SLUG = 'jobs-moscow-ru';
         var CURRENT_UID = null;
 
         function loadProfile() {
+            console.log('🔵 Загружаем профиль Jobs Moscow...');
             db.ref('sites/' + SITE + '/users').orderByChild('slug').equalTo(SLUG).once('value', function(snap) {
                 var users = snap.val() || {};
                 var keys = Object.keys(users);
                 if (keys.length > 0) {
                     CURRENT_UID = keys[0];
                     var userData = users[CURRENT_UID];
-                    document.getElementById('profileName').textContent = userData.name || 'PLAYER Likee';
-                    document.getElementById('profileBio').textContent = userData.bio || 'Администратор METAIMPERIYA';
+                    console.log('✅ Найден пользователь:', userData);
+                    
+                    document.getElementById('profileName').textContent = userData.name || 'Jobs Moscow';
+                    document.getElementById('profileBio').textContent = userData.bio || 'Вакансии и работа в Москве';
+                    
                     var avatar = document.getElementById('profileAvatar');
-                    renderAvatar(CURRENT_UID, avatar, (userData.name || 'P').charAt(0).toUpperCase());
+                    renderAvatar(CURRENT_UID, avatar, (userData.name || 'J').charAt(0).toUpperCase());
                     
                     var topName = document.getElementById('topName');
                     var topAvatar = document.getElementById('topAvatar');
@@ -197,6 +213,8 @@
                     
                     loadStats();
                     loadFeed();
+                } else {
+                    console.error('❌ Пользователь с slug ' + SLUG + ' не найден');
                 }
             });
         }
@@ -209,7 +227,9 @@
             });
             db.ref('sites/' + SITE + '/subscribers/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
-                document.getElementById('subscribersCount').textContent = '👀 ' + Object.keys(data).length;
+                var count = Object.keys(data).length;
+                document.getElementById('subscribersCount').textContent = '👀 ' + count;
+                document.getElementById('subCount').textContent = count;
             });
             db.ref('sites/' + SITE + '/subscriptions/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
@@ -228,7 +248,7 @@
                     return (data[b].timestamp || 0) - (data[a].timestamp || 0);
                 });
                 if (!keys.length) {
-                    container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет постов. Напишите что-нибудь!</div>';
+                    container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">📝 Нет вакансий. Создайте первую!</div>';
                     return;
                 }
                 keys.forEach(function(k) {
