@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Moscow | METAIMPERIYA</title>
     
+    <!-- ===== ЭТО ДЛЯ ПОИСКОВИКОВ (СНИЗУ БУДЕТ ДУБЛИРОВАТЬСЯ) ===== -->
+    <meta name="description" content="Jobs Moscow — вакансии и работа в Москве. Социальная платформа METAIMPERIYA.">
+    <meta property="og:title" content="Jobs Moscow | METAIMPERIYA">
+    <meta property="og:description" content="Вакансии и работа в Москве">
+    <meta property="og:type" content="website">
+    <meta name="robots" content="index, follow">
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,6 +21,7 @@
     <link rel="stylesheet" href="/dark-theme.css">
     
     <style>
+        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
         .jobs-header {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             color: white;
@@ -58,27 +66,97 @@
             margin-bottom: 16px;
             color: var(--text-primary);
         }
+        /* ===== СТИЛИ ДЛЯ ЛЕНТЫ ===== */
+        .post-card {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .post-card .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .post-card .post-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .post-card .post-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post-card .post-avatar .letter {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+        .post-card .post-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .post-card .post-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+        .post-card .post-text {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 8px 0;
+            word-wrap: break-word;
+        }
+        .post-card .post-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
         @media (max-width: 600px) {
             .jobs-header h1 {
                 font-size: 24px;
+            }
+            .jobs-header p {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="app">
-        <div id="topbarContainer"></div>
-        <div id="sidebarContainer"></div>
-        <div id="settingsContainer"></div>
-        <div id="playerContainer"></div>
+    <!-- ============================================================
+         ВЕРХНЯЯ ЧАСТЬ — ЛЕНТА И КОНТЕНТ (ВИДИМАЯ ЧАСТЬ)
+         ============================================================ -->
 
+    <div id="app">
+        <!-- ТОПБАР -->
+        <div id="topbarContainer"></div>
+        
+        <!-- САЙДБАР -->
+        <div id="sidebarContainer"></div>
+        
+        <!-- НАСТРОЙКИ -->
+        <div id="settingsContainer"></div>
+
+        <!-- ===== ОСНОВНОЙ КОНТЕНТ (ЛЕНТА СВЕРХУ) ===== -->
         <main>
+            <!-- УНИКАЛЬНЫЙ ХЕДЕР JOBS MOSCOW -->
             <div class="jobs-header">
                 <h1>💼 Jobs Moscow</h1>
                 <p>Вакансии и работа в Москве</p>
             </div>
 
+            <!-- КОНТЕНТ -->
             <div class="jobs-content">
                 <div class="jobs-card">
                     <h3>🔥 Свежие вакансии</h3>
@@ -90,15 +168,25 @@
                 </div>
             </div>
 
+            <!-- ===== ЛЕНТА ИЗ FIREBASE (СВЕРХУ!) ===== -->
             <div class="feed-container">
                 <h2 class="feed-title">🌐 Лента</h2>
                 <div id="feed"></div>
             </div>
         </main>
 
+        <!-- ПЛЕЕР -->
+        <div id="playerContainer"></div>
+        
+        <!-- МОДАЛКИ -->
         <div id="modalsContainer"></div>
     </div>
 
+    <!-- ============================================================
+         НИЖНЯЯ ЧАСТЬ — СКРИПТЫ (ДЛЯ ПОИСКОВИКОВ И РАБОТЫ)
+         ============================================================ -->
+
+    <!-- ПОДКЛЮЧАЕМ СКРИПТЫ -->
     <script src="/firebase.js"></script>
     <script src="/auth.js"></script>
     <script src="/app.js"></script>
@@ -115,6 +203,7 @@
         var SLUG = 'jobs-moscow-ru';
         var CURRENT_UID = null;
 
+        // ===== ЗАГРУЗКА ПРОФИЛЯ =====
         function loadJobsProfile() {
             console.log('🔵 Загружаем профиль Jobs Moscow...');
             
@@ -128,8 +217,10 @@
                     console.log('✅ Найден пользователь:', userData);
                     
                     // ОБНОВЛЯЕМ ХЕДЕР
-                    document.querySelector('.jobs-header h1').textContent = '💼 ' + (userData.name || 'Jobs Moscow');
-                    document.querySelector('.jobs-header p').textContent = userData.bio || 'Вакансии и работа в Москве';
+                    var headerH1 = document.querySelector('.jobs-header h1');
+                    var headerP = document.querySelector('.jobs-header p');
+                    if (headerH1) headerH1.textContent = '💼 ' + (userData.name || 'Jobs Moscow');
+                    if (headerP) headerP.textContent = userData.bio || 'Вакансии и работа в Москве';
                     
                     // ОБНОВЛЯЕМ ТОПБАР
                     var topName = document.getElementById('topName');
@@ -151,6 +242,7 @@
             });
         }
 
+        // ===== ЗАГРУЗКА ЛЕНТЫ =====
         function loadJobsFeed() {
             var container = document.getElementById('feed');
             if (!container || !CURRENT_UID) return;
@@ -178,6 +270,7 @@
             });
         }
 
+        // ===== ПЕРЕХОД НА СВОЮ СТРАНИЦУ =====
         window.goToUserPage = function() {
             if (!USER_UID) {
                 var loginModal = document.getElementById('loginModal');
@@ -194,9 +287,19 @@
             });
         };
 
+        // ===== СТАРТ =====
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(loadJobsProfile, 500);
         });
     </script>
+
+    <!-- ===== ДУБЛИРУЕМ СОДЕРЖИМОЕ ДЛЯ ПОИСКОВИКОВ ===== -->
+    <noscript>
+        <div style="display:none;">
+            <h1>Jobs Moscow — вакансии и работа в Москве</h1>
+            <p>Социальная платформа METAIMPERIYA</p>
+            <p>Вакансии, работа, Москва, трудоустройство</p>
+        </div>
+    </noscript>
 </body>
 </html>
