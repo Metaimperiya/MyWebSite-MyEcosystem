@@ -71,9 +71,6 @@
             cursor: pointer;
             color: var(--link-color);
         }
-        .profile-page .profile-stats span:hover {
-            text-decoration: underline;
-        }
         .feed-container {
             max-width: 800px;
             margin: 20px auto;
@@ -137,24 +134,23 @@
     <script src="/load-components.js"></script>
 
     <script>
-        // ================================================================
-        // ПОЛУЧАЕМ UID ИЗ URL
-        // ================================================================
-        
         function getUidFromUrl() {
             var path = window.location.pathname;
             var uid = path.replace('/user/', '').replace('/', '');
             return uid;
         }
-        
-        function loadUserProfile(uid) {
-            if (!uid) {
+
+        var CURRENT_UID = null;
+
+        function loadProfile() {
+            CURRENT_UID = getUidFromUrl();
+            if (!CURRENT_UID) {
                 document.getElementById('profileName').textContent = 'Ошибка';
                 document.getElementById('profileBio').textContent = 'Пользователь не найден';
                 return;
             }
             
-            db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
+            db.ref('sites/' + SITE + '/users/' + CURRENT_UID).once('value', function(snap) {
                 var userData = snap.val() || {};
                 
                 if (!userData.name) {
@@ -168,36 +164,36 @@
                 document.getElementById('profileBio').textContent = userData.bio || 'Привет!';
                 
                 var avatar = document.getElementById('profileAvatar');
-                renderAvatar(uid, avatar, (userData.name || '?').charAt(0).toUpperCase());
+                renderAvatar(CURRENT_UID, avatar, (userData.name || '?').charAt(0).toUpperCase());
                 
-                loadStats(uid);
-                loadUserFeed(uid);
+                loadStats();
+                loadFeed();
             });
         }
-        
-        function loadStats(uid) {
-            db.ref('sites/' + SITE + '/friends/' + uid).once('value', function(snap) {
+
+        function loadStats() {
+            db.ref('sites/' + SITE + '/friends/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
                 var count = Object.keys(data).filter(function(k) { return data[k] === true; }).length;
                 document.getElementById('friendsCount').textContent = '👥 ' + count;
             });
-            db.ref('sites/' + SITE + '/subscribers/' + uid).once('value', function(snap) {
+            db.ref('sites/' + SITE + '/subscribers/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
                 document.getElementById('subscribersCount').textContent = '👀 ' + Object.keys(data).length;
             });
-            db.ref('sites/' + SITE + '/subscriptions/' + uid).once('value', function(snap) {
+            db.ref('sites/' + SITE + '/subscriptions/' + CURRENT_UID).once('value', function(snap) {
                 var data = snap.val() || {};
                 document.getElementById('subscriptionsCount').textContent = '📌 ' + Object.keys(data).length;
             });
         }
-        
-        function loadUserFeed(uid) {
+
+        function loadFeed() {
             var container = document.getElementById('feed');
-            if (!container) return;
+            if (!container || !CURRENT_UID) return;
             
             container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка...</div>';
             
-            db.ref('sites/' + SITE + '/user_posts/' + uid).orderByChild('timestamp').on('value', function(snap) {
+            db.ref('sites/' + SITE + '/user_posts/' + CURRENT_UID).orderByChild('timestamp').on('value', function(snap) {
                 container.innerHTML = '';
                 var data = snap.val() || {};
                 var keys = Object.keys(data).sort(function(a, b) {
@@ -217,8 +213,7 @@
                 });
             });
         }
-        
-        // ===== ПЕРЕХОД НА СВОЮ СТРАНИЦУ =====
+
         window.goToUserPage = function() {
             if (!USER_UID) {
                 var loginModal = document.getElementById('loginModal');
@@ -234,13 +229,9 @@
                 }
             });
         };
-        
+
         document.addEventListener('DOMContentLoaded', function() {
-            var uid = getUidFromUrl();
-            console.log('🔵 Загружаем профиль по UID:', uid);
-            setTimeout(function() {
-                loadUserProfile(uid);
-            }, 500);
+            setTimeout(loadProfile, 500);
         });
     </script>
 </body>
