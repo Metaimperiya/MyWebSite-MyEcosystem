@@ -2,14 +2,8 @@
 // АВТОРИЗАЦИЯ — ТОЛЬКО GOOGLE REDIRECT
 // ================================================================
 
-// ===== УБЕДИСЬ, ЧТО FIREBASE ЗАГРУЖЕН =====
-if (typeof firebase === 'undefined') {
-    console.error('❌ Firebase не загружен! Проверь подключение SDK.');
-}
-
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ===== ИНИЦИАЛИЗАЦИЯ КНОПКИ =====
     function initGoogleButton() {
         var btn = document.getElementById('googleBtn');
         if (btn) {
@@ -34,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(function(result) {
             if (result.user) {
                 console.log('✅ Google-вход успешен:', result.user.displayName);
-                // Дальше сработает onAuthStateChanged
             }
         })
         .catch(function(error) {
@@ -82,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== СОСТОЯНИЕ АВТОРИЗАЦИИ =====
     auth.onAuthStateChanged(function(user) {
         if (user) {
-            // ===== ПОЛЬЗОВАТЕЛЬ ЗАЛОГИНИЛСЯ =====
             USER_UID = user.uid;
             USER = user.displayName || user.email || 'User';
             localStorage.setItem('dc_u_' + SITE, USER);
@@ -110,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 slug: slug
             });
             
-            // ===== ПРОВЕРКА АДМИНА =====
             isAdmin = ADMIN_UIDS.includes(USER_UID);
             if (isAdmin) {
                 localStorage.setItem('dc_admin_' + SITE, 'true');
@@ -119,13 +110,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('✅ Админ-режим активен');
             }
             
-            // ===== СКРЫВАЕМ МОДАЛКУ =====
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.remove('open');
             var mainContainer = document.getElementById('mainContainer');
             if (mainContainer) mainContainer.style.display = 'block';
             
-            // ===== ЗАГРУЖАЕМ ВСЁ =====
             if (typeof updateUI === 'function') updateUI();
             if (typeof loadFeed === 'function') loadFeed();
             if (typeof loadGroups === 'function') loadGroups();
@@ -135,9 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof loadFriendRequests === 'function') loadFriendRequests();
             
             console.log('✅ Пользователь авторизован:', USER);
-            
         } else {
-            // ===== ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН =====
             USER = null;
             USER_UID = null;
             isAdmin = false;
@@ -152,6 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    console.log('✅ Google Auth настроен (окно НЕ выскакивает автоматически)');
+    console.log('✅ Google Auth настроен');
 
 });
