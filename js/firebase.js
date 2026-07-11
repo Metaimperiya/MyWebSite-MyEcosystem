@@ -1,40 +1,41 @@
 // ================================================================
-// FIREBASE ИНИЦИАЛИЗАЦИЯ — ВСТАВЛЯЕМ В САМОЕ НАЧАЛО
+// FIREBASE ИНИЦИАЛИЗАЦИЯ — COMPAT SDK
 // ================================================================
 
-// ===== КОНФИГ (ЗАМЕНИ НА СВОЙ!) =====
+// ===== ВСТАВЬ СВОЙ КОНФИГ =====
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "ТВОЙ_API_KEY",
+    authDomain: "ТВОЙ_PROJECT.firebaseapp.com",
+    databaseURL: "https://ТВОЙ_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "ТВОЙ_PROJECT",
+    storageBucket: "ТВОЙ_PROJECT.appspot.com",
+    messagingSenderId: "ТВОЙ_SENDER_ID",
+    appId: "ТВОЙ_APP_ID"
 };
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 firebase.initializeApp(firebaseConfig);
+
+// ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 const auth = firebase.auth();
 const db = firebase.database();
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
 window.auth = auth;
 window.db = db;
 window.provider = provider;
-window.SITE = 'metaimperiya'; // ИЛИ ТВОЙ САЙТ
-window.ADMIN_UIDS = ["ayXehcol9FgAQU6tZuup7aSaRoV2"]; // ТВОЙ UID
+window.SITE = 'metaimperiya';
+window.ADMIN_UIDS = ["ayXehcol9FgAQU6tZuup7aSaRoV2"];
 window.USER = null;
 window.USER_UID = null;
 window.isAdmin = false;
 window.avatarCache = {};
 
 // ================================================================
-// ОСТАЛЬНОЙ ТВОЙ КОД ИЗ firebase.js (НИЧЕГО НЕ ВЫКИДЫВАЮ)
+// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
-// ===== ШЛАГБАУМ — ПРОВЕРКА ДОСТУПА =====
+// ===== ШЛАГБАУМ =====
 function checkAccess() {
     if (!USER_UID) {
         var loginModal = document.getElementById('loginModal');
@@ -46,7 +47,7 @@ function checkAccess() {
     return true;
 }
 
-// ===== ДЕБАГ-ФУНКЦИЯ =====
+// ===== ДЕБАГ =====
 function debugDatabaseConnection() {
     if (!USER_UID) {
         console.warn("⛔ DEBUG: Пользователь не авторизован, база не будет грузиться.");
@@ -62,7 +63,6 @@ function debugDatabaseConnection() {
                 console.log("✅ DEBUG: Данные в базе найдены:", snapshot.val());
             } else {
                 console.error("❌ DEBUG: ОШИБКА! В базе данных по пути " + testPath + " НИЧЕГО НЕТ.");
-                console.error("Возможно, неверный SITE или юзер не зарегистрирован в этой ветке.");
             }
         })
         .catch(function(error) {
@@ -188,7 +188,7 @@ function setActivePage(pageId) {
     if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
 }
 
-// ===== КНОПКА "ГЛАВНАЯ" В САЙДБАРЕ =====
+// ===== КНОПКИ НАВИГАЦИИ =====
 window.goToHome = function() {
     if (!checkAccess()) return;
     window.location.href = '/';
@@ -294,21 +294,6 @@ window.toggleAccordion = function(header) {
         body.style.maxHeight = body.scrollHeight + 'px';
         body.style.padding = '6px 16px 10px 16px';
         if (arrow) arrow.textContent = '▴';
-    }
-};
-
-// ===== РАЗМЕР ФРЕЙМА =====
-window.setFrameSize = function(size) {
-    currentFrameSize = size;
-    document.querySelectorAll('.frame-size-btn').forEach(function(btn) {
-        btn.classList.remove('active');
-    });
-    if (size === 'small') {
-        var btn = document.getElementById('frameSizeSmall');
-        if (btn) btn.classList.add('active');
-    } else {
-        var btn2 = document.getElementById('frameSizeLarge');
-        if (btn2) btn2.classList.add('active');
     }
 };
 
@@ -462,47 +447,6 @@ function loadChatList() {
                 });
             });
         });
-    });
-}
-
-// ================================================================
-// ИНДИКАТОР НАБОРА
-// ================================================================
-
-var typingTimeout = null;
-
-function setupTypingIndicator(chatId) {
-    var typingRef = db.ref('dms/' + SITE + '/' + chatId + '/typing');
-    var input = document.getElementById('chatInput');
-
-    if (window._typingHandler) {
-        input.removeEventListener('keydown', window._typingHandler);
-    }
-
-    window._typingHandler = function() {
-        typingRef.set({ [USER_UID]: true });
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(function() {
-            typingRef.set(null);
-        }, 2000);
-    };
-    input.addEventListener('keydown', window._typingHandler);
-
-    typingRef.on('value', function(snap) {
-        var data = snap.val() || {};
-        var isTyping = Object.keys(data).some(function(key) {
-            return data[key] === true && key !== USER_UID;
-        });
-
-        var indicator = document.getElementById('typingIndicator');
-        if (indicator) {
-            if (isTyping) {
-                indicator.textContent = '✍️ Печатает...';
-                indicator.style.display = 'block';
-            } else {
-                indicator.style.display = 'none';
-            }
-        }
     });
 }
 
@@ -669,10 +613,9 @@ function openPage(pageId) {
 window.openPage = openPage;
 
 // ================================================================
-// ИНИЦИАЛИЗАЦИЯ
+// АДМИН-АВТОВХОД ПО UID
 // ================================================================
 
-// ===== АВТОМАТИЧЕСКИЙ ВХОД В АДМИНКУ ПО UID =====
 (function autoAdmin() {
     if (USER_UID && USER_UID === "ayXehcol9FgAQU6tZuup7aSaRoV2") {
         isAdmin = true;
@@ -687,7 +630,7 @@ window.openPage = openPage;
     }
 })();
 
-// ===== ПРИНУДИТЕЛЬНАЯ ПРОВЕРКА =====
+// ===== ПРИНУДИТЕЛЬНАЯ ПРОВЕРКА АДМИНКИ =====
 setTimeout(function() {
     if (localStorage.getItem('dc_admin_' + SITE) === '1') {
         isAdmin = true;
@@ -697,5 +640,37 @@ setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
     }
 }, 1000);
+
+// ================================================================
+// ИНИЦИАЛИЗАЦИЯ
+// ================================================================
+
+var originalUpdateUI = updateUI || function() {};
+updateUI = function() {
+    originalUpdateUI();
+    setTimeout(function() {
+        if (typeof translatePage === 'function') translatePage();
+        updateLangDisplay();
+        updateNotifBadge();
+    }, 200);
+};
+
+setTimeout(function() {
+    updateLangDisplay();
+    updateNotifBadge();
+}, 500);
+
+setInterval(updateNotifBadge, 5000);
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (USER_UID) {
+        updateUI();
+    } else {
+        var mainContainer = document.getElementById('mainContainer');
+        if (mainContainer) mainContainer.style.display = 'none';
+        var loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.classList.add('open');
+    }
+});
 
 console.log('✅ firebase.js загружен с правильной инициализацией!');
