@@ -1,27 +1,8 @@
 // ================================================================
-// АДМИН-ПАНЕЛЬ — АВТОВХОД ПО UID
+// АДМИН-ПАНЕЛЬ — ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ
 // ================================================================
 
-// ===== ТВОЙ UID (ЗАМЕНИ НА СВОЙ!) =====
-const MY_UID = "ayXehcol9FgAQU6tZuup7aSaRoV2"; // <- СЮДА ВСТАВЬ СВОЙ UID
-
-// ===== АВТОВХОД В АДМИНКУ =====
-(function autoAdmin() {
-    if (USER_UID && USER_UID === MY_UID) {
-        isAdmin = true;
-        localStorage.setItem('dc_admin_' + SITE, '1');
-        var dot = document.getElementById('adminDot');
-        if (dot) dot.classList.add('active');
-        console.log('✅ Админ-режим активен (автовход по UID)');
-        setTimeout(function() {
-            if (typeof loadFeed === 'function') loadFeed();
-            if (typeof loadProfile === 'function') loadProfile();
-        }, 500);
-    }
-})();
-
 // ===== КНОПКА АДМИНКИ =====
-
 window.adminLogin = function() {
     if (isAdmin) {
         adminLogout();
@@ -50,7 +31,6 @@ window.checkAdmin = function() {
 };
 
 // ===== ВЫХОД ИЗ АДМИНКИ =====
-
 window.adminLogout = function() {
     isAdmin = false;
     localStorage.removeItem('dc_admin_' + SITE);
@@ -61,7 +41,6 @@ window.adminLogout = function() {
 };
 
 // ===== УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ =====
-
 function adminDeleteUser(uid) {
     if (!isAdmin || !uid || uid === USER_UID) return;
     if (!confirm('Удалить пользователя? Это необратимо!')) return;
@@ -72,7 +51,7 @@ function adminDeleteUser(uid) {
     });
     
     db.ref().update(updates).then(function() {
-        loadPeople();
+        if (typeof loadPeople === 'function') loadPeople();
         alert('✅ Пользователь удален');
     }).catch(function(err) {
         console.error(err);
@@ -99,7 +78,7 @@ function adminDeleteAllUsers() {
         updates['sites/' + SITE + '/room_users'] = null;
         
         db.ref().update(updates).then(function() {
-            loadPeople();
+            if (typeof loadPeople === 'function') loadPeople();
             alert('✅ Все пользователи удалены');
         }).catch(function(err) {
             console.error(err);
@@ -113,7 +92,7 @@ function adminClearRooms() {
     if (!confirm('Очистить все комнаты?')) return;
     db.ref('sites/' + SITE + '/rooms').remove();
     db.ref('sites/' + SITE + '/room_users').remove();
-    loadGroups();
+    if (typeof loadGroups === 'function') loadGroups();
     alert('✅ Комнаты очищены');
 }
 
@@ -138,17 +117,6 @@ function adminExportData() {
         URL.revokeObjectURL(url);
     });
 }
-
-// ===== ПРИНУДИТЕЛЬНАЯ ПРОВЕРКА АДМИНКИ =====
-setTimeout(function() {
-    if (localStorage.getItem('dc_admin_' + SITE) === '1') {
-        isAdmin = true;
-        var dot = document.getElementById('adminDot');
-        if (dot) dot.classList.add('active');
-        console.log('✅ Админ-режим подтверждён (повторная проверка)');
-        if (typeof loadFeed === 'function') loadFeed();
-    }
-}, 1000);
 
 // ===== СОЗДАТЬ СТРАНИЦУ АДМИНИСТРАТОРА =====
 window.createAdminPage = function() {
