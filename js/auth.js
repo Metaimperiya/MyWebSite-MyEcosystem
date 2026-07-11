@@ -2,8 +2,14 @@
 // АВТОРИЗАЦИЯ — ТОЛЬКО GOOGLE REDIRECT
 // ================================================================
 
+// ===== УБЕДИСЬ, ЧТО FIREBASE ЗАГРУЖЕН =====
+if (typeof firebase === 'undefined') {
+    console.error('❌ Firebase не загружен! Проверь подключение SDK.');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
+    // ===== ИНИЦИАЛИЗАЦИЯ КНОПКИ =====
     function initGoogleButton() {
         var btn = document.getElementById('googleBtn');
         if (btn) {
@@ -28,9 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(function(result) {
             if (result.user) {
                 console.log('✅ Google-вход успешен:', result.user.displayName);
-                if (typeof updateUI === 'function') updateUI();
-                if (typeof loadFeed === 'function') loadFeed();
-                if (typeof loadProfile === 'function') loadProfile();
+                // Дальше сработает onAuthStateChanged
             }
         })
         .catch(function(error) {
@@ -46,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modal) modal.classList.remove('open');
     };
 
-    // ===== ОТКРЫТИЕ МОДАЛКИ ВРУЧНУЮ =====
+    // ===== ОТКРЫТИЕ МОДАЛКИ =====
     window.openLoginModal = function() {
         var modal = document.getElementById('loginModal');
         if (modal) modal.classList.add('open');
@@ -75,9 +79,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(function(e) { alert('Ошибка: ' + e.message); });
     };
 
-    // ===== AUTH STATE =====
+    // ===== СОСТОЯНИЕ АВТОРИЗАЦИИ =====
     auth.onAuthStateChanged(function(user) {
         if (user) {
+            // ===== ПОЛЬЗОВАТЕЛЬ ЗАЛОГИНИЛСЯ =====
             USER_UID = user.uid;
             USER = user.displayName || user.email || 'User';
             localStorage.setItem('dc_u_' + SITE, USER);
@@ -85,13 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!avatarCache) avatarCache = {};
             avatarCache[USER_UID] = avatarUrl;
             
-            var slug = null;
-            if (USER && USER.toLowerCase().includes('player')) {
-                slug = 'player-likee';
-            } else {
-                slug = USER.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                if (slug.length > 30) slug = slug.slice(0, 30);
-            }
+            var slug = USER.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            if (slug.length > 30) slug = slug.slice(0, 30);
             
             db.ref('sites/' + SITE + '/users/' + USER_UID).update({
                 name: USER,
@@ -109,8 +109,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 avatarUrl: avatarUrl,
                 slug: slug
             });
+            
+            // ===== ПРОВЕРКА АДМИНА =====
+            isAdmin = ADMIN_UIDS.includes(USER_UID);
+            if (isAdmin) {
+                localStorage.setItem('dc_admin_' + SITE, 'true');
+                var dot = document.getElementById('adminDot');
+                if (dot) dot.classList.add('active');
+                console.log('✅ Админ-режим активен');
+            }
+            
+            // ===== СКРЫВАЕМ МОДАЛКУ =====
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.remove('open');
+            var mainContainer = document.getElementById('mainContainer');
+            if (mainContainer) mainContainer.style.display = 'block';
+            
+            // ===== ЗАГРУЖАЕМ ВСЁ =====
             if (typeof updateUI === 'function') updateUI();
             if (typeof loadFeed === 'function') loadFeed();
             if (typeof loadGroups === 'function') loadGroups();
@@ -118,12 +133,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof loadProfile === 'function') loadProfile();
             if (typeof loadNotifications === 'function') loadNotifications();
             if (typeof loadFriendRequests === 'function') loadFriendRequests();
+            
+            console.log('✅ Пользователь авторизован:', USER);
+            
         } else {
+            // ===== ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН =====
             USER = null;
             USER_UID = null;
+            isAdmin = false;
+            
             var loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.classList.remove('open');
+            if (loginModal) loginModal.classList.add('open');
+            var mainContainer = document.getElementById('mainContainer');
+            if (mainContainer) mainContainer.style.display = 'none';
+            
             if (typeof updateUI === 'function') updateUI();
+            console.log('⛔ Гость, иди нахуй!');
         }
     });
 
