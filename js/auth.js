@@ -1,5 +1,5 @@
 // ================================================================
-// АВТОРИЗАЦИЯ — ТОЛЬКО GOOGLE REDIRECT
+// АВТОРИЗАЦИЯ — GOOGLE POPUP
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -9,10 +9,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if (btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                console.log('🔵 Google-вход нажат');
-                auth.signInWithRedirect(provider);
+                console.log('🔵 Google-вход нажат (POPUP)');
+                
+                auth.signInWithPopup(provider)
+                    .then(function(result) {
+                        console.log('✅ Вход через попап успешен!');
+                    })
+                    .catch(function(error) {
+                        console.error('❌ Ошибка попап:', error);
+                        if (error.code === 'auth/popup-blocked') {
+                            alert('⚠️ Браузер заблокировал попап. Разрешите всплывающие окна.');
+                        } else if (error.code === 'auth/unauthorized-domain') {
+                            alert('⚠️ Добавьте домен в Firebase Console → Authentication → Authorized domains');
+                        } else {
+                            alert('❌ ' + error.message);
+                        }
+                    });
             });
-            console.log('✅ Google-кнопка подключена (Redirect)');
+            console.log('✅ Google-кнопка подключена (POPUP)');
             return true;
         }
         return false;
@@ -22,20 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(initGoogleButton, 1500);
         setTimeout(initGoogleButton, 3000);
     }
-
-    // ===== ОБРАБОТКА ВОЗВРАТА ПОСЛЕ REDIRECT =====
-    auth.getRedirectResult()
-        .then(function(result) {
-            if (result.user) {
-                console.log('✅ Google-вход успешен:', result.user.displayName);
-            }
-        })
-        .catch(function(error) {
-            console.error('❌ Ошибка входа:', error);
-            if (error.code === 'auth/unauthorized-domain') {
-                alert('⚠️ Добавьте этот домен в Firebase Console → Authentication → Sign-in methods → Authorized domains');
-            }
-        });
 
     // ===== ЗАКРЫТИЕ МОДАЛКИ =====
     window.closeLogin = function() {
@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.logout = function() {
         if (!confirm('Выйти из профиля?')) return;
         if (notifUnsub) { try { notifUnsub(); } catch(e) {} notifUnsub = null; }
-        
         auth.signOut()
             .then(function() {
                 localStorage.removeItem('dc_u_' + SITE);
@@ -61,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 USER = null;
                 USER_UID = null;
                 isAdmin = false;
-                
                 var feed = document.getElementById('feed');
                 if (feed) feed.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите через Google</div>';
                 var dot = document.getElementById('adminDot');
@@ -128,17 +126,14 @@ document.addEventListener('DOMContentLoaded', function() {
             USER = null;
             USER_UID = null;
             isAdmin = false;
-            
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.add('open');
             var mainContainer = document.getElementById('mainContainer');
             if (mainContainer) mainContainer.style.display = 'none';
-            
             if (typeof updateUI === 'function') updateUI();
             console.log('⛔ Гость, иди нахуй!');
         }
     });
 
-    console.log('✅ Google Auth настроен');
-
+    console.log('✅ Google Auth настроен (POPUP)');
 });
