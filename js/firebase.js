@@ -2,15 +2,14 @@
 // FIREBASE ИНИЦИАЛИЗАЦИЯ — COMPAT SDK
 // ================================================================
 
-// ===== ВСТАВЬ СВОЙ КОНФИГ =====
 const firebaseConfig = {
-    apiKey: "ТВОЙ_API_KEY",
-    authDomain: "ТВОЙ_PROJECT.firebaseapp.com",
-    databaseURL: "https://ТВОЙ_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "ТВОЙ_PROJECT",
-    storageBucket: "ТВОЙ_PROJECT.appspot.com",
-    messagingSenderId: "ТВОЙ_SENDER_ID",
-    appId: "ТВОЙ_APP_ID"
+    apiKey: "AIzaSyDCx2wLK2EZJorUNoxEdWDLYY0e8cOHhtY",
+    authDomain: "myecosystem-e6414.firebaseapp.com",
+    databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
+    projectId: "myecosystem-e6414",
+    storageBucket: "myecosystem-e6414.firebasestorage.app",
+    messagingSenderId: "426302111033",
+    appId: "1:426302111033:web:7b39e7026e94f528a13ce8"
 };
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
