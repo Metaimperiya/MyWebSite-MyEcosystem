@@ -3,7 +3,7 @@
 // ================================================================
 
 const firebaseConfig = {
-    apiKey: "AIzaSyByAGPMtpdf2ilB2tHJvVe9J7tWwr6-OtY",
+    apiKey: "AIzaSyDCx2wLK2EZJOrUNOxEdW0LYY0e8cOHntY",
     authDomain: "myecosystem-e6414.firebaseapp.com",
     databaseURL: "https://myecosystem-e6414-default-rtdb.firebaseio.com",
     projectId: "myecosystem-e6414",
@@ -610,4 +610,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('✅ firebase.js загружен с новым API-ключом!');
+console.log('✅ firebase.js загружен с правильным ключом из Firebase Console!');
