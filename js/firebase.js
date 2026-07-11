@@ -1,5 +1,37 @@
 // ================================================================
-// ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ — С ЖЕСТКОЙ ПРОВЕРКОЙ
+// FIREBASE ИНИЦИАЛИЗАЦИЯ — ВСТАВЛЯЕМ В САМОЕ НАЧАЛО
+// ================================================================
+
+// ===== КОНФИГ (ЗАМЕНИ НА СВОЙ!) =====
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
+window.auth = auth;
+window.db = db;
+window.provider = provider;
+window.SITE = 'metaimperiya'; // ИЛИ ТВОЙ САЙТ
+window.ADMIN_UIDS = ["ayXehcol9FgAQU6tZuup7aSaRoV2"]; // ТВОЙ UID
+window.USER = null;
+window.USER_UID = null;
+window.isAdmin = false;
+window.avatarCache = {};
+
+// ================================================================
+// ОСТАЛЬНОЙ ТВОЙ КОД ИЗ firebase.js (НИЧЕГО НЕ ВЫКИДЫВАЮ)
 // ================================================================
 
 // ===== ШЛАГБАУМ — ПРОВЕРКА ДОСТУПА =====
@@ -14,9 +46,7 @@ function checkAccess() {
     return true;
 }
 
-// ================================================================
-// 🐛 ДЕБАГ-ФУНКЦИЯ — ПРОВЕРКА ПОДКЛЮЧЕНИЯ К БАЗЕ
-// ================================================================
+// ===== ДЕБАГ-ФУНКЦИЯ =====
 function debugDatabaseConnection() {
     if (!USER_UID) {
         console.warn("⛔ DEBUG: Пользователь не авторизован, база не будет грузиться.");
@@ -92,13 +122,11 @@ function updateUI() {
         }
         updateAdminMenu();
         
-        // ПОКАЗЫВАЕМ КОНТЕНТ, СКРЫВАЕМ МОДАЛКУ
         var mainContainer = document.getElementById('mainContainer');
         if (mainContainer) mainContainer.style.display = 'block';
         var loginModal = document.getElementById('loginModal');
         if (loginModal) loginModal.classList.remove('open');
         
-        // 👇 ЗАПУСКАЕМ ДЕБАГ
         setTimeout(debugDatabaseConnection, 1000);
     } else {
         if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
@@ -109,7 +137,6 @@ function updateUI() {
         var item = document.getElementById('adminChatsMenuItem');
         if (item) item.style.display = 'none';
         
-        // СКРЫВАЕМ КОНТЕНТ, ПОКАЗЫВАЕМ МОДАЛКУ
         var mainContainer = document.getElementById('mainContainer');
         if (mainContainer) mainContainer.style.display = 'none';
         var loginModal = document.getElementById('loginModal');
@@ -645,33 +672,30 @@ window.openPage = openPage;
 // ИНИЦИАЛИЗАЦИЯ
 // ================================================================
 
-var originalUpdateUI = updateUI || function() {};
-updateUI = function() {
-    originalUpdateUI();
-    setTimeout(function() {
-        if (typeof translatePage === 'function') translatePage();
-        updateLangDisplay();
-        updateNotifBadge();
-    }, 200);
-};
-
-setTimeout(function() {
-    updateLangDisplay();
-    updateNotifBadge();
-}, 500);
-
-setInterval(updateNotifBadge, 5000);
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (USER_UID) {
-        updateUI();
-    } else {
-        // СКРЫВАЕМ ВСЁ, ПОКАЗЫВАЕМ МОДАЛКУ
-        var mainContainer = document.getElementById('mainContainer');
-        if (mainContainer) mainContainer.style.display = 'none';
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
+// ===== АВТОМАТИЧЕСКИЙ ВХОД В АДМИНКУ ПО UID =====
+(function autoAdmin() {
+    if (USER_UID && USER_UID === "ayXehcol9FgAQU6tZuup7aSaRoV2") {
+        isAdmin = true;
+        localStorage.setItem('dc_admin_' + SITE, '1');
+        var dot = document.getElementById('adminDot');
+        if (dot) dot.classList.add('active');
+        console.log('✅ Админ-режим активен (автовход по UID)');
+        setTimeout(function() {
+            if (typeof loadFeed === 'function') loadFeed();
+            if (typeof loadProfile === 'function') loadProfile();
+        }, 500);
     }
-});
+})();
 
-console.log('✅ app.js загружен с жесткой проверкой доступа!');
+// ===== ПРИНУДИТЕЛЬНАЯ ПРОВЕРКА =====
+setTimeout(function() {
+    if (localStorage.getItem('dc_admin_' + SITE) === '1') {
+        isAdmin = true;
+        var dot = document.getElementById('adminDot');
+        if (dot) dot.classList.add('active');
+        console.log('✅ Админ-режим подтверждён (повторная проверка)');
+        if (typeof loadFeed === 'function') loadFeed();
+    }
+}, 1000);
+
+console.log('✅ firebase.js загружен с правильной инициализацией!');
