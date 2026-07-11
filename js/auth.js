@@ -1,5 +1,5 @@
 // ================================================================
-// АВТОРИЗАЦИЯ — GOOGLE POPUP
+// АВТОРИЗАЦИЯ — ТОЛЬКО GOOGLE POPUP
 // ================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     .catch(function(error) {
                         console.error('❌ Ошибка попап:', error);
                         if (error.code === 'auth/popup-blocked') {
-                            alert('⚠️ Браузер заблокировал попап. Разрешите всплывающие окна.');
+                            alert('⚠️ Браузер заблокировал попап. Разрешите всплывающие окна для этого сайта.');
                         } else if (error.code === 'auth/unauthorized-domain') {
-                            alert('⚠️ Добавьте домен в Firebase Console → Authentication → Authorized domains');
+                            alert('⚠️ Добавьте этот домен в Firebase Console → Authentication → Sign-in methods → Authorized domains');
                         } else {
-                            alert('❌ ' + error.message);
+                            alert('❌ Ошибка входа: ' + error.message);
                         }
                     });
             });
