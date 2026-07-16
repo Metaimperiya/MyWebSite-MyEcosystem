@@ -1,0 +1,30 @@
+/* ================================================================ */
+/* GRID — ОСНОВНАЯ СЕТКА */
+/* ================================================================ */
+
+.app-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 16px 80px;
+}
+
+/* ===== ДЕСКТОП: 3 КОЛОНКИ ===== */
+@media (min-width: 820px) {
+    .app-layout {
+        grid-template-columns: var(--panel-width) var(--feed-width) var(--panel-width);
+        gap: 20px;
+        padding: 0 20px 80px;
+        margin-top: 10px;
+        justify-content: center;
+    }
+}
+
+/* ===== ЦЕНТР ===== */
+.panel-center {
+    width: 100%;
+    min-width: 0;
+    padding-bottom: 20px;
+}

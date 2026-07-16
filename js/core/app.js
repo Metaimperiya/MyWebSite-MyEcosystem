@@ -1,6 +1,6 @@
-// ================================================================
+// ================================================================ */
 // ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
-// ================================================================
+// ================================================================ */
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -22,10 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn("⛔ DEBUG: Пользователь не авторизован, база не будет грузиться.");
             return;
         }
-        
+
         const testPath = 'sites/' + SITE + '/users/' + USER_UID;
         console.log("🔍 DEBUG: Пробую прочитать путь:", testPath);
-        
+
         db.ref(testPath).once('value')
             .then(function(snapshot) {
                 if (snapshot.exists()) {
@@ -39,28 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     };
 
-    // ================================================================
-    // 🎵 ПЛЕЕР — ВЫДВИЖНАЯ ПАНЕЛЬ
-    // ================================================================
-
-    window.toggleDrawer = function() {
-        var drawer = document.getElementById('playerDrawer');
-        var handle = document.getElementById('playerHandle');
-        if (!drawer) return;
-        
-        drawer.classList.toggle('open');
-        
-        if (handle) {
-            var label = handle.querySelector('.handle-label');
-            if (label) {
-                label.textContent = drawer.classList.contains('open') ? '🎵 СВЕРНУТЬ' : '🎵 ПЛЕЕР';
-            }
-        }
-    };
-
-    // ================================================================
+    // ================================================================ */
     // НАСТРОЙКИ (ВЫПАДАЮЩЕЕ МЕНЮ)
-    // ================================================================
+    // ================================================================ */
 
     window.toggleSettingsMenu = function() {
         var dropdown = document.getElementById('settingsDropdown');
@@ -86,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== ПЕРЕХОД НА ПЕРСОНАЛЬНУЮ СТРАНИЦУ (SPA) =====
     window.goToUserPage = function() {
         if (!window.checkAccess()) return;
-        
+
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/slug').once('value', function(snap) {
             var slug = snap.val();
             if (slug) {
@@ -123,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (USER && USER_UID) {
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
                 var dbName = snap.val() || USER;
-                
+
                 if (dbName && dbName !== 'Гость' && dbName !== 'Anonymous') {
                     if (name) name.textContent = dbName;
                     if (sName) sName.textContent = dbName;
@@ -133,10 +114,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (sName) sName.textContent = USER;
                 }
             });
-            
+
             window.renderAvatar(USER_UID, topAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
             window.renderAvatar(USER_UID, sAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
-            
+
             isAdmin = ADMIN_UIDS.includes(USER_UID);
             if (isAdmin) {
                 if (dot) dot.classList.add('active');
@@ -146,12 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.removeItem('dc_admin_' + SITE);
             }
             window.updateAdminMenu();
-            
+
             var mainContainer = document.getElementById('mainContainer');
             if (mainContainer) mainContainer.style.display = 'block';
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.remove('open');
-            
+
             setTimeout(window.debugDatabaseConnection, 1000);
         } else {
             if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
@@ -161,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (dot) dot.classList.remove('active');
             var item = document.getElementById('adminChatsMenuItem');
             if (item) item.style.display = 'none';
-            
+
             var mainContainer = document.getElementById('mainContainer');
             if (mainContainer) mainContainer.style.display = 'none';
             var loginModal = document.getElementById('loginModal');
@@ -203,11 +184,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var el = document.getElementById('page-' + pageId);
             if (el) el.classList.add('active');
         }
-        
+
         document.querySelectorAll('.tab-bar .tab').forEach(function(el) {
             el.classList.remove('active');
         });
-        
+
         var tabs = document.querySelectorAll('.tab-bar .tab');
         var map = { feed: 0, groups: 1, people: 2, profile: 3 };
         if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
@@ -238,12 +219,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== ПЕРЕХОД В ПРОФИЛЬ (SPA) =====
     window.goToProfile = function() {
         if (!window.checkAccess()) return;
-        
+
         if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
             window.location.href = '/?page=profile';
             return;
         }
-        
+
         VIEWING_USER = null;
         window.setActivePage('profile');
         document.getElementById('chatView').classList.remove('active');
@@ -258,17 +239,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== ПРОСМОТР ПРОФИЛЯ ДРУГОГО ПОЛЬЗОВАТЕЛЯ (SPA) =====
     window.viewUserProfile = function(uid) {
         if (!window.checkAccess()) return;
-        
+
         if (uid === USER_UID) {
             goToProfile();
             return;
         }
-        
+
         VIEWING_USER = uid;
-        
+
         db.ref('sites/' + SITE + '/users/' + uid + '/slug').once('value', function(snap) {
             var slug = snap.val();
-            
+
             if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
                 if (slug) {
                     window.location.href = '/' + slug + '/';
@@ -277,7 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 return;
             }
-            
+
             if (window.history && window.history.pushState) {
                 if (slug) {
                     window.history.pushState({}, '', '/' + slug + '/');
@@ -285,16 +266,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.history.pushState({}, '', '/?page=profile&user=' + uid);
                 }
             }
-            
+
             window.setActivePage('profile');
             document.getElementById('chatView').classList.remove('active');
-            
+
             if (chatUnsub) {
                 if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
                 chatUnsub = null;
             }
             CURRENT_ROOM = null;
-            
+
             if (typeof loadProfile === 'function') loadProfile();
         });
     };
@@ -348,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var item = header.parentElement;
         var body = item.querySelector('.accordion-body');
         var arrow = header.querySelector('.accordion-arrow');
-        
+
         document.querySelectorAll('.accordion-body').forEach(function(b) {
             if (b !== body && b.style.maxHeight) {
                 b.style.maxHeight = null;
@@ -357,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (otherArrow) otherArrow.textContent = '▾';
             }
         });
-        
+
         if (body.style.maxHeight) {
             body.style.maxHeight = null;
             body.style.padding = '0 16px';
@@ -388,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.toggleTheme = function() {
         var currentTheme = document.documentElement.getAttribute('data-theme');
         var newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
-        
+
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
     };
@@ -402,13 +383,13 @@ document.addEventListener('DOMContentLoaded', function() {
     window.formatText = function(type) {
         var editor = document.getElementById('postEditor');
         if (!editor) return;
-        
+
         var selection = window.getSelection();
         if (!selection.rangeCount) return;
-        
+
         var range = selection.getRangeAt(0);
         var selectedText = range.toString();
-        
+
         if (!selectedText) {
             var templates = {
                 'bold': '**жирный текст**',
@@ -420,14 +401,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 'quote': '> Цитата',
                 'code': '```код```'
             };
-            
+
             var template = templates[type] || '';
             if (template) {
                 document.execCommand('insertText', false, template);
             }
             return;
         }
-        
+
         var wrappers = {
             'bold': '**',
             'italic': '*',
@@ -438,10 +419,10 @@ document.addEventListener('DOMContentLoaded', function() {
             'quote': '> ',
             'code': '```'
         };
-        
+
         var wrapper = wrappers[type];
         if (!wrapper) return;
-        
+
         var newText;
         if (type === 'h1' || type === 'h2' || type === 'quote') {
             newText = wrapper + selectedText;
@@ -450,17 +431,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (type === 'code') closeWrapper = '```';
             newText = wrapper + selectedText + closeWrapper;
         }
-        
+
         document.execCommand('insertText', false, newText);
     };
 
     window.insertLink = function() {
         var url = prompt('Введите ссылку:');
         if (!url) return;
-        
+
         var editor = document.getElementById('postEditor');
         if (!editor) return;
-        
+
         var selection = window.getSelection();
         if (selection.rangeCount) {
             var text = selection.toString() || 'ссылка';
@@ -468,9 +449,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // ================================================================
+    // ================================================================ */
     // СПИСОК ЧАТОВ
-    // ================================================================
+    // ================================================================ */
 
     window.openChatList = function() {
         if (!window.checkAccess()) return;
@@ -485,36 +466,36 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadChatList() {
         var container = document.getElementById('chatListContainer');
         if (!container) return;
-        
+
         container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>';
-        
+
         db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', function(snap) {
             var friends = snap.val() || {};
             var friendIds = Object.keys(friends).filter(function(k) { return friends[k] === true; });
-            
+
             if (!friendIds.length) {
                 container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">🤝 Добавьте друзей, чтобы начать общение</div>';
                 return;
             }
-            
+
             var html = '';
             var loaded = 0;
-            
+
             friendIds.forEach(function(uid) {
                 db.ref('sites/' + SITE + '/users/' + uid).once('value', function(usnap) {
                     var u = usnap.val() || {};
                     var name = u.name || 'Аноним';
                     var letter = name.charAt(0).toUpperCase();
-                    
+
                     var chatId = [USER_UID, uid].sort().join('_');
                     var path = 'dms/' + SITE + '/' + chatId + '/messages';
-                    
+
                     db.ref(path).orderByChild('timestamp').limitToLast(1).once('value', function(msgSnap) {
                         var lastMsg = '';
                         msgSnap.forEach(function(m) {
                             lastMsg = m.val().text || '';
                         });
-                        
+
                         html += '<div class="chat-list-item" onclick="openPrivateChat(\'' + uid + '\');closeChatList();">';
                         html += '<span class="avatar-wrap" id="clava-' + uid + '"><span class="letter">' + letter + '</span></span>';
                         html += '<div class="chat-list-info">';
@@ -522,7 +503,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         html += '<div class="chat-list-last">' + (lastMsg ? esc(lastMsg.slice(0, 30)) : 'Нет сообщений') + '</div>';
                         html += '</div>';
                         html += '</div>';
-                        
+
                         loaded++;
                         if (loaded === friendIds.length) {
                             container.innerHTML = html;
@@ -537,9 +518,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ================================================================
+    // ================================================================ */
     // ИНДИКАТОР НАБОРА
-    // ================================================================
+    // ================================================================ */
 
     var typingTimeout = null;
 
@@ -578,150 +559,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ================================================================
-    // АДМИН-ПАНЕЛЬ
-    // ================================================================
-
-    window.openAdminChats = function() {
-        if (!isAdmin) {
-            alert('Только для администратора!');
-            return;
-        }
-        document.getElementById('adminChatsModal').classList.add('open');
-        loadAdminChats();
-    };
-
-    window.closeAdminChats = function() {
-        document.getElementById('adminChatsModal').classList.remove('open');
-    };
-
-    function loadAdminChats() {
-        var container = document.getElementById('adminChatsList');
-        if (!container) return;
-        
-        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>';
-        
-        db.ref('dms/' + SITE).once('value', function(snap) {
-            var dms = snap.val() || {};
-            var chatIds = Object.keys(dms);
-            
-            if (!chatIds.length) {
-                container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">Нет личных чатов</div>';
-                return;
-            }
-            
-            var html = '';
-            var loaded = 0;
-            
-            chatIds.forEach(function(chatId) {
-                var uids = chatId.split('_');
-                
-                var promises = uids.map(function(uid) {
-                    return db.ref('sites/' + SITE + '/users/' + uid + '/name').once('value');
-                });
-                
-                Promise.all(promises).then(function(results) {
-                    var names = results.map(function(r) { return r.val() || 'Аноним'; });
-                    var chatName = names.join(' ⬄ ');
-                    var path = 'dms/' + SITE + '/' + chatId + '/messages';
-                    
-                    db.ref(path).once('value', function(msgSnap) {
-                        var count = msgSnap.numChildren();
-                        var lastMsg = '';
-                        msgSnap.orderByChild('timestamp').limitToLast(1).forEach(function(m) {
-                            lastMsg = m.val().text || '';
-                        });
-                        
-                        html += '<div class="chat-list-item" onclick="adminViewChat(\'' + chatId + '\')">';
-                        html += '<div class="chat-list-info">';
-                        html += '<div class="chat-list-name">💬 ' + esc(chatName) + '</div>';
-                        html += '<div class="chat-list-last">' + (lastMsg ? esc(lastMsg.slice(0, 30)) : 'Сообщений: ' + count) + '</div>';
-                        html += '</div>';
-                        html += '</div>';
-                        
-                        loaded++;
-                        if (loaded === chatIds.length) {
-                            container.innerHTML = html;
-                        }
-                    });
-                });
-            });
-        });
-    }
-
-    window.adminViewChat = function(chatId) {
-        if (!isAdmin) return;
-        var path = 'dms/' + SITE + '/' + chatId + '/messages';
-        closeAdminChats();
-        CURRENT_ROOM = chatId;
-        document.getElementById('chatView').classList.add('active');
-        setActivePage(null);
-        loadChat(path);
-    };
-
-    window.updateAdminMenu = function() {
-        var item = document.getElementById('adminChatsMenuItem');
-        if (item) {
-            item.style.display = isAdmin ? 'block' : 'none';
-        }
-    };
-
-    // ================================================================
-    // ЯЗЫК
-    // ================================================================
-
-    if (typeof toggleLanguage === 'undefined') {
-        window.toggleLanguage = function() {
-            var newLang = currentLang === 'ru' ? 'en' : 'ru';
-            setLanguage(newLang);
-        };
-    }
-
-    function updateLangDisplay() {
-        var display = document.getElementById('langDisplay');
-        if (display) {
-            display.textContent = currentLang === 'ru' ? 'Русский' : 'English';
-        }
-    }
-
-    // ================================================================
-    // ОБНОВЛЕНИЕ БЕЙДЖИКА УВЕДОМЛЕНИЙ
-    // ================================================================
-
-    function updateNotifBadge() {
-        if (typeof USER_UID === 'undefined' || !USER_UID) return;
-        db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('read').equalTo(false).once('value', function(snap) {
-            var count = snap.numChildren();
-            var badge = document.getElementById('notifBadge');
-            if (badge) {
-                if (count > 0) {
-                    badge.style.display = 'inline';
-                    badge.textContent = count;
-                } else {
-                    badge.style.display = 'none';
-                }
-            }
-        });
-    }
-
-    // ================================================================
+    // ================================================================ */
     // ОТКРЫТИЕ СТРАНИЦ (SPA)
-    // ================================================================
+    // ================================================================ */
 
     window.openPage = function(pageId) {
         if (!pageId) return;
-        
+
         document.querySelectorAll('.page').forEach(function(el) {
             el.style.display = 'none';
             el.classList.remove('active');
         });
-        
+
         var page = document.getElementById('page-' + pageId);
         if (page) {
             page.style.display = 'block';
             page.classList.add('active');
             console.log('✅ Открыта страница:', pageId);
-            
+
             if (pageId === 'foto') {
                 setTimeout(function() {
                     if (typeof loadFotoFeed === 'function') {
@@ -732,15 +587,15 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.warn('⚠️ Страница не найдена:', pageId);
         }
-        
+
         if (typeof closeSidebar === 'function') {
             closeSidebar();
         }
     };
 
-    // ================================================================
+    // ================================================================ */
     // ИНИЦИАЛИЗАЦИЯ
-    // ================================================================
+    // ================================================================ */
 
     var originalUpdateUI = window.updateUI || function() {};
     window.updateUI = function() {

@@ -1,0 +1,16 @@
+<header class="pc-topbar" id="topbar">
+    <div class="logo">
+        <span class="menu-icon" onclick="toggleSidebar()">☰</span>
+        <span onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+    </div>
+    <input class="search" placeholder="Поиск..." id="pcSearch">
+    <div class="right">
+        <button onclick="openChatList()" title="Чаты">💬</button>
+        <button onclick="openNotifications()" title="Уведомления">🔔</button>
+        <div class="avatar-wrap" id="pcAvatar" onclick="goToProfile()">
+            <span class="letter">?</span>
+        </div>
+        <span class="username" id="pcName" onclick="goToProfile()"></span>
+        <button onclick="toggleSettingsMenu()" title="Меню">⋮</button>
+    </div>
+</header>

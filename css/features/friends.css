@@ -1,0 +1,59 @@
+/* ================================================================ */
+/* FRIENDS — ДРУЗЬЯ И ПОДПИСКИ */
+/* ================================================================ */
+
+/* Стили для друзей уже есть в profile.css и feed.css */
+/* Этот файл для будущего расширения */
+
+.people-list .people-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.people-list .people-item:hover {
+    background: var(--input-bg);
+}
+
+.people-list .people-item .avatar-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--avatar-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.people-list .people-item .avatar-wrap .letter {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--avatar-text);
+}
+
+.people-list .people-item .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.people-list .people-item .info {
+    flex: 1;
+}
+
+.people-list .people-item .info .name {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--text-color);
+}
+
+.people-list .people-item .info .status {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+}

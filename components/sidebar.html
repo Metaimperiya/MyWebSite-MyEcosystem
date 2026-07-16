@@ -1,0 +1,85 @@
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+    <button class="close-btn" onclick="closeSidebar()">✕</button>
+
+    <div class="user-info">
+        <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
+        <div>
+            <div class="name" id="sName">Гость</div>
+            <div class="email" id="sEmail"></div>
+        </div>
+    </div>
+
+    <!-- ===== ОСНОВНОЕ МЕНЮ ===== -->
+    <div class="menu-item" onclick="goToFeed();closeSidebar();">
+        <span class="icon">🏠</span> Главная
+    </div>
+    <div class="menu-item" onclick="goToProfile();closeSidebar();">
+        <span class="icon">👤</span> Профиль
+    </div>
+    <div class="menu-item" onclick="goToPeople();closeSidebar();">
+        <span class="icon">👥</span> Люди
+    </div>
+    <div class="menu-item" onclick="goToGroups();closeSidebar();">
+        <span class="icon">📁</span> Группы
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <!-- ===== СТРАНИЦЫ ===== -->
+    <div class="menu-item" onclick="openPage('foto');closeSidebar();">
+        <span class="icon">📸</span> Фото
+    </div>
+    <div class="menu-item" onclick="openPage('page');closeSidebar();">
+        <span class="icon">📄</span> Страницы
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div style="font-size:0.6rem;color:var(--muted-text);padding:4px 12px;text-transform:uppercase;letter-spacing:0.5px;">📂 Разделы</div>
+
+    <div class="menu-sub">
+        <div class="menu-item" onclick="window.location.href='pages/news/novosti.html';closeSidebar();">
+            <span class="icon">📰</span> Новости
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/multimedia/video.html';closeSidebar();">
+            <span class="icon">🎬</span> Видео
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/multimedia/muzyka.html';closeSidebar();">
+            <span class="icon">🎵</span> Музыка
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/life/igry.html';closeSidebar();">
+            <span class="icon">🎮</span> Игры
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/life/sport.html';closeSidebar();">
+            <span class="icon">⚽</span> Спорт
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/life/kino.html';closeSidebar();">
+            <span class="icon">🎥</span> Кино
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/tech/programmirovanie.html';closeSidebar();">
+            <span class="icon">💻</span> Программирование
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/business/business.html';closeSidebar();">
+            <span class="icon">💼</span> Бизнес
+        </div>
+        <div class="menu-item" onclick="window.location.href='pages/communication/znakomstva.html';closeSidebar();">
+            <span class="icon">❤️</span> Знакомства
+        </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-item" onclick="openNotifications();closeSidebar();">
+        <span class="icon">🔔</span> Уведомления
+    </div>
+    <div class="menu-item" onclick="openChatList();closeSidebar();">
+        <span class="icon">💬</span> Чаты
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <div class="menu-item" onclick="logout();closeSidebar();">
+        <span class="icon">🚪</span> Выйти
+    </div>
+</div>

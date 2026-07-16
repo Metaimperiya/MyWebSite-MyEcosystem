@@ -1,0 +1,74 @@
+/* ================================================================ */
+/* BASE — БАЗОВЫЕ СТИЛИ */
+/* ================================================================ */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.5;
+    overflow-x: hidden;
+    padding-top: 0;
+}
+
+button {
+    font-family: inherit;
+}
+
+/* ===== СКРОЛЛ ===== */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* ===== ВЫДЕЛЕНИЕ ===== */
+::selection {
+    background: var(--link-color);
+    color: #fff;
+}
+
+/* ===== ССЫЛКИ ===== */
+a {
+    color: var(--link-color);
+    transition: var(--transition);
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+/* ===== КОНТЕЙНЕРЫ ===== */
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* ===== СКРЫТЫЕ ЭЛЕМЕНТЫ ===== */
+.hidden {
+    display: none !important;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}

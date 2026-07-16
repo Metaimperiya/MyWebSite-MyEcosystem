@@ -1,0 +1,89 @@
+<!-- ===== МОДАЛКИ ===== -->
+
+<!-- ВХОД -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeLogin()">✕</button>
+        <h3>👤 Вход</h3>
+        <button class="btn-primary" onclick="document.getElementById('googleBtn').click()" style="width:100%;padding:12px;font-size:1rem;">🔑 Войти через Google</button>
+        <button id="googleBtn" style="display:none;"></button>
+    </div>
+</div>
+
+<!-- РЕДАКТИРОВАНИЕ ПРОФИЛЯ -->
+<div class="modal-overlay" id="editProfileModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeEditProfile()">✕</button>
+        <h3>✏️ Редактировать профиль</h3>
+        <input type="text" id="editName" placeholder="Имя...">
+        <textarea id="editBio" placeholder="О себе..."></textarea>
+        <button class="btn-primary" onclick="saveProfile()">💾 Сохранить</button>
+        <button class="btn-secondary" onclick="closeEditProfile()">Отмена</button>
+    </div>
+</div>
+
+<!-- РЕДАКТИРОВАНИЕ ПОСТА -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeEdit()">✕</button>
+        <h3>✏️ Редактировать пост</h3>
+        <input type="text" id="editMarquee" placeholder="Бегущая строка...">
+        <textarea id="editText" placeholder="Текст поста..." style="min-height:80px;"></textarea>
+        <input type="text" id="editLink" placeholder="Ссылка для встраивания...">
+        <input type="text" id="editHashtags" placeholder="#хэштеги через пробел">
+        <div style="margin:8px 0;display:flex;gap:8px;align-items:center;">
+            <span style="font-size:0.7rem;color:var(--text-secondary);">Размер фрейма:</span>
+            <button id="frameSizeSmall" class="btn-secondary" onclick="setFrameSize('small')" style="padding:2px 12px;font-size:0.6rem;">📱 Маленький</button>
+            <button id="frameSizeLarge" class="btn-secondary" onclick="setFrameSize('large')" style="padding:2px 12px;font-size:0.6rem;">🖥️ Большой</button>
+        </div>
+        <div id="editButtonsContainer"></div>
+        <button onclick="addEditBtn()" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-size:0.7rem;padding:4px 0;">➕ Добавить кнопку</button>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+            <button class="btn-primary" onclick="saveEdit()">💾 Сохранить</button>
+            <button class="btn-secondary" onclick="closeEdit()">Отмена</button>
+            <button class="btn-danger" onclick="deleteEditPost()" style="margin-left:auto;">🗑 Удалить</button>
+        </div>
+    </div>
+</div>
+
+<!-- УВЕДОМЛЕНИЯ -->
+<div class="modal-overlay" id="notificationsModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeNotifications()">✕</button>
+        <h3>🔔 Уведомления</h3>
+        <div id="notificationsList"></div>
+    </div>
+</div>
+
+<!-- РЕПОСТ -->
+<div class="modal-overlay" id="repostModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeRepost()">✕</button>
+        <h3>🔄 Репост</h3>
+        <input type="hidden" id="repostPostId">
+        <input type="hidden" id="repostType">
+        <textarea id="repostText" placeholder="Напишите что-нибудь (необязательно)..." style="min-height:60px;"></textarea>
+        <div style="display:flex;gap:8px;">
+            <button class="btn-primary" onclick="submitRepost()">🔄 Репостнуть</button>
+            <button class="btn-secondary" onclick="closeRepost()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- СПИСОК ЧАТОВ -->
+<div class="modal-overlay" id="chatListModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeChatList()">✕</button>
+        <h3>💬 Чаты</h3>
+        <div id="chatListContainer"></div>
+    </div>
+</div>
+
+<!-- АДМИН-ЧАТЫ -->
+<div class="modal-overlay" id="adminChatsModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeAdminChats()">✕</button>
+        <h3>🏴‍☠️ Все чаты (админ)</h3>
+        <div id="adminChatsList"></div>
+    </div>
+</div>

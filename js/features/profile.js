@@ -1,16 +1,16 @@
-// ================================================================
+// ================================================================ */
 // ПРОФИЛЬ — БЕЗ ГОСТЯ
-// ================================================================
+// ================================================================ */
 
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
-    
+
     // ЕСЛИ НЕТ ПОЛЬЗОВАТЕЛЯ — ПОКАЗЫВАЕМ КНОПКУ ВХОДА
     if (!uid) {
         var nameEl = document.getElementById('profileName');
         var bioEl = document.getElementById('profileBio');
         var avatarEl = document.getElementById('profileAvatar');
-        
+
         if (nameEl) {
             nameEl.textContent = '👤 Войдите';
             nameEl.style.display = 'block';
@@ -22,20 +22,20 @@ function loadProfile() {
         if (avatarEl) {
             avatarEl.innerHTML = '<span class="letter" style="cursor:pointer;font-size:24px;" onclick="document.getElementById(\'loginModal\').classList.add(\'open\')">🔑</span>';
         }
-        
+
         var postsContainer = document.getElementById('profilePosts');
         if (postsContainer) postsContainer.innerHTML = '';
-        
+
         return;
     }
 
     db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
         var u = snap.val() || {};
-        
+
         var nameEl = document.getElementById('profileName');
         var bioEl = document.getElementById('profileBio');
         var avatarEl = document.getElementById('profileAvatar');
-        
+
         // ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН В БАЗЕ
         if (!u.name) {
             if (nameEl) {
@@ -51,7 +51,7 @@ function loadProfile() {
             }
             return;
         }
-        
+
         // ПОКАЗЫВАЕМ ПРОФИЛЬ
         if (nameEl) {
             nameEl.textContent = u.name;
@@ -66,7 +66,7 @@ function loadProfile() {
         makeStatsClickable(uid);
         loadProfileLink(uid);
     });
-    
+
     loadFriends(uid);
     loadSubscribers(uid);
     loadSubscriptions(uid);
@@ -76,23 +76,23 @@ function loadProfile() {
 function loadProfilePosts(uid) {
     var container = document.getElementById('profilePosts');
     if (!container) return;
-    
+
     container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
-    
+
     var postsRef = db.ref('sites/' + SITE + '/user_posts/' + uid);
-    
+
     postsRef.orderByChild('timestamp').on('value', function(snap) {
         container.innerHTML = '';
         var data = snap.val() || {};
         var keys = Object.keys(data).sort(function(a, b) {
             return (data[b].timestamp || 0) - (data[a].timestamp || 0);
         });
-        
+
         if (!keys.length) {
             container.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.65rem;">📝 Нет постов. Напишите что-нибудь!</div>';
             return;
         }
-        
+
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
@@ -109,7 +109,7 @@ function makeStatsClickable(uid) {
     var friendsCount = document.getElementById('friendsCount');
     var subscribersCount = document.getElementById('subscribersCount');
     var subscriptionsCount = document.getElementById('subscriptionsCount');
-    
+
     if (friendsCount) {
         friendsCount.style.cursor = 'pointer';
         friendsCount.style.color = 'var(--link-color)';
@@ -130,7 +130,7 @@ function makeStatsClickable(uid) {
 window.toggleFriendsList = function() {
     var section = document.getElementById('friendsSection');
     if (!section) return;
-    
+
     if (section.style.display === 'none') {
         section.style.display = 'block';
         loadFriends(VIEWING_USER || USER_UID);
@@ -154,17 +154,17 @@ window.saveProfileLink = function() {
     if (!USER_UID) { alert('Войдите!'); return; }
     var input = document.getElementById('profileLinkInput');
     var link = input.value.trim();
-    
+
     if (!link) {
         document.getElementById('profileIframeWrap').style.display = 'none';
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').remove();
         return;
     }
-    
+
     if (!link.startsWith('http://') && !link.startsWith('https://')) {
         link = 'https://' + link;
     }
-    
+
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').set(link);
     document.getElementById('profileIframe').src = link;
     document.getElementById('profileIframeWrap').style.display = 'block';
@@ -175,7 +175,7 @@ window.toggleIframe = function() {
     var wrap = document.getElementById('profileIframeWrap');
     var btn = wrap.querySelector('.iframe-header button');
     var iframe = document.getElementById('profileIframe');
-    
+
     if (iframe.style.display === 'none') {
         iframe.style.display = 'block';
         btn.textContent = '🔼 Свернуть';
@@ -188,23 +188,14 @@ window.toggleIframe = function() {
 function showProfileActions(uid) {
     var actions = document.getElementById('profileActions');
     if (!uid) return;
-    
+
     actions.innerHTML = '';
     actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
-    
+
     if (uid === USER_UID) {
         var wrapper = document.createElement('div');
         wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;justify-content:center;';
-        
-        var editBtn = document.createElement('button');
-        editBtn.className = 'friend-btn add';
-        editBtn.textContent = '✏️ Редактировать профиль';
-        editBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;background:var(--link-color);color:#fff;transition:0.2s;';
-        editBtn.onclick = function() { openEditProfile(); };
-        editBtn.onmouseover = function() { this.style.background = 'var(--link-hover)'; };
-        editBtn.onmouseout = function() { this.style.background = 'var(--link-color)'; };
-        wrapper.appendChild(editBtn);
-        
+
         var dotsBtn = document.createElement('button');
         dotsBtn.className = 'profile-dots-btn';
         dotsBtn.textContent = '⋮';
@@ -216,33 +207,33 @@ function showProfileActions(uid) {
             toggleProfileMenu(uid);
         };
         wrapper.appendChild(dotsBtn);
-        
+
         actions.appendChild(wrapper);
-        
+
         var menuContainer = document.createElement('div');
         menuContainer.style.cssText = 'position:relative;width:100%;';
         actions.appendChild(menuContainer);
-        
+
         var menu = document.createElement('div');
         menu.id = 'profileMenu';
         menu.className = 'profile-dropdown-menu';
         menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
         menuContainer.appendChild(menu);
-        
+
         fillOwnProfileMenu(uid, menu);
         return;
     }
-    
+
     var wrapper = document.createElement('div');
     wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
-    
+
     var mainBtn = document.createElement('button');
     mainBtn.id = 'friendActionBtn';
     mainBtn.className = 'friend-btn add';
     mainBtn.textContent = 'Загрузка...';
     mainBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;';
     wrapper.appendChild(mainBtn);
-    
+
     var msgBtn = document.createElement('button');
     msgBtn.className = 'friend-btn';
     msgBtn.textContent = '💬 Написать';
@@ -251,7 +242,7 @@ function showProfileActions(uid) {
     msgBtn.onmouseover = function() { this.style.background = '#4a9eff'; };
     msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
     wrapper.appendChild(msgBtn);
-    
+
     var dotsBtn = document.createElement('button');
     dotsBtn.className = 'profile-dots-btn';
     dotsBtn.textContent = '⋮';
@@ -263,27 +254,27 @@ function showProfileActions(uid) {
         toggleProfileMenu(uid);
     };
     wrapper.appendChild(dotsBtn);
-    
+
     actions.appendChild(wrapper);
-    
+
     var menuContainer = document.createElement('div');
     menuContainer.style.cssText = 'position:relative;width:100%;';
     actions.appendChild(menuContainer);
-    
+
     var menu = document.createElement('div');
     menu.id = 'profileMenu';
     menu.className = 'profile-dropdown-menu';
     menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
     menuContainer.appendChild(menu);
-    
+
     fillProfileMenu(uid, menu);
     updateFriendButton(uid);
-    
+
     db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).on('value', function() {
         updateFriendButton(uid);
         fillProfileMenu(uid, document.getElementById('profileMenu'));
     });
-    
+
     db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).on('value', function() {
         updateFriendButton(uid);
         fillProfileMenu(uid, document.getElementById('profileMenu'));
@@ -292,29 +283,29 @@ function showProfileActions(uid) {
 
 function fillOwnProfileMenu(uid, menu) {
     if (!menu) return;
-    
+
     var html = '';
     html += '<div class="profile-menu-item" onclick="openEditProfile();closeProfileMenu();">✏️ Редактировать профиль</div>';
     html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
     html += '<div class="profile-menu-item" onclick="uploadAvatar();closeProfileMenu();">📷 Сменить аватар</div>';
     html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
     html += '<div class="profile-menu-item" onclick="goToFeed();closeProfileMenu();">🏠 На главную</div>';
-    
+
     if (isAdmin) {
         html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
         html += '<div class="profile-menu-item" style="color:#e67e22;" onclick="openAdminChats();closeProfileMenu();">🏴‍☠️ Все чаты</div>';
     }
-    
+
     menu.innerHTML = html;
 }
 
 function fillProfileMenu(uid, menu) {
     if (!menu) return;
-    
+
     var status = getCachedFriendStatus(USER_UID, uid);
-    
+
     var items = [];
-    
+
     if (status === 'friend') {
         items.push({ label: '⭐ В избранное', action: 'addFavorite', icon: '⭐' });
         items.push({ label: '📝 Редактировать список друзей', action: 'editFriendList', icon: '📝' });
@@ -328,7 +319,7 @@ function fillProfileMenu(uid, menu) {
     } else {
         items.push({ label: '➕ Добавить в друзья', action: 'addFriend', icon: '➕' });
     }
-    
+
     var html = '';
     items.forEach(function(item, index) {
         var dangerClass = item.danger ? ' style="color:var(--danger);"' : '';
@@ -339,9 +330,9 @@ function fillProfileMenu(uid, menu) {
             html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
         }
     });
-    
+
     menu.innerHTML = html;
-    
+
     menu.querySelectorAll('.profile-menu-item').forEach(function(el) {
         el.onclick = function() {
             var action = this.dataset.action;
@@ -385,13 +376,13 @@ function handleProfileMenuAction(action, uid) {
 function toggleProfileMenu(uid) {
     var menu = document.getElementById('profileMenu');
     if (!menu) return;
-    
+
     var isOpen = menu.style.display === 'block';
-    
+
     document.querySelectorAll('.profile-dropdown-menu').forEach(function(el) {
         el.style.display = 'none';
     });
-    
+
     if (!isOpen) {
         menu.style.display = 'block';
         if (uid === USER_UID) {
@@ -417,14 +408,14 @@ document.addEventListener('click', function(e) {
 function updateFriendButton(uid) {
     var btn = document.getElementById('friendActionBtn');
     if (!btn) return;
-    
+
     if (uid === USER_UID) {
         btn.style.display = 'none';
         return;
     }
-    
+
     btn.style.display = 'inline-block';
-    
+
     getFriendStatusRealtime(USER_UID, uid, function(status) {
         if (status === 'friend') {
             btn.textContent = '🤝 В друзьях';
@@ -459,22 +450,22 @@ function getCachedFriendStatus(myUid, targetUid) {
 
 function loadFriends(uid) {
     if (!uid) return;
-    
+
     db.ref('sites/' + SITE + '/friends/' + uid).on('value', function(snap) {
         var data = snap.val() || {};
         var keys = Object.keys(data).filter(function(k) { return data[k] === true; });
-        
+
         var countEl = document.getElementById('friendsCount');
         if (countEl) countEl.textContent = keys.length;
-        
+
         var el = document.getElementById('friendList');
         if (!el) return;
-        
+
         if (!keys.length) {
             el.innerHTML = '<span style="color:#bbb;font-size:0.55rem;">Нет друзей</span>';
             return;
         }
-        
+
         var html = '';
         var loaded = 0;
         keys.forEach(function(k) {
@@ -538,7 +529,7 @@ window.saveProfile = function() {
     var name = document.getElementById('editName').value.trim();
     var bio = document.getElementById('editBio').value.trim();
     if (!name) { alert('Введите имя'); return; }
-    
+
     USER = name;
     localStorage.setItem('dc_u_' + SITE, USER);
     db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
@@ -558,7 +549,7 @@ window.uploadAvatar = function() {
         var file = e.target.files[0];
         if (!file) return;
         if (file.size > 5 * 1024 * 1024) { alert('Максимум 5 МБ'); return; }
-        
+
         var ref = storage.ref('avatars/' + USER_UID + '/' + Date.now() + '_' + file.name);
         ref.put(file).then(function(snap) {
             return snap.ref.getDownloadURL();

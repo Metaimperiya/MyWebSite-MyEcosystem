@@ -1,0 +1,45 @@
+/* ================================================================ */
+/* NOTIFICATIONS — УВЕДОМЛЕНИЯ */
+/* ================================================================ */
+
+.notif-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.notif-item:hover {
+    background: var(--input-bg);
+}
+
+.notif-item.unread {
+    background: #e8f0fe;
+}
+
+.notif-item .notif-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.notif-item .notif-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-item .notif-time {
+    font-size: 0.55rem;
+    color: var(--muted-text);
+}
+
+.notif-item .notif-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--link-color);
+    border-radius: 50%;
+    flex-shrink: 0;
+}

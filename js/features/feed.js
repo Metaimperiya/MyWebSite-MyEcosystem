@@ -1,6 +1,6 @@
-// ================================================================
+// ================================================================ */
 // ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ
-// ================================================================
+// ================================================================ */
 
 var commentStates = {};
 var feedListener = null;
@@ -50,9 +50,9 @@ function removeLoading(el) {
     if (spinner) spinner.remove();
 }
 
-// ================================================================
+// ================================================================ */
 // ЗАГРУЗКА ЛЕНТЫ (ГЛАВНАЯ)
-// ================================================================
+// ================================================================ */
 
 function loadFeed() {
     var el = document.getElementById('feed');
@@ -96,7 +96,7 @@ function loadFeed() {
         keys.forEach(function(k) {
             var p = data[k];
             p.id = k;
-            
+
             if (p.deleted && p.deletedAt) {
                 db.ref('sites/' + SITE + '/feed_posts/' + k).remove();
                 if (p.authorUid) {
@@ -104,7 +104,7 @@ function loadFeed() {
                 }
                 return;
             }
-            
+
             if (existingIds[k]) {
                 updatePostStats(k, p);
                 delete existingIds[k];
@@ -135,23 +135,23 @@ function loadFeed() {
     db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').on('value', feedListener);
 }
 
-// ================================================================
+// ================================================================ */
 // ОБНОВЛЕНИЕ СТАТИСТИКИ ПОСТА
-// ================================================================
+// ================================================================ */
 
 function updatePostStats(postId, data) {
     var likeCount = document.getElementById('likeCount_' + postId);
     var commentCount = document.getElementById('commentCount_' + postId);
     var repostCount = document.getElementById('repostCount_' + postId);
-    
+
     if (likeCount) likeCount.textContent = data.likes || 0;
     if (commentCount) commentCount.textContent = data.commentCount || 0;
     if (repostCount) repostCount.textContent = data.reposts || 0;
 }
 
-// ================================================================
+// ================================================================ */
 // РАБОТА С РЕДАКТОРОМ
-// ================================================================
+// ================================================================ */
 
 function getEditorText() {
     var editor = document.getElementById('postEditor');
@@ -177,78 +177,9 @@ function clearProfileEditor() {
     editor.innerHTML = '';
 }
 
-function formatText(type) {
-    var editor = document.getElementById('postEditor');
-    if (!editor) return;
-    
-    var selection = window.getSelection();
-    if (!selection.rangeCount) return;
-    
-    var range = selection.getRangeAt(0);
-    var selectedText = range.toString();
-    
-    if (!selectedText) {
-        var templates = {
-            'bold': '**жирный текст**',
-            'italic': '*курсив*',
-            'underline': '__подчёркнутый__',
-            'strike': '~~зачёркнутый~~',
-            'h1': '# Заголовок',
-            'h2': '## Подзаголовок',
-            'quote': '> Цитата',
-            'code': '```код```'
-        };
-        
-        var template = templates[type] || '';
-        if (template) {
-            document.execCommand('insertText', false, template);
-        }
-        return;
-    }
-    
-    var wrappers = {
-        'bold': '**',
-        'italic': '*',
-        'underline': '__',
-        'strike': '~~',
-        'h1': '# ',
-        'h2': '## ',
-        'quote': '> ',
-        'code': '```'
-    };
-    
-    var wrapper = wrappers[type];
-    if (!wrapper) return;
-    
-    var newText;
-    if (type === 'h1' || type === 'h2' || type === 'quote') {
-        newText = wrapper + selectedText;
-    } else {
-        var closeWrapper = wrapper;
-        if (type === 'code') closeWrapper = '```';
-        newText = wrapper + selectedText + closeWrapper;
-    }
-    
-    document.execCommand('insertText', false, newText);
-}
-
-function insertLink() {
-    var url = prompt('Введите ссылку:');
-    if (!url) return;
-    
-    var editor = document.getElementById('postEditor');
-    if (!editor) return;
-    
-    var selection = window.getSelection();
-    if (selection.rangeCount) {
-        var text = selection.toString() || 'ссылка';
-        document.execCommand('insertText', false, '[' + text + '](' + url + ')');
-    }
-}
-
-// ================================================================
+// ================================================================ */
 // ОТПРАВКА ПОСТА (ГЛАВНАЯ ЛЕНТА)
-// ================================================================
+// ================================================================ */
 
 window.submitPost = function() {
     if (!USER) { alert('Войдите!'); return; }
@@ -260,10 +191,10 @@ window.submitPost = function() {
     }
 
     var hashtags = extractHashtags(text);
-    
+
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
         var avatarUrl = avatarSnap.val() || null;
-        
+
         var postData = {
             author: USER,
             authorUid: USER_UID,
@@ -291,12 +222,12 @@ window.submitPost = function() {
 
         var savePost = function(imgData) {
             if (imgData) postData.img = imgData;
-            
+
             db.ref('sites/' + SITE + '/feed_posts').push(postData);
             db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
             clearEditor();
             clearPostForm();
-            
+
             setTimeout(function() {
                 if (typeof loadFeed === 'function') loadFeed();
             }, 300);
@@ -314,9 +245,9 @@ window.submitPost = function() {
     });
 };
 
-// ================================================================
+// ================================================================ */
 // ОТПРАВКА ПОСТА (ПРОФИЛЬ)
-// ================================================================
+// ================================================================ */
 
 var pendingProfileImageFile = null;
 
@@ -330,10 +261,10 @@ window.submitProfilePost = function() {
     }
 
     var hashtags = extractHashtags(text);
-    
+
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
         var avatarUrl = avatarSnap.val() || null;
-        
+
         var postData = {
             author: USER,
             authorUid: USER_UID,
@@ -361,12 +292,12 @@ window.submitProfilePost = function() {
 
         var savePost = function(imgData) {
             if (imgData) postData.img = imgData;
-            
+
             db.ref('sites/' + SITE + '/feed_posts').push(postData);
             db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
             clearProfileEditor();
             clearProfilePostForm();
-            
+
             setTimeout(function() {
                 if (typeof loadFeed === 'function') loadFeed();
                 if (typeof loadProfile === 'function') loadProfile();
@@ -468,9 +399,9 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     reader.readAsDataURL(file);
 });
 
-// ================================================================
+// ================================================================ */
 // РЕНДЕР ПОСТА (ПОЛНАЯ ВЕРСИЯ С ТРИ ТОЧКИ)
-// ================================================================
+// ================================================================ */
 
 function renderPost(p, type) {
     var div = document.createElement('div');
@@ -481,7 +412,7 @@ function renderPost(p, type) {
     if (p.deleted) {
         div.innerHTML = `
             <div style="padding:10px;text-align:center;color:var(--muted-text);background:var(--input-bg);border-radius:8px;border:1px solid var(--border-color);">
-                🗑 Пост удален 
+                🗑 Пост удален
                 <button onclick="restorePost('${p.id}', '${type}')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:6px;">↩️ Восстановить</button>
                 <button onclick="permanentDeletePost('${p.id}', '${type}')" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:4px;">✕ Удалить навсегда</button>
             </div>
@@ -491,7 +422,7 @@ function renderPost(p, type) {
 
     var isLiked = localStorage.getItem('lk_' + p.id + '_' + USER_UID) === '1';
     var letter = (p.author || '?').charAt(0).toUpperCase();
-    
+
     var avatarHtml = '';
     if (p.authorAvatar) {
         avatarHtml = '<span class="avatar-wrap" id="post-avatar-' + p.id + '"><img src="' + p.authorAvatar + '" /></span>';
@@ -577,9 +508,9 @@ function renderPost(p, type) {
     `;
 
     var contentHtml = textHtml + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml;
-    
-    div.innerHTML = menuHtml + marqueeHtml + 
-        '<div class="author" onclick="event.stopPropagation();viewUser(\'' + (p.authorUid || '') + '\')">' + avatarHtml + 
+
+    div.innerHTML = menuHtml + marqueeHtml +
+        '<div class="author" onclick="event.stopPropagation();viewUser(\'' + (p.authorUid || '') + '\')">' + avatarHtml +
         '<span class="name" onclick="event.stopPropagation();viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span>' +
         '<span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>' +
         '</div>' +
@@ -605,20 +536,20 @@ function renderPost(p, type) {
     return div;
 }
 
-// ================================================================
+// ================================================================ */
 // РЕКУРСИВНЫЙ РЕНДЕР ВЛОЖЕННЫХ РЕПОСТОВ
-// ================================================================
+// ================================================================ */
 
 function renderNestedRepost(repost, level) {
     if (!repost) return '';
-    
+
     var maxLevel = 5;
     if (level > maxLevel) return '<div class="repost-nested" style="padding:6px;color:var(--muted-text);font-size:0.6rem;">📦 Слишком глубокий репост</div>';
-    
+
     var textHtml = repost.text || '';
     var imgHtml = repost.img ? '<img src="' + repost.img + '" class="repost-img" onclick="window.open(this.src)">' : '';
     var marqueeHtml = repost.marquee ? '<div class="marquee"><span>' + esc(repost.marquee) + '</span></div>' : '';
-    
+
     var buttonsHtml = '';
     if (repost.buttons && repost.buttons.length > 0) {
         buttonsHtml = '<div class="buttons-wrap">';
@@ -629,14 +560,14 @@ function renderNestedRepost(repost, level) {
         });
         buttonsHtml += '</div>';
     }
-    
+
     var linkHtml = '';
     if (repost.link) {
         var frameSize = repost.frameSize || 'small';
         var height = frameSize === 'large' ? '450px' : '250px';
         linkHtml = '<div class="link-preview"><iframe src="' + repost.link + '" style="width:100%;height:' + height + ';border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
-    
+
     var hashtagsHtml = '';
     if (repost.hashtags && repost.hashtags.length > 0) {
         hashtagsHtml = '<div class="hashtags">';
@@ -645,22 +576,22 @@ function renderNestedRepost(repost, level) {
         });
         hashtagsHtml += '</div>';
     }
-    
+
     var nestedHtml = '';
     if (repost.repost) {
         nestedHtml = renderNestedRepost(repost.repost, level + 1);
     }
-    
-    var borderColor = level === 1 ? 'var(--link-color)' : 
-                      level === 2 ? 'var(--success)' : 
-                      level === 3 ? 'var(--warning)' : 
-                      'var(--muted-text)';
-    
-    var levelLabel = level === 1 ? '🔄 Репост' : 
-                     level === 2 ? '🔄 Репост репоста' : 
-                     level === 3 ? '🔄 Третий репост' : 
-                     '🔄 Репост #' + level;
-    
+
+    var borderColor = level === 1 ? 'var(--link-color)' :
+        level === 2 ? 'var(--success)' :
+        level === 3 ? 'var(--warning)' :
+        'var(--muted-text)';
+
+    var levelLabel = level === 1 ? '🔄 Репост' :
+        level === 2 ? '🔄 Репост репоста' :
+        level === 3 ? '🔄 Третий репост' :
+        '🔄 Репост #' + level;
+
     return '<div class="repost-nested" style="border-left:3px solid ' + borderColor + ';padding:8px 10px;margin-top:6px;background:var(--input-bg);border-radius:6px;">' +
         '<div class="repost-header">' + levelLabel + ' от <span class="repost-author" onclick="viewUser(\'' + (repost.authorUid || '') + '\')">' + esc(repost.author || 'Аноним') + '</span>' +
         ' <span class="repost-time">' + (repost.time || '') + '</span></div>' +
@@ -674,9 +605,9 @@ function renderNestedRepost(repost, level) {
         '</div>';
 }
 
-// ================================================================
+// ================================================================ */
 // КОММЕНТАРИИ — БЕЗ ПРЫЖКОВ, БЕЗ ЗАКРЫТИЯ
-// ================================================================
+// ================================================================ */
 
 window.toggleComments = function(postId, type) {
     var state = getCommentState(postId);
@@ -833,7 +764,7 @@ window.openReply = function(postId, parentId, type) {
     document.querySelectorAll('.comment-reply-input-wrap').forEach(function(el) {
         el.style.display = 'none';
     });
-    
+
     var wrap = document.getElementById('replyInput_' + parentId);
     if (wrap) {
         wrap.style.display = 'flex';
@@ -846,16 +777,16 @@ window.openReply = function(postId, parentId, type) {
 
 window.submitReply = function(postId, parentId, type) {
     if (!USER) { alert('Войдите!'); return; }
-    
+
     var input = document.getElementById('replyInputField_' + parentId);
     if (!input) return;
-    
+
     var text = input.value.trim();
     if (!text) return;
-    
+
     var path = getPostPath(type);
     var state = getCommentState(postId);
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
         author: USER,
         authorUid: USER_UID,
@@ -865,10 +796,10 @@ window.submitReply = function(postId, parentId, type) {
         likes: 0,
         parentId: parentId
     });
-    
+
     input.value = '';
     document.getElementById('replyInput_' + parentId).style.display = 'none';
-    
+
     // Обновляем комментарии если они открыты
     if (state.open) {
         loadComments(postId, type);
@@ -881,7 +812,7 @@ window.toggleLikeComment = function(postId, commentId, type) {
     var path = getPostPath(type);
     var ref = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments/' + commentId + '/likes');
     var countEl = document.getElementById('commentLikeCount_' + commentId);
-    
+
     ref.transaction(function(likes) {
         return (likes || 0) + 1;
     });
@@ -892,9 +823,9 @@ window.toggleLikeComment = function(postId, commentId, type) {
     }
 };
 
-// ================================================================
+// ================================================================ */
 // ЛАЙКИ
-// ================================================================
+// ================================================================ */
 
 window.toggleLike = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
@@ -923,19 +854,19 @@ window.toggleLike = function(postId, type) {
             btn.style.pointerEvents = 'auto';
             btn.style.opacity = '1';
         }
-        
+
         if (error) {
             console.error('Ошибка лайка:', error);
             return;
         }
-        
+
         if (committed) {
             var newValue = snapshot.val() || 0;
-            
+
             if (countEl) {
                 countEl.textContent = newValue;
             }
-            
+
             if (liked) {
                 localStorage.removeItem(key);
                 if (btn) btn.classList.remove('liked');
@@ -947,25 +878,25 @@ window.toggleLike = function(postId, type) {
     });
 };
 
-// ================================================================
+// ================================================================ */
 // ОТПРАВКА КОММЕНТАРИЯ — НЕ ЗАКРЫВАЕТ КОММЕНТАРИИ
-// ================================================================
+// ================================================================ */
 
 window.submitComment = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
 
     var input = document.getElementById('commentInput_' + postId);
     if (!input) return;
-    
+
     var text = input.value.trim();
     if (!text) return;
 
     var path = getPostPath(type);
     var state = getCommentState(postId);
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + postId + '/authorUid').once('value', function(authorSnap) {
         var authorUid = authorSnap.val();
-        
+
         db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push({
             author: USER,
             authorUid: USER_UID,
@@ -994,19 +925,19 @@ window.submitComment = function(postId, type) {
     });
 };
 
-// ================================================================
+// ================================================================ */
 // УДАЛЕНИЕ КОММЕНТАРИЯ С ВЕТКОЙ
-// ================================================================
+// ================================================================ */
 
 function deleteCommentWithChildren(postId, commentId, type) {
     var path = getPostPath(type);
     var commentsRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments');
     var state = getCommentState(postId);
-    
+
     commentsRef.once('value', function(snap) {
         var allComments = snap.val() || {};
         var toDelete = {};
-        
+
         function collectChildren(parentId) {
             Object.keys(allComments).forEach(function(id) {
                 if (allComments[id].parentId === parentId) {
@@ -1015,15 +946,15 @@ function deleteCommentWithChildren(postId, commentId, type) {
                 }
             });
         }
-        
+
         toDelete[commentId] = true;
         collectChildren(commentId);
-        
+
         var updates = {};
         Object.keys(toDelete).forEach(function(id) {
             updates[id] = null;
         });
-        
+
         commentsRef.update(updates).then(function() {
             var remaining = 0;
             Object.keys(allComments).forEach(function(id) {
@@ -1113,22 +1044,22 @@ function saveCommentEdit(postId, commentId, type, newText) {
     });
 }
 
-// ================================================================
+// ================================================================ */
 // ОТКРЫТИЕ СТРАНИЦЫ ПОСТА
-// ================================================================
+// ================================================================ */
 
 window.openPostPage = function(postId, type) {
     window.CURRENT_POST_ID = postId;
     window.CURRENT_POST_TYPE = type;
-    
+
     var container = document.getElementById('postPageContainer');
     if (!container) return;
-    
+
     document.getElementById('postPage').classList.add('active');
     setActivePage(null);
-    
+
     container.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">⏳ Загрузка поста...</div>';
-    
+
     var path = getPostPath(type);
     db.ref('sites/' + SITE + '/' + path + '/' + postId).once('value', function(snap) {
         var post = snap.val();
@@ -1140,7 +1071,7 @@ window.openPostPage = function(postId, type) {
         var postEl = renderPost(post, type);
         container.innerHTML = '';
         container.appendChild(postEl);
-        
+
         setTimeout(function() {
             var wrapper = document.getElementById('commentsWrapper_' + postId);
             if (wrapper) {
@@ -1162,18 +1093,18 @@ window.closePostPage = function() {
     loadFeed();
 };
 
-// ================================================================
+// ================================================================ */
 // УДАЛЕНИЕ ПОСТА
-// ================================================================
+// ================================================================ */
 
 window.deletePost = function(id, type) {
     var path = getPostPath(type);
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + id).update({
         deleted: true,
         deletedAt: Date.now()
     });
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + id + '/authorUid').once('value', function(snap) {
         var authorUid = snap.val();
         if (authorUid) {
@@ -1183,16 +1114,16 @@ window.deletePost = function(id, type) {
             });
         }
     });
-    
+
     var menu = document.getElementById('menu_' + id);
     if (menu) menu.classList.remove('open');
-    
+
     if (type === 'feed' || type === 'profile') {
         var postEl = document.querySelector('.post[data-id="' + id + '"]');
         if (postEl) {
             var deletedHtml = `
                 <div style="padding:10px;text-align:center;color:var(--muted-text);background:var(--input-bg);border-radius:8px;border:1px solid var(--border-color);">
-                    🗑 Пост удален 
+                    🗑 Пост удален
                     <button onclick="restorePost('${id}', '${type}')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:6px;">↩️ Восстановить</button>
                     <button onclick="permanentDeletePost('${id}', '${type}')" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:4px;">✕ Удалить навсегда</button>
                 </div>
@@ -1200,7 +1131,7 @@ window.deletePost = function(id, type) {
             postEl.innerHTML = deletedHtml;
         }
     }
-    
+
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1209,21 +1140,21 @@ window.deletePost = function(id, type) {
 
 window.permanentDeletePost = function(id, type) {
     var path = getPostPath(type);
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + id).remove();
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + id + '/authorUid').once('value', function(snap) {
         var authorUid = snap.val();
         if (authorUid) {
             db.ref('sites/' + SITE + '/user_posts/' + authorUid + '/' + id).remove();
         }
     });
-    
+
     var postEl = document.querySelector('.post[data-id="' + id + '"]');
     if (postEl && postEl.parentNode) {
         postEl.parentNode.removeChild(postEl);
     }
-    
+
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1232,12 +1163,12 @@ window.permanentDeletePost = function(id, type) {
 
 window.restorePost = function(id, type) {
     var path = getPostPath(type);
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + id).update({
         deleted: null,
         deletedAt: null
     });
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + id + '/authorUid').once('value', function(snap) {
         var authorUid = snap.val();
         if (authorUid) {
@@ -1247,7 +1178,7 @@ window.restorePost = function(id, type) {
             });
         }
     });
-    
+
     if (type === 'feed' || type === 'profile') {
         var postEl = document.querySelector('.post[data-id="' + id + '"]');
         if (postEl) {
@@ -1261,16 +1192,16 @@ window.restorePost = function(id, type) {
             });
         }
     }
-    
+
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
     }, 300);
 };
 
-// ================================================================
+// ================================================================ */
 // РЕДАКТИРОВАНИЕ ПОСТА
-// ================================================================
+// ================================================================ */
 
 window.openEdit = function(id, type) {
     EDITING_ID = { id: id, type: type };
@@ -1368,12 +1299,12 @@ window.saveEdit = function() {
     db.ref('sites/' + SITE + '/' + path + '/' + id).update(updates);
     closeEdit();
     alert('✅ Пост обновлён!');
-    
+
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
     }, 100);
-    
+
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1385,14 +1316,14 @@ window.deleteEditPost = function() {
     var id = EDITING_ID.id;
     var type = EDITING_ID.type;
     var path = getPostPath(type);
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + id).update({
         deleted: true,
         deletedAt: Date.now()
     });
-    
+
     closeEdit();
-    
+
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
@@ -1430,13 +1361,13 @@ window.searchByTag = function(tag) {
     }
 };
 
-// ================================================================
+// ================================================================ */
 // РЕПОСТЫ — БЕЗ ЛИШНЕГО ПОДТВЕРЖДЕНИЯ
-// ================================================================
+// ================================================================ */
 
 window.openRepost = function(postId, type) {
     if (!USER) { alert('Войдите!'); return; }
-    
+
     document.getElementById('repostModal').classList.add('open');
     document.getElementById('repostPostId').value = postId;
     document.getElementById('repostType').value = type;
@@ -1453,20 +1384,20 @@ window.submitRepost = function() {
     var postId = document.getElementById('repostPostId').value;
     var type = document.getElementById('repostType').value;
     var comment = document.getElementById('repostText').value.trim();
-    
+
     if (!postId) { alert('Ошибка: пост не найден'); return; }
-    
+
     var path = getPostPath(type);
-    
+
     db.ref('sites/' + SITE + '/' + path + '/' + postId).once('value', function(snap) {
         var original = snap.val();
         if (!original) { alert('Пост удалён'); closeRepost(); return; }
-        
+
         var repostText = comment || '🔁 Репост';
-        
+
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
             var avatarUrl = avatarSnap.val() || null;
-            
+
             var repostData = {
                 author: USER,
                 authorUid: USER_UID,
@@ -1488,7 +1419,7 @@ window.submitRepost = function() {
                 deleted: null,
                 deletedAt: null
             };
-            
+
             if (pendingImageFile) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
@@ -1499,7 +1430,7 @@ window.submitRepost = function() {
                 reader.readAsDataURL(pendingImageFile);
                 return;
             }
-            
+
             repostData.repost = createRepostObject(original);
             saveNestedRepost(repostData, postId, type, path);
         });
@@ -1523,7 +1454,7 @@ function createRepostObject(original) {
             repost: original.repost
         };
     }
-    
+
     return {
         author: original.author,
         authorUid: original.authorUid,
@@ -1545,21 +1476,21 @@ function saveNestedRepost(repostData, postId, type, path) {
     repostRef.transaction(function(current) {
         return (current || 0) + 1;
     });
-    
+
     db.ref('sites/' + SITE + '/feed_posts').push(repostData);
     db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
-    
+
     closeRepost();
-    
+
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
     }, 300);
 };
 
-// ================================================================
+// ================================================================ */
 // РАЗМЕР ФРЕЙМА
-// ================================================================
+// ================================================================ */
 
 window.setFrameSize = function(size) {
     currentFrameSize = size;
@@ -1575,9 +1506,9 @@ window.setFrameSize = function(size) {
     }
 };
 
-// ================================================================
+// ================================================================ */
 // ФОТО-ЛЕНТА (ОТДЕЛЬНАЯ)
-// ================================================================
+// ================================================================ */
 
 var fotoFeedListener = null;
 var pendingFotoImage = null;
@@ -1702,10 +1633,10 @@ window.submitFotoPost = function() {
     }
 
     var hashtags = extractHashtags(text);
-    
+
     db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
         var avatarUrl = avatarSnap.val() || null;
-        
+
         var postData = {
             author: USER,
             authorUid: USER_UID,
@@ -1730,10 +1661,10 @@ window.submitFotoPost = function() {
 
         var savePost = function(imgData) {
             if (imgData) postData.img = imgData;
-            
+
             db.ref('sites/' + SITE + '/foto_posts').push(postData);
             clearFotoPostForm();
-            
+
             setTimeout(function() {
                 loadFotoFeed();
             }, 100);
@@ -1751,9 +1682,9 @@ window.submitFotoPost = function() {
     });
 };
 
-// ================================================================
+// ================================================================ */
 // ТОГЛ МЕНЮ
-// ================================================================
+// ================================================================ */
 
 window.togglePostMenu = function(id) {
     var menu = document.getElementById('menu_' + id);

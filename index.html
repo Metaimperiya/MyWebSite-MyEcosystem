@@ -8,144 +8,1724 @@
     <meta name="description" content="METAIMPERIYA — социальная сеть нового поколения">
     <meta name="theme-color" content="#1877f2">
 
-    <!-- ===== FIREBASE SDK 10.12.0 (ПОСЛЕДНЯЯ) ===== -->
+    <link rel="icon" href="assets/icons/metaimperiya.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/metaimperiya-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/metaimperiya-32x32.png">
+    <link rel="apple-touch-icon" href="assets/images/metaimperiya-192x192.png">
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="msapplication-TileColor" content="#1877f2">
+
+    <meta property="og:title" content="METAIMPERIYA — Социальная платформа">
+    <meta property="og:description" content="METAIMPERIYA — социальная сеть нового поколения для общения, блогов и контента.">
+    <meta property="og:image" content="https://myecosystem-e6414.web.app/assets/images/metaimperiya-icon.png">
+    <meta property="og:url" content="https://myecosystem-e6414.web.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="METAIMPERIYA">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="METAIMPERIYA">
+    <meta name="twitter:description" content="Социальная сеть нового поколения">
+    <meta name="twitter:image" content="https://myecosystem-e6414.web.app/assets/images/metaimperiya-icon.png">
+
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/mobile.css">
+    <style>
+        /* ================================================================ */
+        /* БАЗА */
+        /* ================================================================ */
+
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #1c1e21;
+            --text-secondary: #65676b;
+            --link-color: #1877f2;
+            --border-color: #e4e6eb;
+            --input-bg: #f0f2f5;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+            --avatar-bg: #e4e6eb;
+            --avatar-text: #1c1e21;
+            --muted-text: #8a8d91;
+            --hover-bg: #f0f2f5;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            overflow-x: hidden;
+            padding-top: 0;
+        }
+        button { font-family: inherit; }
+
+        /* ===== ТОП-БАР ===== */
+        .pc-topbar {
+            width: 100vw;
+            position: sticky;
+            top: 0;
+            left: 0;
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            z-index: 9999;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            height: 60px;
+        }
+        .pc-topbar .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--link-color);
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pc-topbar .logo .menu-icon {
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.15s;
+            padding: 0 4px;
+        }
+        .pc-topbar .logo .menu-icon:hover { color: var(--text-color); }
+        .pc-topbar .search {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            font-size: 0.8rem;
+            color: var(--text-color);
+            outline: none;
+        }
+        .pc-topbar .search:focus { border-color: var(--link-color); }
+        .pc-topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .pc-topbar .right .avatar-wrap {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--avatar-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .pc-topbar .right .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .pc-topbar .right .avatar-wrap .letter {
+            color: var(--avatar-text);
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .pc-topbar .right .username {
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--link-color);
+            white-space: nowrap;
+            transition: 0.15s;
+        }
+        .pc-topbar .right .username:hover { opacity: 0.7; }
+        .pc-topbar .right button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 6px;
+            border-radius: 8px;
+            transition: 0.15s;
+            line-height: 1;
+        }
+        .pc-topbar .right button:hover { background: var(--hover-bg); }
+
+        /* ===== САЙДБАР ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 99999;
+        }
+        .sidebar-overlay.show { display: block; }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -350px;
+            width: 330px;
+            height: 100%;
+            background: var(--card-bg);
+            z-index: 999999;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.15);
+            overflow-y: auto;
+            padding: 20px 16px;
+        }
+        .sidebar.open { left: 0; }
+        .sidebar .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.6rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+        }
+        .sidebar .close-btn:hover { color: var(--text-color); }
+        .sidebar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+        .sidebar .user-info .avatar-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--avatar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .sidebar .user-info .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .sidebar .user-info .avatar-wrap .letter {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--avatar-text);
+        }
+        .sidebar .user-info .name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+        .sidebar .user-info .email {
+            font-size: 0.65rem;
+            color: var(--muted-text);
+        }
+        .sidebar .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+            color: var(--text-color);
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+        .sidebar .menu-item:hover { background: var(--input-bg); }
+        .sidebar .menu-item .icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        .sidebar .menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 8px 0;
+        }
+        .sidebar .menu-sub {
+            padding-left: 36px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .sidebar .menu-sub .menu-item { padding: 6px 12px; font-size: 0.75rem; }
+        .sidebar .menu-sub .menu-item:hover { color: var(--link-color); }
+
+        /* ===== ОСНОВНОЙ ЛЭЙАУТ ===== */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 16px 80px;
+        }
+
+        @media (min-width: 820px) {
+            .app-layout {
+                grid-template-columns: 290px 520px 290px;
+                gap: 20px;
+                padding: 0 20px 80px;
+                margin-top: 10px;
+                justify-content: center;
+            }
+        }
+
+        .panel-left { display: none; }
+        @media (min-width: 820px) {
+            .panel-left {
+                display: block;
+                position: sticky;
+                top: 76px;
+                align-self: start;
+                height: fit-content;
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .panel-left::-webkit-scrollbar { width: 3px; }
+            .panel-left::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 10px;
+            }
+        }
+
+        .panel-center {
+            width: 100%;
+            min-width: 0;
+            padding-bottom: 20px;
+        }
+
+        .panel-right { display: none; }
+        @media (min-width: 820px) {
+            .panel-right {
+                display: block;
+                position: sticky;
+                top: 76px;
+                align-self: start;
+                height: fit-content;
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+            }
+            .panel-right::-webkit-scrollbar { width: 3px; }
+            .panel-right::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 10px;
+            }
+        }
+
+        /* ===== КАРТОЧКИ ===== */
+        .panel-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        .panel-title {
+            font-weight: 700;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .panel-item {
+            padding: 4px 0;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: 0.15s;
+        }
+        .panel-item:last-child { border-bottom: none; }
+        .panel-item:hover { color: var(--link-color); }
+
+        /* ===== КАРТОЧКА ПОСТА ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+        .post-form { width: 100%; }
+        .editor-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 6px;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .editor-toolbar button {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-radius: 4px;
+            transition: 0.15s;
+        }
+        .editor-toolbar button:hover {
+            background: var(--hover-bg);
+            color: var(--text-color);
+        }
+        .post-editor {
+            min-height: 60px;
+            padding: 8px 4px;
+            outline: none;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+        .post-editor:empty::before {
+            content: attr(placeholder);
+            color: var(--muted-text);
+        }
+        .post-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+        .file-label {
+            padding: 6px 12px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            transition: 0.15s;
+        }
+        .file-label:hover { background: var(--hover-bg); }
+        .btn-submit {
+            padding: 6px 18px;
+            background: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-submit:hover { opacity: 0.85; }
+        .btn-cancel {
+            padding: 6px 14px;
+            background: var(--input-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-cancel:hover { background: var(--hover-bg); }
+        .hidden { display: none !important; }
+        .preview-box {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            margin-top: 6px;
+            background: var(--input-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .preview-box.active { display: flex; }
+        .preview-box img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .preview-box .remove-pic {
+            background: none;
+            border: none;
+            color: #ff3b30;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 4px;
+        }
+
+        /* ===== ПЛЕЕР (БЕЗ ГИФОК) ===== */
+        .player-drawer {
+            position: relative;
+            z-index: 10;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            padding: 12px 16px;
+            transition: 0.3s ease;
+            overflow: hidden;
+        }
+        .player-drawer .handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 0;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .player-drawer .handle .bar {
+            width: 24px;
+            height: 3px;
+            background: var(--text-secondary);
+            border-radius: 4px;
+        }
+        .player-drawer .content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: 0.3s ease;
+        }
+        .player-drawer.open .content {
+            max-height: 400px;
+            opacity: 1;
+            padding-top: 12px;
+        }
+        .player-drawer .track-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .player-drawer .track-info .track-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex: 1;
+        }
+        .player-drawer .progress-wrap {
+            width: 100%;
+            height: 4px;
+            background: var(--input-bg);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            margin: 4px 0 6px;
+        }
+        .player-drawer .progress-wrap .progress-fill {
+            height: 100%;
+            background: var(--link-color);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        .player-drawer .time-wrap {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.55rem;
+            color: var(--muted-text);
+        }
+        .player-drawer .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .player-drawer .controls button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: 0.15s;
+        }
+        .player-drawer .controls button:hover {
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+        .player-drawer .controls .play-btn {
+            font-size: 1.8rem;
+            color: var(--link-color);
+        }
+        .player-drawer .controls .play-btn:hover { color: #4a9eff; }
+        .player-drawer .playlist {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 8px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 8px;
+        }
+        .player-drawer .playlist::-webkit-scrollbar { width: 3px; }
+        .player-drawer .playlist::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        .player-drawer .playlist .playlist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        .player-drawer .playlist .playlist-item:hover { background: var(--input-bg); }
+        .player-drawer .playlist .playlist-item.active {
+            background: var(--input-bg);
+            color: var(--link-color);
+            font-weight: 600;
+        }
+        .player-drawer .playlist .playlist-item .pl-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .player-drawer .playlist .playlist-item .pl-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            padding: 0 4px;
+        }
+        .player-drawer .playlist .playlist-item .pl-btn:hover { color: var(--link-color); }
+        .player-drawer .playlist .playlist-item .pl-download { color: var(--success); }
+        .player-drawer .playlist .playlist-item .pl-download:hover { color: #2ecc71; }
+
+        /* ===== МОБИЛЬНАЯ ВЕРСИЯ ===== */
+        @media (max-width: 819px) {
+            .panel-left, .panel-right { display: none !important; }
+            .app-layout {
+                grid-template-columns: 1fr;
+                padding: 10px 10px 80px;
+                gap: 10px;
+                margin-top: 0;
+            }
+            .pc-topbar {
+                padding: 10px 12px;
+                height: 56px;
+                flex-wrap: nowrap;
+            }
+            .pc-topbar .logo { font-size: 0.9rem; }
+            .pc-topbar .logo .menu-icon { font-size: 1.2rem; }
+            .pc-topbar .search {
+                max-width: 120px;
+                margin: 0 8px;
+                font-size: 0.7rem;
+                padding: 6px 10px;
+            }
+            .pc-topbar .right .username { display: none; }
+            .pc-topbar .right .avatar-wrap {
+                width: 28px;
+                height: 28px;
+            }
+            .pc-topbar .right button {
+                font-size: 1rem;
+                padding: 2px 4px;
+            }
+            .sidebar { width: 280px; left: -300px; }
+            .card { padding: 12px; border-radius: 10px; }
+            .post-editor {
+                min-height: 50px;
+                font-size: 0.85rem;
+            }
+            .editor-toolbar button {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .pc-topbar .search {
+                max-width: 80px;
+                font-size: 0.6rem;
+                padding: 4px 8px;
+                margin: 0 4px;
+            }
+            .pc-topbar .logo { font-size: 0.75rem; }
+            .pc-topbar .right button {
+                font-size: 0.9rem;
+                padding: 2px 3px;
+            }
+            .pc-topbar .right { gap: 6px; }
+        }
+
+        /* ===== СТРАНИЦЫ ===== */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ===== КОМПОНЕНТЫ-КОНТЕЙНЕРЫ ===== */
+        #settingsContainer, #modalsContainer, #playerContainer { display: none; }
+
+        /* ===== ПРОФИЛЬ ===== */
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .profile-header .avatar-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--avatar-bg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        .profile-header .avatar-wrap .letter {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--avatar-text);
+        }
+        .profile-header .name { font-size: 1.2rem; font-weight: 700; }
+        .profile-header .bio {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 4px 0;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 6px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .profile-stats .stat-clickable {
+            cursor: pointer;
+            color: var(--link-color);
+            font-weight: 600;
+        }
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 8px;
+            gap: 6px;
+        }
+        .friend-btn {
+            padding: 6px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+        .friend-btn.add { background: var(--link-color); color: #fff; }
+        .friend-btn.add:hover { background: #4a9eff; }
+        .friend-btn.friend { background: var(--input-bg); color: var(--text-secondary); }
+        .friend-btn.friend:hover { background: var(--border-color); }
+        .friend-btn.pending { background: #fff3cd; color: #856404; }
+        .friend-btn.pending:hover { background: #ffe69c; }
+        .friend-btn.received { background: #d4edda; color: #155724; }
+        .friend-btn.received:hover { background: #c3e6cb; }
+        .profile-dots-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0 8px;
+            border-radius: 50%;
+            transition: 0.2s;
+            line-height: 1;
+        }
+        .profile-dots-btn:hover { background: var(--input-bg); }
+        .profile-dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 32px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            min-width: 200px;
+            padding: 4px 0;
+            z-index: 100;
+            margin-top: 4px;
+        }
+        .profile-dropdown-menu .profile-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-color);
+            transition: 0.15s;
+            border-radius: 4px;
+        }
+        .profile-dropdown-menu .profile-menu-item:hover { background: var(--input-bg); }
+        .profile-dropdown-menu .profile-menu-item[style*="color:var(--danger)"]:hover { background: #fde8e8; }
+
+        /* ===== ЧАТ ===== */
+        .chat-view {
+            display: none;
+            flex-direction: column;
+            height: 70vh;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .chat-view.active { display: flex; }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .chat-messages .msg {
+            padding: 6px 12px;
+            border-radius: 12px;
+            max-width: 80%;
+            font-size: 0.85rem;
+            word-wrap: break-word;
+            position: relative;
+        }
+        .chat-messages .msg.self {
+            background: var(--link-color);
+            color: #fff;
+            align-self: flex-end;
+        }
+        .chat-messages .msg.other {
+            background: var(--input-bg);
+            color: var(--text-color);
+            align-self: flex-start;
+        }
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .chat-input input:focus { border-color: var(--link-color); }
+        .chat-input button {
+            padding: 8px 16px;
+            background: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .chat-input button:hover { opacity: 0.85; }
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--link-color);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 6px 0;
+            font-weight: 600;
+        }
+
+        /* ===== АДМИН-ДОТ ===== */
+        .admin-dot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: #ff3b30;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 999;
+            opacity: 0.3;
+            transition: 0.2s;
+        }
+        .admin-dot:hover {
+            opacity: 1;
+            transform: scale(1.3);
+        }
+
+        /* ===== МОДАЛКИ ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-box .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.6rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.2s;
+            line-height: 1;
+        }
+        .modal-box .close-btn:hover { color: var(--danger); }
+        .modal-box h3 { margin-bottom: 16px; font-size: 1.1rem; }
+        .modal-box input, .modal-box textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+        .modal-box input:focus, .modal-box textarea:focus { border-color: var(--link-color); }
+        .modal-box textarea { min-height: 80px; resize: vertical; }
+        .modal-box .btn-primary {
+            padding: 8px 24px;
+            background: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.15s;
+        }
+        .modal-box .btn-primary:hover { opacity: 0.85; }
+        .modal-box .btn-secondary {
+            padding: 8px 24px;
+            background: var(--input-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.15s;
+            margin-left: 8px;
+        }
+        .modal-box .btn-secondary:hover { background: var(--border-color); }
+        .modal-box .btn-danger {
+            padding: 8px 24px;
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.15s;
+        }
+        .modal-box .btn-danger:hover { opacity: 0.85; }
+
+        /* ===== ВСПОМОГАТЕЛЬНЫЕ ===== */
+        .friend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px 2px 4px;
+            background: var(--input-bg);
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            transition: 0.15s;
+            margin: 2px;
+        }
+        .friend-item:hover { background: var(--border-color); }
+        .friend-item .avatar-wrap {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--avatar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .friend-item .avatar-wrap .letter {
+            font-size: 0.5rem;
+            font-weight: 700;
+            color: var(--avatar-text);
+        }
+        .friend-item .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .friends-section {
+            margin-top: 8px;
+            padding: 10px 12px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .friends-section h4 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .friend-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .link-input-wrap {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .link-input-wrap input {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            font-size: 0.8rem;
+            outline: none;
+            color: var(--text-color);
+        }
+        .link-input-wrap input:focus { border-color: var(--link-color); }
+        .link-input-wrap button {
+            padding: 6px 14px;
+            background: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .profile-iframe-wrap { margin-top: 4px; }
+        .profile-iframe-wrap .iframe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .profile-iframe-wrap .iframe-header button {
+            background: none;
+            border: none;
+            color: var(--link-color);
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .profile-iframe {
+            width: 100%;
+            height: 300px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        /* ===== УВЕДОМЛЕНИЯ ===== */
+        .notif-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.15s;
+            position: relative;
+        }
+        .notif-item:hover { background: var(--input-bg); }
+        .notif-item.unread { background: #e8f0fe; }
+        .notif-item .notif-icon { font-size: 1.2rem; flex-shrink: 0; }
+        .notif-item .notif-text { flex: 1; min-width: 0; }
+        .notif-item .notif-time { font-size: 0.55rem; color: var(--muted-text); }
+        .notif-item .notif-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--link-color);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ===== ПОСТЫ ===== */
+        .post {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        .post .author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .post .author .avatar-wrap {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--avatar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .post .author .avatar-wrap .letter {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--avatar-text);
+        }
+        .post .author .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post .author .name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        .post .author .name:hover { color: var(--link-color); }
+        .post .author .time {
+            font-size: 0.55rem;
+            color: var(--muted-text);
+            margin-left: auto;
+        }
+        .post .post-content {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+            cursor: pointer;
+        }
+        .post .post-content img.post-img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+        .post .post-content .hashtags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .post .post-content .hashtags .tag {
+            font-size: 0.65rem;
+            color: var(--link-color);
+            cursor: pointer;
+            background: var(--input-bg);
+            padding: 1px 8px;
+            border-radius: 12px;
+            transition: 0.15s;
+        }
+        .post .post-content .hashtags .tag:hover { background: var(--border-color); }
+        .post .post-content .marquee {
+            background: var(--input-bg);
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            overflow: hidden;
+        }
+        .post .post-content .marquee span {
+            display: block;
+            animation: marquee 10s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .post .post-content .link-preview { margin-top: 6px; }
+        .post .post-content .link-preview iframe {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #fff;
+        }
+        .post .post-content .buttons-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .post .post-content .buttons-wrap .btn-item {
+            padding: 4px 14px;
+            background: var(--link-color);
+            color: #fff;
+            border-radius: 16px;
+            font-size: 0.7rem;
+            text-decoration: none;
+            transition: 0.15s;
+        }
+        .post .post-content .buttons-wrap .btn-item:hover { opacity: 0.85; }
+        .post .post-content .repost-nested {
+            border-left: 3px solid var(--link-color);
+            padding: 8px 10px;
+            margin-top: 6px;
+            background: var(--input-bg);
+            border-radius: 6px;
+        }
+        .post .post-content .repost-nested .repost-header {
+            font-size: 0.65rem;
+            color: var(--muted-text);
+            margin-bottom: 4px;
+        }
+        .post .post-content .repost-nested .repost-author {
+            font-weight: 600;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+        .post .post-content .repost-nested .repost-author:hover { color: var(--link-color); }
+        .post .post-content .repost-nested .repost-time {
+            font-size: 0.5rem;
+            color: var(--muted-text);
+        }
+        .post .post-content .repost-nested .repost-text {
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+        .post .post-content .repost-nested .repost-img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-top: 4px;
+            cursor: pointer;
+        }
+        .post .post-content .repost-nested .repost-nested {
+            border-left-color: var(--success);
+        }
+        .post .post-content .repost-nested .repost-nested .repost-nested {
+            border-left-color: var(--warning);
+        }
+        .post .stats {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border-color);
+        }
+        .post .stats button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .post .stats button:hover { background: var(--input-bg); }
+        .post .stats button.liked {
+            color: var(--link-color);
+            font-weight: 600;
+        }
+        .post .post-menu {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+        }
+        .post .post-menu .dots {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0 4px;
+            line-height: 1;
+        }
+        .post .post-menu .dots:hover { color: var(--text-color); }
+        .post .post-menu .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            z-index: 60;
+            min-width: 140px;
+            padding: 4px 0;
+        }
+        .post .post-menu .dropdown.open { display: block; }
+        .post .post-menu .dropdown button {
+            display: block;
+            width: 100%;
+            padding: 6px 14px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.15s;
+        }
+        .post .post-menu .dropdown button:hover { background: var(--input-bg); }
+        .post .post-menu .dropdown .edit-btn { color: var(--warning); }
+        .post .post-menu .dropdown .del-btn { color: var(--danger); }
+        .post .post-menu .dropdown .del-btn:hover { background: #fde8e8; }
+        .post .comment-input-wrap {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border-color);
+        }
+        .post .comment-input-wrap input {
+            flex: 1;
+            padding: 6px 10px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            font-size: 0.7rem;
+            outline: none;
+            color: var(--text-color);
+        }
+        .post .comment-input-wrap input:focus { border-color: var(--link-color); }
+        .post .comment-input-wrap button {
+            padding: 6px 12px;
+            background: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        .post .comments-wrapper {
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border-color);
+        }
+        .post .comments-wrapper .comments .comments-body {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .post .comments-wrapper .comments .comments-body::-webkit-scrollbar { width: 3px; }
+        .post .comments-wrapper .comments .comments-body::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        .post .comment-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            padding: 4px 0;
+            position: relative;
+        }
+        .post .comment-item .avatar-wrap {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--avatar-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .post .comment-item .avatar-wrap .letter {
+            font-size: 0.5rem;
+            font-weight: 700;
+            color: var(--avatar-text);
+        }
+        .post .comment-item .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .post .comment-item .body {
+            flex: 1;
+            background: var(--input-bg);
+            padding: 4px 10px;
+            border-radius: 12px;
+            min-width: 0;
+        }
+        .post .comment-item .body .name {
+            font-weight: 600;
+            font-size: 0.65rem;
+            color: var(--text-color);
+        }
+        .post .comment-item .body .time {
+            font-size: 0.5rem;
+            color: var(--muted-text);
+            margin-left: 4px;
+        }
+        .post .comment-item .body .text {
+            font-size: 0.75rem;
+            color: var(--text-color);
+            word-wrap: break-word;
+        }
+        .post .comment-item .body .edit-comment-input {
+            width: 100%;
+            padding: 2px 6px;
+            border: 1px solid var(--link-color);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: var(--card-bg);
+            color: var(--text-color);
+            outline: none;
+        }
+        .post .comment-item .comment-actions-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 2px;
+        }
+        .post .comment-item .comment-actions-row button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.55rem;
+            color: var(--muted-text);
+            padding: 0 2px;
+        }
+        .post .comment-item .comment-actions-row button:hover { color: var(--text-secondary); }
+        .post .comment-item .comment-reply-input-wrap {
+            display: none;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .post .comment-item .comment-reply-input-wrap input {
+            flex: 1;
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            font-size: 0.65rem;
+            outline: none;
+            color: var(--text-color);
+        }
+        .post .comment-item .comment-reply-input-wrap input:focus { border-color: var(--link-color); }
+        .post .comment-item .comment-reply-input-wrap button {
+            padding: 4px 10px;
+            background: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.65rem;
+        }
+        .post .comment-item .comment-actions {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .post .comment-item .comment-actions .more-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--muted-text);
+            padding: 0 4px;
+        }
+        .post .comment-item .comment-actions .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 18px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            z-index: 50;
+            min-width: 100px;
+            padding: 4px 0;
+        }
+        .post .comment-item .comment-actions .dropdown.open { display: block; }
+        .post .comment-item .comment-actions .dropdown button {
+            display: block;
+            width: 100%;
+            padding: 4px 12px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 0.6rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.15s;
+        }
+        .post .comment-item .comment-actions .dropdown button:hover { background: var(--input-bg); }
+        .post .comment-item .comment-actions .dropdown .edit-btn { color: var(--warning); }
+        .post .comment-item .comment-actions .dropdown .del-btn { color: var(--danger); }
+        .post .comment-item.comment-reply { padding-left: 20px; }
+        .post .no-comments {
+            text-align: center;
+            padding: 8px;
+            color: var(--muted-text);
+            font-size: 0.65rem;
+        }
+
+        /* ===== ЗАГРУЗЧИК ===== */
+        .loading-spinner {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .loading-spinner .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--link-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .loading-spinner .text {
+            margin-top: 12px;
+            color: var(--muted-text);
+            font-size: 0.75rem;
+        }
+        .loading-spinner .progress {
+            width: 100%;
+            max-width: 200px;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 4px;
+            margin: 8px auto 0;
+            overflow: hidden;
+        }
+        .loading-spinner .progress .fill {
+            width: 0%;
+            height: 100%;
+            background: var(--link-color);
+            border-radius: 4px;
+            animation: progress 1.5s ease-in-out infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+    </style>
 </head>
 <body>
 
 <div class="app" id="app">
 
-    <div id="topbarContainer"></div>
+    <!-- ===== ТОП-БАР ===== -->
+    <header class="pc-topbar" id="topbar">
+        <div class="logo">
+            <span class="menu-icon" onclick="toggleSidebar()">☰</span>
+            <span onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+        </div>
+        <input class="search" placeholder="Поиск..." id="pcSearch">
+        <div class="right">
+            <button onclick="openChatList()">💬</button>
+            <button onclick="openNotifications()">🔔</button>
+            <div class="avatar-wrap" id="pcAvatar" onclick="goToProfile()">
+                <span class="letter">?</span>
+            </div>
+            <span class="username" id="pcName" onclick="goToProfile()"></span>
+            <button onclick="toggleSettingsMenu()">⋮</button>
+        </div>
+    </header>
+
+    <!-- ===== САЙДБАР ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="closeSidebar()">✕</button>
+        <div class="user-info">
+            <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
+            <div>
+                <div class="name" id="sName">Гость</div>
+                <div class="email" id="sEmail"></div>
+            </div>
+        </div>
+        <div class="menu-item" onclick="goToFeed();closeSidebar();">
+            <span class="icon">🏠</span> Главная
+        </div>
+        <div class="menu-item" onclick="goToProfile();closeSidebar();">
+            <span class="icon">👤</span> Профиль
+        </div>
+        <div class="menu-item" onclick="goToPeople();closeSidebar();">
+            <span class="icon">👥</span> Люди
+        </div>
+        <div class="menu-item" onclick="goToGroups();closeSidebar();">
+            <span class="icon">📁</span> Группы
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" onclick="openPage('foto');closeSidebar();">
+            <span class="icon">📸</span> Фото
+        </div>
+        <div class="menu-item" onclick="openPage('page');closeSidebar();">
+            <span class="icon">📄</span> Страницы
+        </div>
+        <div class="menu-divider"></div>
+        <div style="font-size:0.6rem;color:var(--muted-text);padding:4px 12px;text-transform:uppercase;letter-spacing:0.5px;">📂 Разделы</div>
+        <div class="menu-sub">
+            <div class="menu-item" onclick="window.location.href='pages/news/novosti.html';closeSidebar();">
+                <span class="icon">📰</span> Новости
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/multimedia/video.html';closeSidebar();">
+                <span class="icon">🎬</span> Видео
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/multimedia/muzyka.html';closeSidebar();">
+                <span class="icon">🎵</span> Музыка
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/life/igry.html';closeSidebar();">
+                <span class="icon">🎮</span> Игры
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/life/sport.html';closeSidebar();">
+                <span class="icon">⚽</span> Спорт
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/life/kino.html';closeSidebar();">
+                <span class="icon">🎥</span> Кино
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/tech/programmirovanie.html';closeSidebar();">
+                <span class="icon">💻</span> Программирование
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/business/business.html';closeSidebar();">
+                <span class="icon">💼</span> Бизнес
+            </div>
+            <div class="menu-item" onclick="window.location.href='pages/communication/znakomstva.html';closeSidebar();">
+                <span class="icon">❤️</span> Знакомства
+            </div>
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" onclick="openNotifications();closeSidebar();">
+            <span class="icon">🔔</span> Уведомления
+        </div>
+        <div class="menu-item" onclick="openChatList();closeSidebar();">
+            <span class="icon">💬</span> Чаты
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-item" onclick="logout();closeSidebar();">
+            <span class="icon">🚪</span> Выйти
+        </div>
+    </div>
+
+    <!-- ===== КОНТЕЙНЕРЫ ===== -->
     <div id="settingsContainer"></div>
-    <div id="sidebarContainer"></div>
-    <div id="playerContainer"></div>
     <div id="modalsContainer"></div>
+    <div id="playerContainer"></div>
 
-    <div class="container" id="mainContainer">
+    <!-- ===== ОСНОВНОЙ ЛЭЙАУТ ===== -->
+    <div class="app-layout" id="appLayout">
 
-        <div class="player-handle" id="playerHandle" onclick="if(window.toggleDrawer) toggleDrawer();">
-            <div class="handle-bar"></div>
-            <div class="handle-label">🎵 ПЛЕЕР</div>
-        </div>
-
-        <!-- ===== ГЛАВНАЯ ЛЕНТА ===== -->
-        <div class="page active" id="page-feed">
-            <div class="card">
-                <div class="post-form">
-                    <div class="editor-toolbar">
-                        <button onclick="formatText('bold')"><b>B</b></button>
-                        <button onclick="formatText('italic')"><i>I</i></button>
-                        <button onclick="formatText('underline')"><u>U</u></button>
-                        <button onclick="formatText('strike')"><s>S</s></button>
-                        <button onclick="formatText('h1')">H1</button>
-                        <button onclick="formatText('h2')">H2</button>
-                        <button onclick="formatText('quote')">"</button>
-                        <button onclick="formatText('code')">&lt;/&gt;</button>
-                        <button onclick="insertLink()">🔗</button>
-                    </div>
-                    <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
-                    <div class="post-actions" style="margin-top:6px;">
-                        <label class="file-label" for="fileInput">📎 Фото</label>
-                        <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
-                        <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
-                    </div>
-                    <input type="file" id="fileInput" accept="image/*" class="hidden">
-                    <div class="preview-box" id="previewBox">
-                        <img id="previewImg"><span id="previewName"></span>
-                        <button class="remove-pic" onclick="removeImage()">✕</button>
-                    </div>
-                </div>
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <div class="panel-left" id="panelLeft">
+            <div class="panel-card">
+                <div class="panel-title">🔥 Тренды</div>
+                <div class="panel-item">#метаимперия</div>
+                <div class="panel-item">#новости</div>
+                <div class="panel-item">#музыка</div>
+                <div class="panel-item">#игры</div>
+                <div class="panel-item">#технологии</div>
             </div>
-            <div id="feed"></div>
-        </div>
-
-        <div class="page" id="page-groups">
-            <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
-        </div>
-
-        <div class="page" id="page-people">
-            <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
-        </div>
-
-        <!-- ===== ПРОФИЛЬ ===== -->
-        <div class="page" id="page-profile">
-            <div class="profile-header">
-                <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
-                <div class="name" id="profileName" style="display:none;"></div>
-                <div class="bio" id="profileBio" style="display:none;"></div>
-                <div class="profile-stats">
-                    <span>🤝 <span data-i18n="friends">Друзья</span>: <span id="friendsCount" class="stat-clickable">0</span></span>
-                    <span>👀 <span data-i18n="subscribers">Подписчики</span>: <span id="subscribersCount" class="stat-clickable">0</span></span>
-                    <span>📌 <span data-i18n="subscriptions">Подписки</span>: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
-                </div>
-                <div class="profile-actions" id="profileActions"></div>
+            <div class="panel-card">
+                <div class="panel-title">📊 Статистика</div>
+                <div class="panel-item">👥 Онлайн: <span id="onlineCount">0</span></div>
+                <div class="panel-item">📰 Постов: <span id="totalPosts">0</span></div>
             </div>
+            <div class="panel-card" style="min-height:120px;">
+                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">📦 Твой виджет</div>
+            </div>
+        </div>
 
-            <div class="link-section" id="linkSection">
-                <div class="link-input-wrap">
-                    <input type="text" id="profileLinkInput" data-i18n-placeholder="enter_link" placeholder="Вставьте ссылку для встраивания...">
-                    <button onclick="saveProfileLink()">➡️</button>
+        <!-- ЦЕНТР -->
+        <div class="panel-center">
+
+            <!-- ПЛЕЕР (БЕЗ ГИФОК) -->
+            <div class="player-drawer" id="playerDrawer">
+                <div class="handle" onclick="toggleDrawer()">
+                    <div class="bar"></div>
+                    🎵 ПЛЕЕР
+                    <div class="bar"></div>
                 </div>
-                <div class="profile-iframe-wrap" id="profileIframeWrap" style="display:none;">
-                    <div class="iframe-header">
-                        <span data-i18n="embedded_page">📄 Встроенная страница</span>
-                        <button onclick="toggleIframe()" data-i18n="collapse">🔼 Свернуть</button>
+                <div class="content" id="playerContent">
+                    <div class="track-info">
+                        <div class="track-name" id="currentTrackName">Выберите трек</div>
                     </div>
-                    <iframe id="profileIframe" src="" class="profile-iframe"></iframe>
+                    <div class="progress-wrap" id="progressWrap">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-wrap">
+                        <span id="currentTime">0:00</span>
+                        <span id="totalTime">0:00</span>
+                    </div>
+                    <div class="controls">
+                        <button onclick="prevTrack()">⏮</button>
+                        <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+                        <button onclick="nextTrack()">⏭</button>
+                        <button onclick="downloadCurrentTrack()">⬇️</button>
+                    </div>
+                    <div class="playlist" id="playlistContainer"></div>
                 </div>
             </div>
 
-            <div class="friends-section" id="friendsSection" style="display:none;">
-                <h4>🤝 <span data-i18n="friends">Друзья</span> <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
-                <div class="friend-list" id="friendList"></div>
-            </div>
-
-            <div class="card" style="margin-top:8px;">
-                <div class="post-form">
-                    <div class="editor-toolbar">
-                        <button onclick="formatText('bold')"><b>B</b></button>
-                        <button onclick="formatText('italic')"><i>I</i></button>
-                        <button onclick="formatText('underline')"><u>U</u></button>
-                        <button onclick="formatText('strike')"><s>S</s></button>
-                        <button onclick="formatText('h1')">H1</button>
-                        <button onclick="formatText('h2')">H2</button>
-                        <button onclick="formatText('quote')">"</button>
-                        <button onclick="formatText('code')">&lt;/&gt;</button>
-                        <button onclick="insertLink()">🔗</button>
-                    </div>
-                    <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
-                    <div class="post-actions" style="margin-top:6px;">
-                        <label class="file-label" for="fileInputProfile">📎 <span data-i18n="photo">Фото</span></label>
-                        <button class="btn-submit" onclick="submitProfilePost()">📤 <span data-i18n="publish">Опубликовать</span></button>
-                        <button class="btn-cancel" onclick="clearProfilePostForm()"><span data-i18n="clear">Очистить</span></button>
-                    </div>
-                    <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
-                    <div class="preview-box" id="previewBoxProfile">
-                        <img id="previewImgProfile"><span id="previewNameProfile"></span>
-                        <button class="remove-pic" onclick="removeProfileImage()">✕</button>
-                    </div>
-                </div>
-            </div>
-
-            <h4 style="margin:10px 0 6px;" data-i18n="my_posts">📰 Мои посты</h4>
-            <div id="profilePosts"></div>
-        </div>
-
-        <!-- ===== ФОТО-ЛЕНТА ===== -->
-        <div class="page" id="page-foto" style="display:none;">
-            <div class="container" style="padding-top:10px;">
-                <button onclick="window.location.href='/'">← Назад</button>
-                <h1>📸 Фото</h1>
-                <p style="color:#888;font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
-
-                <div class="card" style="margin-top:10px;">
+            <!-- ЛЕНТА -->
+            <div class="page active" id="page-feed">
+                <div class="card">
                     <div class="post-form">
                         <div class="editor-toolbar">
                             <button onclick="formatText('bold')"><b>B</b></button>
@@ -158,65 +1738,286 @@
                             <button onclick="formatText('code')">&lt;/&gt;</button>
                             <button onclick="insertLink()">🔗</button>
                         </div>
-                        <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что нового в мире фото?"></div>
-                        <div class="post-actions" style="margin-top:6px;">
-                            <label class="file-label" for="fileInputFoto">📎 Фото</label>
-                            <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
-                            <button class="btn-cancel" onclick="clearFotoPostForm()">Очистить</button>
+                        <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                        <div class="post-actions">
+                            <label class="file-label" for="fileInput">📎 Фото</label>
+                            <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
+                            <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
                         </div>
-                        <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
-                        <div class="preview-box" id="previewBoxFoto">
-                            <img id="previewImgFoto"><span id="previewNameFoto"></span>
-                            <button class="remove-pic" onclick="removeFotoImage()">✕</button>
+                        <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        <div class="preview-box" id="previewBox">
+                            <img id="previewImg"><span id="previewName"></span>
+                            <button class="remove-pic" onclick="removeImage()">✕</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="feed"></div>
+            </div>
+
+            <div class="page" id="page-groups">
+                <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
+            </div>
+
+            <div class="page" id="page-people">
+                <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
+            </div>
+
+            <!-- ===== ПРОФИЛЬ ===== -->
+            <div class="page" id="page-profile">
+                <div class="profile-header">
+
+                    <!-- ===== ТРИ ТОЧКИ В ПРАВОМ ВЕРХНЕМ УГЛУ ===== -->
+                    <div style="position:absolute;top:12px;right:16px;z-index:10;">
+                        <button onclick="toggleProfileMenu(event)" style="background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;line-height:1;transition:0.2s;border-radius:50%;">
+                            ⋮
+                        </button>
+                        <div id="profileMenuDropdown" style="display:none;position:absolute;right:0;top:32px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;">
+                            <div class="profile-menu-item" onclick="openEditProfile();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">✏️ Редактировать профиль</div>
+                            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
+                            <div class="profile-menu-item" onclick="uploadAvatar();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">📷 Сменить аватар</div>
+                            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
+                            <div class="profile-menu-item" onclick="goToFeed();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">🏠 На главную</div>
+                            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
+                            <div class="profile-menu-item" onclick="logout();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--danger);transition:0.15s;border-radius:4px;">🚪 Выйти</div>
+                        </div>
+                    </div>
+
+                    <!-- АВАТАР И ИМЯ -->
+                    <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
+                    <div class="name" id="profileName"></div>
+                    <div class="bio" id="profileBio"></div>
+                    <div class="profile-stats">
+                        <span>🤝 Друзья: <span id="friendsCount" class="stat-clickable">0</span></span>
+                        <span>👀 Подписчики: <span id="subscribersCount" class="stat-clickable">0</span></span>
+                        <span>📌 Подписки: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
+                    </div>
+                    <div class="profile-actions" id="profileActions"></div>
+                </div>
+
+                <div class="link-section" id="linkSection">
+                    <div class="link-input-wrap">
+                        <input type="text" id="profileLinkInput" placeholder="Вставьте ссылку для встраивания...">
+                        <button onclick="saveProfileLink()">➡️</button>
+                    </div>
+                    <div class="profile-iframe-wrap" id="profileIframeWrap" style="display:none;">
+                        <div class="iframe-header">
+                            <span>📄 Встроенная страница</span>
+                            <button onclick="toggleIframe()">🔼 Свернуть</button>
+                        </div>
+                        <iframe id="profileIframe" src="" class="profile-iframe"></iframe>
+                    </div>
+                </div>
+
+                <div class="friends-section" id="friendsSection" style="display:none;">
+                    <h4>🤝 Друзья <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
+                    <div class="friend-list" id="friendList"></div>
+                </div>
+
+                <div class="card" style="margin-top:8px;">
+                    <div class="post-form">
+                        <div class="editor-toolbar">
+                            <button onclick="formatText('bold')"><b>B</b></button>
+                            <button onclick="formatText('italic')"><i>I</i></button>
+                            <button onclick="formatText('underline')"><u>U</u></button>
+                            <button onclick="formatText('strike')"><s>S</s></button>
+                            <button onclick="formatText('h1')">H1</button>
+                            <button onclick="formatText('h2')">H2</button>
+                            <button onclick="formatText('quote')">"</button>
+                            <button onclick="formatText('code')">&lt;/&gt;</button>
+                            <button onclick="insertLink()">🔗</button>
+                        </div>
+                        <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
+                        <div class="post-actions">
+                            <label class="file-label" for="fileInputProfile">📎 Фото</label>
+                            <button class="btn-submit" onclick="submitProfilePost()">📤 Опубликовать</button>
+                            <button class="btn-cancel" onclick="clearProfilePostForm()">Очистить</button>
+                        </div>
+                        <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
+                        <div class="preview-box" id="previewBoxProfile">
+                            <img id="previewImgProfile"><span id="previewNameProfile"></span>
+                            <button class="remove-pic" onclick="removeProfileImage()">✕</button>
                         </div>
                     </div>
                 </div>
 
-                <div id="fotoFeed"></div>
+                <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
+                <div id="profilePosts"></div>
             </div>
+
+            <div class="page" id="page-foto" style="display:none;">
+                <div style="padding-top:10px;">
+                    <button onclick="window.location.href='/'" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-weight:600;">← Назад</button>
+                    <h1>📸 Фото</h1>
+                    <p style="color:var(--text-secondary);font-size:0.8rem;margin-bottom:10px;">Публикуйте фото и смотрите новые посты</p>
+                    <div class="card" style="margin-top:10px;">
+                        <div class="post-form">
+                            <div class="editor-toolbar">
+                                <button onclick="formatText('bold')"><b>B</b></button>
+                                <button onclick="formatText('italic')"><i>I</i></button>
+                                <button onclick="formatText('underline')"><u>U</u></button>
+                                <button onclick="formatText('strike')"><s>S</s></button>
+                                <button onclick="formatText('h1')">H1</button>
+                                <button onclick="formatText('h2')">H2</button>
+                                <button onclick="formatText('quote')">"</button>
+                                <button onclick="formatText('code')">&lt;/&gt;</button>
+                                <button onclick="insertLink()">🔗</button>
+                            </div>
+                            <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что нового в мире фото?"></div>
+                            <div class="post-actions">
+                                <label class="file-label" for="fileInputFoto">📎 Фото</label>
+                                <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
+                                <button class="btn-cancel" onclick="clearFotoPostForm()">Очистить</button>
+                            </div>
+                            <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
+                            <div class="preview-box" id="previewBoxFoto">
+                                <img id="previewImgFoto"><span id="previewNameFoto"></span>
+                                <button class="remove-pic" onclick="removeFotoImage()">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="fotoFeed"></div>
+                </div>
+            </div>
+
+            <div class="page" id="page-page" style="display:none;">
+                <div style="padding:6px 0;">
+                    <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
+                </div>
+                <div id="pageContainer"></div>
+            </div>
+
+            <div class="chat-view" id="chatView">
+                <button class="back-btn" onclick="closeChat()">← Назад</button>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Сообщение...">
+                    <button onclick="sendChatMessage()">→</button>
+                </div>
+            </div>
+
+            <div class="page" id="postPage">
+                <div style="padding:6px 0;">
+                    <button class="back-btn" onclick="closePostPage()">← Назад</button>
+                </div>
+                <div id="postPageContainer"></div>
+            </div>
+
         </div>
 
-        <!-- ===== СТРАНИЦА ПОЛЬЗОВАТЕЛЯ ===== -->
-        <div class="page" id="page-page" style="display:none;">
-            <div style="padding:6px 0;">
-                <button class="back-btn" onclick="window.location.href='/'">← Назад</button>
+        <!-- ПРАВАЯ ПАНЕЛЬ -->
+        <div class="panel-right" id="panelRight">
+            <div id="custom-frame-1" class="panel-card" style="min-height:300px;">
+                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">
+                    📦 Твой фрейм #1<br>
+                    <span style="font-size:0.5rem;">(Telegram-канал, виджет, карта...)</span>
+                </div>
             </div>
-            <div id="pageContainer"></div>
-        </div>
-
-        <div class="chat-view" id="chatView">
-            <button class="back-btn" onclick="closeChat()" data-i18n="back">← Назад</button>
-            <div class="chat-messages" id="chatMessages"></div>
-            <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
-            <div class="chat-input">
-                <input type="text" id="chatInput" data-i18n-placeholder="message" placeholder="Сообщение...">
-                <button onclick="sendChatMessage()">→</button>
+            <div id="custom-frame-2" class="panel-card" style="min-height:200px;">
+                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">📦 Твой фрейм #2</div>
             </div>
-        </div>
-
-        <div class="page" id="postPage">
-            <div style="padding:6px 0;">
-                <button class="back-btn" onclick="closePostPage()" style="background:none;border:none;color:var(--link-color);font-size:0.8rem;cursor:pointer;padding:8px 0;font-weight:600;">← Назад</button>
+            <div id="custom-frame-3" class="panel-card" style="min-height:100px;">
+                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">📦 Твой фрейм #3</div>
             </div>
-            <div id="postPageContainer"></div>
         </div>
 
     </div>
 
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
-    <div class="visualizer-overlay" id="visualizerOverlay" style="display:none;">
-        <div class="visualizer-close" onclick="closeVisualizer()">✕</div>
-        <canvas id="visualizerCanvas"></canvas>
+    <!-- ===== МОДАЛКИ ===== -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeLogin()">✕</button>
+            <h3>👤 Вход</h3>
+            <button class="btn-primary" onclick="document.getElementById('googleBtn').click()" style="width:100%;padding:12px;font-size:1rem;">🔑 Войти через Google</button>
+            <button id="googleBtn" style="display:none;"></button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeEditProfile()">✕</button>
+            <h3>✏️ Редактировать профиль</h3>
+            <input type="text" id="editName" placeholder="Имя...">
+            <textarea id="editBio" placeholder="О себе..."></textarea>
+            <button class="btn-primary" onclick="saveProfile()">💾 Сохранить</button>
+            <button class="btn-secondary" onclick="closeEditProfile()">Отмена</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeEdit()">✕</button>
+            <h3>✏️ Редактировать пост</h3>
+            <input type="text" id="editMarquee" placeholder="Бегущая строка...">
+            <textarea id="editText" placeholder="Текст поста..." style="min-height:80px;"></textarea>
+            <input type="text" id="editLink" placeholder="Ссылка для встраивания...">
+            <input type="text" id="editHashtags" placeholder="#хэштеги через пробел">
+            <div style="margin:8px 0;display:flex;gap:8px;align-items:center;">
+                <span style="font-size:0.7rem;color:var(--text-secondary);">Размер фрейма:</span>
+                <button id="frameSizeSmall" class="btn-secondary" onclick="setFrameSize('small')" style="padding:2px 12px;font-size:0.6rem;">📱 Маленький</button>
+                <button id="frameSizeLarge" class="btn-secondary" onclick="setFrameSize('large')" style="padding:2px 12px;font-size:0.6rem;">🖥️ Большой</button>
+            </div>
+            <div id="editButtonsContainer"></div>
+            <button onclick="addEditBtn()" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-size:0.7rem;padding:4px 0;">➕ Добавить кнопку</button>
+            <div style="margin-top:8px;display:flex;gap:8px;">
+                <button class="btn-primary" onclick="saveEdit()">💾 Сохранить</button>
+                <button class="btn-secondary" onclick="closeEdit()">Отмена</button>
+                <button class="btn-danger" onclick="deleteEditPost()" style="margin-left:auto;">🗑 Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="notificationsModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeNotifications()">✕</button>
+            <h3>🔔 Уведомления</h3>
+            <div id="notificationsList"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="repostModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeRepost()">✕</button>
+            <h3>🔄 Репост</h3>
+            <input type="hidden" id="repostPostId">
+            <input type="hidden" id="repostType">
+            <textarea id="repostText" placeholder="Напишите что-нибудь (необязательно)..." style="min-height:60px;"></textarea>
+            <div style="display:flex;gap:8px;">
+                <button class="btn-primary" onclick="submitRepost()">🔄 Репостнуть</button>
+                <button class="btn-secondary" onclick="closeRepost()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="chatListModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeChatList()">✕</button>
+            <h3>💬 Чаты</h3>
+            <div id="chatListContainer"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="adminChatsModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeAdminChats()">✕</button>
+            <h3>🏴‍☠️ Все чаты (админ)</h3>
+            <div id="adminChatsList"></div>
+        </div>
     </div>
 
 </div>
 
-<!-- ===== ВСЕ СКРИПТЫ ===== -->
+<!-- ================================================================ -->
+<!-- ПОДКЛЮЧЕНИЕ ТВОИХ JS-ФАЙЛОВ -->
+<!-- ================================================================ -->
+
 <script src="js/firebase.js"></script>
 <script src="js/lang.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/app.js"></script>
+<script src="js/modules/player.js"></script>
 <script src="js/feed.js"></script>
 <script src="js/profile.js"></script>
 <script src="js/friends.js"></script>
@@ -226,321 +2027,291 @@
 <script src="js/admin.js"></script>
 <script src="js/page.js"></script>
 
+<!-- ================================================================ -->
+<!-- ВСТРОЕННЫЙ JS ДЛЯ ПЛЕЕРА, САЙДБАРА, АВАТАРКИ И МЕНЮ ПРОФИЛЯ -->
+<!-- ================================================================ -->
+
 <script>
-// ================================================================
-// ФОТО-ЛЕНТА
-// ================================================================
+// ================================================================ */
+// ПЛЕЕР (БЕЗ ГИФОК И ВИЗУАЛИЗАТОРА)
+// ================================================================ */
 
-var fotoFeedListener = null;
-var pendingFotoImage = null;
-var pendingFotoImageFile = null;
+var playlist = [];
+var currentTrackIndex = 0;
+var audio = new Audio();
+var isPlaying = false;
 
-function getFotoEditorText() {
-    var editor = document.getElementById('postEditorFoto');
-    if (!editor) return '';
-    return editor.innerHTML;
+function loadPlaylist() {
+    var musicFiles = [
+        { name: 'Давай замутим', file: 'music/davay-zamutim-chto-my-s-toboy-zamutim.mp3' },
+        { name: 'Google Maps накрутка', file: 'music/google-maps-nakrutka.mp3' },
+        { name: 'SPA Web Development', file: 'music/spa-web-development.mp3' }
+    ];
+    playlist = musicFiles;
+    if (playlist.length > 0) {
+        audio.src = playlist[0].file;
+        audio.load();
+        renderPlaylist();
+        updateTrackInfo();
+    }
 }
 
-function clearFotoPostForm() {
-    var editor = document.getElementById('postEditorFoto');
-    if (editor) editor.innerHTML = '';
-    pendingFotoImage = null;
-    pendingFotoImageFile = null;
-    var preview = document.getElementById('previewBoxFoto');
-    if (preview) preview.classList.remove('visible');
-    var input = document.getElementById('fileInputFoto');
-    if (input) input.value = '';
+function renderPlaylist() {
+    var container = document.getElementById('playlistContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    playlist.forEach(function(track, index) {
+        var div = document.createElement('div');
+        div.className = 'playlist-item' + (index === currentTrackIndex ? ' active' : '');
+        div.innerHTML = `
+            <span class="pl-name">${track.name}</span>
+            <button class="pl-btn pl-download" onclick="event.stopPropagation();downloadTrack(${index})" title="Скачать">⬇️</button>
+        `;
+        div.onclick = function() { playTrack(index); };
+        container.appendChild(div);
+    });
 }
 
-function removeFotoImage() {
-    pendingFotoImage = null;
-    pendingFotoImageFile = null;
-    var preview = document.getElementById('previewBoxFoto');
-    if (preview) preview.classList.remove('visible');
-    var input = document.getElementById('fileInputFoto');
-    if (input) input.value = '';
+function playTrack(index) {
+    if (index < 0 || index >= playlist.length) return;
+    currentTrackIndex = index;
+    var track = playlist[index];
+    audio.src = track.file;
+    audio.load();
+    audio.play().then(function() {
+        isPlaying = true;
+        updatePlayerUI();
+    }).catch(function(err) {
+        console.error('❌ Ошибка воспроизведения:', err);
+    });
+    updateTrackInfo();
+    renderPlaylist();
 }
+
+function togglePlay() {
+    if (isPlaying) {
+        audio.pause();
+        isPlaying = false;
+    } else {
+        if (audio.src) {
+            audio.play().then(function() {
+                isPlaying = true;
+            }).catch(function(err) {
+                console.error('❌ Ошибка:', err);
+                if (playlist[currentTrackIndex]) {
+                    audio.src = playlist[currentTrackIndex].file;
+                    audio.load();
+                    audio.play();
+                    isPlaying = true;
+                }
+            });
+        } else {
+            playTrack(0);
+        }
+    }
+    updatePlayerUI();
+}
+
+function nextTrack() {
+    var next = (currentTrackIndex + 1) % playlist.length;
+    playTrack(next);
+}
+
+function prevTrack() {
+    var prev = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+    playTrack(prev);
+}
+
+function downloadTrack(index) {
+    var track = playlist[index];
+    if (!track) return;
+    var a = document.createElement('a');
+    a.href = track.file;
+    a.download = track.name + '.mp3';
+    a.click();
+}
+
+function downloadCurrentTrack() { downloadTrack(currentTrackIndex); }
+
+function updateTrackInfo() {
+    var nameEl = document.getElementById('currentTrackName');
+    if (nameEl && playlist[currentTrackIndex]) {
+        nameEl.textContent = playlist[currentTrackIndex].name;
+    }
+}
+
+function updatePlayerUI() {
+    var playBtn = document.getElementById('playBtn');
+    if (playBtn) playBtn.textContent = isPlaying ? '⏸' : '▶';
+    renderPlaylist();
+}
+
+audio.addEventListener('timeupdate', function() {
+    var fill = document.getElementById('progressFill');
+    var currentTime = document.getElementById('currentTime');
+    var totalTime = document.getElementById('totalTime');
+    if (fill && audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    if (currentTime) currentTime.textContent = formatTime(audio.currentTime);
+    if (totalTime && audio.duration) totalTime.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener('ended', function() {
+    isPlaying = false;
+    updatePlayerUI();
+});
 
 document.addEventListener('DOMContentLoaded', function() {
-    var fileInput = document.getElementById('fileInputFoto');
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            var file = e.target.files[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) {
-                alert('Только изображения!');
-                this.value = '';
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Максимум 5 МБ');
-                this.value = '';
-                return;
-            }
-
-            pendingFotoImageFile = file;
-            var reader = new FileReader();
-            reader.onload = function(ev) {
-                pendingFotoImage = ev.target.result;
-                var img = document.getElementById('previewImgFoto');
-                var name = document.getElementById('previewNameFoto');
-                var box = document.getElementById('previewBoxFoto');
-                if (img) img.src = pendingFotoImage;
-                if (name) name.textContent = file.name.slice(0, 16);
-                if (box) box.classList.add('visible');
-            };
-            reader.readAsDataURL(file);
+    var wrap = document.getElementById('progressWrap');
+    if (wrap) {
+        wrap.addEventListener('click', function(e) {
+            if (!audio.duration) return;
+            var rect = this.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var percent = x / rect.width;
+            audio.currentTime = percent * audio.duration;
         });
     }
 });
 
-function loadFotoFeed() {
-    var el = document.getElementById('fotoFeed');
-    if (!el) return;
-
-    if (!USER || !USER_UID) {
-        el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите, чтобы видеть ленту</div>';
-        return;
-    }
-
-    if (fotoFeedListener) {
-        db.ref('sites/' + SITE + '/foto_posts').off('value', fotoFeedListener);
-        fotoFeedListener = null;
-    }
-
-    fotoFeedListener = function(snap) {
-        var data = snap.val() || {};
-        var keys = Object.keys(data).sort(function(a, b) {
-            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
-        });
-
-        if (!keys.length) {
-            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока нет фото-постов. Будьте первым!</div>';
-            return;
-        }
-
-        el.innerHTML = '';
-
-        keys.forEach(function(k) {
-            var p = data[k];
-            p.id = k;
-            var postEl = renderPost(p, 'foto');
-            if (postEl) {
-                el.appendChild(postEl);
-            }
-        });
-    };
-
-    db.ref('sites/' + SITE + '/foto_posts').orderByChild('timestamp').on('value', fotoFeedListener);
+function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    var min = Math.floor(seconds / 60);
+    var sec = Math.floor(seconds % 60);
+    return min + ':' + (sec < 10 ? '0' : '') + sec;
 }
 
-window.submitFotoPost = function() {
-    if (!USER || !USER_UID) {
-        alert('Войдите, чтобы опубликовать пост!');
-        var loginModal = document.getElementById('loginModal');
-        if (loginModal) loginModal.classList.add('open');
-        return;
-    }
+// ================================================================ */
+// САЙДБАР
+// ================================================================ */
 
-    var text = getFotoEditorText().trim();
-    if (!text && !pendingFotoImageFile) {
-        alert('Введите текст или добавьте фото');
-        return;
-    }
+function toggleDrawer() {
+    var drawer = document.getElementById('playerDrawer');
+    if (drawer) drawer.classList.toggle('open');
+}
 
-    var hashtags = extractHashtags(text);
-    
-    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
-        var avatarUrl = avatarSnap.val() || null;
-        
-        var postData = {
-            author: USER,
-            authorUid: USER_UID,
-            authorAvatar: avatarUrl,
-            text: text || '📷',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            timestamp: Date.now(),
-            likes: 0,
-            commentCount: 0,
-            reposts: 0,
-            hashtags: hashtags,
-            marquee: null,
-            link: null,
-            buttons: [],
-            frameSize: 'small',
-            edited: false,
-            img: null,
-            repost: null,
-            deleted: null,
-            deletedAt: null
-        };
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
 
-        var savePost = function(imgData) {
-            if (imgData) postData.img = imgData;
-            
-            db.ref('sites/' + SITE + '/foto_posts').push(postData);
-            clearFotoPostForm();
-            
-            setTimeout(function() {
-                loadFotoFeed();
-            }, 100);
-        };
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+}
 
-        if (pendingFotoImageFile) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                savePost(e.target.result);
-            };
-            reader.readAsDataURL(pendingFotoImageFile);
-        } else {
-            savePost(null);
-        }
-    });
-};
+// ================================================================ */
+// ОБНОВЛЕНИЕ ТОП-БАРА И САЙДБАРА (АВАТАРКА + НИКНЕЙМ)
+// ================================================================ */
 
-// ================================================================
-// ЗАГРУЗКА КОМПОНЕНТОВ
-// ================================================================
+function updatePcTopbar() {
+    var pcAvatar = document.getElementById('pcAvatar');
+    var pcName = document.getElementById('pcName');
+    var sAvatar = document.getElementById('sAvatar');
+    var sName = document.getElementById('sName');
+    var sEmail = document.getElementById('sEmail');
 
-(function() {
-    const components = [
-        { id: 'topbarContainer', url: 'topbar.html' },
-        { id: 'settingsContainer', url: 'settings.html' },
-        { id: 'sidebarContainer', url: 'sidebar.html' },
-        { id: 'modalsContainer', url: 'modals.html' },
-        { id: 'playerContainer', url: 'player.html' }
-    ];
+    if (USER && USER_UID) {
+        db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
+            var dbName = snap.val() || USER;
+            if (pcName) pcName.textContent = dbName;
+            if (sName) sName.textContent = dbName;
+        });
 
-    let loaded = 0;
-    const total = components.length;
+        db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(snap) {
+            var avatarUrl = snap.val();
+            var letter = (USER || '?').charAt(0).toUpperCase();
 
-    components.forEach(function(comp) {
-        const container = document.getElementById(comp.id);
-        if (!container) return;
-
-        fetch(comp.url)
-            .then(response => {
-                if (!response.ok) throw new Error('Не удалось загрузить ' + comp.url);
-                return response.text();
-            })
-            .then(html => {
-                container.innerHTML = html;
-                loaded++;
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены!');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        var urlParams = new URLSearchParams(window.location.search);
-                        var page = urlParams.get('page');
-                        if (page) {
-                            openPage(page);
-                        }
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                        if (typeof initAudio === 'function') initAudio();
-                        
-                        var path = window.location.pathname;
-                        if (path.includes('/pages/')) {
-                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
-                            if (slug && typeof loadPage === 'function') {
-                                setTimeout(function() {
-                                    loadPage(slug);
-                                }, 300);
-                            }
-                        }
-                    }, 500);
+            if (pcAvatar) {
+                if (avatarUrl) {
+                    pcAvatar.innerHTML = '<img src="' + avatarUrl + '" alt="аватар">';
+                } else {
+                    pcAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
                 }
-            })
-            .catch(err => {
-                console.warn('❌ Ошибка загрузки ' + comp.url + ':', err);
-                container.innerHTML = `<div style="display:none;"></div>`;
-                loaded++;
-                if (loaded === total) {
-                    console.log('✅ Все компоненты загружены (с ошибками)');
-                    setTimeout(function() {
-                        if (typeof translatePage === 'function') translatePage();
-                        var urlParams = new URLSearchParams(window.location.search);
-                        var page = urlParams.get('page');
-                        if (page) {
-                            openPage(page);
-                        }
-                        if (typeof updateUI === 'function') updateUI();
-                        if (typeof loadNotifications === 'function') loadNotifications();
-                        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-                        if (typeof initAudio === 'function') initAudio();
-                        
-                        var path = window.location.pathname;
-                        if (path.includes('/pages/')) {
-                            var slug = path.replace('/pages/profiles/admin/', '').replace('/', '');
-                            if (slug && typeof loadPage === 'function') {
-                                setTimeout(function() {
-                                    loadPage(slug);
-                                }, 300);
-                            }
-                        }
-                    }, 500);
+            }
+
+            if (sAvatar) {
+                if (avatarUrl) {
+                    sAvatar.innerHTML = '<img src="' + avatarUrl + '" alt="аватар">';
+                } else {
+                    sAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
                 }
+            }
+        });
+
+        if (sEmail) {
+            db.ref('sites/' + SITE + '/users/' + USER_UID + '/email').once('value', function(snap) {
+                sEmail.textContent = snap.val() || '';
             });
-    });
-})();
+        }
 
-// ================================================================
-// АВТО-СКРЫТИЕ ШАПКИ
-// ================================================================
+    } else {
+        if (pcAvatar) pcAvatar.innerHTML = '<span class="letter">?</span>';
+        if (pcName) pcName.textContent = '';
+        if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
+        if (sName) sName.textContent = 'Гость';
+        if (sEmail) sEmail.textContent = '';
+    }
+}
 
+// ================================================================ */
+// МЕНЮ ПРОФИЛЯ (ТРИ ТОЧКИ)
+// ================================================================ */
+
+function toggleProfileMenu(event) {
+    if (event) event.stopPropagation();
+    var menu = document.getElementById('profileMenuDropdown');
+    if (!menu) return;
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function closeProfileMenu() {
+    var menu = document.getElementById('profileMenuDropdown');
+    if (menu) menu.style.display = 'none';
+}
+
+// Закрываем меню при клике вне его
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.profile-header')) {
+        var menu = document.getElementById('profileMenuDropdown');
+        if (menu) menu.style.display = 'none';
+    }
+});
+
+// ================================================================ */
+// ИНИЦИАЛИЗАЦИЯ
+// ================================================================ */
+
+setTimeout(function() {
+    loadPlaylist();
+    updatePcTopbar();
+}, 500);
+
+auth.onAuthStateChanged(function(user) {
+    setTimeout(updatePcTopbar, 500);
+});
+
+// ===== АВТО-СКРЫТИЕ ШАПКИ =====
 (function() {
     var lastScrollY = 0;
     var topbar = document.getElementById('topbar');
-    var playerHandle = document.getElementById('playerHandle');
     var playerDrawer = document.getElementById('playerDrawer');
     var isPlayerOpen = false;
     var ticking = false;
 
-    function waitForTopbar() {
-        topbar = document.getElementById('topbar');
-        if (!topbar) {
-            setTimeout(waitForTopbar, 200);
-            return;
-        }
-        console.log('✅ Топбар найден, авто-скрытие работает');
-    }
-    waitForTopbar();
-
     function checkPlayerState() {
-        if (playerDrawer) {
-            isPlayerOpen = playerDrawer.classList.contains('open');
-        }
+        if (playerDrawer) isPlayerOpen = playerDrawer.classList.contains('open');
     }
 
     function updateHeader() {
         var currentScrollY = window.scrollY;
         checkPlayerState();
-
-        if (isPlayerOpen) {
-            showAll();
-            lastScrollY = currentScrollY;
-            return;
-        }
-
-        if (currentScrollY < lastScrollY || currentScrollY < 30) {
-            showAll();
-        } else if (currentScrollY > lastScrollY && currentScrollY > 50) {
-            hideAll();
-        }
-
+        if (isPlayerOpen || currentScrollY < 30) showAll();
+        else if (currentScrollY > lastScrollY && currentScrollY > 50) hideAll();
         lastScrollY = currentScrollY;
     }
 
     function showAll() {
-        if (topbar) {
-            topbar.style.transform = 'translateY(0)';
-            topbar.style.opacity = '1';
-        }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(0)';
-            playerHandle.style.opacity = '1';
-        }
+        if (topbar) { topbar.style.transform = 'translateY(0)'; topbar.style.opacity = '1'; }
     }
 
     function hideAll() {
@@ -549,19 +2320,11 @@ window.submitFotoPost = function() {
             topbar.style.opacity = '0';
             topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
         }
-        if (playerHandle) {
-            playerHandle.style.transform = 'translateY(-100%)';
-            playerHandle.style.opacity = '0';
-            playerHandle.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        }
     }
 
     window.addEventListener('scroll', function() {
         if (!ticking) {
-            window.requestAnimationFrame(function() {
-                updateHeader();
-                ticking = false;
-            });
+            window.requestAnimationFrame(function() { updateHeader(); ticking = false; });
             ticking = true;
         }
     }, { passive: true });
@@ -569,26 +2332,28 @@ window.submitFotoPost = function() {
     if (playerDrawer) {
         var observer = new MutationObserver(function() {
             checkPlayerState();
-            if (isPlayerOpen) {
-                showAll();
-            }
+            if (isPlayerOpen) showAll();
         });
         observer.observe(playerDrawer, { attributes: true, attributeFilter: ['class'] });
     }
 
-    if (playerHandle) {
-        playerHandle.addEventListener('click', function() {
-            setTimeout(function() {
-                checkPlayerState();
-                if (isPlayerOpen) {
-                    showAll();
-                }
-            }, 150);
-        });
-    }
-
     console.log('✅ Авто-скрытие шапки включено!');
 })();
+
+// ===== ПОИСК =====
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('pcSearch');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                var query = this.value.trim();
+                if (query) {
+                    alert('Поиск: ' + query + ' (функция в разработке)');
+                }
+            }
+        });
+    }
+});
 </script>
 
 </body>

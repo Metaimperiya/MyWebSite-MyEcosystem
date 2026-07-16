@@ -8,26 +8,6 @@
     ],
     "rewrites": [
       {
-        "source": "/player-likee/**",
-        "destination": "/pages/player-likee/index.html"
-      },
-      {
-        "source": "/jobs-moscow-ru/**",
-        "destination": "/pages/jobs-moscow-ru/jobs-moscow-ru.html"
-      },
-      {
-        "source": "/eva-maria/**",
-        "destination": "/pages/eva-maria/index.html"
-      },
-      {
-        "source": "/vse-rabotniki/**",
-        "destination": "/pages/vse-rabotniki/index.html"
-      },
-      {
-        "source": "/user/**",
-        "destination": "/pages/user/index.html"
-      },
-      {
         "source": "/css/**",
         "destination": "/css/$1"
       },

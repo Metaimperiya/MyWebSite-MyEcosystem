@@ -1,0 +1,293 @@
+/* ================================================================ */
+/* PROFILE — ПРОФИЛЬ */
+/* ================================================================ */
+
+.profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.profile-header .avatar-wrap {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--avatar-bg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.profile-header .avatar-wrap .letter {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--avatar-text);
+}
+
+.profile-header .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-header .name {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.profile-header .bio {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 4px 0;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 6px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.profile-stats .stat-clickable {
+    cursor: pointer;
+    color: var(--link-color);
+    font-weight: 600;
+}
+
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 8px;
+    gap: 6px;
+}
+
+/* ===== КНОПКИ ДРУЗЕЙ ===== */
+.friend-btn {
+    padding: 6px 20px;
+    border: none;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: var(--transition);
+}
+
+.friend-btn.add {
+    background: var(--link-color);
+    color: #fff;
+}
+
+.friend-btn.add:hover {
+    background: #4a9eff;
+}
+
+.friend-btn.friend {
+    background: var(--input-bg);
+    color: var(--text-secondary);
+}
+
+.friend-btn.friend:hover {
+    background: var(--border-color);
+}
+
+.friend-btn.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.friend-btn.pending:hover {
+    background: #ffe69c;
+}
+
+.friend-btn.received {
+    background: #d4edda;
+    color: #155724;
+}
+
+.friend-btn.received:hover {
+    background: #c3e6cb;
+}
+
+/* ===== ТРИ ТОЧКИ В ПРОФИЛЕ ===== */
+.profile-dots-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0 8px;
+    border-radius: 50%;
+    transition: var(--transition);
+    line-height: 1;
+}
+
+.profile-dots-btn:hover {
+    background: var(--input-bg);
+}
+
+.profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 32px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    padding: 4px 0;
+    z-index: 100;
+}
+
+.profile-dropdown-menu .profile-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--text-color);
+    transition: var(--transition);
+    border-radius: 4px;
+}
+
+.profile-dropdown-menu .profile-menu-item:hover {
+    background: var(--input-bg);
+}
+
+.profile-dropdown-menu .profile-menu-item[style*="color:var(--danger)"]:hover {
+    background: #fde8e8;
+}
+
+/* ===== ДРУЗЬЯ В ПРОФИЛЕ ===== */
+.friends-section {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.friends-section h4 {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.friend-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.friend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px 2px 4px;
+    background: var(--input-bg);
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    margin: 2px;
+}
+
+.friend-item:hover {
+    background: var(--border-color);
+}
+
+.friend-item .avatar-wrap {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--avatar-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.friend-item .avatar-wrap .letter {
+    font-size: 0.5rem;
+    font-weight: 700;
+    color: var(--avatar-text);
+}
+
+.friend-item .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== ССЫЛКА В ПРОФИЛЕ ===== */
+.link-input-wrap {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.link-input-wrap input {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    font-size: 0.8rem;
+    outline: none;
+    color: var(--text-color);
+}
+
+.link-input-wrap input:focus {
+    border-color: var(--link-color);
+}
+
+.link-input-wrap button {
+    padding: 6px 14px;
+    background: var(--link-color);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.profile-iframe-wrap {
+    margin-top: 4px;
+}
+
+.profile-iframe-wrap .iframe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.profile-iframe-wrap .iframe-header button {
+    background: none;
+    border: none;
+    color: var(--link-color);
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+
+.profile-iframe {
+    width: 100%;
+    height: 300px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+}

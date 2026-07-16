@@ -1,0 +1,123 @@
+/* ================================================================ */
+/* TOPBAR — ТОП-БАР */
+/* ================================================================ */
+
+.pc-topbar {
+    width: 100vw;
+    position: sticky;
+    top: 0;
+    left: 0;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    z-index: 9999;
+    background: var(--card-bg);
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-color);
+    height: var(--topbar-height);
+}
+
+.pc-topbar .logo {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--link-color);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pc-topbar .logo .menu-icon {
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    padding: 0 4px;
+}
+
+.pc-topbar .logo .menu-icon:hover {
+    color: var(--text-color);
+}
+
+.pc-topbar .search {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 20px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    font-size: 0.8rem;
+    color: var(--text-color);
+    outline: none;
+    transition: var(--transition);
+}
+
+.pc-topbar .search:focus {
+    border-color: var(--link-color);
+    background: var(--card-bg);
+}
+
+.pc-topbar .right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.pc-topbar .right .avatar-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--avatar-bg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pc-topbar .right .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pc-topbar .right .avatar-wrap .letter {
+    color: var(--avatar-text);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.pc-topbar .right .username {
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--link-color);
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.pc-topbar .right .username:hover {
+    opacity: 0.7;
+}
+
+.pc-topbar .right button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px 6px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    line-height: 1;
+}
+
+.pc-topbar .right button:hover {
+    background: var(--hover-bg);
+}

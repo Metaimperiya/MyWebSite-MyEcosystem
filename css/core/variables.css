@@ -1,0 +1,41 @@
+/* ================================================================ */
+/* VARIABLES — CSS-ПЕРЕМЕННЫЕ */
+/* ================================================================ */
+
+:root {
+    /* ЦВЕТА */
+    --bg-color: #f0f2f5;
+    --card-bg: #ffffff;
+    --text-color: #1c1e21;
+    --text-secondary: #65676b;
+    --link-color: #1877f2;
+    --border-color: #e4e6eb;
+    --input-bg: #f0f2f5;
+    --avatar-bg: #e4e6eb;
+    --avatar-text: #1c1e21;
+    --muted-text: #8a8d91;
+    --hover-bg: #f0f2f5;
+
+    /* ФУНКЦИОНАЛЬНЫЕ ЦВЕТА */
+    --danger: #e74c3c;
+    --success: #27ae60;
+    --warning: #f39c12;
+
+    /* ТЕНИ */
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+
+    /* РАЗМЕРЫ */
+    --topbar-height: 60px;
+    --sidebar-width: 330px;
+    --panel-width: 290px;
+    --feed-width: 520px;
+    --max-width: 1100px;
+
+    /* РАДИУСЫ */
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-full: 9999px;
+
+    /* ПЕРЕХОДЫ */
+    --transition: 0.3s ease;
+}
