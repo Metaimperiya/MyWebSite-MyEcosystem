@@ -2,6 +2,50 @@
 // ЛЕНТА И ПОСТЫ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
+// ================================================================ */
+// ФОРМАТИРОВАНИЕ ВРЕМЕНИ ПОСТА
+// ================================================================ */
+
+function formatPostTime(timestamp) {
+    if (!timestamp) return '';
+
+    var now = Date.now();
+    var diff = now - timestamp;
+    var date = new Date(timestamp);
+    var today = new Date();
+    var yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // СЕГОДНЯ
+    if (date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()) {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
+    }
+
+    // ВЧЕРА
+    if (date.getDate() === yesterday.getDate() &&
+        date.getMonth() === yesterday.getMonth() &&
+        date.getFullYear() === yesterday.getFullYear()) {
+        return 'Вчера';
+    }
+
+    // БОЛЬШЕ 7 ДНЕЙ — ПОКАЗЫВАЕМ ДАТУ
+    if (diff > 7 * 24 * 60 * 60 * 1000) {
+        var months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+        return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+
+    // ДНИ НАЗАД (2-7 дней)
+    var days = Math.floor(diff / (24 * 60 * 60 * 1000));
+    var words = ['', 'вчера', '2 дня', '3 дня', '4 дня', '5 дней', '6 дней', '7 дней'];
+    return words[days] || days + ' дней';
+}
+
 var commentStates = {};
 var feedListener = null;
 
@@ -469,7 +513,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 });
 
 // ================================================================
-// РЕНДЕР ПОСТА (ПОЛНАЯ ВЕРСИЯ С ТРИ ТОЧКИ)
+// РЕНДЕР ПОСТА — ВСЁ В ОДНОЙ СТРОКЕ
 // ================================================================
 
 function renderPost(p, type) {
@@ -494,9 +538,9 @@ function renderPost(p, type) {
     
     var avatarHtml = '';
     if (p.authorAvatar) {
-        avatarHtml = '<span class="avatar-wrap" id="post-avatar-' + p.id + '"><img src="' + p.authorAvatar + '" /></span>';
+        avatarHtml = '<span class="avatar-wrap" id="post-avatar-' + p.id + '" style="flex-shrink:0;"><img src="' + p.authorAvatar + '" /></span>';
     } else {
-        avatarHtml = '<span class="avatar-wrap" id="post-avatar-' + p.id + '"><span class="letter">' + letter + '</span></span>';
+        avatarHtml = '<span class="avatar-wrap" id="post-avatar-' + p.id + '" style="flex-shrink:0;"><span class="letter">' + letter + '</span></span>';
     }
 
     var marqueeHtml = p.marquee ? '<div class="marquee"><span>' + esc(p.marquee) + '</span></div>' : '';
@@ -538,14 +582,14 @@ function renderPost(p, type) {
     var isAuthor = (p.authorUid === USER_UID);
     var canDelete = isAuthor || isAdmin;
 
-    // ===== ТРИ ТОЧКИ =====
+    // ===== МЕНЮ (ТРИ ТОЧКИ) ВНУТРИ СТРОКИ =====
     var menuHtml = '';
     if (canDelete) {
-        menuHtml = '<div class="post-menu">' +
-            '<button class="dots" onclick="event.stopPropagation();togglePostMenu(\'' + p.id + '\')">⋮</button>' +
-            '<div class="dropdown" id="menu_' + p.id + '">' +
-            '<button class="edit-btn" onclick="event.stopPropagation();openEdit(\'' + p.id + '\', \'' + type + '\')" style="color:#e67e22;">✏️ Редактировать</button>' +
-            '<button class="del-btn" onclick="event.stopPropagation();deletePost(\'' + p.id + '\', \'' + type + '\')" style="color:var(--danger);">🗑 Удалить</button>' +
+        menuHtml = '<div class="post-menu" style="position:absolute;top:4px;right:4px;z-index:5;">' +
+            '<button class="dots" onclick="event.stopPropagation();togglePostMenu(\'' + p.id + '\')" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;line-height:1;">⋮</button>' +
+            '<div class="dropdown" id="menu_' + p.id + '" style="display:none;position:absolute;right:0;top:24px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15);z-index:60;min-width:140px;padding:4px 0;">' +
+            '<button class="edit-btn" onclick="event.stopPropagation();openEdit(\'' + p.id + '\', \'' + type + '\')" style="display:block;width:100%;padding:6px 14px;background:none;border:none;text-align:left;font-size:0.7rem;cursor:pointer;color:#e67e22;">✏️ Редактировать</button>' +
+            '<button class="del-btn" onclick="event.stopPropagation();deletePost(\'' + p.id + '\', \'' + type + '\')" style="display:block;width:100%;padding:6px 14px;background:none;border:none;text-align:left;font-size:0.7rem;cursor:pointer;color:var(--danger);">🗑 Удалить</button>' +
             '</div>' +
             '</div>';
     }
@@ -556,7 +600,6 @@ function renderPost(p, type) {
         '<button onclick="event.stopPropagation();openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
         '</div>';
 
-    // ===== КОММЕНТАРИИ (ВЛОЖЕННЫЕ) =====
     var commentsHtml = `
         <div class="comments-wrapper" id="commentsWrapper_${p.id}" style="display:none;" onclick="event.stopPropagation();">
             <div class="comments" id="comments_${p.id}">
@@ -578,11 +621,19 @@ function renderPost(p, type) {
 
     var contentHtml = textHtml + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml;
     
-    div.innerHTML = menuHtml + marqueeHtml + 
-        '<div class="author" onclick="event.stopPropagation();viewUser(\'' + (p.authorUid || '') + '\')">' + avatarHtml + 
-        '<span class="name" onclick="event.stopPropagation();viewUser(\'' + (p.authorUid || '') + '\')">' + esc(p.author || 'Аноним') + '</span>' +
-        '<span class="time">' + (p.time || '') + (p.edited ? ' <span style="color:#999;font-size:0.4rem;">(ред.)</span>' : '') + '</span>' +
-        '</div>' +
+    // ===== БЛОК АВТОРА + ВРЕМЯ + МЕНЮ В ОДНОЙ СТРОКЕ =====
+    var authorHtml = `
+        <div class="author" style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;position:relative;padding-right:30px;">
+            ${avatarHtml}
+            <span class="name" style="font-weight:600;font-size:0.8rem;cursor:pointer;flex-shrink:0;" onclick="event.stopPropagation();viewUser('${p.authorUid || ''}')">${esc(p.author || 'Аноним')}</span>
+            <span style="font-size:0.55rem;color:var(--muted-text);flex-shrink:0;">•</span>
+            <span class="time" style="font-size:0.55rem;color:var(--muted-text);flex-shrink:0;">${formatPostTime(p.timestamp)}</span>
+            ${p.edited ? '<span style="font-size:0.4rem;color:var(--muted-text);flex-shrink:0;">(ред.)</span>' : ''}
+            ${menuHtml}
+        </div>
+    `;
+    
+    div.innerHTML = marqueeHtml + authorHtml +
         '<div class="post-content" onclick="openPostPage(\'' + p.id + '\', \'' + type + '\')" style="cursor:pointer;">' + contentHtml + '</div>' +
         actionsHtml + commentsHtml + inputHtml;
 
@@ -593,12 +644,10 @@ function renderPost(p, type) {
         }
     }
 
-    // Загружаем комментарии только если они открыты
     var state = getCommentState(p.id);
     if (state.open) {
         loadComments(p.id, type);
     } else {
-        // Просто обновляем счетчик
         var countEl = document.getElementById('commentCount_' + p.id);
         if (countEl) countEl.textContent = p.commentCount || 0;
     }
@@ -703,7 +752,6 @@ function loadComments(postId, type) {
     var path = getPostPath(type);
     var state = getCommentState(postId);
 
-    // Если комментарии не открыты — не грузим
     if (!state.open) {
         return;
     }
@@ -869,7 +917,6 @@ window.submitReply = function(postId, parentId, type) {
     input.value = '';
     document.getElementById('replyInput_' + parentId).style.display = 'none';
     
-    // Обновляем комментарии если они открыты
     if (state.open) {
         loadComments(postId, type);
     }
@@ -948,7 +995,7 @@ window.toggleLike = function(postId, type) {
 };
 
 // ================================================================
-// ОТПРАВКА КОММЕНТАРИЯ — НЕ ЗАКРЫВАЕТ КОММЕНТАРИИ
+// ОТПРАВКА КОММЕНТАРИЯ
 // ================================================================
 
 window.submitComment = function(postId, type) {
@@ -986,7 +1033,6 @@ window.submitComment = function(postId, type) {
                     timestamp: Date.now()
                 });
             }
-            // Если комментарии открыты — обновляем их, НЕ ЗАКРЫВАЯ
             if (state.open) {
                 loadComments(postId, type);
             }
@@ -1431,7 +1477,7 @@ window.searchByTag = function(tag) {
 };
 
 // ================================================================
-// РЕПОСТЫ — БЕЗ ЛИШНЕГО ПОДТВЕРЖДЕНИЯ
+// РЕПОСТЫ
 // ================================================================
 
 window.openRepost = function(postId, type) {

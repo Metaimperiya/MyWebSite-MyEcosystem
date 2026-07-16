@@ -1762,28 +1762,17 @@
                 <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
             </div>
 
-            <!-- ===== ПРОФИЛЬ ===== -->
+            <!-- ============================================================ -->
+            <!-- ===== ПРОФИЛЬ (БЕЗ КНОПКИ ⋮ В HTML — ОНА В JS) ===== -->
+            <!-- ============================================================ -->
             <div class="page" id="page-profile">
                 <div class="profile-header">
+                    <!-- ===== КНОПКА ⋮ УДАЛЕНА ИЗ HTML — ОНА В PROFILE.JS ===== -->
 
-                    <!-- ===== ТРИ ТОЧКИ В ПРАВОМ ВЕРХНЕМ УГЛУ ===== -->
-                    <div style="position:absolute;top:12px;right:16px;z-index:10;">
-                        <button onclick="toggleProfileMenu(event)" style="background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;line-height:1;transition:0.2s;border-radius:50%;">
-                            ⋮
-                        </button>
-                        <div id="profileMenuDropdown" style="display:none;position:absolute;right:0;top:32px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;">
-                            <div class="profile-menu-item" onclick="openEditProfile();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">✏️ Редактировать профиль</div>
-                            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
-                            <div class="profile-menu-item" onclick="uploadAvatar();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">📷 Сменить аватар</div>
-                            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
-                            <div class="profile-menu-item" onclick="goToFeed();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">🏠 На главную</div>
-                            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
-                            <div class="profile-menu-item" onclick="logout();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--danger);transition:0.15s;border-radius:4px;">🚪 Выйти</div>
-                        </div>
+                    <!-- ===== АВАТАРКА ===== -->
+                    <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()">
+                        <span class="letter">?</span>
                     </div>
-
-                    <!-- АВАТАР И ИМЯ -->
-                    <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
                     <div class="name" id="profileName"></div>
                     <div class="bio" id="profileBio"></div>
                     <div class="profile-stats">
@@ -1791,9 +1780,12 @@
                         <span>👀 Подписчики: <span id="subscribersCount" class="stat-clickable">0</span></span>
                         <span>📌 Подписки: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
                     </div>
+
+                    <!-- ===== profileActions ПУСТОЙ — КНОПКИ УБРАНЫ! ===== -->
                     <div class="profile-actions" id="profileActions"></div>
                 </div>
 
+                <!-- ===== ССЫЛКА ДЛЯ ВСТРАИВАНИЯ ===== -->
                 <div class="link-section" id="linkSection">
                     <div class="link-input-wrap">
                         <input type="text" id="profileLinkInput" placeholder="Вставьте ссылку для встраивания...">
@@ -1808,11 +1800,13 @@
                     </div>
                 </div>
 
+                <!-- ===== ДРУЗЬЯ ===== -->
                 <div class="friends-section" id="friendsSection" style="display:none;">
                     <h4>🤝 Друзья <button onclick="toggleFriendsList()" style="float:right;background:none;border:none;color:var(--link-color);cursor:pointer;">✕</button></h4>
                     <div class="friend-list" id="friendList"></div>
                 </div>
 
+                <!-- ===== ФОРМА ПОСТА В ПРОФИЛЕ ===== -->
                 <div class="card" style="margin-top:8px;">
                     <div class="post-form">
                         <div class="editor-toolbar">
@@ -1843,6 +1837,7 @@
                 <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
                 <div id="profilePosts"></div>
             </div>
+            <!-- ===== КОНЕЦ ПРОФИЛЯ ===== -->
 
             <div class="page" id="page-foto" style="display:none;">
                 <div style="padding-top:10px;">
@@ -2200,6 +2195,12 @@ function closeSidebar() {
 }
 
 // ================================================================ */
+// МЕНЮ ПРОФИЛЯ (ТРИ ТОЧКИ) — ТЕПЕРЬ ТОЛЬКО В PROFILE.JS
+// ================================================================ */
+
+// Эти функции теперь есть в profile.js, дублировать не нужно
+
+// ================================================================ */
 // ОБНОВЛЕНИЕ ТОП-БАРА И САЙДБАРА (АВАТАРКА + НИКНЕЙМ)
 // ================================================================ */
 
@@ -2252,30 +2253,6 @@ function updatePcTopbar() {
         if (sEmail) sEmail.textContent = '';
     }
 }
-
-// ================================================================ */
-// МЕНЮ ПРОФИЛЯ (ТРИ ТОЧКИ)
-// ================================================================ */
-
-function toggleProfileMenu(event) {
-    if (event) event.stopPropagation();
-    var menu = document.getElementById('profileMenuDropdown');
-    if (!menu) return;
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-}
-
-function closeProfileMenu() {
-    var menu = document.getElementById('profileMenuDropdown');
-    if (menu) menu.style.display = 'none';
-}
-
-// Закрываем меню при клике вне его
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.profile-header')) {
-        var menu = document.getElementById('profileMenuDropdown');
-        if (menu) menu.style.display = 'none';
-    }
-});
 
 // ================================================================ */
 // ИНИЦИАЛИЗАЦИЯ

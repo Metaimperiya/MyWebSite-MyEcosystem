@@ -1,11 +1,10 @@
 // ================================================================ */
-// ПРОФИЛЬ — БЕЗ ГОСТЯ
+// ПРОФИЛЬ — ПОЛНАЯ ПЕРЕЗАПИСЬ (БЕЗ ЛИШНИХ КНОПОК)
 // ================================================================ */
 
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
 
-    // ЕСЛИ НЕТ ПОЛЬЗОВАТЕЛЯ — ПОКАЗЫВАЕМ КНОПКУ ВХОДА
     if (!uid) {
         var nameEl = document.getElementById('profileName');
         var bioEl = document.getElementById('profileBio');
@@ -25,7 +24,6 @@ function loadProfile() {
 
         var postsContainer = document.getElementById('profilePosts');
         if (postsContainer) postsContainer.innerHTML = '';
-
         return;
     }
 
@@ -36,7 +34,6 @@ function loadProfile() {
         var bioEl = document.getElementById('profileBio');
         var avatarEl = document.getElementById('profileAvatar');
 
-        // ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ НАЙДЕН В БАЗЕ
         if (!u.name) {
             if (nameEl) {
                 nameEl.textContent = '👤 Пользователь не найден';
@@ -52,7 +49,6 @@ function loadProfile() {
             return;
         }
 
-        // ПОКАЗЫВАЕМ ПРОФИЛЬ
         if (nameEl) {
             nameEl.textContent = u.name;
             nameEl.style.display = 'block';
@@ -185,45 +181,31 @@ window.toggleIframe = function() {
     }
 };
 
+// ================================================================ */
+// ГЛАВНАЯ ФУНКЦИЯ — ПОЛНОСТЬЮ ПЕРЕПИСАНА
+// ================================================================ */
+
 function showProfileActions(uid) {
     var actions = document.getElementById('profileActions');
     if (!uid) return;
 
+    // ОЧИЩАЕМ ВСЁ
     actions.innerHTML = '';
     actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
 
+    // ================================================================ */
+    // СВОЙ ПРОФИЛЬ — ВООБЩЕ НИЧЕГО НЕ ДОБАВЛЯЕМ
+    // ТОЛЬКО ТРИ ТОЧКИ ИЗ HTML
+    // ================================================================ */
     if (uid === USER_UID) {
-        var wrapper = document.createElement('div');
-        wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;width:100%;justify-content:center;';
-
-        var dotsBtn = document.createElement('button');
-        dotsBtn.className = 'profile-dots-btn';
-        dotsBtn.textContent = '⋮';
-        dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 8px;border-radius:50%;transition:0.2s;line-height:1;';
-        dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
-        dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
-        dotsBtn.onclick = function(e) {
-            e.stopPropagation();
-            toggleProfileMenu(uid);
-        };
-        wrapper.appendChild(dotsBtn);
-
-        actions.appendChild(wrapper);
-
-        var menuContainer = document.createElement('div');
-        menuContainer.style.cssText = 'position:relative;width:100%;';
-        actions.appendChild(menuContainer);
-
-        var menu = document.createElement('div');
-        menu.id = 'profileMenu';
-        menu.className = 'profile-dropdown-menu';
-        menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
-        menuContainer.appendChild(menu);
-
-        fillOwnProfileMenu(uid, menu);
+        // ПУСТО — НИЧЕГО НЕ СОЗДАЕМ
+        console.log('✅ Свой профиль — лишние кнопки скрыты');
         return;
     }
 
+    // ================================================================ */
+    // ЧУЖОЙ ПРОФИЛЬ — КНОПКИ
+    // ================================================================ */
     var wrapper = document.createElement('div');
     wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
 
@@ -243,20 +225,9 @@ function showProfileActions(uid) {
     msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
     wrapper.appendChild(msgBtn);
 
-    var dotsBtn = document.createElement('button');
-    dotsBtn.className = 'profile-dots-btn';
-    dotsBtn.textContent = '⋮';
-    dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;border-radius:50%;transition:0.2s;line-height:1;';
-    dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
-    dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
-    dotsBtn.onclick = function(e) {
-        e.stopPropagation();
-        toggleProfileMenu(uid);
-    };
-    wrapper.appendChild(dotsBtn);
-
     actions.appendChild(wrapper);
 
+    // МЕНЮ ДЛЯ ЧУЖОГО ПРОФИЛЯ
     var menuContainer = document.createElement('div');
     menuContainer.style.cssText = 'position:relative;width:100%;';
     actions.appendChild(menuContainer);
@@ -266,6 +237,25 @@ function showProfileActions(uid) {
     menu.className = 'profile-dropdown-menu';
     menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
     menuContainer.appendChild(menu);
+
+    // КНОПКА ТРИ ТОЧКИ ДЛЯ ЧУЖОГО ПРОФИЛЯ
+    var dotsBtn = document.createElement('button');
+    dotsBtn.className = 'profile-dots-btn';
+    dotsBtn.textContent = '⋮';
+    dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;border-radius:50%;transition:0.2s;line-height:1;';
+    dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
+    dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
+    dotsBtn.onclick = function(e) {
+        e.stopPropagation();
+        var m = document.getElementById('profileMenu');
+        if (m) {
+            m.style.display = m.style.display === 'block' ? 'none' : 'block';
+            if (m.style.display === 'block') {
+                fillProfileMenu(uid, m);
+            }
+        }
+    };
+    wrapper.appendChild(dotsBtn);
 
     fillProfileMenu(uid, menu);
     updateFriendButton(uid);
@@ -400,7 +390,7 @@ function closeProfileMenu() {
 }
 
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('#profileActions')) {
+    if (!e.target.closest('#profileActions') && !e.target.closest('#profileMenuDropdown')) {
         closeProfileMenu();
     }
 });
