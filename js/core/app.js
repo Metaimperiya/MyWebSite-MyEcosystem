@@ -2,55 +2,162 @@
 // ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
 // ================================================================
 
-// Проверяем, что SITE определён
-if (typeof SITE === 'undefined') {
-    var SITE = 'www_metaimperiya_com'; // Твой SITE из firebase.js
-    console.warn('⚠️ SITE не был определён, установлено значение по умолчанию:', SITE);
-} else {
-    console.log('✅ SITE определён:', SITE);
+console.log('✅ app.js загружен, SITE =', SITE);
+
+// ================================================================
+// ПЕРЕКЛЮЧЕНИЕ МЕЖДУ ПК И МОБИЛЬНЫМ РЕЖИМОМ
+// ================================================================
+
+var viewMode = localStorage.getItem('viewMode') || 'pc';
+
+window.toggleViewMode = function() {
+    var newMode = (viewMode === 'pc') ? 'mobile' : 'pc';
+    viewMode = newMode;
+    localStorage.setItem('viewMode', viewMode);
+    
+    // Просто добавляем/удаляем класс на body
+    if (viewMode === 'mobile') {
+        document.body.classList.add('mobile-view');
+        document.body.classList.remove('pc-view');
+    } else {
+        document.body.classList.add('pc-view');
+        document.body.classList.remove('mobile-view');
+    }
+    
+    updateViewModeDisplay();
+    console.log('📱 Режим изменён на:', viewMode);
+    
+    // Перезагружаем ленту
+    setTimeout(function() {
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadProfile === 'function') {
+            var profilePage = document.getElementById('page-profile');
+            if (profilePage && profilePage.classList.contains('active')) {
+                loadProfile();
+            }
+        }
+    }, 300);
+};
+
+function updateViewModeDisplay() {
+    var display = document.getElementById('viewModeDisplay');
+    if (display) {
+        display.textContent = viewMode === 'pc' ? 'ПК' : 'Мобильный';
+    }
 }
+
+// Применяем режим при загрузке
+(function initViewMode() {
+    var savedMode = localStorage.getItem('viewMode') || 'pc';
+    viewMode = savedMode;
+    
+    if (viewMode === 'mobile') {
+        document.body.classList.add('mobile-view');
+        document.body.classList.remove('pc-view');
+    } else {
+        document.body.classList.add('pc-view');
+        document.body.classList.remove('mobile-view');
+    }
+    
+    updateViewModeDisplay();
+    setTimeout(function() {
+        if (typeof loadFeed === 'function') loadFeed();
+    }, 300);
+})();
+
+// ================================================================
+// ЕДИНЫЙ МЕХАНИЗМ НАВИГАЦИИ В ПРОФИЛЬ
+// ================================================================
+
+window.navigateToProfile = function(uid) {
+    console.log('🔵 navigateToProfile вызвана с uid:', uid, 'USER_UID:', USER_UID);
+
+    if (!window.checkAccess) {
+        console.error('❌ checkAccess не определён!');
+        return;
+    }
+
+    if (!window.checkAccess()) return;
+
+    if (!uid) {
+        uid = USER_UID;
+        console.log('✅ uid не передан, используем USER_UID:', uid);
+    }
+
+    if (uid === USER_UID) {
+        console.log('✅ Открываем свой профиль');
+        VIEWING_USER = null;
+        
+        if (typeof window.setActivePage === 'function') {
+            window.setActivePage('profile');
+        }
+        
+        var chatView = document.getElementById('chatView');
+        if (chatView) chatView.classList.remove('active');
+        
+        if (chatUnsub) {
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null;
+        }
+        CURRENT_ROOM = null;
+        
+        if (typeof loadProfile === 'function') {
+            loadProfile();
+        }
+        
+        if (window.history && window.history.pushState) {
+            window.history.pushState({}, '', '/');
+        }
+        return;
+    }
+
+    console.log('👤 Открываем профиль пользователя:', uid);
+    VIEWING_USER = uid;
+    
+    if (typeof window.setActivePage === 'function') {
+        window.setActivePage('profile');
+    }
+    
+    var chatView = document.getElementById('chatView');
+    if (chatView) chatView.classList.remove('active');
+    
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    
+    if (typeof loadProfile === 'function') {
+        loadProfile();
+    }
+
+    if (window.history && window.history.pushState) {
+        db.ref('sites/' + SITE + '/users/' + uid + '/slug').once('value', function(snap) {
+            var slug = snap.val();
+            if (slug) {
+                window.history.pushState({}, '', '/' + slug + '/');
+            } else {
+                window.history.pushState({}, '', '/?page=profile&user=' + uid);
+            }
+        });
+    }
+};
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ===== ШЛАГБАУМ — ПРОВЕРКА ДОСТУПА =====
+    // ===== ШЛАГБАУМ =====
     window.checkAccess = function() {
         if (typeof USER_UID === 'undefined' || !USER_UID) {
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.add('open');
-            console.log('⛔ Шлагбаум закрыт! Гость, иди нахуй!');
+            console.log('⛔ Шлагбаум закрыт!');
             return false;
         }
-        console.log('✅ Шлагбаум открыт! Проходи, братан!');
+        console.log('✅ Шлагбаум открыт!');
         return true;
     };
 
-    // ===== ДЕБАГ-ФУНКЦИЯ =====
-    window.debugDatabaseConnection = function() {
-        if (!USER_UID) {
-            console.warn("⛔ DEBUG: Пользователь не авторизован, база не будет грузиться.");
-            return;
-        }
-
-        const testPath = 'sites/' + SITE + '/users/' + USER_UID;
-        console.log("🔍 DEBUG: Пробую прочитать путь:", testPath);
-
-        db.ref(testPath).once('value')
-            .then(function(snapshot) {
-                if (snapshot.exists()) {
-                    console.log("✅ DEBUG: Данные в базе найдены:", snapshot.val());
-                } else {
-                    console.error("❌ DEBUG: ОШИБКА! В базе данных по пути " + testPath + " НИЧЕГО НЕТ.");
-                }
-            })
-            .catch(function(error) {
-                console.error("❌ DEBUG: ОШИБКА ДОСТУПА К БАЗЕ:", error);
-            });
-    };
-
-    // ================================================================
-    // НАСТРОЙКИ (ВЫПАДАЮЩЕЕ МЕНЮ)
-    // ================================================================
-
+    // ===== НАСТРОЙКИ =====
     window.toggleSettingsMenu = function() {
         var dropdown = document.getElementById('settingsDropdown');
         if (!dropdown) return;
@@ -63,11 +170,10 @@ document.addEventListener('DOMContentLoaded', function() {
         dropdown.classList.remove('open');
     };
 
-    // ЗАКРЫВАЕМ МЕНЮ ПРИ КЛИКЕ ВНЕ ЕГО
     document.addEventListener('click', function(e) {
         var dropdown = document.getElementById('settingsDropdown');
         if (!dropdown) return;
-        if (!e.target.closest('.topbar .right') && !e.target.closest('#settingsDropdown')) {
+        if (!e.target.closest('.pc-topbar .right') && !e.target.closest('#settingsDropdown')) {
             dropdown.classList.remove('open');
         }
     });
@@ -79,6 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var name = document.getElementById('topName');
         var sName = document.getElementById('sName');
         var dot = document.getElementById('adminDot');
+
+        console.log('🔄 updateUI вызвана, topAvatar:', !!topAvatar, 'topName:', !!name);
 
         if (USER && USER_UID) {
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
@@ -111,7 +219,6 @@ document.addEventListener('DOMContentLoaded', function() {
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.remove('open');
 
-            setTimeout(window.debugDatabaseConnection, 1000);
         } else {
             if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
             if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
@@ -155,24 +262,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== НАВИГАЦИЯ =====
     window.setActivePage = function(pageId) {
+        console.log('🔵 setActivePage: активирую', pageId);
+        
         document.querySelectorAll('.page').forEach(function(el) {
             el.classList.remove('active');
+            el.style.display = 'none';
         });
-        if (pageId) {
-            var el = document.getElementById('page-' + pageId);
-            if (el) el.classList.add('active');
+        
+        var el = document.getElementById('page-' + pageId);
+        if (el) {
+            el.classList.add('active');
+            el.style.display = 'block';
+            console.log('✅ Успешно активирована:', pageId);
+        } else {
+            console.error('❌ Элемент с ID "page-' + pageId + '" не найден!');
         }
-
-        document.querySelectorAll('.tab-bar .tab').forEach(function(el) {
-            el.classList.remove('active');
-        });
-
-        var tabs = document.querySelectorAll('.tab-bar .tab');
-        var map = { feed: 0, groups: 1, people: 2, profile: 3 };
-        if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
     };
 
-    // ===== КНОПКА "ГЛАВНАЯ" =====
+    // ===== ПЕРЕХОДЫ =====
     window.goToHome = function() {
         if (!window.checkAccess()) return;
         window.location.href = '/';
@@ -191,71 +298,19 @@ document.addEventListener('DOMContentLoaded', function() {
             chatUnsub = null;
         }
         CURRENT_ROOM = null;
-        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadFeed === 'function') {
+            loadFeed();
+        }
     };
 
-    // ===== ПЕРЕХОД В ПРОФИЛЬ (SPA) =====
     window.goToProfile = function() {
-        if (!window.checkAccess()) return;
-
-        if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-            window.location.href = '/?page=profile';
-            return;
-        }
-
-        VIEWING_USER = null;
-        window.setActivePage('profile');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) {
-            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null;
-        }
-        CURRENT_ROOM = null;
-        if (typeof loadProfile === 'function') loadProfile();
+        console.log('🔵 goToProfile вызвана!');
+        window.navigateToProfile(null);
     };
 
-    // ===== ПРОСМОТР ПРОФИЛЯ ДРУГОГО ПОЛЬЗОВАТЕЛЯ (SPA) =====
     window.viewUserProfile = function(uid) {
-        if (!window.checkAccess()) return;
-
-        if (uid === USER_UID) {
-            goToProfile();
-            return;
-        }
-
-        VIEWING_USER = uid;
-
-        db.ref('sites/' + SITE + '/users/' + uid + '/slug').once('value', function(snap) {
-            var slug = snap.val();
-
-            if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-                if (slug) {
-                    window.location.href = '/' + slug + '/';
-                } else {
-                    window.location.href = '/?page=profile&user=' + uid;
-                }
-                return;
-            }
-
-            if (window.history && window.history.pushState) {
-                if (slug) {
-                    window.history.pushState({}, '', '/' + slug + '/');
-                } else {
-                    window.history.pushState({}, '', '/?page=profile&user=' + uid);
-                }
-            }
-
-            window.setActivePage('profile');
-            document.getElementById('chatView').classList.remove('active');
-
-            if (chatUnsub) {
-                if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-                chatUnsub = null;
-            }
-            CURRENT_ROOM = null;
-
-            if (typeof loadProfile === 'function') loadProfile();
-        });
+        console.log('🔵 viewUserProfile вызвана с uid:', uid);
+        window.navigateToProfile(uid);
     };
 
     window.goToPeople = function() {
@@ -293,61 +348,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== САЙДБАР =====
     window.toggleSidebar = function() {
         if (!window.checkAccess()) return;
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('overlay').classList.toggle('show');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('show');
     };
 
     window.closeSidebar = function() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-    };
-
-    // ===== АККОРДЕОН =====
-    window.toggleAccordion = function(header) {
-        var item = header.parentElement;
-        var body = item.querySelector('.accordion-body');
-        var arrow = header.querySelector('.accordion-arrow');
-
-        document.querySelectorAll('.accordion-body').forEach(function(b) {
-            if (b !== body && b.style.maxHeight) {
-                b.style.maxHeight = null;
-                b.style.padding = '0 16px';
-                var otherArrow = b.parentElement.querySelector('.accordion-arrow');
-                if (otherArrow) otherArrow.textContent = '▾';
-            }
-        });
-
-        if (body.style.maxHeight) {
-            body.style.maxHeight = null;
-            body.style.padding = '0 16px';
-            if (arrow) arrow.textContent = '▾';
-        } else {
-            body.style.maxHeight = body.scrollHeight + 'px';
-            body.style.padding = '6px 16px 10px 16px';
-            if (arrow) arrow.textContent = '▴';
-        }
-    };
-
-    // ===== РАЗМЕР ФРЕЙМА =====
-    window.setFrameSize = function(size) {
-        currentFrameSize = size;
-        document.querySelectorAll('.frame-size-btn').forEach(function(btn) {
-            btn.classList.remove('active');
-        });
-        if (size === 'small') {
-            var btn = document.getElementById('frameSizeSmall');
-            if (btn) btn.classList.add('active');
-        } else {
-            var btn2 = document.getElementById('frameSizeLarge');
-            if (btn2) btn2.classList.add('active');
-        }
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('show');
     };
 
     // ===== ТЕМА =====
     window.toggleTheme = function() {
         var currentTheme = document.documentElement.getAttribute('data-theme');
         var newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
-
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
     };
@@ -497,48 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ================================================================
-    // ИНДИКАТОР НАБОРА
-    // ================================================================
-
-    var typingTimeout = null;
-
-    function setupTypingIndicator(chatId) {
-        var typingRef = db.ref('dms/' + SITE + '/' + chatId + '/typing');
-        var input = document.getElementById('chatInput');
-
-        if (window._typingHandler) {
-            input.removeEventListener('keydown', window._typingHandler);
-        }
-
-        window._typingHandler = function() {
-            typingRef.set({ [USER_UID]: true });
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(function() {
-                typingRef.set(null);
-            }, 2000);
-        };
-        input.addEventListener('keydown', window._typingHandler);
-
-        typingRef.on('value', function(snap) {
-            var data = snap.val() || {};
-            var isTyping = Object.keys(data).some(function(key) {
-                return data[key] === true && key !== USER_UID;
-            });
-
-            var indicator = document.getElementById('typingIndicator');
-            if (indicator) {
-                if (isTyping) {
-                    indicator.textContent = '✍️ Печатает...';
-                    indicator.style.display = 'block';
-                } else {
-                    indicator.style.display = 'none';
-                }
-            }
-        });
-    }
-
-    // ================================================================
-    // ОТКРЫТИЕ СТРАНИЦ (SPA)
+    // ОТКРЫТИЕ СТРАНИЦ
     // ================================================================
 
     window.openPage = function(pageId) {
@@ -592,7 +568,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setInterval(updateNotifBadge, 5000);
 
-    // ЕСЛИ НЕТ ПОЛЬЗОВАТЕЛЯ — СКРЫВАЕМ ВСЁ
     if (typeof USER_UID === 'undefined' || !USER_UID) {
         var mainContainer = document.getElementById('mainContainer');
         if (mainContainer) mainContainer.style.display = 'none';
@@ -600,7 +575,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (loginModal) loginModal.classList.add('open');
     }
 
-    // Проверяем URL-параметры при загрузке
     var urlParams = new URLSearchParams(window.location.search);
     var userParam = urlParams.get('user');
     var pageParam = urlParams.get('page');
@@ -613,12 +587,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
 
-    console.log('✅ app.js загружен с жесткой проверкой доступа! SITE =', SITE);
+    console.log('✅ app.js загружен! SITE =', SITE);
+    console.log('✅ navigateToProfile доступна:', typeof window.navigateToProfile);
+    console.log('✅ goToProfile доступна:', typeof window.goToProfile);
 
 });
 
 // ================================================================
-// updateNotifBadge — ОБНОВЛЕНИЕ БЕЙДЖА УВЕДОМЛЕНИЙ
+// updateNotifBadge
 // ================================================================
 
 window.updateNotifBadge = function() {
@@ -641,20 +617,19 @@ window.updateNotifBadge = function() {
 };
 
 // ================================================================
-// ОБНОВЛЕНИЕ ТОП-БАРА (АВАТАРКА + НИКНЕЙМ)
+// ОБНОВЛЕНИЕ ТОП-БАРА
 // ================================================================
 
 function updatePcTopbar() {
-    var pcAvatar = document.getElementById('pcAvatar');
-    var pcName = document.getElementById('pcName');
+    var pcAvatar = document.getElementById('topAvatar');
+    var pcName = document.getElementById('topName');
     var sAvatar = document.getElementById('sAvatar');
     var sName = document.getElementById('sName');
     var sEmail = document.getElementById('sEmail');
 
-    console.log('🔄 updatePcTopbar вызвана! USER =', USER, 'USER_UID =', USER_UID, 'SITE =', SITE);
+    console.log('🔄 updatePcTopbar вызвана! USER =', USER, 'USER_UID =', USER_UID);
 
     if (USER && USER_UID) {
-        // Загружаем имя
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
             var dbName = snap.val() || USER;
             if (pcName) {
@@ -666,7 +641,6 @@ function updatePcTopbar() {
             }
         });
 
-        // Загружаем аватарку
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(snap) {
             var avatarUrl = snap.val();
             var letter = (USER || '?').charAt(0).toUpperCase();
@@ -674,10 +648,8 @@ function updatePcTopbar() {
             if (pcAvatar) {
                 if (avatarUrl) {
                     pcAvatar.innerHTML = '<img src="' + avatarUrl + '" alt="аватар" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />';
-                    console.log('✅ Аватарка в топ-баре обновлена (URL)');
                 } else {
                     pcAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
-                    console.log('✅ Аватарка в топ-баре обновлена (буква)');
                 }
             }
 
@@ -690,26 +662,19 @@ function updatePcTopbar() {
             }
         });
 
-        // Загружаем email
         if (sEmail) {
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/email').once('value', function(snap) {
                 sEmail.textContent = snap.val() || '';
             });
         }
     } else {
-        // Если пользователь не залогинен
         if (pcAvatar) pcAvatar.innerHTML = '<span class="letter">?</span>';
         if (pcName) pcName.textContent = '';
         if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
         if (sName) sName.textContent = 'Гость';
         if (sEmail) sEmail.textContent = '';
-        console.log('⚠️ Пользователь не залогинен, топ-бар очищен');
     }
 }
-
-// ================================================================
-// ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ ЯЗЫКА
-// ================================================================
 
 function updateLangDisplay() {
     var display = document.getElementById('langDisplay');
@@ -718,17 +683,11 @@ function updateLangDisplay() {
     }
 }
 
-// ================================================================
-// ПРИНУДИТЕЛЬНЫЙ ВЫЗОВ updatePcTopbar ПОСЛЕ ЗАГРУЗКИ
-// ================================================================
-
-// Вызываем сразу после загрузки страницы
 setTimeout(function() {
     console.log('🔄 Принудительный вызов updatePcTopbar()');
     updatePcTopbar();
 }, 1000);
 
-// Вызываем после авторизации
 if (typeof auth !== 'undefined') {
     auth.onAuthStateChanged(function(user) {
         setTimeout(function() {
@@ -738,12 +697,5 @@ if (typeof auth !== 'undefined') {
         }, 500);
     });
 }
-
-// Вызываем после каждого переключения страницы
-document.addEventListener('click', function() {
-    setTimeout(function() {
-        updatePcTopbar();
-    }, 300);
-});
 
 console.log('✅ app.js загружен! SITE =', SITE);

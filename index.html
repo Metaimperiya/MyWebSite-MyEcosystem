@@ -16,7 +16,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
-    <!-- ===== CSS ===== -->
+    <!-- CSS -->
     <link rel="stylesheet" href="css/core/base.css">
     <link rel="stylesheet" href="css/core/reset.css">
     <link rel="stylesheet" href="css/core/variables.css">
@@ -46,13 +46,31 @@
         <div class="right">
             <button onclick="openChatList()">💬</button>
             <button onclick="openNotifications()">🔔</button>
-            <div class="avatar-wrap" id="pcAvatar" onclick="goToProfile()">
+            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
                 <span class="letter">?</span>
             </div>
-            <span class="username" id="pcName" onclick="goToProfile()"></span>
+            <span class="username" id="topName" onclick="goToProfile()"></span>
             <button onclick="toggleSettingsMenu()">⋮</button>
         </div>
     </header>
+
+    <!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== -->
+    <div id="settingsDropdown" class="settings-dropdown">
+        <div class="settings-item" onclick="toggleTheme()">
+            <span class="icon">🌓</span> Тема
+        </div>
+        <div class="settings-item" onclick="toggleLanguage()">
+            <span class="icon">🌐</span> <span id="langDisplay">Русский</span>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-item" onclick="toggleViewMode()">
+            <span class="icon">📱</span> <span id="viewModeDisplay">ПК</span>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-item" onclick="logout()">
+            <span class="icon">🚪</span> Выйти
+        </div>
+    </div>
 
     <!-- ===== САЙДБАР ===== -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -378,10 +396,10 @@
 </div>
 
 <!-- ================================================================ -->
-<!-- ПОДКЛЮЧЕНИЕ JS-ФАЙЛОВ - ПРАВИЛЬНЫЙ ПОРЯДОК -->
+<!-- ПОДКЛЮЧЕНИЕ JS-ФАЙЛОВ -->
 <!-- ================================================================ -->
 
-<!-- 1. CORE (ВАЖНО: СНАЧАЛА firebase.js, ПОТОМ auth.js, ПОТОМ app.js) -->
+<!-- 1. CORE -->
 <script src="js/core/firebase.js"></script>
 <script src="js/core/auth.js"></script>
 <script src="js/core/app.js"></script>
@@ -390,9 +408,8 @@
 <!-- 2. МОДУЛИ -->
 <script src="js/modules/player.js"></script>
 
-<!-- 3. ЛЕНТА (РАЗБИТА) -->
+<!-- 3. ЛЕНТА -->
 <script src="js/features/feed/feed-core.js"></script>
-<script src="js/features/feed/feed-render.js"></script>
 <script src="js/features/feed/feed-actions.js"></script>
 <script src="js/features/feed/feed-edit.js"></script>
 
@@ -406,11 +423,10 @@
 <script src="js/features/page.js"></script>
 
 <!-- ================================================================ -->
-<!-- ВСТРОЕННЫЙ JS - ПРИНУДИТЕЛЬНОЕ ОТКРЫТИЕ ЛЕНТЫ -->
+<!-- ВСТРОЕННЫЙ JS -->
 <!-- ================================================================ -->
 
 <script>
-// ===== ПРИНУДИТЕЛЬНО ОТКРЫВАЕМ ЛЕНТУ ПРИ ЗАГРУЗКЕ =====
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         document.querySelectorAll('.page').forEach(function(el) {
@@ -435,8 +451,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-console.log('✅ index.html загружен, лента принудительно открыта!');
-console.log('🔍 SITE =', typeof SITE !== 'undefined' ? SITE : 'НЕ ОПРЕДЕЛЁН!');
+console.log('✅ index.html загружен');
 </script>
 
 </body>
