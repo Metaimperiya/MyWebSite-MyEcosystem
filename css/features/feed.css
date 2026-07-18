@@ -674,3 +674,83 @@
     color: var(--muted-text);
     font-size: 0.65rem;
 }
+
+/* ===== МЕНЮ ПОСТА (ТРОЕТОЧИЕ) ===== */
+.post .post-menu {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 10;
+}
+
+.post .post-menu .dots {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0 4px;
+    line-height: 1;
+    pointer-events: auto;
+}
+
+.post .post-menu .dots:hover {
+    color: var(--text-color);
+}
+
+.post .post-menu .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 60;
+    min-width: 140px;
+    padding: 4px 0;
+}
+
+.post .post-menu .dropdown.open {
+    display: block;
+}
+
+.post .post-menu .dropdown button {
+    display: block;
+    width: 100%;
+    padding: 6px 14px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background 0.2s;
+}
+
+.post .post-menu .dropdown button:hover {
+    background: var(--input-bg);
+}
+
+.post .post-menu .dropdown .edit-btn {
+    color: #e67e22;
+}
+
+.post .post-menu .dropdown .del-btn {
+    color: var(--danger);
+}
+
+.post .post-menu .dropdown .del-btn:hover {
+    background: #fde8e8;
+}
+
+/* Убедимся, что .author имеет position:relative для позиционирования меню */
+.post .author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    position: relative;
+    padding-right: 30px;
+}

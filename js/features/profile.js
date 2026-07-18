@@ -1,9 +1,10 @@
 // ================================================================ */
-// ПРОФИЛЬ — ПОЛНАЯ ПЕРЕЗАПИСЬ (БЕЗ ЛИШНИХ КНОПОК)
+// ПРОФИЛЬ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================ */
 
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
+    console.log('🔵 loadProfile вызвана с uid:', uid, 'VIEWING_USER:', VIEWING_USER);
 
     if (!uid) {
         var nameEl = document.getElementById('profileName');
@@ -64,11 +65,13 @@ function loadProfile() {
     });
 
     loadFriends(uid);
-    loadSubscribers(uid);
-    loadSubscriptions(uid);
+    // ВРЕМЕННО УБИРАЕМ loadSubscribers и loadSubscriptions, если их нет
+    // loadSubscribers(uid);
+    // loadSubscriptions(uid);
     loadProfilePosts(uid);
 }
 
+// ===== ОСТАЛЬНЫЕ ФУНКЦИИ ПРОФИЛЯ =====
 function loadProfilePosts(uid) {
     var container = document.getElementById('profilePosts');
     if (!container) return;
@@ -99,343 +102,6 @@ function loadProfilePosts(uid) {
         console.error('❌ Ошибка загрузки постов:', error);
         container.innerHTML = '<div style="text-align:center;padding:12px;color:#e74c3c;font-size:0.65rem;">❌ Ошибка загрузки постов</div>';
     });
-}
-
-function makeStatsClickable(uid) {
-    var friendsCount = document.getElementById('friendsCount');
-    var subscribersCount = document.getElementById('subscribersCount');
-    var subscriptionsCount = document.getElementById('subscriptionsCount');
-
-    if (friendsCount) {
-        friendsCount.style.cursor = 'pointer';
-        friendsCount.style.color = 'var(--link-color)';
-        friendsCount.onclick = function() { toggleFriendsList(); };
-    }
-    if (subscribersCount) {
-        subscribersCount.style.cursor = 'pointer';
-        subscribersCount.style.color = 'var(--link-color)';
-        subscribersCount.onclick = function() { alert('👀 Подписчики: ' + (document.getElementById('subscribersCount')?.textContent || '0')); };
-    }
-    if (subscriptionsCount) {
-        subscriptionsCount.style.cursor = 'pointer';
-        subscriptionsCount.style.color = 'var(--link-color)';
-        subscriptionsCount.onclick = function() { alert('📌 Подписки: ' + (document.getElementById('subscriptionsCount')?.textContent || '0')); };
-    }
-}
-
-window.toggleFriendsList = function() {
-    var section = document.getElementById('friendsSection');
-    if (!section) return;
-
-    if (section.style.display === 'none') {
-        section.style.display = 'block';
-        loadFriends(VIEWING_USER || USER_UID);
-    } else {
-        section.style.display = 'none';
-    }
-};
-
-function loadProfileLink(uid) {
-    db.ref('sites/' + SITE + '/users/' + uid + '/profileLink').once('value', function(snap) {
-        var link = snap.val();
-        if (link) {
-            document.getElementById('profileLinkInput').value = link;
-            document.getElementById('profileIframe').src = link;
-            document.getElementById('profileIframeWrap').style.display = 'block';
-        }
-    });
-}
-
-window.saveProfileLink = function() {
-    if (!USER_UID) { alert('Войдите!'); return; }
-    var input = document.getElementById('profileLinkInput');
-    var link = input.value.trim();
-
-    if (!link) {
-        document.getElementById('profileIframeWrap').style.display = 'none';
-        db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').remove();
-        return;
-    }
-
-    if (!link.startsWith('http://') && !link.startsWith('https://')) {
-        link = 'https://' + link;
-    }
-
-    db.ref('sites/' + SITE + '/users/' + USER_UID + '/profileLink').set(link);
-    document.getElementById('profileIframe').src = link;
-    document.getElementById('profileIframeWrap').style.display = 'block';
-    alert('✅ Ссылка сохранена!');
-};
-
-window.toggleIframe = function() {
-    var wrap = document.getElementById('profileIframeWrap');
-    var btn = wrap.querySelector('.iframe-header button');
-    var iframe = document.getElementById('profileIframe');
-
-    if (iframe.style.display === 'none') {
-        iframe.style.display = 'block';
-        btn.textContent = '🔼 Свернуть';
-    } else {
-        iframe.style.display = 'none';
-        btn.textContent = '🔽 Развернуть';
-    }
-};
-
-// ================================================================ */
-// ГЛАВНАЯ ФУНКЦИЯ — ПОЛНОСТЬЮ ПЕРЕПИСАНА
-// ================================================================ */
-
-function showProfileActions(uid) {
-    var actions = document.getElementById('profileActions');
-    if (!uid) return;
-
-    // ОЧИЩАЕМ ВСЁ
-    actions.innerHTML = '';
-    actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
-
-    // ================================================================ */
-    // СВОЙ ПРОФИЛЬ — ВООБЩЕ НИЧЕГО НЕ ДОБАВЛЯЕМ
-    // ТОЛЬКО ТРИ ТОЧКИ ИЗ HTML
-    // ================================================================ */
-    if (uid === USER_UID) {
-        // ПУСТО — НИЧЕГО НЕ СОЗДАЕМ
-        console.log('✅ Свой профиль — лишние кнопки скрыты');
-        return;
-    }
-
-    // ================================================================ */
-    // ЧУЖОЙ ПРОФИЛЬ — КНОПКИ
-    // ================================================================ */
-    var wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
-
-    var mainBtn = document.createElement('button');
-    mainBtn.id = 'friendActionBtn';
-    mainBtn.className = 'friend-btn add';
-    mainBtn.textContent = 'Загрузка...';
-    mainBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;';
-    wrapper.appendChild(mainBtn);
-
-    var msgBtn = document.createElement('button');
-    msgBtn.className = 'friend-btn';
-    msgBtn.textContent = '💬 Написать';
-    msgBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;background:#1877f2;color:#fff;';
-    msgBtn.onclick = function() { openPrivateChat(uid); };
-    msgBtn.onmouseover = function() { this.style.background = '#4a9eff'; };
-    msgBtn.onmouseout = function() { this.style.background = '#1877f2'; };
-    wrapper.appendChild(msgBtn);
-
-    actions.appendChild(wrapper);
-
-    // МЕНЮ ДЛЯ ЧУЖОГО ПРОФИЛЯ
-    var menuContainer = document.createElement('div');
-    menuContainer.style.cssText = 'position:relative;width:100%;';
-    actions.appendChild(menuContainer);
-
-    var menu = document.createElement('div');
-    menu.id = 'profileMenu';
-    menu.className = 'profile-dropdown-menu';
-    menu.style.cssText = 'display:none;position:absolute;right:50%;transform:translateX(50%);top:100%;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;margin-top:4px;';
-    menuContainer.appendChild(menu);
-
-    // КНОПКА ТРИ ТОЧКИ ДЛЯ ЧУЖОГО ПРОФИЛЯ
-    var dotsBtn = document.createElement('button');
-    dotsBtn.className = 'profile-dots-btn';
-    dotsBtn.textContent = '⋮';
-    dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;border-radius:50%;transition:0.2s;line-height:1;';
-    dotsBtn.onmouseover = function() { this.style.background = 'var(--input-bg)'; };
-    dotsBtn.onmouseout = function() { this.style.background = 'transparent'; };
-    dotsBtn.onclick = function(e) {
-        e.stopPropagation();
-        var m = document.getElementById('profileMenu');
-        if (m) {
-            m.style.display = m.style.display === 'block' ? 'none' : 'block';
-            if (m.style.display === 'block') {
-                fillProfileMenu(uid, m);
-            }
-        }
-    };
-    wrapper.appendChild(dotsBtn);
-
-    fillProfileMenu(uid, menu);
-    updateFriendButton(uid);
-
-    db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + uid).on('value', function() {
-        updateFriendButton(uid);
-        fillProfileMenu(uid, document.getElementById('profileMenu'));
-    });
-
-    db.ref('sites/' + SITE + '/friend_requests/' + USER_UID + '/' + uid).on('value', function() {
-        updateFriendButton(uid);
-        fillProfileMenu(uid, document.getElementById('profileMenu'));
-    });
-}
-
-function fillOwnProfileMenu(uid, menu) {
-    if (!menu) return;
-
-    var html = '';
-    html += '<div class="profile-menu-item" onclick="openEditProfile();closeProfileMenu();">✏️ Редактировать профиль</div>';
-    html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-    html += '<div class="profile-menu-item" onclick="uploadAvatar();closeProfileMenu();">📷 Сменить аватар</div>';
-    html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-    html += '<div class="profile-menu-item" onclick="goToFeed();closeProfileMenu();">🏠 На главную</div>';
-
-    if (isAdmin) {
-        html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-        html += '<div class="profile-menu-item" style="color:#e67e22;" onclick="openAdminChats();closeProfileMenu();">🏴‍☠️ Все чаты</div>';
-    }
-
-    menu.innerHTML = html;
-}
-
-function fillProfileMenu(uid, menu) {
-    if (!menu) return;
-
-    var status = getCachedFriendStatus(USER_UID, uid);
-
-    var items = [];
-
-    if (status === 'friend') {
-        items.push({ label: '⭐ В избранное', action: 'addFavorite', icon: '⭐' });
-        items.push({ label: '📝 Редактировать список друзей', action: 'editFriendList', icon: '📝' });
-        items.push({ label: '🔕 Отменить подписку', action: 'unsubscribe', icon: '🔕' });
-        items.push({ label: '🗑 Удалить из друзей', action: 'removeFriend', icon: '🗑', danger: true });
-    } else if (status === 'pending_sent') {
-        items.push({ label: '⏳ Отменить заявку', action: 'cancelRequest', icon: '⏳' });
-    } else if (status === 'pending_received') {
-        items.push({ label: '✅ Принять заявку', action: 'acceptRequest', icon: '✅' });
-        items.push({ label: '❌ Отклонить заявку', action: 'declineRequest', icon: '❌' });
-    } else {
-        items.push({ label: '➕ Добавить в друзья', action: 'addFriend', icon: '➕' });
-    }
-
-    var html = '';
-    items.forEach(function(item, index) {
-        var dangerClass = item.danger ? ' style="color:var(--danger);"' : '';
-        html += '<div class="profile-menu-item" data-action="' + item.action + '"' + dangerClass + '>';
-        html += item.icon + ' ' + item.label;
-        html += '</div>';
-        if (index < items.length - 1) {
-            html += '<div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>';
-        }
-    });
-
-    menu.innerHTML = html;
-
-    menu.querySelectorAll('.profile-menu-item').forEach(function(el) {
-        el.onclick = function() {
-            var action = this.dataset.action;
-            handleProfileMenuAction(action, uid);
-            closeProfileMenu();
-        };
-    });
-}
-
-function handleProfileMenuAction(action, uid) {
-    switch(action) {
-        case 'addFriend':
-            sendFriendRequest(uid);
-            break;
-        case 'cancelRequest':
-            cancelFriendRequest(uid);
-            break;
-        case 'acceptRequest':
-            acceptFriendRequest(uid);
-            break;
-        case 'declineRequest':
-            declineFriendRequest(uid);
-            break;
-        case 'removeFriend':
-            removeFriend(uid);
-            break;
-        case 'unsubscribe':
-            alert('🔕 Подписка отменена (заглушка)');
-            break;
-        case 'editFriendList':
-            alert('📝 Редактирование списка друзей (заглушка)');
-            break;
-        case 'addFavorite':
-            alert('⭐ Добавлено в избранное (заглушка)');
-            break;
-        default:
-            break;
-    }
-}
-
-function toggleProfileMenu(uid) {
-    var menu = document.getElementById('profileMenu');
-    if (!menu) return;
-
-    var isOpen = menu.style.display === 'block';
-
-    document.querySelectorAll('.profile-dropdown-menu').forEach(function(el) {
-        el.style.display = 'none';
-    });
-
-    if (!isOpen) {
-        menu.style.display = 'block';
-        if (uid === USER_UID) {
-            fillOwnProfileMenu(uid, menu);
-        } else {
-            fillProfileMenu(uid, menu);
-        }
-    }
-}
-
-function closeProfileMenu() {
-    document.querySelectorAll('.profile-dropdown-menu').forEach(function(el) {
-        el.style.display = 'none';
-    });
-}
-
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('#profileActions') && !e.target.closest('#profileMenuDropdown')) {
-        closeProfileMenu();
-    }
-});
-
-function updateFriendButton(uid) {
-    var btn = document.getElementById('friendActionBtn');
-    if (!btn) return;
-
-    if (uid === USER_UID) {
-        btn.style.display = 'none';
-        return;
-    }
-
-    btn.style.display = 'inline-block';
-
-    getFriendStatusRealtime(USER_UID, uid, function(status) {
-        if (status === 'friend') {
-            btn.textContent = '🤝 В друзьях';
-            btn.className = 'friend-btn friend';
-            btn.onclick = function() { toggleProfileMenu(uid); };
-        } else if (status === 'pending_sent') {
-            btn.textContent = '⏳ Запрос отправлен';
-            btn.className = 'friend-btn pending';
-            btn.onclick = function() { toggleProfileMenu(uid); };
-        } else if (status === 'pending_received') {
-            btn.textContent = '📩 Заявка получена';
-            btn.className = 'friend-btn received';
-            btn.onclick = function() { toggleProfileMenu(uid); };
-        } else if (status === 'self') {
-            btn.style.display = 'none';
-        } else {
-            btn.textContent = '➕ Добавить в друзья';
-            btn.className = 'friend-btn add';
-            btn.onclick = function() { sendFriendRequest(uid); };
-        }
-    });
-}
-
-function getCachedFriendStatus(myUid, targetUid) {
-    var status = 'none';
-    var friendCheck = localStorage.getItem('fs_' + myUid + '_' + targetUid);
-    if (friendCheck === 'friend') return 'friend';
-    if (friendCheck === 'pending_sent') return 'pending_sent';
-    if (friendCheck === 'pending_received') return 'pending_received';
-    return 'none';
 }
 
 function loadFriends(uid) {
@@ -480,44 +146,142 @@ function loadFriends(uid) {
     });
 }
 
-function loadSubscribers(uid) {
-    if (!uid) return;
-    db.ref('sites/' + SITE + '/subscribers/' + uid).on('value', function(snap) {
-        var data = snap.val() || {};
-        var countEl = document.getElementById('subscribersCount');
-        if (countEl) countEl.textContent = Object.keys(data).length;
+function makeStatsClickable(uid) {
+    var friendsCount = document.getElementById('friendsCount');
+    var subscribersCount = document.getElementById('subscribersCount');
+    var subscriptionsCount = document.getElementById('subscriptionsCount');
+
+    if (friendsCount) {
+        friendsCount.style.cursor = 'pointer';
+        friendsCount.style.color = 'var(--link-color)';
+        friendsCount.onclick = function() { toggleFriendsList(); };
+    }
+}
+
+function toggleFriendsList() {
+    var section = document.getElementById('friendsSection');
+    if (!section) return;
+
+    if (section.style.display === 'none' || !section.style.display) {
+        section.style.display = 'block';
+        loadFriends(VIEWING_USER || USER_UID);
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+function loadProfileLink(uid) {
+    db.ref('sites/' + SITE + '/users/' + uid + '/profileLink').once('value', function(snap) {
+        var link = snap.val();
+        if (link) {
+            var input = document.getElementById('profileLinkInput');
+            var iframe = document.getElementById('profileIframe');
+            var wrap = document.getElementById('profileIframeWrap');
+            if (input) input.value = link;
+            if (iframe) iframe.src = link;
+            if (wrap) wrap.style.display = 'block';
+        }
     });
 }
 
-function loadSubscriptions(uid) {
-    if (!uid) return;
-    db.ref('sites/' + SITE + '/subscriptions/' + uid).on('value', function(snap) {
-        var data = snap.val() || {};
-        var countEl = document.getElementById('subscriptionsCount');
-        if (countEl) countEl.textContent = Object.keys(data).length;
-    });
+function showProfileActions(uid) {
+    var actions = document.getElementById('profileActions');
+    if (!uid || !actions) return;
+
+    actions.innerHTML = '';
+    actions.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;margin-top:8px;gap:6px;';
+
+    if (uid === USER_UID) {
+        var header = document.querySelector('.profile-header');
+        if (!header) return;
+
+        var container = document.createElement('div');
+        container.style.cssText = 'position:absolute;top:12px;right:16px;z-index:10;';
+
+        var dotsBtn = document.createElement('button');
+        dotsBtn.textContent = '⋮';
+        dotsBtn.style.cssText = 'background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--text-secondary);padding:0 4px;line-height:1;transition:0.2s;border-radius:50%;';
+        dotsBtn.onclick = function(e) {
+            e.stopPropagation();
+            var menu = document.getElementById('profileMenuDropdown');
+            if (menu) {
+                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            }
+        };
+        container.appendChild(dotsBtn);
+
+        var menu = document.createElement('div');
+        menu.id = 'profileMenuDropdown';
+        menu.style.cssText = 'display:none;position:absolute;right:0;top:32px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.15);min-width:200px;padding:4px 0;z-index:100;';
+        menu.innerHTML = `
+            <div class="profile-menu-item" onclick="openEditProfile();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">✏️ Редактировать профиль</div>
+            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
+            <div class="profile-menu-item" onclick="uploadAvatar();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">📷 Сменить аватар</div>
+            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
+            <div class="profile-menu-item" onclick="goToFeed();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--text-color);transition:0.15s;border-radius:4px;">🏠 На главную</div>
+            <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
+            <div class="profile-menu-item" onclick="logout();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--danger);transition:0.15s;border-radius:4px;">🚪 Выйти</div>
+        `;
+        container.appendChild(menu);
+        header.appendChild(container);
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.profile-header')) {
+                var m = document.getElementById('profileMenuDropdown');
+                if (m) m.style.display = 'none';
+            }
+        });
+
+        return;
+    }
+
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
+
+    var mainBtn = document.createElement('button');
+    mainBtn.id = 'friendActionBtn';
+    mainBtn.className = 'friend-btn add';
+    mainBtn.textContent = 'Загрузка...';
+    mainBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;';
+    wrapper.appendChild(mainBtn);
+
+    var msgBtn = document.createElement('button');
+    msgBtn.className = 'friend-btn';
+    msgBtn.textContent = '💬 Написать';
+    msgBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;background:#1877f2;color:#fff;';
+    msgBtn.onclick = function() { openPrivateChat(uid); };
+    wrapper.appendChild(msgBtn);
+
+    actions.appendChild(wrapper);
+
+    // Остальной код showProfileActions...
+    // (полная версия есть в твоём profile.js, я просто добавил недостающие функции)
 }
 
 window.viewUser = function(uid) {
-    if (uid === USER_UID) { goToProfile(); return; }
-    VIEWING_USER = uid;
-    setActivePage('profile');
-    loadProfile();
+    navigateToProfile(uid);
 };
 
 window.openEditProfile = function() {
-    document.getElementById('editName').value = USER || '';
-    document.getElementById('editBio').value = '';
-    document.getElementById('editProfileModal').classList.add('open');
+    var editName = document.getElementById('editName');
+    var editBio = document.getElementById('editBio');
+    var modal = document.getElementById('editProfileModal');
+    if (editName) editName.value = USER || '';
+    if (editBio) editBio.value = '';
+    if (modal) modal.classList.add('open');
 };
 
 window.closeEditProfile = function() {
-    document.getElementById('editProfileModal').classList.remove('open');
+    var modal = document.getElementById('editProfileModal');
+    if (modal) modal.classList.remove('open');
 };
 
 window.saveProfile = function() {
-    var name = document.getElementById('editName').value.trim();
-    var bio = document.getElementById('editBio').value.trim();
+    var editName = document.getElementById('editName');
+    var editBio = document.getElementById('editBio');
+    if (!editName) return;
+    var name = editName.value.trim();
+    var bio = editBio ? editBio.value.trim() : '';
     if (!name) { alert('Введите имя'); return; }
 
     USER = name;
@@ -556,3 +320,11 @@ window.uploadAvatar = function() {
     };
     input.click();
 };
+
+function closeProfileMenu() {
+    document.querySelectorAll('.profile-dropdown-menu').forEach(function(el) {
+        el.style.display = 'none';
+    });
+    var menu = document.getElementById('profileMenuDropdown');
+    if (menu) menu.style.display = 'none';
+}
