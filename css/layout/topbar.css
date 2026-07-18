@@ -66,7 +66,6 @@
     align-items: center;
     gap: 12px;
     flex-shrink: 0;
-    position: relative;
 }
 
 .pc-topbar .right .avatar-wrap {
@@ -121,50 +120,4 @@
 
 .pc-topbar .right button:hover {
     background: var(--hover-bg);
-}
-
-/* ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== */
-.settings-dropdown {
-    display: none;
-    position: fixed;
-    top: 60px;
-    right: 16px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    min-width: 180px;
-    padding: 6px 0;
-    z-index: 99999;
-}
-
-.settings-dropdown.open {
-    display: block;
-}
-
-.settings-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: 0.15s;
-    font-size: 0.8rem;
-    color: var(--text-color);
-}
-
-.settings-item:hover {
-    background: var(--input-bg);
-}
-
-.settings-item .icon {
-    font-size: 1rem;
-    width: 24px;
-    text-align: center;
-}
-
-.settings-divider {
-    height: 1px;
-    background: var(--border-color);
-    margin: 4px 12px;
 }
