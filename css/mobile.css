@@ -1,604 +1,714 @@
-/* ================================================================ */
-/* МОБИЛЬНЫЙ АДАПТИВ — ПОЛНАЯ ВЕРСИЯ */
-/* ================================================================ */
+/* ================================================================
+   МОБИЛЬНЫЙ АДАПТИВ — ПОЛНАЯ ВЕРСИЯ
+   ================================================================ */
 
-/* ===== ГЛОБАЛЬНЫЙ СБРОС ДЛЯ МОБИЛОК ===== */
-@media (max-width: 819px) {
+/* ===== МЕДИА-ЗАПРОС ДЛЯ РЕАЛЬНЫХ МОБИЛЬНЫХ УСТРОЙСТВ ===== */
+@media (max-width: 480px) {
+    /* ===== ШАПКА ===== */
+    .topbar {
+        padding: 6px 8px;
+    }
     
-    .panel-left,
-    .panel-right {
-        display: none !important;
+    .topbar .left .logo {
+        font-size: 0.7rem;
     }
-
-    .pc-topbar {
-        width: 100% !important;
-        max-width: 600px !important;
-        margin: 0 auto !important;
-        padding: 4px 8px !important;
-        height: 48px !important;
-        border-radius: 0 !important;
+    
+    .topbar .left .menu-btn {
+        font-size: 1rem;
     }
-
-    .pc-topbar .logo {
-        font-size: 0.7rem !important;
+    
+    .topbar .right .username {
+        display: none;
     }
-
-    .pc-topbar .logo .menu-icon {
-        font-size: 1rem !important;
+    
+    .topbar .right .avatar-wrap {
+        width: 24px;
+        height: 24px;
     }
-
-    .pc-topbar .search {
-        display: none !important;
+    
+    /* ===== КОЛОКОЛЬЧИК ===== */
+    .notif-btn {
+        font-size: 0.8rem;
+        width: 24px;
+        height: 24px;
     }
-
-    .pc-topbar .right {
-        gap: 4px !important;
+    
+    #notifBadge {
+        font-size: 0.4rem;
+        min-width: 14px;
+        height: 14px;
+        line-height: 14px;
+        top: -3px;
+        right: -3px;
     }
-
-    .pc-topbar .right .username {
-        display: none !important;
+    
+    /* ===== ТРИ ТОЧКИ ===== */
+    .menu-dots {
+        font-size: 1.2rem;
     }
-
-    .pc-topbar .right .avatar-wrap {
-        width: 24px !important;
-        height: 24px !important;
-    }
-
-    .pc-topbar .right button {
-        font-size: 0.7rem !important;
-        padding: 2px 3px !important;
-    }
-
-    .post-form {
-        padding: 4px 6px !important;
-    }
-
-    .post {
-        padding: 6px 8px !important;
-        margin-bottom: 6px !important;
-    }
-
-    .post .link-preview,
-    .post .link-preview iframe,
-    .post iframe {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: auto !important;
-        min-height: 350px !important;
-        aspect-ratio: 16 / 9 !important;
-    }
-
-    .post .link-preview iframe.small,
-    .post iframe.small {
-        min-height: 300px !important;
-    }
-
-    .post .link-preview iframe.large,
-    .post iframe.large {
-        min-height: 500px !important;
-    }
-
-    .post .post-img {
-        max-height: 300px !important;
-    }
-
-    .post .stats button {
-        font-size: 0.5rem !important;
-        padding: 2px 4px !important;
-    }
-
-    .post .comment-input-wrap {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        gap: 4px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        padding: 4px 0 !important;
-    }
-
-    .post .comment-input-wrap input {
-        flex: 1 !important;
-        min-width: 0 !important;
-        padding: 4px 8px !important;
-        font-size: 0.55rem !important;
-        border-radius: 16px !important;
-        height: 30px !important;
-    }
-
-    .post .comment-input-wrap button {
-        flex-shrink: 0 !important;
-        padding: 4px 10px !important;
-        font-size: 0.6rem !important;
-        border-radius: 16px !important;
-        white-space: nowrap !important;
-        height: 30px !important;
-        min-width: 30px !important;
-    }
-
-    .post-editor {
-        max-width: 100% !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        overflow-wrap: break-word !important;
-        font-size: 0.7rem !important;
-        min-height: 36px !important;
-        padding: 4px 6px !important;
-    }
-
-    .editor-toolbar button {
-        font-size: 0.55rem !important;
-        padding: 2px 4px !important;
-    }
-
-    .post-actions button,
-    .post-actions label {
-        font-size: 0.5rem !important;
-        padding: 2px 8px !important;
-    }
-
-    .player-drawer {
-        margin-bottom: 6px !important;
-    }
-
-    .player-drawer .controls button {
-        font-size: 0.7rem !important;
-        padding: 2px 4px !important;
-    }
-
-    .player-drawer .controls .play-btn {
-        font-size: 1rem !important;
-    }
-
-    .group-list {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 4px !important;
-    }
-
-    .group-card {
-        padding: 6px !important;
-    }
-
-    .profile-header .avatar-wrap {
-        width: 48px !important;
-        height: 48px !important;
-    }
-
-    .profile-header .name {
-        font-size: 0.75rem !important;
-    }
-
-    .profile-header .bio {
-        font-size: 0.55rem !important;
-    }
-
-    .profile-stats {
-        font-size: 0.5rem !important;
-        gap: 6px !important;
-    }
-
-    .profile-actions button {
-        font-size: 0.5rem !important;
-        padding: 2px 8px !important;
-    }
-
-    .sidebar {
-        width: 260px !important;
-    }
-
+    
     .settings-dropdown {
-        min-width: 140px !important;
-        right: 4px !important;
-        top: 44px !important;
+        min-width: 150px;
+        right: 4px;
+        top: 44px;
     }
-
+    
     .settings-item {
-        font-size: 0.65rem !important;
-        padding: 5px 10px !important;
+        font-size: 0.7rem;
+        padding: 6px 12px;
     }
-
-    .comments-list {
-        max-height: 120px !important;
+    
+    /* ===== МИНИ-ПЛЕЕР В ШАПКЕ ===== */
+    .player-mini {
+        max-width: 130px;
+        padding: 2px 6px;
     }
-
+    
+    .player-mini .track-name {
+        max-width: 35px;
+        font-size: 0.45rem;
+    }
+    
+    .player-mini .play-btn {
+        width: 18px;
+        height: 18px;
+        font-size: 7px;
+    }
+    
+    .player-mini .playlist-btn {
+        font-size: 0.6rem;
+    }
+    
+    .player-mini .track-time {
+        font-size: 0.4rem;
+    }
+    
+    /* ===== ТАБЫ ===== */
+    .tab-bar .tab {
+        font-size: 0.5rem;
+        padding: 4px 6px;
+    }
+    
+    /* ===== КОНТЕЙНЕР ===== */
+    .container {
+        padding: 6px 6px 50px;
+    }
+    
+    /* ===== ПОСТЫ ===== */
+    .post .link-preview iframe {
+        height: 160px;
+    }
+    
+    .post .post-img {
+        max-height: 300px;
+    }
+    
+    .post .stats button {
+        font-size: 0.5rem;
+        padding: 1px 4px;
+    }
+    
+    /* ===== ГРУППЫ ===== */
+    .group-list {
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+    }
+    
+    .group-card {
+        padding: 8px;
+    }
+    
+    .group-card .icon {
+        font-size: 1.2rem;
+    }
+    
+    .group-card .name {
+        font-size: 0.65rem;
+    }
+    
+    /* ===== ПЛЕЙЛИСТ ===== */
+    .playlist-dropdown {
+        min-width: 120px;
+        right: 0;
+        top: 44px;
+    }
+    
+    .playlist-dropdown .playlist-item {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+    
+    /* ===== САЙДБАР ===== */
+    .sidebar {
+        width: 260px;
+        left: -260px;
+        top: 44px;
+        height: calc(100% - 44px);
+    }
+    
+    .sidebar .sidebar-header h3 {
+        font-size: 0.85rem;
+    }
+    
+    .sidebar .sidebar-user .name {
+        font-size: 0.75rem;
+    }
+    
+    .sidebar .sidebar-nav .nav-item {
+        font-size: 0.7rem;
+        padding: 6px 14px;
+    }
+    
+    .sidebar .sidebar-title {
+        font-size: 0.5rem;
+        padding: 4px 14px;
+    }
+    
+    .sidebar .sidebar-footer .create-btn {
+        font-size: 0.7rem;
+        padding: 6px;
+    }
+    
+    /* ===== КОММЕНТАРИИ ===== */
     .comment-item .avatar-wrap {
-        width: 20px !important;
-        height: 20px !important;
+        width: 24px;
+        height: 24px;
     }
-
-    .comment-item .body {
-        font-size: 0.6rem !important;
+    
+    .comment-item .body .name {
+        font-size: 0.65rem;
     }
-
+    
+    .comment-item .body .text {
+        font-size: 0.65rem;
+    }
+    
     .comment-input-wrap input {
-        font-size: 0.55rem !important;
-        padding: 3px 6px !important;
+        font-size: 0.65rem;
+        padding: 4px 10px;
     }
-
+    
     .comment-input-wrap button {
-        width: 22px !important;
-        height: 22px !important;
-        font-size: 0.55rem !important;
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
     }
-
+    
+    .comments-list {
+        max-height: 200px;
+    }
+    
+    .comment-like-btn {
+        font-size: 0.5rem;
+        padding: 1px 4px;
+    }
+    
+    /* ===== ПРОФИЛЬ ===== */
+    .profile-header .avatar-wrap {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .profile-header .avatar-wrap .letter {
+        font-size: 1.5rem;
+    }
+    
+    .profile-header .name {
+        font-size: 0.85rem;
+    }
+    
+    .profile-header .bio {
+        font-size: 0.6rem;
+    }
+    
+    .profile-header .profile-stats {
+        font-size: 0.55rem;
+        gap: 8px;
+    }
+    
+    .profile-header .profile-actions button {
+        font-size: 0.5rem;
+        padding: 2px 10px;
+    }
+    
+    .friend-item {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+    }
+    
+    .friend-item .avatar-wrap {
+        width: 14px;
+        height: 14px;
+    }
+    
+    /* ===== ЛЮДИ ===== */
+    .people-item {
+        padding: 6px 10px;
+    }
+    
+    .people-item .avatar-wrap {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .people-item .info .name {
+        font-size: 0.65rem;
+    }
+    
+    .people-item .info .status {
+        font-size: 0.5rem;
+    }
+    
+    /* ===== ЧАТ ===== */
     .chat-view {
-        height: 45vh !important;
-        padding: 6px !important;
+        height: 50vh;
+        padding: 8px;
     }
-
+    
     .chat-view .chat-messages .msg {
-        font-size: 0.6rem !important;
-        padding: 3px 6px !important;
+        font-size: 0.65rem;
+        padding: 3px 6px;
     }
-
+    
     .chat-view .chat-input input {
-        font-size: 0.55rem !important;
-        padding: 3px 6px !important;
+        font-size: 0.65rem;
+        padding: 3px 8px;
     }
-
+    
     .chat-view .chat-input button {
-        font-size: 0.5rem !important;
-        padding: 0 8px !important;
+        font-size: 0.6rem;
+        padding: 0 10px;
     }
-
+    
+    /* ===== МОДАЛКИ ===== */
     .modal .modal-box {
-        padding: 12px !important;
-        max-width: 300px !important;
+        padding: 12px;
+        max-width: 340px;
     }
-
+    
     .modal .modal-box h3 {
-        font-size: 0.7rem !important;
+        font-size: 0.8rem;
     }
-
+    
     .modal .modal-box input,
     .modal .modal-box textarea {
-        font-size: 0.6rem !important;
-        padding: 4px 6px !important;
+        font-size: 0.7rem;
+        padding: 4px 8px;
     }
-
+    
     .modal .modal-actions button {
-        font-size: 0.55rem !important;
-        padding: 3px 10px !important;
+        font-size: 0.6rem;
+        padding: 3px 12px;
     }
-
-    .people-item {
-        padding: 4px 6px !important;
+    
+    /* ===== ВЫДВИЖНОЙ ПЛЕЕР ===== */
+    .player-drawer {
+        transform: translateY(calc(100% - 40px));
+        border-radius: 12px 12px 0 0;
     }
-
-    .people-item .avatar-wrap {
-        width: 22px !important;
-        height: 22px !important;
+    
+    .player-handle {
+        padding: 6px 0 2px 0;
     }
-
-    .people-item .info .name {
-        font-size: 0.6rem !important;
+    
+    .handle-bar {
+        width: 32px;
+        height: 3px;
     }
-
-    .people-item .info .status {
-        font-size: 0.5rem !important;
+    
+    .player-content {
+        padding: 0 12px 12px 12px;
     }
-
-    .friend-item {
-        font-size: 0.5rem !important;
-        padding: 1px 4px !important;
+    
+    .player-content .player-track-name {
+        font-size: 0.8rem;
     }
-
-    .friend-item .avatar-wrap {
-        width: 12px !important;
-        height: 12px !important;
+    
+    .player-content .player-artist {
+        font-size: 0.6rem;
     }
-
-    .card {
-        padding: 6px 8px !important;
-        margin-bottom: 6px !important;
+    
+    .player-content .player-controls {
+        gap: 4px;
     }
-
-    .card h3 {
-        font-size: 0.7rem !important;
+    
+    .player-content .player-btn {
+        font-size: 0.9rem;
+        padding: 3px 6px;
     }
-
-    .admin-dot {
-        width: 8px !important;
-        height: 8px !important;
-        bottom: 4px !important;
-        right: 4px !important;
+    
+    .player-content .player-btn.play-large {
+        font-size: 1.5rem;
+    }
+    
+    .player-content .player-progress-bar {
+        height: 2px;
+    }
+    
+    .player-content .player-time {
+        font-size: 0.45rem;
+    }
+    
+    .player-content .player-playlist {
+        max-height: 120px;
+        padding-top: 6px;
+    }
+    
+    .player-content .player-playlist .playlist-item {
+        font-size: 0.55rem;
+        padding: 2px 6px;
+    }
+    
+    /* ===== РЕДАКТИРОВАНИЕ ПОСТА ===== */
+    .frame-size-toggle .label {
+        font-size: 0.6rem;
+    }
+    
+    .frame-size-btn {
+        font-size: 0.5rem;
+        padding: 3px 10px;
+    }
+    
+    .btn-group-edit input {
+        font-size: 0.6rem;
+        padding: 3px 6px;
+    }
+    
+    .btn-add {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+    }
+    
+    .btn-remove {
+        font-size: 0.5rem;
+        padding: 3px 8px;
     }
 }
 
 /* ================================================================ */
-/* ПРИНУДИТЕЛЬНЫЙ МОБИЛЬНЫЙ РЕЖИМ НА ПК */
+/* ПРИНУДИТЕЛЬНЫЙ МОБИЛЬНЫЙ РЕЖИМ (класс .mobile-view) */
 /* ================================================================ */
 
-body.mobile-view .panel-left,
-body.mobile-view .panel-right {
+.mobile-view .panel-left,
+.mobile-view .panel-right {
     display: none !important;
 }
 
-body.mobile-view .pc-topbar {
+.mobile-view .app-layout {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+    padding: 0 4px 80px !important;
+}
+
+.mobile-view .panel-center {
+    max-width: 100% !important;
     width: 100% !important;
-    max-width: 600px !important;
-    margin: 0 auto !important;
+    padding: 0 !important;
+}
+
+.mobile-view .pc-topbar {
     padding: 4px 8px !important;
     height: 48px !important;
 }
 
-body.mobile-view .pc-topbar .logo {
-    font-size: 0.7rem !important;
+.mobile-view .pc-topbar .logo {
+    font-size: 0.75rem !important;
 }
 
-body.mobile-view .pc-topbar .logo .menu-icon {
+.mobile-view .pc-topbar .logo .menu-icon {
     font-size: 1rem !important;
 }
 
-body.mobile-view .pc-topbar .search {
-    display: none !important;
+.mobile-view .pc-topbar .search {
+    max-width: 90px !important;
+    margin: 0 4px !important;
+    font-size: 0.55rem !important;
+    padding: 3px 6px !important;
 }
 
-body.mobile-view .pc-topbar .right {
+.mobile-view .pc-topbar .right {
     gap: 4px !important;
 }
 
-body.mobile-view .pc-topbar .right .username {
+.mobile-view .pc-topbar .right .username {
     display: none !important;
 }
 
-body.mobile-view .pc-topbar .right .avatar-wrap {
+.mobile-view .pc-topbar .right .avatar-wrap {
     width: 24px !important;
     height: 24px !important;
 }
 
-body.mobile-view .pc-topbar .right button {
+.mobile-view .pc-topbar .right button {
     font-size: 0.7rem !important;
     padding: 2px 3px !important;
 }
 
-body.mobile-view .post-form {
+.mobile-view .post-form {
     padding: 4px 6px !important;
 }
 
-body.mobile-view .post {
+.mobile-view .post {
     padding: 6px 8px !important;
     margin-bottom: 6px !important;
 }
 
-body.mobile-view .post .link-preview,
-body.mobile-view .post .link-preview iframe,
-body.mobile-view .post iframe {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 350px !important;
-    aspect-ratio: 16 / 9 !important;
+.mobile-view .post .link-preview iframe {
+    height: 160px !important;
 }
 
-body.mobile-view .post .link-preview iframe.small,
-body.mobile-view .post iframe.small {
-    min-height: 300px !important;
+.mobile-view .post .post-img {
+    max-height: 200px !important;
 }
 
-body.mobile-view .post .link-preview iframe.large,
-body.mobile-view .post iframe.large {
-    min-height: 500px !important;
-}
-
-body.mobile-view .post .post-img {
-    max-height: 300px !important;
-}
-
-body.mobile-view .post .stats button {
+.mobile-view .post .stats button {
     font-size: 0.5rem !important;
     padding: 2px 4px !important;
 }
 
-body.mobile-view .post .comment-input-wrap {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 4px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    padding: 4px 0 !important;
-}
-
-body.mobile-view .post .comment-input-wrap input {
-    flex: 1 !important;
-    min-width: 0 !important;
-    padding: 4px 8px !important;
-    font-size: 0.55rem !important;
-    border-radius: 16px !important;
-    height: 30px !important;
-}
-
-body.mobile-view .post .comment-input-wrap button {
-    flex-shrink: 0 !important;
-    padding: 4px 10px !important;
-    font-size: 0.6rem !important;
-    border-radius: 16px !important;
-    white-space: nowrap !important;
-    height: 30px !important;
-    min-width: 30px !important;
-}
-
-body.mobile-view .post-editor {
-    max-width: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    overflow-wrap: break-word !important;
-    font-size: 0.7rem !important;
-    min-height: 36px !important;
-    padding: 4px 6px !important;
-}
-
-body.mobile-view .editor-toolbar button {
-    font-size: 0.55rem !important;
-    padding: 2px 4px !important;
-}
-
-body.mobile-view .post-actions button,
-body.mobile-view .post-actions label {
-    font-size: 0.5rem !important;
-    padding: 2px 8px !important;
-}
-
-body.mobile-view .player-drawer {
+.mobile-view .player-drawer {
     margin-bottom: 6px !important;
 }
 
-body.mobile-view .player-drawer .controls button {
+.mobile-view .player-drawer .controls button {
     font-size: 0.7rem !important;
     padding: 2px 4px !important;
 }
 
-body.mobile-view .player-drawer .controls .play-btn {
+.mobile-view .player-drawer .controls .play-btn {
     font-size: 1rem !important;
 }
 
-body.mobile-view .group-list {
+.mobile-view .group-list {
     grid-template-columns: 1fr 1fr !important;
     gap: 4px !important;
 }
 
-body.mobile-view .group-card {
+.mobile-view .group-card {
     padding: 6px !important;
 }
 
-body.mobile-view .profile-header .avatar-wrap {
+.mobile-view .group-card .icon {
+    font-size: 1rem !important;
+}
+
+.mobile-view .group-card .name {
+    font-size: 0.6rem !important;
+}
+
+.mobile-view .profile-header .avatar-wrap {
     width: 48px !important;
     height: 48px !important;
 }
 
-body.mobile-view .profile-header .name {
+.mobile-view .profile-header .name {
     font-size: 0.75rem !important;
 }
 
-body.mobile-view .profile-header .bio {
+.mobile-view .profile-header .bio {
     font-size: 0.55rem !important;
 }
 
-body.mobile-view .profile-stats {
+.mobile-view .profile-stats {
     font-size: 0.5rem !important;
     gap: 6px !important;
 }
 
-body.mobile-view .profile-actions button {
+.mobile-view .profile-actions button {
     font-size: 0.5rem !important;
     padding: 2px 8px !important;
 }
 
-body.mobile-view .sidebar {
+.mobile-view .sidebar {
     width: 260px !important;
 }
 
-body.mobile-view .settings-dropdown {
+.mobile-view .settings-dropdown {
     min-width: 140px !important;
     right: 4px !important;
     top: 44px !important;
 }
 
-body.mobile-view .settings-item {
+.mobile-view .settings-item {
     font-size: 0.65rem !important;
     padding: 5px 10px !important;
 }
 
-body.mobile-view .comments-list {
+.mobile-view .comments-list {
     max-height: 120px !important;
 }
 
-body.mobile-view .comment-item .avatar-wrap {
+.mobile-view .comment-item .avatar-wrap {
     width: 20px !important;
     height: 20px !important;
 }
 
-body.mobile-view .comment-item .body {
+.mobile-view .comment-item .body {
     font-size: 0.6rem !important;
 }
 
-body.mobile-view .comment-input-wrap input {
+.mobile-view .comment-input-wrap input {
     font-size: 0.55rem !important;
     padding: 3px 6px !important;
 }
 
-body.mobile-view .comment-input-wrap button {
+.mobile-view .comment-input-wrap button {
     width: 22px !important;
     height: 22px !important;
     font-size: 0.55rem !important;
 }
 
-body.mobile-view .chat-view {
+.mobile-view .chat-view {
     height: 45vh !important;
     padding: 6px !important;
 }
 
-body.mobile-view .chat-view .chat-messages .msg {
+.mobile-view .chat-view .chat-messages .msg {
     font-size: 0.6rem !important;
     padding: 3px 6px !important;
 }
 
-body.mobile-view .chat-view .chat-input input {
+.mobile-view .chat-view .chat-input input {
     font-size: 0.55rem !important;
     padding: 3px 6px !important;
 }
 
-body.mobile-view .chat-view .chat-input button {
+.mobile-view .chat-view .chat-input button {
     font-size: 0.5rem !important;
     padding: 0 8px !important;
 }
 
-body.mobile-view .modal .modal-box {
+.mobile-view .modal .modal-box {
     padding: 12px !important;
     max-width: 300px !important;
 }
 
-body.mobile-view .modal .modal-box h3 {
+.mobile-view .modal .modal-box h3 {
     font-size: 0.7rem !important;
 }
 
-body.mobile-view .modal .modal-box input,
-body.mobile-view .modal .modal-box textarea {
+.mobile-view .modal .modal-box input,
+.mobile-view .modal .modal-box textarea {
     font-size: 0.6rem !important;
     padding: 4px 6px !important;
 }
 
-body.mobile-view .modal .modal-actions button {
+.mobile-view .modal .modal-actions button {
     font-size: 0.55rem !important;
     padding: 3px 10px !important;
 }
 
-body.mobile-view .people-item {
+.mobile-view .people-item {
     padding: 4px 6px !important;
 }
 
-body.mobile-view .people-item .avatar-wrap {
+.mobile-view .people-item .avatar-wrap {
     width: 22px !important;
     height: 22px !important;
 }
 
-body.mobile-view .people-item .info .name {
+.mobile-view .people-item .info .name {
     font-size: 0.6rem !important;
 }
 
-body.mobile-view .people-item .info .status {
+.mobile-view .people-item .info .status {
     font-size: 0.5rem !important;
 }
 
-body.mobile-view .friend-item {
+.mobile-view .friend-item {
     font-size: 0.5rem !important;
     padding: 1px 4px !important;
 }
 
-body.mobile-view .friend-item .avatar-wrap {
+.mobile-view .friend-item .avatar-wrap {
     width: 12px !important;
     height: 12px !important;
 }
 
-body.mobile-view .card {
+.mobile-view .editor-toolbar button {
+    font-size: 0.55rem !important;
+    padding: 2px 4px !important;
+}
+
+.mobile-view .post-editor {
+    font-size: 0.7rem !important;
+    min-height: 36px !important;
+    padding: 4px 6px !important;
+}
+
+.mobile-view .post-actions button,
+.mobile-view .post-actions label {
+    font-size: 0.5rem !important;
+    padding: 2px 8px !important;
+}
+
+.mobile-view .card {
     padding: 6px 8px !important;
     margin-bottom: 6px !important;
 }
 
-body.mobile-view .card h3 {
+.mobile-view .card h3 {
     font-size: 0.7rem !important;
 }
 
-body.mobile-view .admin-dot {
+.mobile-view .panel-card {
+    padding: 6px 8px !important;
+    margin-bottom: 4px !important;
+}
+
+.mobile-view .panel-title {
+    font-size: 0.5rem !important;
+}
+
+.mobile-view .panel-item {
+    font-size: 0.55rem !important;
+    padding: 2px 0 !important;
+}
+
+.mobile-view .player-drawer .track-info .track-name {
+    font-size: 0.65rem !important;
+}
+
+.mobile-view .player-drawer .time-wrap {
+    font-size: 0.4rem !important;
+}
+
+.mobile-view .player-drawer .playlist .playlist-item {
+    font-size: 0.5rem !important;
+    padding: 2px 4px !important;
+}
+
+.mobile-view .profile-header {
+    padding: 8px !important;
+}
+
+.mobile-view .profile-header .profile-stats span {
+    font-size: 0.45rem !important;
+}
+
+.mobile-view .link-input-wrap input {
+    font-size: 0.55rem !important;
+    padding: 3px 6px !important;
+}
+
+.mobile-view .link-input-wrap button {
+    font-size: 0.55rem !important;
+    padding: 3px 8px !important;
+}
+
+.mobile-view .profile-iframe {
+    height: 160px !important;
+}
+
+.mobile-view .friends-section {
+    padding: 4px 6px !important;
+}
+
+.mobile-view .friends-section h4 {
+    font-size: 0.6rem !important;
+}
+
+.mobile-view .admin-dot {
     width: 8px !important;
     height: 8px !important;
     bottom: 4px !important;

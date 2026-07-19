@@ -2,18 +2,6 @@
 // РЕДАКТИРОВАНИЕ И УДАЛЕНИЕ ПОСТОВ
 // ================================================================
 
-// ===== БЕЗОПАСНОЕ ОБЪЯВЛЕНИЕ ПЕРЕМЕННЫХ (ПРОВЕРЯЕМ, ЧТОБЫ НЕ БЫЛО ДУБЛЕЙ) =====
-if (typeof window.pendingImageFile === 'undefined') {
-    window.pendingImageFile = null;
-    window.pendingProfileImageFile = null;
-    window.pendingFotoImageFile = null;
-}
-
-// Для обратной совместимости
-var pendingImageFile = window.pendingImageFile;
-var pendingProfileImageFile = window.pendingProfileImageFile;
-var pendingFotoImageFile = window.pendingFotoImageFile;
-
 function extractHashtags(text) {
     if (!text) return [];
     var matches = text.match(/#[\wа-яё]+/gi) || [];
@@ -53,8 +41,8 @@ function getFotoEditorText() {
 function clearFotoPostForm() {
     var editor = document.getElementById('postEditorFoto');
     if (editor) editor.innerHTML = '';
-    window.pendingFotoImage = null;
-    window.pendingFotoImageFile = null;
+    pendingFotoImage = null;
+    pendingFotoImageFile = null;
     var preview = document.getElementById('previewBoxFoto');
     if (preview) preview.classList.remove('visible');
     var input = document.getElementById('fileInputFoto');
@@ -74,7 +62,7 @@ window.submitPost = function() {
     }
 
     var text = getEditorText().trim();
-    if (!text && !window.pendingImageFile) {
+    if (!text && !pendingImageFile) {
         alert('Введите текст или добавьте фото');
         return;
     }
@@ -116,17 +104,17 @@ window.submitPost = function() {
             clearEditor();
             clearPostForm();
             
-            if (typeof loadFeed === 'function') {
-                loadFeed();
-            }
+            setTimeout(function() {
+                if (typeof loadFeed === 'function') loadFeed();
+            }, 500);
         };
 
-        if (window.pendingImageFile) {
+        if (pendingImageFile) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 savePost(e.target.result);
             };
-            reader.readAsDataURL(window.pendingImageFile);
+            reader.readAsDataURL(pendingImageFile);
         } else {
             savePost(null);
         }
@@ -140,7 +128,7 @@ window.submitProfilePost = function() {
     }
 
     var text = getProfileEditorText().trim();
-    if (!text && !window.pendingProfileImageFile) {
+    if (!text && !pendingProfileImageFile) {
         alert('Введите текст или добавьте фото');
         return;
     }
@@ -182,16 +170,18 @@ window.submitProfilePost = function() {
             clearProfileEditor();
             clearProfilePostForm();
             
-            if (typeof loadFeed === 'function') loadFeed();
-            if (typeof loadProfile === 'function') loadProfile();
+            setTimeout(function() {
+                if (typeof loadFeed === 'function') loadFeed();
+                if (typeof loadProfile === 'function') loadProfile();
+            }, 500);
         };
 
-        if (window.pendingProfileImageFile) {
+        if (pendingProfileImageFile) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 savePost(e.target.result);
             };
-            reader.readAsDataURL(window.pendingProfileImageFile);
+            reader.readAsDataURL(pendingProfileImageFile);
         } else {
             savePost(null);
         }
@@ -207,7 +197,7 @@ window.submitFotoPost = function() {
     }
 
     var text = getFotoEditorText().trim();
-    if (!text && !window.pendingFotoImageFile) {
+    if (!text && !pendingFotoImageFile) {
         alert('Введите текст или добавьте фото');
         return;
     }
@@ -244,15 +234,17 @@ window.submitFotoPost = function() {
             db.ref('sites/' + SITE + '/foto_posts').push(postData);
             clearFotoPostForm();
             
-            if (typeof loadFotoFeed === 'function') loadFotoFeed();
+            setTimeout(function() {
+                loadFotoFeed();
+            }, 100);
         };
 
-        if (window.pendingFotoImageFile) {
+        if (pendingFotoImageFile) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 savePost(e.target.result);
             };
-            reader.readAsDataURL(window.pendingFotoImageFile);
+            reader.readAsDataURL(pendingFotoImageFile);
         } else {
             savePost(null);
         }
@@ -261,35 +253,35 @@ window.submitFotoPost = function() {
 
 window.clearPostForm = function() {
     clearEditor();
-    window.pendingImage = null;
-    window.pendingImageFile = null;
+    pendingImage = null;
+    pendingImageFile = null;
     document.getElementById('previewBox').classList.remove('visible');
     document.getElementById('fileInput').value = '';
 };
 
 window.clearProfilePostForm = function() {
     clearProfileEditor();
-    window.pendingProfileImageFile = null;
+    pendingProfileImageFile = null;
     document.getElementById('previewBoxProfile').classList.remove('visible');
     document.getElementById('fileInputProfile').value = '';
 };
 
 window.removeImage = function() {
-    window.pendingImage = null;
-    window.pendingImageFile = null;
+    pendingImage = null;
+    pendingImageFile = null;
     document.getElementById('previewBox').classList.remove('visible');
     document.getElementById('fileInput').value = '';
 };
 
 window.removeProfileImage = function() {
-    window.pendingProfileImageFile = null;
+    pendingProfileImageFile = null;
     document.getElementById('previewBoxProfile').classList.remove('visible');
     document.getElementById('fileInputProfile').value = '';
 };
 
 function removeFotoImage() {
-    window.pendingFotoImage = null;
-    window.pendingFotoImageFile = null;
+    pendingFotoImage = null;
+    pendingFotoImageFile = null;
     var preview = document.getElementById('previewBoxFoto');
     if (preview) preview.classList.remove('visible');
     var input = document.getElementById('fileInputFoto');
@@ -434,6 +426,7 @@ window.saveEdit = function() {
         editedAt: Date.now()
     };
 
+    // Если ссылка есть — добавляем её в текст для отображения
     if (link) {
         if (!updates.text.includes(link)) {
             updates.text = updates.text + '\n' + link;
@@ -451,8 +444,10 @@ window.saveEdit = function() {
         var authorUid = postData.authorUid;
         var actualPath = path;
         
+        // Обновляем в feed_posts
         db.ref('sites/' + SITE + '/' + actualPath + '/' + id).update(updates);
         
+        // Обновляем в user_posts
         if (actualPath !== 'foto_posts' && !actualPath.startsWith('group_posts/')) {
             if (authorUid) {
                 db.ref('sites/' + SITE + '/user_posts/' + authorUid + '/' + id).update(updates);
@@ -628,10 +623,6 @@ window.closePostPage = function() {
     loadFeed();
 };
 
-// ================================================================
-// МЕНЮ ПОСТА (ТРИ ТОЧКИ)
-// ================================================================
-
 window.togglePostMenu = function(id) {
     var menu = document.getElementById('menu_' + id);
     if (menu) {
@@ -642,7 +633,6 @@ window.togglePostMenu = function(id) {
     }
 };
 
-// Закрываем меню при клике вне
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.post-menu')) {
         document.querySelectorAll('.post-menu .dropdown.open').forEach(function(el) {

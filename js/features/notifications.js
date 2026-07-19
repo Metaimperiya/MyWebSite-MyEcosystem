@@ -1,15 +1,9 @@
 // ================================================================
-// СИСТЕМА УВЕДОМЛЕНИЙ — ИСПРАВЛЕННАЯ ВЕРСИЯ
+// СИСТЕМА УВЕДОМЛЕНИЙ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================
 
-// ===== БЕЗОПАСНОЕ ОБЪЯВЛЕНИЕ ПЕРЕМЕННЫХ =====
-if (typeof window.notifUnsub === 'undefined') {
-    window.notifUnsub = null;
-    window.notificationListeners = {};
-}
-
-var notifUnsub = window.notifUnsub;
-var notificationListeners = window.notificationListeners;
+var notifUnsub = null;
+var notificationListeners = {};
 
 // ================================================================
 // 1. ОТПРАВКА УВЕДОМЛЕНИЙ
@@ -17,12 +11,15 @@ var notificationListeners = window.notificationListeners;
 
 function sendNotification(targetUid, data) {
     if (!USER_UID || !targetUid || targetUid === USER_UID) {
-        console.log('⏭️ Уведомление пропущено');
+        console.log('⏭️ Уведомление пропущено (себе или нет пользователя)');
         return;
     }
 
+    // Проверяем, не дублируется ли уведомление
+    var dedupKey = data.type + '_' + (data.postId || '') + '_' + (data.from || '');
     var ref = db.ref('sites/' + SITE + '/notifications/' + targetUid);
     
+    // Проверяем последние 10 уведомлений на дубли
     ref.orderByChild('timestamp').limitToLast(10).once('value', function(snap) {
         var notifications = snap.val() || {};
         var isDuplicate = false;
@@ -177,8 +174,8 @@ function renderNotifications(notifications, keys) {
                         style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted-text);padding:0 4px;line-height:1;">
                     ⋮
                 </button>
-                <div id="notifMenu_${k}" class="dropdown-menu" style="display:none;position:absolute;right:0;top:24px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15);z-index:70;min-width:120px;padding:4px 0;">
-                    <button class="del-btn" onclick="event.stopPropagation();deleteNotification('${k}')" 
+                <div id="notifMenu_${k}" style="display:none;position:absolute;right:0;top:24px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15);z-index:70;min-width:120px;padding:4px 0;">
+                    <button onclick="event.stopPropagation();deleteNotification('${k}')" 
                             style="display:block;width:100%;padding:6px 14px;background:none;border:none;text-align:left;font-size:0.7rem;cursor:pointer;color:var(--danger);">
                         🗑 Удалить
                     </button>
@@ -337,19 +334,6 @@ function buildNotificationClickHandler(n, key) {
 // 6. УПРАВЛЕНИЕ УВЕДОМЛЕНИЯМИ
 // ================================================================
 
-window.toggleNotifMenu = function(key) {
-    var menu = document.getElementById('notifMenu_' + key);
-    if (!menu) return;
-    
-    document.querySelectorAll('.dropdown-menu').forEach(function(el) {
-        if (el.id !== 'notifMenu_' + key) {
-            el.style.display = 'none';
-        }
-    });
-    
-    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-};
-
 function markNotificationRead(key) {
     if (!USER_UID || !key) return;
     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + key + '/read').set(true);
@@ -361,6 +345,17 @@ function deleteNotification(key) {
     db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + key).remove();
     var menu = document.getElementById('notifMenu_' + key);
     if (menu) menu.style.display = 'none';
+}
+
+function toggleNotifMenu(key) {
+    var menu = document.getElementById('notifMenu_' + key);
+    if (!menu) return;
+    
+    document.querySelectorAll('.notif-item .dropdown-menu').forEach(function(el) {
+        if (el.id !== 'notifMenu_' + key) el.style.display = 'none';
+    });
+    
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 }
 
 function markAllNotificationsRead() {
@@ -392,6 +387,7 @@ window.openNotifications = function() {
     }
     document.getElementById('notificationsModal').classList.add('open');
     
+    // Загружаем свежие уведомления
     db.ref('sites/' + SITE + '/notifications/' + USER_UID)
         .orderByChild('timestamp').limitToLast(50)
         .once('value', function(snap) {
@@ -411,14 +407,16 @@ window.closeNotifications = function() {
 // 8. ОБРАБОТЧИКИ СОБЫТИЙ
 // ================================================================
 
+// Закрываем меню при клике вне
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.notif-item')) {
-        document.querySelectorAll('.dropdown-menu').forEach(function(el) {
+        document.querySelectorAll('.notif-item .dropdown-menu').forEach(function(el) {
             el.style.display = 'none';
         });
     }
 });
 
+// Закрываем модалку по Esc
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeNotifications();
@@ -426,9 +424,10 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ================================================================
-// 9. СТИЛИ
+// 9. ИНИЦИАЛИЗАЦИЯ
 // ================================================================
 
+// Добавляем стили для уведомлений
 (function addNotificationStyles() {
     var style = document.createElement('style');
     style.textContent = `
@@ -453,11 +452,10 @@ document.addEventListener('keydown', function(e) {
             border-radius: 50%;
             flex-shrink: 0;
         }
-        .dropdown-menu {
-            display: none;
+        .notif-item .dropdown-menu {
             position: absolute;
-            right: 0;
-            top: 24px;
+            right: 10px;
+            top: 30px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -466,8 +464,7 @@ document.addEventListener('keydown', function(e) {
             min-width: 120px;
             padding: 4px 0;
         }
-        .dropdown-menu.open { display: block; }
-        .dropdown-menu button {
+        .notif-item .dropdown-menu button {
             display: block;
             width: 100%;
             padding: 6px 14px;
@@ -479,9 +476,39 @@ document.addEventListener('keydown', function(e) {
             color: var(--text-secondary);
             transition: 0.15s;
         }
-        .dropdown-menu button:hover { background: var(--input-bg); }
-        .dropdown-menu .del-btn { color: var(--danger); }
-        .dropdown-menu .del-btn:hover { background: var(--danger-bg); }
+        .notif-item .dropdown-menu button:hover {
+            background: var(--input-bg);
+        }
+        .notif-item .dropdown-menu .del-btn {
+            color: var(--danger);
+        }
+        .notif-item .dropdown-menu .del-btn:hover {
+            background: var(--danger-bg);
+        }
+        .notif-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            justify-content: flex-end;
+        }
+        .notif-actions button {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .notif-actions .mark-all {
+            background: var(--input-bg);
+            color: var(--text-secondary);
+        }
+        .notif-actions .mark-all:hover {
+            background: var(--link-color);
+            color: #fff;
+        }
     `;
     document.head.appendChild(style);
 })();

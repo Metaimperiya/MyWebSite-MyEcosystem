@@ -7,12 +7,14 @@ var feedListener = null;
 var fotoFeedListener = null;
 var POSTS_CACHE = {};
 
+// ===== КОНФИГУРАЦИЯ =====
 var FEED_CONFIG = {
     limit: 50,
     maxRepostDepth: 5,
-    avatarCacheTTL: 300000
+    avatarCacheTTL: 300000 // 5 минут
 };
 
+// ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 function esc(str) {
     if (!str) return '';
     var div = document.createElement('div');
@@ -44,6 +46,7 @@ function formatPostTime(timestamp) {
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+// ===== РЕНДЕР ВЛОЖЕННОГО РЕПОСТА (С КЭШИРОВАНИЕМ) =====
 var repostCache = {};
 
 function renderNestedRepost(repost, level) {
@@ -73,12 +76,8 @@ function renderNestedRepost(repost, level) {
     var linkHtml = '';
     if (repost.link) {
         var frameSize = repost.frameSize || 'small';
-        var frameClass = frameSize === 'large' ? 'large' : 'small';
-        linkHtml = '<div class="video-container ' + frameClass + '">' +
-            '<iframe src="' + repost.link + '" ' +
-            'sandbox="allow-scripts allow-same-origin allow-popups allow-forms">' +
-            '</iframe>' +
-            '</div>';
+        var height = frameSize === 'large' ? '450px' : '250px';
+        linkHtml = '<div class="link-preview"><iframe src="' + repost.link + '" style="width:100%;height:' + height + ';border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
     
     var hashtagsHtml = '';
@@ -125,6 +124,7 @@ function renderNestedRepost(repost, level) {
     return result;
 }
 
+// ===== КЭШИРОВАННЫЙ РЕНДЕР ПОСТА =====
 function renderPost(p, type) {
     var div = document.createElement('div');
     div.className = 'post';
@@ -171,12 +171,8 @@ function renderPost(p, type) {
     var previewHtml = '';
     if (p.link) {
         var frameSize = p.frameSize || 'small';
-        var frameClass = frameSize === 'large' ? 'large' : 'small';
-        previewHtml = '<div class="video-container ' + frameClass + '">' +
-            '<iframe src="' + p.link + '" ' +
-            'sandbox="allow-scripts allow-same-origin allow-popups allow-forms">' +
-            '</iframe>' +
-            '</div>';
+        var height = frameSize === 'large' ? '450px' : '250px';
+        previewHtml = '<div class="link-preview" onclick="event.stopPropagation();"><iframe src="' + p.link + '" style="width:100%;height:' + height + ';border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
     
     var hashtagsHtml = '';
@@ -303,6 +299,7 @@ function removeLoading(el) {
     if (spinner) spinner.remove();
 }
 
+// ===== ОПТИМИЗИРОВАННАЯ ЗАГРУЗКА ЛЕНТЫ =====
 function loadFeed() {
     var el = document.getElementById('feed');
     if (!el) return;
@@ -326,6 +323,7 @@ function loadFeed() {
             return (data[b].timestamp || 0) - (data[a].timestamp || 0);
         });
         
+        // Ограничиваем количество постов
         if (keys.length > FEED_CONFIG.limit) {
             keys = keys.slice(0, FEED_CONFIG.limit);
         }

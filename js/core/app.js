@@ -15,22 +15,19 @@ window.toggleViewMode = function() {
     viewMode = newMode;
     localStorage.setItem('viewMode', viewMode);
     
-    // Упрощаем — просто переключаем класс
-    document.body.classList.remove('pc-view', 'mobile-view');
-    document.body.classList.add(viewMode + '-view');
+    // Просто добавляем/удаляем класс на body
+    if (viewMode === 'mobile') {
+        document.body.classList.add('mobile-view');
+        document.body.classList.remove('pc-view');
+    } else {
+        document.body.classList.add('pc-view');
+        document.body.classList.remove('mobile-view');
+    }
     
     updateViewModeDisplay();
     console.log('📱 Режим изменён на:', viewMode);
     
-    // ===== СБРАСЫВАЕМ ИНЛАЙН-СТИЛИ У ФРЕЙМОВ =====
-    document.querySelectorAll('.video-container iframe').forEach(function(iframe) {
-        iframe.style.width = '';
-        iframe.style.height = '';
-    });
-
-    // ===== ПРИНУДИТЕЛЬНЫЙ РЕСАЙЗ =====
-    window.dispatchEvent(new Event('resize'));
-    
+    // Перезагружаем ленту
     setTimeout(function() {
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') {
@@ -49,12 +46,18 @@ function updateViewModeDisplay() {
     }
 }
 
+// Применяем режим при загрузке
 (function initViewMode() {
     var savedMode = localStorage.getItem('viewMode') || 'pc';
     viewMode = savedMode;
     
-    document.body.classList.remove('pc-view', 'mobile-view');
-    document.body.classList.add(viewMode + '-view');
+    if (viewMode === 'mobile') {
+        document.body.classList.add('mobile-view');
+        document.body.classList.remove('pc-view');
+    } else {
+        document.body.classList.add('pc-view');
+        document.body.classList.remove('mobile-view');
+    }
     
     updateViewModeDisplay();
     setTimeout(function() {
