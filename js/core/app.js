@@ -1,48 +1,160 @@
-// ================================================================ */
+// ================================================================
 // ОСНОВНЫЕ ФУНКЦИИ ПРИЛОЖЕНИЯ
-// ================================================================ */
+// ================================================================
+
+console.log('✅ app.js загружен, SITE =', SITE);
+
+// ================================================================
+// ПЕРЕКЛЮЧЕНИЕ МЕЖДУ ПК И МОБИЛЬНЫМ РЕЖИМОМ
+// ================================================================
+
+var viewMode = localStorage.getItem('viewMode') || 'pc';
+
+window.toggleViewMode = function() {
+    var newMode = (viewMode === 'pc') ? 'mobile' : 'pc';
+    viewMode = newMode;
+    localStorage.setItem('viewMode', viewMode);
+    
+    // Упрощаем — просто переключаем класс
+    document.body.classList.remove('pc-view', 'mobile-view');
+    document.body.classList.add(viewMode + '-view');
+    
+    updateViewModeDisplay();
+    console.log('📱 Режим изменён на:', viewMode);
+    
+    // ===== СБРАСЫВАЕМ ИНЛАЙН-СТИЛИ У ФРЕЙМОВ =====
+    document.querySelectorAll('.video-container iframe').forEach(function(iframe) {
+        iframe.style.width = '';
+        iframe.style.height = '';
+    });
+
+    // ===== ПРИНУДИТЕЛЬНЫЙ РЕСАЙЗ =====
+    window.dispatchEvent(new Event('resize'));
+    
+    setTimeout(function() {
+        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadProfile === 'function') {
+            var profilePage = document.getElementById('page-profile');
+            if (profilePage && profilePage.classList.contains('active')) {
+                loadProfile();
+            }
+        }
+    }, 300);
+};
+
+function updateViewModeDisplay() {
+    var display = document.getElementById('viewModeDisplay');
+    if (display) {
+        display.textContent = viewMode === 'pc' ? 'ПК' : 'Мобильный';
+    }
+}
+
+(function initViewMode() {
+    var savedMode = localStorage.getItem('viewMode') || 'pc';
+    viewMode = savedMode;
+    
+    document.body.classList.remove('pc-view', 'mobile-view');
+    document.body.classList.add(viewMode + '-view');
+    
+    updateViewModeDisplay();
+    setTimeout(function() {
+        if (typeof loadFeed === 'function') loadFeed();
+    }, 300);
+})();
+
+// ================================================================
+// ЕДИНЫЙ МЕХАНИЗМ НАВИГАЦИИ В ПРОФИЛЬ
+// ================================================================
+
+window.navigateToProfile = function(uid) {
+    console.log('🔵 navigateToProfile вызвана с uid:', uid, 'USER_UID:', USER_UID);
+
+    if (!window.checkAccess) {
+        console.error('❌ checkAccess не определён!');
+        return;
+    }
+
+    if (!window.checkAccess()) return;
+
+    if (!uid) {
+        uid = USER_UID;
+        console.log('✅ uid не передан, используем USER_UID:', uid);
+    }
+
+    if (uid === USER_UID) {
+        console.log('✅ Открываем свой профиль');
+        VIEWING_USER = null;
+        
+        if (typeof window.setActivePage === 'function') {
+            window.setActivePage('profile');
+        }
+        
+        var chatView = document.getElementById('chatView');
+        if (chatView) chatView.classList.remove('active');
+        
+        if (chatUnsub) {
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null;
+        }
+        CURRENT_ROOM = null;
+        
+        if (typeof loadProfile === 'function') {
+            loadProfile();
+        }
+        
+        if (window.history && window.history.pushState) {
+            window.history.pushState({}, '', '/');
+        }
+        return;
+    }
+
+    console.log('👤 Открываем профиль пользователя:', uid);
+    VIEWING_USER = uid;
+    
+    if (typeof window.setActivePage === 'function') {
+        window.setActivePage('profile');
+    }
+    
+    var chatView = document.getElementById('chatView');
+    if (chatView) chatView.classList.remove('active');
+    
+    if (chatUnsub) {
+        if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+        chatUnsub = null;
+    }
+    CURRENT_ROOM = null;
+    
+    if (typeof loadProfile === 'function') {
+        loadProfile();
+    }
+
+    if (window.history && window.history.pushState) {
+        db.ref('sites/' + SITE + '/users/' + uid + '/slug').once('value', function(snap) {
+            var slug = snap.val();
+            if (slug) {
+                window.history.pushState({}, '', '/' + slug + '/');
+            } else {
+                window.history.pushState({}, '', '/?page=profile&user=' + uid);
+            }
+        });
+    }
+};
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ===== ШЛАГБАУМ — ПРОВЕРКА ДОСТУПА =====
+    // ===== ШЛАГБАУМ =====
     window.checkAccess = function() {
         if (typeof USER_UID === 'undefined' || !USER_UID) {
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.add('open');
-            console.log('⛔ Шлагбаум закрыт! Гость, иди нахуй!');
+            console.log('⛔ Шлагбаум закрыт!');
             return false;
         }
-        console.log('✅ Шлагбаум открыт! Проходи, братан!');
+        console.log('✅ Шлагбаум открыт!');
         return true;
     };
 
-    // ===== ДЕБАГ-ФУНКЦИЯ =====
-    window.debugDatabaseConnection = function() {
-        if (!USER_UID) {
-            console.warn("⛔ DEBUG: Пользователь не авторизован, база не будет грузиться.");
-            return;
-        }
-
-        const testPath = 'sites/' + SITE + '/users/' + USER_UID;
-        console.log("🔍 DEBUG: Пробую прочитать путь:", testPath);
-
-        db.ref(testPath).once('value')
-            .then(function(snapshot) {
-                if (snapshot.exists()) {
-                    console.log("✅ DEBUG: Данные в базе найдены:", snapshot.val());
-                } else {
-                    console.error("❌ DEBUG: ОШИБКА! В базе данных по пути " + testPath + " НИЧЕГО НЕТ.");
-                }
-            })
-            .catch(function(error) {
-                console.error("❌ DEBUG: ОШИБКА ДОСТУПА К БАЗЕ:", error);
-            });
-    };
-
-    // ================================================================ */
-    // НАСТРОЙКИ (ВЫПАДАЮЩЕЕ МЕНЮ)
-    // ================================================================ */
-
+    // ===== НАСТРОЙКИ =====
     window.toggleSettingsMenu = function() {
         var dropdown = document.getElementById('settingsDropdown');
         if (!dropdown) return;
@@ -58,21 +170,20 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(e) {
         var dropdown = document.getElementById('settingsDropdown');
         if (!dropdown) return;
-        if (!e.target.closest('.topbar .right') && !e.target.closest('#settingsDropdown')) {
+        if (!e.target.closest('.pc-topbar .right') && !e.target.closest('#settingsDropdown')) {
             dropdown.classList.remove('open');
         }
     });
 
-    // ================================================================ */
-    // ОБНОВЛЕНИЕ UI
-    // ================================================================ */
-
+    // ===== ОБНОВЛЕНИЕ UI =====
     window.updateUI = function() {
         var topAvatar = document.getElementById('topAvatar');
         var sAvatar = document.getElementById('sAvatar');
         var name = document.getElementById('topName');
         var sName = document.getElementById('sName');
         var dot = document.getElementById('adminDot');
+
+        console.log('🔄 updateUI вызвана, topAvatar:', !!topAvatar, 'topName:', !!name);
 
         if (USER && USER_UID) {
             db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
@@ -105,7 +216,6 @@ document.addEventListener('DOMContentLoaded', function() {
             var loginModal = document.getElementById('loginModal');
             if (loginModal) loginModal.classList.remove('open');
 
-            setTimeout(window.debugDatabaseConnection, 1000);
         } else {
             if (topAvatar) topAvatar.innerHTML = '<span class="letter">?</span>';
             if (sAvatar) sAvatar.innerHTML = '<span class="letter">?</span>';
@@ -122,10 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // ================================================================ */
-    // АВАТАРКИ
-    // ================================================================ */
-
+    // ===== АВАТАРКИ =====
     window.getUserAvatar = function(uid, callback) {
         if (avatarCache && avatarCache[uid]) {
             callback(avatarCache[uid]);
@@ -143,33 +250,36 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!container) return;
         window.getUserAvatar(uid, function(url) {
             if (url) {
-                container.innerHTML = '<img src="' + url + '" />';
+                container.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />';
             } else {
                 container.innerHTML = '<span class="letter">' + (letter || '?') + '</span>';
             }
         });
     };
 
-    // ================================================================ */
-    // НАВИГАЦИЯ
-    // ================================================================ */
-
+    // ===== НАВИГАЦИЯ =====
     window.setActivePage = function(pageId) {
+        console.log('🔵 setActivePage: активирую', pageId);
+        
         document.querySelectorAll('.page').forEach(function(el) {
             el.classList.remove('active');
+            el.style.display = 'none';
         });
-        if (pageId) {
-            var el = document.getElementById('page-' + pageId);
-            if (el) el.classList.add('active');
+        
+        var el = document.getElementById('page-' + pageId);
+        if (el) {
+            el.classList.add('active');
+            el.style.display = 'block';
+            console.log('✅ Успешно активирована:', pageId);
+        } else {
+            console.error('❌ Элемент с ID "page-' + pageId + '" не найден!');
         }
+    };
 
-        document.querySelectorAll('.tab-bar .tab').forEach(function(el) {
-            el.classList.remove('active');
-        });
-
-        var tabs = document.querySelectorAll('.tab-bar .tab');
-        var map = { feed: 0, groups: 1, people: 2, profile: 3 };
-        if (tabs[map[pageId]]) tabs[map[pageId]].classList.add('active');
+    // ===== ПЕРЕХОДЫ =====
+    window.goToHome = function() {
+        if (!window.checkAccess()) return;
+        window.location.href = '/';
     };
 
     window.goToFeed = function() {
@@ -185,24 +295,19 @@ document.addEventListener('DOMContentLoaded', function() {
             chatUnsub = null;
         }
         CURRENT_ROOM = null;
-        if (typeof loadFeed === 'function') loadFeed();
+        if (typeof loadFeed === 'function') {
+            loadFeed();
+        }
     };
 
     window.goToProfile = function() {
-        if (!window.checkAccess()) return;
-        if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-            window.location.href = '/?page=profile';
-            return;
-        }
-        VIEWING_USER = null;
-        window.setActivePage('profile');
-        document.getElementById('chatView').classList.remove('active');
-        if (chatUnsub) {
-            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
-            chatUnsub = null;
-        }
-        CURRENT_ROOM = null;
-        if (typeof loadProfile === 'function') loadProfile();
+        console.log('🔵 goToProfile вызвана!');
+        window.navigateToProfile(null);
+    };
+
+    window.viewUserProfile = function(uid) {
+        console.log('🔵 viewUserProfile вызвана с uid:', uid);
+        window.navigateToProfile(uid);
     };
 
     window.goToPeople = function() {
@@ -237,25 +342,36 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof loadGroups === 'function') loadGroups();
     };
 
-    // ================================================================ */
-    // САЙДБАР
-    // ================================================================ */
-
+    // ===== САЙДБАР =====
     window.toggleSidebar = function() {
         if (!window.checkAccess()) return;
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('overlay').classList.toggle('show');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('show');
     };
 
     window.closeSidebar = function() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('show');
     };
 
-    // ================================================================ */
-    // РЕДАКТОР
-    // ================================================================ */
+    // ===== ТЕМА =====
+    window.toggleTheme = function() {
+        var currentTheme = document.documentElement.getAttribute('data-theme');
+        var newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    };
 
+    (function applySavedTheme() {
+        var savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+
+    // ===== РЕДАКТОР =====
     window.formatText = function(type) {
         var editor = document.getElementById('postEditor');
         if (!editor) return;
@@ -325,9 +441,78 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // ================================================================ */
-    // ОТКРЫТИЕ СТРАНИЦ (SPA)
-    // ================================================================ */
+    // ================================================================
+    // СПИСОК ЧАТОВ
+    // ================================================================
+
+    window.openChatList = function() {
+        if (!window.checkAccess()) return;
+        document.getElementById('chatListModal').classList.add('open');
+        loadChatList();
+    };
+
+    window.closeChatList = function() {
+        document.getElementById('chatListModal').classList.remove('open');
+    };
+
+    function loadChatList() {
+        var container = document.getElementById('chatListContainer');
+        if (!container) return;
+
+        container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>';
+
+        db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', function(snap) {
+            var friends = snap.val() || {};
+            var friendIds = Object.keys(friends).filter(function(k) { return friends[k] === true; });
+
+            if (!friendIds.length) {
+                container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">🤝 Добавьте друзей, чтобы начать общение</div>';
+                return;
+            }
+
+            var html = '';
+            var loaded = 0;
+
+            friendIds.forEach(function(uid) {
+                db.ref('sites/' + SITE + '/users/' + uid).once('value', function(usnap) {
+                    var u = usnap.val() || {};
+                    var name = u.name || 'Аноним';
+                    var letter = name.charAt(0).toUpperCase();
+
+                    var chatId = [USER_UID, uid].sort().join('_');
+                    var path = 'dms/' + SITE + '/' + chatId + '/messages';
+
+                    db.ref(path).orderByChild('timestamp').limitToLast(1).once('value', function(msgSnap) {
+                        var lastMsg = '';
+                        msgSnap.forEach(function(m) {
+                            lastMsg = m.val().text || '';
+                        });
+
+                        html += '<div class="chat-list-item" onclick="openPrivateChat(\'' + uid + '\');closeChatList();">';
+                        html += '<span class="avatar-wrap" id="clava-' + uid + '"><span class="letter">' + letter + '</span></span>';
+                        html += '<div class="chat-list-info">';
+                        html += '<div class="chat-list-name">' + esc(name) + '</div>';
+                        html += '<div class="chat-list-last">' + (lastMsg ? esc(lastMsg.slice(0, 30)) : 'Нет сообщений') + '</div>';
+                        html += '</div>';
+                        html += '</div>';
+
+                        loaded++;
+                        if (loaded === friendIds.length) {
+                            container.innerHTML = html;
+                            friendIds.forEach(function(k) {
+                                var el = document.getElementById('clava-' + k);
+                                if (el) renderAvatar(k, el, '?');
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    }
+
+    // ================================================================
+    // ОТКРЫТИЕ СТРАНИЦ
+    // ================================================================
 
     window.openPage = function(pageId) {
         if (!pageId) return;
@@ -359,43 +544,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // ================================================================ */
-    // updateNotifBadge — ОБНОВЛЕНИЕ БЕЙДЖА УВЕДОМЛЕНИЙ
-    // ================================================================ */
+    // ================================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // ================================================================
 
-    window.updateNotifBadge = function() {
-        if (!USER_UID) {
-            var badge = document.getElementById('notifBadge');
-            if (badge) badge.style.display = 'none';
-            return;
-        }
-        var badge = document.getElementById('notifBadge');
-        if (!badge) return;
-        db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('read').equalTo(false).once('value', function(snap) {
-            var count = snap.numChildren();
-            if (count > 0) {
-                badge.style.display = 'inline';
-                badge.textContent = count;
-            } else {
-                badge.style.display = 'none';
-            }
-        });
+    var originalUpdateUI = window.updateUI || function() {};
+    window.updateUI = function() {
+        originalUpdateUI();
+        setTimeout(function() {
+            if (typeof translatePage === 'function') translatePage();
+            updateLangDisplay();
+            updateNotifBadge();
+        }, 200);
     };
 
-    // ================================================================ */
-    // ИНИЦИАЛИЗАЦИЯ
-    // ================================================================ */
-
     setTimeout(function() {
-        if (typeof updateUI === 'function') updateUI();
-        if (typeof updateNotifBadge === 'function') updateNotifBadge();
+        updateLangDisplay();
+        updateNotifBadge();
     }, 500);
 
-    setInterval(function() {
-        if (typeof updateNotifBadge === 'function') updateNotifBadge();
-    }, 5000);
+    setInterval(updateNotifBadge, 5000);
 
-    // ЕСЛИ НЕТ ПОЛЬЗОВАТЕЛЯ — ПОКАЗЫВАЕМ ВХОД
     if (typeof USER_UID === 'undefined' || !USER_UID) {
         var mainContainer = document.getElementById('mainContainer');
         if (mainContainer) mainContainer.style.display = 'none';
@@ -403,25 +572,70 @@ document.addEventListener('DOMContentLoaded', function() {
         if (loginModal) loginModal.classList.add('open');
     }
 
-    console.log('✅ app.js загружен!');
+    var urlParams = new URLSearchParams(window.location.search);
+    var userParam = urlParams.get('user');
+    var pageParam = urlParams.get('page');
+
+    if (userParam && pageParam === 'profile') {
+        VIEWING_USER = userParam;
+        setTimeout(function() {
+            window.setActivePage('profile');
+            if (typeof loadProfile === 'function') loadProfile();
+        }, 1000);
+    }
+
+    console.log('✅ app.js загружен! SITE =', SITE);
+    console.log('✅ navigateToProfile доступна:', typeof window.navigateToProfile);
+    console.log('✅ goToProfile доступна:', typeof window.goToProfile);
+
 });
 
-// ================================================================ */
-// ФУНКЦИЯ ОБНОВЛЕНИЯ ТОП-БАРА
-// ================================================================ */
+// ================================================================
+// updateNotifBadge
+// ================================================================
+
+window.updateNotifBadge = function() {
+    if (!USER_UID) {
+        var badge = document.getElementById('notifBadge');
+        if (badge) badge.style.display = 'none';
+        return;
+    }
+    var badge = document.getElementById('notifBadge');
+    if (!badge) return;
+    db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('read').equalTo(false).once('value', function(snap) {
+        var count = snap.numChildren();
+        if (count > 0) {
+            badge.style.display = 'inline';
+            badge.textContent = count;
+        } else {
+            badge.style.display = 'none';
+        }
+    });
+};
+
+// ================================================================
+// ОБНОВЛЕНИЕ ТОП-БАРА
+// ================================================================
 
 function updatePcTopbar() {
-    var pcAvatar = document.getElementById('pcAvatar');
-    var pcName = document.getElementById('pcName');
+    var pcAvatar = document.getElementById('topAvatar');
+    var pcName = document.getElementById('topName');
     var sAvatar = document.getElementById('sAvatar');
     var sName = document.getElementById('sName');
     var sEmail = document.getElementById('sEmail');
 
+    console.log('🔄 updatePcTopbar вызвана! USER =', USER, 'USER_UID =', USER_UID);
+
     if (USER && USER_UID) {
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/name').once('value', function(snap) {
             var dbName = snap.val() || USER;
-            if (pcName) pcName.textContent = dbName;
-            if (sName) sName.textContent = dbName;
+            if (pcName) {
+                pcName.textContent = dbName;
+                console.log('✅ Имя в топ-баре обновлено:', dbName);
+            }
+            if (sName) {
+                sName.textContent = dbName;
+            }
         });
 
         db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(snap) {
@@ -430,7 +644,7 @@ function updatePcTopbar() {
 
             if (pcAvatar) {
                 if (avatarUrl) {
-                    pcAvatar.innerHTML = '<img src="' + avatarUrl + '" />';
+                    pcAvatar.innerHTML = '<img src="' + avatarUrl + '" alt="аватар" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />';
                 } else {
                     pcAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
                 }
@@ -438,7 +652,7 @@ function updatePcTopbar() {
 
             if (sAvatar) {
                 if (avatarUrl) {
-                    sAvatar.innerHTML = '<img src="' + avatarUrl + '" />';
+                    sAvatar.innerHTML = '<img src="' + avatarUrl + '" alt="аватар" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />';
                 } else {
                     sAvatar.innerHTML = '<span class="letter">' + letter + '</span>';
                 }
@@ -458,3 +672,27 @@ function updatePcTopbar() {
         if (sEmail) sEmail.textContent = '';
     }
 }
+
+function updateLangDisplay() {
+    var display = document.getElementById('langDisplay');
+    if (display) {
+        display.textContent = currentLang === 'ru' ? 'Русский' : 'English';
+    }
+}
+
+setTimeout(function() {
+    console.log('🔄 Принудительный вызов updatePcTopbar()');
+    updatePcTopbar();
+}, 1000);
+
+if (typeof auth !== 'undefined') {
+    auth.onAuthStateChanged(function(user) {
+        setTimeout(function() {
+            console.log('🔄 Авторизация изменилась, обновляем топ-бар');
+            updatePcTopbar();
+            if (typeof updateUI === 'function') updateUI();
+        }, 500);
+    });
+}
+
+console.log('✅ app.js загружен! SITE =', SITE);

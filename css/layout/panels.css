@@ -69,3 +69,9 @@
 .panel-item:hover {
     color: var(--link-color);
 }
+
+/* ===== ПРИНУДИТЕЛЬНОЕ УБИВАНИЕ ПАНЕЛЕЙ В МОБИЛЬНОМ РЕЖИМЕ ===== */
+body.mobile-view .panel-left,
+body.mobile-view .panel-right {
+    display: none !important;
+}

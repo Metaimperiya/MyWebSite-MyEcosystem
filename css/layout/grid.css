@@ -1,30 +1,42 @@
 /* ================================================================ */
-/* GRID — ОСНОВНАЯ СЕТКА */
+/* GRID — ОСНОВНАЯ СЕТКА (ФИКСИРОВАННАЯ) */
 /* ================================================================ */
 
 .app-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 16px 80px;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    padding: 0 10px 80px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
 }
 
 /* ===== ДЕСКТОП: 3 КОЛОНКИ ===== */
 @media (min-width: 820px) {
     .app-layout {
-        grid-template-columns: var(--panel-width) var(--feed-width) var(--panel-width);
-        gap: 20px;
-        padding: 0 20px 80px;
-        margin-top: 10px;
-        justify-content: center;
+        max-width: 1200px !important;
+        grid-template-columns: var(--panel-width) var(--feed-width) var(--panel-width) !important;
+        gap: 20px !important;
+        padding: 10px 20px 80px !important;
+        justify-content: center !important;
     }
+}
+
+/* ===== ПРИНУДИТЕЛЬНЫЙ МОБИЛЬНЫЙ РЕЖИМ (класс .mobile-view) ===== */
+body.mobile-view .app-layout {
+    grid-template-columns: 1fr !important;
+    max-width: 600px !important;
+    padding: 0 10px 80px !important;
+    gap: 6px !important;
 }
 
 /* ===== ЦЕНТР ===== */
 .panel-center {
-    width: 100%;
-    min-width: 0;
-    padding-bottom: 20px;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
 }

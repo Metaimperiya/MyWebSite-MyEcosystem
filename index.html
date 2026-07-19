@@ -16,7 +16,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
-    <!-- ===== CSS ===== -->
+    <!-- CSS -->
     <link rel="stylesheet" href="css/core/base.css">
     <link rel="stylesheet" href="css/core/reset.css">
     <link rel="stylesheet" href="css/core/variables.css">
@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="css/layout/sidebar.css">
     <link rel="stylesheet" href="css/layout/topbar.css">
     <link rel="stylesheet" href="css/modules/player.css">
+    <link rel="stylesheet" href="css/modules/frames.css">
     <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
@@ -46,13 +47,31 @@
         <div class="right">
             <button onclick="openChatList()">💬</button>
             <button onclick="openNotifications()">🔔</button>
-            <div class="avatar-wrap" id="pcAvatar" onclick="goToProfile()">
+            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
                 <span class="letter">?</span>
             </div>
-            <span class="username" id="pcName" onclick="goToProfile()"></span>
+            <span class="username" id="topName" onclick="goToProfile()"></span>
             <button onclick="toggleSettingsMenu()">⋮</button>
         </div>
     </header>
+
+    <!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== -->
+    <div id="settingsDropdown" class="settings-dropdown">
+        <div class="settings-item" onclick="toggleTheme()">
+            <span class="icon">🌓</span> Тема
+        </div>
+        <div class="settings-item" onclick="toggleLanguage()">
+            <span class="icon">🌐</span> <span id="langDisplay">Русский</span>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-item" onclick="toggleViewMode()">
+            <span class="icon">📱</span> <span id="viewModeDisplay">ПК</span>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-item" onclick="logout()">
+            <span class="icon">🚪</span> Выйти
+        </div>
+    </div>
 
     <!-- ===== САЙДБАР ===== -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -378,24 +397,24 @@
 </div>
 
 <!-- ================================================================ -->
-<!-- ПОДКЛЮЧЕНИЕ JS-ФАЙЛОВ - ПРАВИЛЬНЫЙ ПОРЯДОК -->
+<!-- ПОДКЛЮЧЕНИЕ JS-ФАЙЛОВ -->
 <!-- ================================================================ -->
 
 <!-- 1. CORE -->
 <script src="js/core/firebase.js"></script>
-<script src="js/core/lang.js"></script>
 <script src="js/core/auth.js"></script>
 <script src="js/core/app.js"></script>
+<script src="js/core/lang.js"></script>
 
 <!-- 2. МОДУЛИ -->
 <script src="js/modules/player.js"></script>
 
-<!-- 3. ФИЧИ -->
-<script src="js/features/feed.js"></script>
-<script src="js/features/postMenu.js"></script>
-<script src="js/features/likes.js"></script>
-<script src="js/features/comments.js"></script>
-<script src="js/features/reposts.js"></script>
+<!-- 3. ЛЕНТА -->
+<script src="js/features/feed/feed-core.js"></script>
+<script src="js/features/feed/feed-actions.js"></script>
+<script src="js/features/feed/feed-edit.js"></script>
+
+<!-- 4. ОСТАЛЬНЫЕ ФИЧИ -->
 <script src="js/features/profile.js"></script>
 <script src="js/features/friends.js"></script>
 <script src="js/features/groups.js"></script>
@@ -405,43 +424,35 @@
 <script src="js/features/page.js"></script>
 
 <!-- ================================================================ -->
-<!-- ВСТРОЕННЫЙ JS - ПРИНУДИТЕЛЬНОЕ ОТКРЫТИЕ ЛЕНТЫ -->
+<!-- ВСТРОЕННЫЙ JS -->
 <!-- ================================================================ -->
 
 <script>
-// ===== ПРИНУДИТЕЛЬНО ОТКРЫВАЕМ ЛЕНТУ ПРИ ЗАГРУЗКЕ =====
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
-        // Скрываем все страницы
         document.querySelectorAll('.page').forEach(function(el) {
             el.classList.remove('active');
             el.style.display = 'none';
         });
-        
-        // Показываем ленту
         var feed = document.getElementById('page-feed');
         if (feed) {
             feed.classList.add('active');
             feed.style.display = 'block';
             console.log('✅ Принудительно открыта лента');
         }
-        
-        // Обновляем UI
         if (typeof updateUI === 'function') updateUI();
         if (typeof updatePcTopbar === 'function') updatePcTopbar();
         if (typeof updateNotifBadge === 'function') updateNotifBadge();
     }, 300);
 });
 
-// ===== ФИКС САЙДБАРА =====
 document.addEventListener('click', function(e) {
-    // Закрываем сайдбар при клике на оверлей
     if (e.target.id === 'sidebarOverlay') {
         closeSidebar();
     }
 });
 
-console.log('✅ index.html загружен, лента принудительно открыта!');
+console.log('✅ index.html загружен');
 </script>
 
 </body>
