@@ -91,9 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 avatarUrl: avatarUrl,
                 slug: slug
             });
-            db.ref('sites/' + SITE + '/all_users/' + USER_UID).set({
+            db.ref('sites/' + SITE + '/all_users/' + USER_UID).update({
                 name: USER,
-                email: user.email || 'anon',
                 uid: USER_UID,
                 lastLogin: Date.now(),
                 avatarUrl: avatarUrl,
@@ -120,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof loadProfile === 'function') loadProfile();
             if (typeof loadNotifications === 'function') loadNotifications();
             if (typeof loadFriendRequests === 'function') loadFriendRequests();
+            if (typeof startDirectMessageUnreadTracking === 'function') startDirectMessageUnreadTracking();
 
             console.log('✅ Пользователь авторизован:', USER);
         } else {
@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var mainContainer = document.getElementById('mainContainer');
             if (mainContainer) mainContainer.style.display = 'none';
             if (typeof updateUI === 'function') updateUI();
+            if (typeof startDirectMessageUnreadTracking === 'function') startDirectMessageUnreadTracking();
             console.log('⛔ Гость, иди нахуй!');
         }
     });

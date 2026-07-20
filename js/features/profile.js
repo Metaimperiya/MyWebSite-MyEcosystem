@@ -28,7 +28,7 @@ function loadProfile() {
         return;
     }
 
-    db.ref('sites/' + SITE + '/users/' + uid).once('value', function(snap) {
+    db.ref('sites/' + SITE + '/all_users/' + uid).once('value', function(snap) {
         var u = snap.val() || {};
 
         var nameEl = document.getElementById('profileName');
@@ -65,9 +65,7 @@ function loadProfile() {
     });
 
     loadFriends(uid);
-    // ВРЕМЕННО УБИРАЕМ loadSubscribers и loadSubscriptions, если их нет
-    // loadSubscribers(uid);
-    // loadSubscriptions(uid);
+    loadProfileRelationshipCounts(uid);
     loadProfilePosts(uid);
 }
 
@@ -125,7 +123,7 @@ function loadFriends(uid) {
         var html = '';
         var loaded = 0;
         keys.forEach(function(k) {
-            db.ref('sites/' + SITE + '/users/' + k).once('value', function(usnap) {
+            db.ref('sites/' + SITE + '/all_users/' + k).once('value', function(usnap) {
                 var u = usnap.val() || {};
                 var name = u.name || 'Аноним';
                 var letter = name.charAt(0).toUpperCase();
@@ -147,28 +145,100 @@ function loadFriends(uid) {
 }
 
 function makeStatsClickable(uid) {
-    var friendsCount = document.getElementById('friendsCount');
-    var subscribersCount = document.getElementById('subscribersCount');
-    var subscriptionsCount = document.getElementById('subscriptionsCount');
+    var stats = [
+        { id: 'friendsStat', type: 'friends' },
+        { id: 'subscribersStat', type: 'subscribers' },
+        { id: 'subscriptionsStat', type: 'subscriptions' }
+    ];
 
-    if (friendsCount) {
-        friendsCount.style.cursor = 'pointer';
-        friendsCount.style.color = 'var(--link-color)';
-        friendsCount.onclick = function() { toggleFriendsList(); };
-    }
+    stats.forEach(function(stat) {
+        var button = document.getElementById(stat.id);
+        if (button) button.onclick = function() { openProfileList(stat.type, uid); };
+    });
 }
 
-function toggleFriendsList() {
-    var section = document.getElementById('friendsSection');
-    if (!section) return;
+function loadProfileRelationshipCounts(uid) {
+    var relationships = [
+        { path: 'subscribers', element: 'subscribersCount' },
+        { path: 'subscriptions', element: 'subscriptionsCount' }
+    ];
 
-    if (section.style.display === 'none' || !section.style.display) {
-        section.style.display = 'block';
-        loadFriends(VIEWING_USER || USER_UID);
-    } else {
-        section.style.display = 'none';
-    }
+    relationships.forEach(function(item) {
+        var ref = db.ref('sites/' + SITE + '/' + item.path + '/' + uid);
+        ref.off('value');
+        ref.on('value', function(snap) {
+            var data = snap.val() || {};
+            var count = Object.keys(data).filter(function(key) { return data[key] === true; }).length;
+            var element = document.getElementById(item.element);
+            if (element) element.textContent = count;
+        });
+    });
 }
+
+window.openProfileList = function(type, uid) {
+    uid = uid || VIEWING_USER || USER_UID;
+    if (!uid) return;
+
+    var config = {
+        friends: { path: 'friends', title: 'Друзья', empty: 'Пока нет друзей' },
+        subscribers: { path: 'subscribers', title: 'Подписчики', empty: 'Пока нет подписчиков' },
+        subscriptions: { path: 'subscriptions', title: 'Подписки', empty: 'Пока нет подписок' }
+    }[type];
+    if (type === 'blocks') {
+        config = { path: 'blocks', title: 'Заблокированные пользователи', empty: 'Список блокировок пуст' };
+    }
+    if (!config) return;
+
+    var section = document.getElementById('profileListSection');
+    var title = document.getElementById('profileListTitle');
+    var list = document.getElementById('profileUserList');
+    if (!section || !title || !list) return;
+
+    section.hidden = false;
+    title.textContent = config.title;
+    list.innerHTML = '<div class="profile-list-state">Загрузка…</div>';
+
+    db.ref('sites/' + SITE + '/' + config.path + '/' + uid).once('value', function(snap) {
+        var data = snap.val() || {};
+        var ids = Object.keys(data).filter(function(key) { return data[key] === true || (type === 'blocks' && !!data[key]); });
+        if (!ids.length) {
+            list.innerHTML = '<div class="profile-list-state">' + config.empty + '</div>';
+            return;
+        }
+
+        Promise.all(ids.map(function(userId) {
+            return db.ref('sites/' + SITE + '/all_users/' + userId).once('value').then(function(userSnap) {
+                return { uid: userId, user: userSnap.val() || {} };
+            });
+        })).then(function(users) {
+            list.innerHTML = users.map(function(item) {
+                var name = item.user.name || 'Пользователь';
+                return '<button type="button" class="profile-user-row" onclick="viewUser(\'' + item.uid + '\')">' +
+                    '<span class="avatar-wrap" id="profile-list-avatar-' + item.uid + '"><span class="letter">' + esc(name.charAt(0).toUpperCase()) + '</span></span>' +
+                    '<span>' + esc(name) + '</span></button>';
+            }).join('');
+            users.forEach(function(item) {
+                var avatar = document.getElementById('profile-list-avatar-' + item.uid);
+                if (avatar) renderAvatar(item.uid, avatar, '?');
+            });
+        }).catch(function() {
+            list.innerHTML = '<div class="profile-list-state">Не удалось загрузить список</div>';
+        });
+    }, function() {
+        list.innerHTML = '<div class="profile-list-state">Нет доступа к этому списку</div>';
+    });
+};
+
+window.closeProfileList = function() {
+    var section = document.getElementById('profileListSection');
+    if (section) section.hidden = true;
+};
+
+window.toggleFriendsList = function() {
+    var section = document.getElementById('profileListSection');
+    if (section && !section.hidden) return closeProfileList();
+    openProfileList('friends');
+};
 
 function loadProfileLink(uid) {
     db.ref('sites/' + SITE + '/users/' + uid + '/profileLink').once('value', function(snap) {
@@ -183,6 +253,88 @@ function loadProfileLink(uid) {
         }
     });
 }
+
+function setProfileRelationshipButton(button, active, activeLabel, inactiveLabel, activeClass) {
+    if (!button) return;
+    button.className = 'profile-action-btn ' + (active ? activeClass : 'primary');
+    button.textContent = active ? activeLabel : inactiveLabel;
+}
+
+function watchProfileSubscription(targetUid, button) {
+    db.ref('sites/' + SITE + '/subscriptions/' + USER_UID + '/' + targetUid).on('value', function(snap) {
+        var subscribed = snap.val() === true;
+        setProfileRelationshipButton(button, subscribed, '✓ Вы подписаны', '+ Подписаться', 'secondary');
+        button.setAttribute('aria-pressed', subscribed ? 'true' : 'false');
+        button.onclick = function() { toggleProfileSubscription(targetUid, subscribed, button); };
+    });
+}
+
+window.toggleProfileSubscription = function(targetUid, subscribed, button) {
+    if (!USER_UID || !targetUid || targetUid === USER_UID) return;
+    if (button) button.disabled = true;
+
+    // A subscription must never be created when either participant has blocked the other.
+    Promise.all([
+        db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).once('value'),
+        db.ref('sites/' + SITE + '/blocks/' + targetUid + '/' + USER_UID).once('value')
+    ]).then(function(snaps) {
+        if (!subscribed && (snaps[0].exists() || snaps[1].exists())) {
+            alert('Нельзя оформить подписку: один из пользователей заблокировал другого.');
+            return;
+        }
+        var updates = {};
+        updates['sites/' + SITE + '/subscriptions/' + USER_UID + '/' + targetUid] = subscribed ? null : true;
+        updates['sites/' + SITE + '/subscribers/' + targetUid + '/' + USER_UID] = subscribed ? null : true;
+        return db.ref().update(updates).then(function() {
+            if (!subscribed && typeof sendNotification === 'function') {
+                sendNotification(targetUid, { type: 'subscribe', fromUid: USER_UID, text: USER + ' подписался(ась) на вас', timestamp: Date.now() });
+            }
+        });
+    }).catch(function() { alert('Не удалось обновить подписку. Попробуйте ещё раз.');
+    }).finally(function() {
+        if (button) button.disabled = false;
+    });
+};
+
+function watchProfileBlock(targetUid, button, controls) {
+    db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).on('value', function(snap) {
+        var blocked = snap.exists();
+        setProfileRelationshipButton(button, blocked, '✓ Разблокировать', '⛔ Заблокировать', 'danger');
+        button.onclick = function() { blocked ? unblockUser(targetUid) : blockUser(targetUid); };
+        controls.forEach(function(control) { if (control) control.disabled = blocked; });
+    });
+}
+
+window.blockUser = function(targetUid) {
+    if (!USER_UID || !targetUid || targetUid === USER_UID) return;
+    if (!confirm('Заблокировать пользователя? Заявки и дружба с ним будут удалены.')) return;
+    var updates = {};
+    updates['sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid] = { blockedAt: Date.now() };
+    updates['sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid] = null;
+    updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
+    updates['sites/' + SITE + '/friend_requests/' + USER_UID + '/' + targetUid] = null;
+    updates['sites/' + SITE + '/friend_requests/' + targetUid + '/' + USER_UID] = null;
+    // Blocking also breaks a follow relationship in both denormalized indexes.
+    updates['sites/' + SITE + '/subscriptions/' + USER_UID + '/' + targetUid] = null;
+    updates['sites/' + SITE + '/subscribers/' + targetUid + '/' + USER_UID] = null;
+    db.ref().update(updates).then(function() {
+        localStorage.removeItem('fs_' + USER_UID + '_' + targetUid);
+        localStorage.removeItem('fs_' + targetUid + '_' + USER_UID);
+        if (typeof loadPeople === 'function') loadPeople();
+        if (typeof loadProfile === 'function') loadProfile();
+    }).catch(function() { alert('Не удалось заблокировать пользователя. Попробуйте ещё раз.'); });
+};
+
+window.unblockUser = function(targetUid) {
+    if (!USER_UID || !targetUid) return;
+    db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).remove().catch(function() {
+        alert('Не удалось снять блокировку. Попробуйте ещё раз.');
+    });
+};
+
+window.openBlockedUsers = function() {
+    if (USER_UID) openProfileList('blocks', USER_UID);
+};
 
 function showProfileActions(uid) {
     var actions = document.getElementById('profileActions');
@@ -222,6 +374,13 @@ function showProfileActions(uid) {
             <div style="height:1px;background:var(--border-color);margin:2px 12px;"></div>
             <div class="profile-menu-item" onclick="logout();closeProfileMenu();" style="padding:8px 16px;cursor:pointer;font-size:0.8rem;color:var(--danger);transition:0.15s;border-radius:4px;">🚪 Выйти</div>
         `;
+        var blockedMenuItem = document.createElement('button');
+        blockedMenuItem.type = 'button';
+        blockedMenuItem.className = 'profile-menu-item';
+        blockedMenuItem.textContent = '⛔ Заблокированные пользователи';
+        blockedMenuItem.style.cssText = 'width:100%;padding:8px 16px;border:0;background:transparent;text-align:left;cursor:pointer;font-size:0.8rem;color:var(--text-color);';
+        blockedMenuItem.onclick = function() { openBlockedUsers(); closeProfileMenu(); };
+        menu.insertBefore(blockedMenuItem, menu.lastElementChild);
         container.appendChild(menu);
         header.appendChild(container);
 
@@ -246,13 +405,25 @@ function showProfileActions(uid) {
     wrapper.appendChild(mainBtn);
 
     var msgBtn = document.createElement('button');
-    msgBtn.className = 'friend-btn';
+    msgBtn.className = 'profile-action-btn primary';
     msgBtn.textContent = '💬 Написать';
-    msgBtn.style.cssText = 'padding:6px 20px;border:none;border-radius:20px;font-weight:600;cursor:pointer;font-size:0.7rem;transition:0.2s;background:#1877f2;color:#fff;';
     msgBtn.onclick = function() { openPrivateChat(uid); };
     wrapper.appendChild(msgBtn);
 
+    var subscribeBtn = document.createElement('button');
+    subscribeBtn.type = 'button';
+    wrapper.appendChild(subscribeBtn);
+
+    var blockBtn = document.createElement('button');
+    blockBtn.type = 'button';
+    wrapper.appendChild(blockBtn);
+
     actions.appendChild(wrapper);
+    getFriendStatusRealtime(USER_UID, uid, function(status) {
+        setProfileFriendAction(mainBtn, status, uid);
+    });
+    watchProfileSubscription(uid, subscribeBtn);
+    watchProfileBlock(uid, blockBtn, [mainBtn, msgBtn, subscribeBtn]);
 
     // Остальной код showProfileActions...
     // (полная версия есть в твоём profile.js, я просто добавил недостающие функции)

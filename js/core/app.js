@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
             callback(avatarCache[uid]);
             return;
         }
-        db.ref('sites/' + SITE + '/users/' + uid + '/avatarUrl').once('value', function(snap) {
+        db.ref('sites/' + SITE + '/all_users/' + uid + '/avatarUrl').once('value', function(snap) {
             var url = snap.val() || null;
             if (!avatarCache) avatarCache = {};
             avatarCache[uid] = url;
@@ -473,11 +473,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            var html = '';
+            var chats = [];
             var loaded = 0;
 
             friendIds.forEach(function(uid) {
-                db.ref('sites/' + SITE + '/users/' + uid).once('value', function(usnap) {
+                db.ref('sites/' + SITE + '/all_users/' + uid).once('value', function(usnap) {
                     var u = usnap.val() || {};
                     var name = u.name || 'Аноним';
                     var letter = name.charAt(0).toUpperCase();
@@ -485,26 +485,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     var chatId = [USER_UID, uid].sort().join('_');
                     var path = 'dms/' + SITE + '/' + chatId + '/messages';
 
-                    db.ref(path).orderByChild('timestamp').limitToLast(1).once('value', function(msgSnap) {
-                        var lastMsg = '';
-                        msgSnap.forEach(function(m) {
-                            lastMsg = m.val().text || '';
+                    db.ref(path).once('value', function(msgSnap) {
+                        var messages = msgSnap.val() || {};
+                        var messageIds = Object.keys(messages).sort(function(a, b) {
+                            return (messages[b].timestamp || 0) - (messages[a].timestamp || 0);
                         });
-
-                        html += '<div class="chat-list-item" onclick="openPrivateChat(\'' + uid + '\');closeChatList();">';
-                        html += '<span class="avatar-wrap" id="clava-' + uid + '"><span class="letter">' + letter + '</span></span>';
-                        html += '<div class="chat-list-info">';
-                        html += '<div class="chat-list-name">' + esc(name) + '</div>';
-                        html += '<div class="chat-list-last">' + (lastMsg ? esc(lastMsg.slice(0, 30)) : 'Нет сообщений') + '</div>';
-                        html += '</div>';
-                        html += '</div>';
+                        var last = messageIds.length ? messages[messageIds[0]] : null;
+                        var unread = messageIds.filter(function(id) {
+                            var message = messages[id];
+                            return message.senderUid && message.senderUid !== USER_UID &&
+                                (!message.readBy || message.readBy[USER_UID] !== true);
+                        }).length;
+                        chats.push({ uid: uid, name: name, letter: letter, last: last, unread: unread });
 
                         loaded++;
                         if (loaded === friendIds.length) {
-                            container.innerHTML = html;
-                            friendIds.forEach(function(k) {
-                                var el = document.getElementById('clava-' + k);
-                                if (el) renderAvatar(k, el, '?');
+                            chats.sort(function(a, b) {
+                                return ((b.last && b.last.timestamp) || 0) - ((a.last && a.last.timestamp) || 0);
+                            });
+                            container.innerHTML = chats.map(function(chat) {
+                                var preview = chat.last ? chat.last.text || '' : 'Нет сообщений';
+                                return '<button type="button" class="chat-list-item' + (chat.unread ? ' unread' : '') + '" onclick="openPrivateChat(\'' + chat.uid + '\');closeChatList();">' +
+                                    '<span class="avatar-wrap" id="clava-' + chat.uid + '"><span class="letter">' + esc(chat.letter) + '</span></span>' +
+                                    '<span class="chat-list-info"><span class="chat-list-name">' + esc(chat.name) + '</span>' +
+                                    '<span class="chat-list-last">' + esc(preview.slice(0, 44)) + '</span></span>' +
+                                    (chat.unread ? '<span class="chat-list-unread">' + (chat.unread > 99 ? '99+' : chat.unread) + '</span>' : '') +
+                                    '</button>';
+                            }).join('');
+                            chats.forEach(function(chat) {
+                                var el = document.getElementById('clava-' + chat.uid);
+                                if (el) renderAvatar(chat.uid, el, '?');
                             });
                         }
                     });

@@ -2,6 +2,61 @@
 // ЧАТ — С РАЗДЕЛЕНИЕМ СООБЩЕНИЙ (СЛЕВА/СПРАВА) И УВЕДОМЛЕНИЯМИ
 // ================================================================ */
 
+var dmUnreadRef = null;
+
+function isUnreadDirectMessage(message) {
+    return message && message.senderUid && message.senderUid !== USER_UID &&
+        (!message.readBy || message.readBy[USER_UID] !== true);
+}
+
+function updateChatUnreadBadge(count) {
+    var badge = document.getElementById('chatUnreadBadge');
+    if (!badge) return;
+    badge.hidden = !count;
+    badge.textContent = count > 99 ? '99+' : count;
+}
+
+function markDirectMessagesRead(path, messages) {
+    if (!USER_UID || !messages) return;
+    var updates = {};
+    Object.keys(messages).forEach(function(id) {
+        if (isUnreadDirectMessage(messages[id])) updates[id + '/readBy/' + USER_UID] = true;
+    });
+    if (Object.keys(updates).length) db.ref(path).update(updates);
+}
+
+function markChatNotificationsRead(chatId) {
+    if (!USER_UID || !chatId) return;
+    db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('chatId').equalTo(chatId).once('value', function(snap) {
+        var updates = {};
+        snap.forEach(function(item) {
+            if (item.val().type === 'message' && !item.val().read) updates[item.key + '/read'] = true;
+        });
+        if (Object.keys(updates).length) db.ref('sites/' + SITE + '/notifications/' + USER_UID).update(updates);
+    });
+}
+
+window.startDirectMessageUnreadTracking = function() {
+    if (dmUnreadRef) {
+        dmUnreadRef.off('value');
+        dmUnreadRef = null;
+    }
+    if (!USER_UID) return updateChatUnreadBadge(0);
+
+    dmUnreadRef = db.ref('dms/' + SITE);
+    dmUnreadRef.on('value', function(snap) {
+        var count = 0;
+        snap.forEach(function(chatSnap) {
+            var chatId = chatSnap.key || '';
+            if (chatId.split('_').indexOf(USER_UID) === -1) return;
+            chatSnap.child('messages').forEach(function(messageSnap) {
+                if (isUnreadDirectMessage(messageSnap.val())) count++;
+            });
+        });
+        updateChatUnreadBadge(count);
+    });
+};
+
 function loadChat(path) {
     if (chatUnsub) {
         if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
@@ -24,6 +79,8 @@ function loadChat(path) {
             return;
         }
 
+        var messages = snap.val() || {};
+        markDirectMessagesRead(path, messages);
         snap.forEach(function(s) {
             var m = s.val();
             var msgId = s.key;
@@ -118,6 +175,8 @@ window.sendChatMessage = function() {
 
     db.ref(path).push({
         nick: USER,
+        senderUid: USER_UID,
+        recipientUid: targetUid || null,
         text: text,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
@@ -159,11 +218,19 @@ window.openPrivateChat = function(targetUid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
 
-    var chatId = [USER_UID, targetUid].sort().join('_');
-    var path = 'dms/' + SITE + '/' + chatId + '/messages';
-    closeNotifications();
-    CURRENT_ROOM = chatId;
-    document.getElementById('chatView').classList.add('active');
-    setActivePage(null);
-    loadChat(path);
+    db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).once('value', function(blockSnap) {
+        if (blockSnap.exists()) {
+            alert('Сначала снимите блокировку с этого пользователя.');
+            return;
+        }
+
+        var chatId = [USER_UID, targetUid].sort().join('_');
+        var path = 'dms/' + SITE + '/' + chatId + '/messages';
+        closeNotifications();
+        markChatNotificationsRead(chatId);
+        CURRENT_ROOM = chatId;
+        document.getElementById('chatView').classList.add('active');
+        setActivePage(null);
+        loadChat(path);
+    });
 };

@@ -45,6 +45,7 @@
 
 .people-list .people-item .info {
     flex: 1;
+    min-width: 0;
 }
 
 .people-list .people-item .info .name {
@@ -57,3 +58,7 @@
     font-size: 0.65rem;
     color: var(--text-secondary);
 }
+
+.people-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.people-action { border: none; border-radius: 14px; padding: 5px 9px; background: var(--link-color); color: #fff; cursor: pointer; font-size: 0.6rem; font-weight: 600; }
+.people-action.secondary { background: var(--input-bg); color: var(--text-secondary); border: 1px solid var(--border-color); }

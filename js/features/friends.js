@@ -47,6 +47,43 @@ function getFriendStatusRealtime(myUid, targetUid, callback) {
 // 2. ОТОБРАЖЕНИЕ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
 // ================================================================ */
 
+function friendActionHtml(status, targetUid) {
+    if (status === 'friend') {
+        return '<button class="people-action secondary" onclick="event.stopPropagation();removeFriend(\'' + targetUid + '\')">Remove</button>';
+    }
+    if (status === 'pending_sent') {
+        return '<button class="people-action secondary" onclick="event.stopPropagation();cancelFriendRequest(\'' + targetUid + '\')">Requested</button>';
+    }
+    if (status === 'pending_received') {
+        return '<button class="people-action" onclick="event.stopPropagation();acceptFriendRequest(\'' + targetUid + '\')">Accept</button>' +
+            '<button class="people-action secondary" onclick="event.stopPropagation();declineFriendRequest(\'' + targetUid + '\')">Decline</button>';
+    }
+    return '<button class="people-action" onclick="event.stopPropagation();sendFriendRequest(\'' + targetUid + '\')">Add friend</button>';
+}
+
+function canInteractWithUser(targetUid, callback) {
+    if (!USER_UID || !targetUid || targetUid === USER_UID) return callback(false);
+    db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).once('value', function(snap) {
+        callback(!snap.exists());
+    }, function() { callback(false); });
+}
+
+function setProfileFriendAction(button, status, targetUid) {
+    if (!button) return;
+    button.className = 'friend-btn';
+    button.disabled = false;
+    button.onclick = null;
+    if (status === 'friend') {
+        button.classList.add('friend'); button.textContent = '🤝 Friends'; button.onclick = function() { removeFriend(targetUid); };
+    } else if (status === 'pending_sent') {
+        button.classList.add('pending'); button.textContent = '⏳ Request sent'; button.onclick = function() { cancelFriendRequest(targetUid); };
+    } else if (status === 'pending_received') {
+        button.classList.add('received'); button.textContent = '📩 Accept request'; button.onclick = function() { acceptFriendRequest(targetUid); };
+    } else {
+        button.classList.add('add'); button.textContent = '➕ Add friend'; button.onclick = function() { sendFriendRequest(targetUid); };
+    }
+}
+
 function loadPeople() {
     if (!USER_UID) {
         document.getElementById('peopleList').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
@@ -71,6 +108,7 @@ function loadPeople() {
             html += '<div class="people-item" onclick="viewUser(\'' + k + '\')">';
             html += '<span class="avatar-wrap" id="pava-' + k + '"><span class="letter">' + letter + '</span></span>';
             html += '<div class="info"><div class="name">' + esc(name) + '</div><div class="status" id="pstatus-' + k + '">Загрузка...</div></div>';
+            html += '<div class="people-actions" id="paction-' + k + '"></div>';
             html += '</div>';
         });
         el.innerHTML = html;
@@ -92,6 +130,8 @@ function loadPeople() {
                 };
                 statusEl.textContent = labels[status] || '❓ Неизвестно';
                 statusEl.style.color = status === 'friend' ? '#1877f2' : '#888';
+                var actionEl = document.getElementById('paction-' + k);
+                if (actionEl) actionEl.innerHTML = friendActionHtml(status, k);
             });
         });
     });
@@ -107,6 +147,11 @@ function sendFriendRequest(targetUid) {
         return;
     }
 
+    canInteractWithUser(targetUid, function(allowed) {
+        if (!allowed) {
+            alert('Сначала снимите блокировку с этого пользователя.');
+            return;
+        }
     db.ref('sites/' + SITE + '/friends/' + USER_UID + '/' + targetUid).once('value', function(friendSnap) {
         if (friendSnap.val() === true) {
             alert('✅ Вы уже друзья!');
@@ -147,6 +192,7 @@ function sendFriendRequest(targetUid) {
                 loadPeople();
             });
         });
+    });
     });
 }
 
@@ -201,20 +247,10 @@ function acceptFriendRequest(fromUid) {
         if (VIEWING_USER) loadProfile();
         loadPeople();
         loadFriends(USER_UID);
-        closeNotifications();
-
         // 👇 ПЕРЕЗАГРУЖАЕМ УВЕДОМЛЕНИЯ
-        setTimeout(function() {
-            if (document.getElementById('notificationsModal') && document.getElementById('notificationsModal').classList.contains('open')) {
-                db.ref('sites/' + SITE + '/notifications/' + USER_UID).orderByChild('timestamp').limitToLast(50).once('value', function(snap) {
-                    var notifications = snap.val() || {};
-                    var keys = Object.keys(notifications).sort(function(a, b) {
-                        return (notifications[b].timestamp || 0) - (notifications[a].timestamp || 0);
-                    });
-                    renderNotifications(notifications, keys);
-                });
-            }
-        }, 300);
+        if (document.getElementById('notificationsModal') && document.getElementById('notificationsModal').classList.contains('open')) {
+            openNotifications();
+        }
     });
 }
 
@@ -286,7 +322,7 @@ function loadFriends(uid) {
         var html = '';
         var loaded = 0;
         keys.forEach(function(k) {
-            db.ref('sites/' + SITE + '/users/' + k).once('value', function(usnap) {
+            db.ref('sites/' + SITE + '/all_users/' + k).once('value', function(usnap) {
                 var u = usnap.val() || {};
                 var name = u.name || 'Аноним';
                 var letter = name.charAt(0).toUpperCase();

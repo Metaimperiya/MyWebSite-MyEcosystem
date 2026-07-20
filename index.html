@@ -27,15 +27,15 @@
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=3.1">
-    <link rel="stylesheet" href="css/features/profile.css?v=3.0">
-    <link rel="stylesheet" href="css/features/friends.css?v=3.0">
-    <link rel="stylesheet" href="css/features/chat.css?v=3.0">
+    <link rel="stylesheet" href="css/features/profile.css?v=3.3">
+    <link rel="stylesheet" href="css/features/friends.css?v=3.1">
+    <link rel="stylesheet" href="css/features/chat.css?v=3.1">
     <link rel="stylesheet" href="css/features/modals.css?v=3.0">
     <link rel="stylesheet" href="css/features/notifications.css?v=3.0">
     <link rel="stylesheet" href="css/layout/grid.css?v=3.0">
     <link rel="stylesheet" href="css/layout/panels.css?v=3.0">
     <link rel="stylesheet" href="css/layout/sidebar.css?v=3.0">
-    <link rel="stylesheet" href="css/layout/topbar.css?v=3.0">
+    <link rel="stylesheet" href="css/layout/topbar.css?v=3.1">
     <link rel="stylesheet" href="css/modules/player.css?v=3.0">
     <link rel="stylesheet" href="css/components/admin.css?v=3.0">
     
@@ -56,7 +56,7 @@
         </div>
         <input class="search" placeholder="Search..." id="pcSearch">
         <div class="right">
-            <button onclick="openChatList()">💬</button>
+            <button class="topbar-icon-button" onclick="openChatList()" aria-label="Личные сообщения">💬<span id="chatUnreadBadge" class="count-badge" hidden></span></button>
             <button onclick="openNotifications()">🔔</button>
             <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
                 <span class="letter">?</span>
@@ -212,13 +212,20 @@
                     <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
                     <div class="name" id="profileName"></div>
                     <div class="bio" id="profileBio"></div>
-                    <div class="profile-stats">
-                        <span>🤝 Friends: <span id="friendsCount" class="stat-clickable">0</span></span>
-                        <span>👀 Subscribers: <span id="subscribersCount" class="stat-clickable">0</span></span>
-                        <span>📌 Subscriptions: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
+                    <div class="profile-stats" aria-label="Статистика профиля">
+                        <button type="button" class="profile-stat" id="friendsStat">🤝 <span>Друзья</span><strong id="friendsCount">0</strong></button>
+                        <button type="button" class="profile-stat" id="subscribersStat">👀 <span>Подписчики</span><strong id="subscribersCount">0</strong></button>
+                        <button type="button" class="profile-stat" id="subscriptionsStat">📌 <span>Подписки</span><strong id="subscriptionsCount">0</strong></button>
                     </div>
                     <div class="profile-actions" id="profileActions"></div>
                 </div>
+                <section class="profile-list-section" id="profileListSection" hidden aria-live="polite">
+                    <div class="profile-list-heading">
+                        <h4 id="profileListTitle">Друзья</h4>
+                        <button type="button" class="profile-list-close" onclick="closeProfileList()" aria-label="Закрыть">✕</button>
+                    </div>
+                    <div class="profile-user-list" id="profileUserList"></div>
+                </section>
                 <div class="card" style="margin-top:8px;">
                     <div class="post-form">
                         <div class="editor-toolbar">
@@ -409,17 +416,17 @@
 
 <!-- ===== JS ===== -->
 <script src="js/core/firebase.js?v=3.0"></script>
-<script src="js/core/auth.js?v=3.0"></script>
-<script src="js/core/app.js?v=3.0"></script>
+<script src="js/core/auth.js?v=3.1"></script>
+<script src="js/core/app.js?v=3.1"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
 <script src="js/features/feed/feed-core.js?v=3.1"></script>
 <script src="js/features/feed/feed-actions.js?v=3.0"></script>
 <script src="js/features/feed/feed-edit.js?v=3.0"></script>
-<script src="js/features/profile.js?v=3.0"></script>
-<script src="js/features/friends.js?v=3.0"></script>
+<script src="js/features/profile.js?v=3.3"></script>
+<script src="js/features/friends.js?v=3.1"></script>
 <script src="js/features/groups.js?v=3.0"></script>
-<script src="js/features/chat.js?v=3.0"></script>
+<script src="js/features/chat.js?v=3.1"></script>
 <script src="js/features/notifications.js?v=3.0"></script>
 <script src="js/features/admin.js?v=3.0"></script>
 <script src="js/features/page.js?v=3.0"></script>

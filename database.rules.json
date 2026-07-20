@@ -2,8 +2,6 @@
   "rules": {
     "sites": {
       "$site": {
-        ".read": "auth != null",
-        ".write": "auth != null",
         "users": {
           "$uid": {
             ".read": "$uid === auth.uid || auth.token.admin === true",
@@ -12,11 +10,29 @@
         },
         "all_users": {
           ".read": "auth != null",
-          ".write": "auth != null"
+          "$uid": {
+            ".write": "$uid === auth.uid || auth.token.admin === true"
+          }
         },
         "feed_posts": {
           ".read": "auth != null",
-          ".write": "auth != null"
+          "$postId": {
+            ".write": "( !data.exists() && newData.child('authorUid').val() === auth.uid ) || ( data.exists() && data.child('authorUid').val() === auth.uid ) || auth.token.admin === true"
+          }
+        },
+        "user_posts": {
+          ".read": "auth != null",
+          "$uid": {
+            "$postId": {
+              ".write": "$uid === auth.uid || auth.token.admin === true"
+            }
+          }
+        },
+        "foto_posts": {
+          ".read": "auth != null",
+          "$postId": {
+            ".write": "( !data.exists() && newData.child('authorUid').val() === auth.uid ) || ( data.exists() && data.child('authorUid').val() === auth.uid ) || auth.token.admin === true"
+          }
         },
         "comments": {
           "$postId": {
@@ -26,28 +42,54 @@
           }
         },
         "friends": {
+          ".read": "auth != null",
           "$uid": {
             "$friendId": {
-              ".write": "$uid === auth.uid"
+              ".write": "($uid === auth.uid || $friendId === auth.uid) && ((!data.exists() && newData.val() === true && ((auth.uid === $uid && root.child('sites').child($site).child('friend_requests').child($uid).child($friendId).child('from').val() === $friendId) || (auth.uid === $friendId && root.child('sites').child($site).child('friend_requests').child($friendId).child($uid).child('from').val() === $uid))) || (!newData.exists() && data.val() === true))"
+            }
+          }
+        },
+        "friend_requests": {
+          "$recipientUid": {
+            "$otherUid": {
+              ".read": "auth.uid === $recipientUid || auth.uid === $otherUid",
+              ".write": "(!data.exists() && newData.child('from').val() === auth.uid && ((auth.uid === $recipientUid && newData.child('to').val() === $otherUid) || (auth.uid === $otherUid && newData.child('to').val() === $recipientUid))) || (!newData.exists() && (auth.uid === $recipientUid || auth.uid === $otherUid))"
             }
           }
         },
         "subscribers": {
-          "$uid": {
-            ".read": "$uid === auth.uid",
-            ".write": "$uid === auth.uid"
+          "$profileUid": {
+            ".read": "auth != null",
+            "$followerUid": {
+              ".write": "$followerUid === auth.uid",
+              ".validate": "!newData.exists() || (auth.uid !== $profileUid && newData.isBoolean() && newData.val() === true && !root.child('sites').child($site).child('blocks').child(auth.uid).child($profileUid).exists() && !root.child('sites').child($site).child('blocks').child($profileUid).child(auth.uid).exists())"
+            }
           }
         },
         "subscriptions": {
-          "$uid": {
-            ".read": "$uid === auth.uid",
-            ".write": "$uid === auth.uid"
+          "$followerUid": {
+            ".read": "auth != null",
+            "$profileUid": {
+              ".write": "$followerUid === auth.uid",
+              ".validate": "!newData.exists() || (auth.uid !== $profileUid && newData.isBoolean() && newData.val() === true && !root.child('sites').child($site).child('blocks').child(auth.uid).child($profileUid).exists() && !root.child('sites').child($site).child('blocks').child($profileUid).child(auth.uid).exists())"
+            }
+          }
+        },
+        "blocks": {
+          "$blockerUid": {
+            ".read": "$blockerUid === auth.uid || auth.token.admin === true",
+            "$blockedUid": {
+              ".write": "$blockerUid === auth.uid || auth.token.admin === true",
+              ".validate": "!newData.exists() || ($blockedUid !== $blockerUid && newData.hasChildren(['blockedAt']) && newData.child('blockedAt').isNumber())"
+            }
           }
         },
         "notifications": {
           "$uid": {
             ".read": "$uid === auth.uid",
-            ".write": "$uid === auth.uid"
+            "$notificationId": {
+              ".write": "(!data.exists() && newData.child('fromUid').val() === auth.uid) || (data.exists() && auth.uid === $uid)"
+            }
           }
         },
         "rooms": {
@@ -57,6 +99,30 @@
         "room_users": {
           ".read": "auth != null",
           ".write": "auth != null"
+        },
+        "pages": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        "page_posts": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        "page_subscribers": {
+          ".read": "auth != null",
+          "$pageUid": {
+            "$uid": {
+              ".write": "$uid === auth.uid"
+            }
+          }
+        },
+        "page_views": {
+          ".read": "auth != null",
+          "$pageUid": {
+            "$uid": {
+              ".write": "$uid === auth.uid"
+            }
+          }
         }
       }
     },
@@ -70,7 +136,11 @@
       "$site": {
         "$chatId": {
           ".read": "auth != null",
-          ".write": "auth != null"
+          "messages": {
+            "$messageId": {
+              ".write": "(!data.exists() && newData.child('senderUid').val() === auth.uid && !root.child('sites').child($site).child('blocks').child(auth.uid).child(newData.child('recipientUid').val()).exists() && !root.child('sites').child($site).child('blocks').child(newData.child('recipientUid').val()).child(auth.uid).exists()) || (data.exists() && data.child('senderUid').val() === auth.uid) || (data.exists() && newData.child('readBy').child(auth.uid).val() === true && newData.child('senderUid').val() === data.child('senderUid').val() && newData.child('text').val() === data.child('text').val() && newData.child('recipientUid').val() === data.child('recipientUid').val())"
+            }
+          }
         }
       }
     }

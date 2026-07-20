@@ -123,6 +123,27 @@
     background: var(--hover-bg);
 }
 
+.topbar-icon-button {
+    position: relative;
+}
+
+.count-badge {
+    position: absolute;
+    top: -5px;
+    right: -6px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border: 2px solid var(--card-bg);
+    border-radius: 10px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 12px;
+    text-align: center;
+}
+
 /* ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== */
 .settings-dropdown {
     display: none;
