@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>METAIMPERIYA — Социальная платформа</title>
+    
+    <!-- ===== ПОЛНОСТЬЮ ОТКЛЮЧАЕМ КЭШ ===== -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>METAIMPERIYA — Social Platform</title>
     <link rel="icon" href="assets/icons/metaimperiya.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/metaimperiya-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/metaimperiya-32x32.png">
@@ -16,33 +22,39 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/core/base.css">
-    <link rel="stylesheet" href="css/core/reset.css">
-    <link rel="stylesheet" href="css/core/variables.css">
-    <link rel="stylesheet" href="css/features/feed.css">
-    <link rel="stylesheet" href="css/features/profile.css">
-    <link rel="stylesheet" href="css/features/friends.css">
-    <link rel="stylesheet" href="css/features/chat.css">
-    <link rel="stylesheet" href="css/features/modals.css">
-    <link rel="stylesheet" href="css/layout/grid.css">
-    <link rel="stylesheet" href="css/layout/panels.css">
-    <link rel="stylesheet" href="css/layout/sidebar.css">
-    <link rel="stylesheet" href="css/layout/topbar.css">
-    <link rel="stylesheet" href="css/modules/player.css">
-    <link rel="stylesheet" href="css/mobile.css">
+    <!-- ===== CSS (mobile.css ТОЛЬКО ЧЕРЕЗ style.css) ===== -->
+    <link rel="stylesheet" href="css/core/base.css?v=3.0">
+    <link rel="stylesheet" href="css/core/reset.css?v=3.0">
+    <link rel="stylesheet" href="css/core/variables.css?v=3.0">
+    <link rel="stylesheet" href="css/features/feed.css?v=3.1">
+    <link rel="stylesheet" href="css/features/profile.css?v=3.0">
+    <link rel="stylesheet" href="css/features/friends.css?v=3.0">
+    <link rel="stylesheet" href="css/features/chat.css?v=3.0">
+    <link rel="stylesheet" href="css/features/modals.css?v=3.0">
+    <link rel="stylesheet" href="css/features/notifications.css?v=3.0">
+    <link rel="stylesheet" href="css/layout/grid.css?v=3.0">
+    <link rel="stylesheet" href="css/layout/panels.css?v=3.0">
+    <link rel="stylesheet" href="css/layout/sidebar.css?v=3.0">
+    <link rel="stylesheet" href="css/layout/topbar.css?v=3.0">
+    <link rel="stylesheet" href="css/modules/player.css?v=3.0">
+    <link rel="stylesheet" href="css/components/admin.css?v=3.0">
+    
+    <!-- ===== ГЛАВНЫЙ СТИЛЬ — mobile.css ПОДТЯНЕТСЯ ПОСЛЕДНИМ ===== -->
+    <link rel="stylesheet" href="css/style.css?v=3.1">
 </head>
 <body>
 
-<div class="app" id="app">
+<!-- ===== ВЕСЬ ТВОЙ HTML КАК БЫЛ ===== -->
+<!-- ... (просто копируй сюда ВЕСЬ свой старый index.html без head) ... -->
 
+<div class="app" id="app">
     <!-- ===== ТОП-БАР ===== -->
     <header class="pc-topbar" id="topbar">
         <div class="logo">
             <span class="menu-icon" onclick="toggleSidebar()">☰</span>
             <span onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
         </div>
-        <input class="search" placeholder="Поиск..." id="pcSearch">
+        <input class="search" placeholder="Search..." id="pcSearch">
         <div class="right">
             <button onclick="openChatList()">💬</button>
             <button onclick="openNotifications()">🔔</button>
@@ -57,18 +69,18 @@
     <!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== -->
     <div id="settingsDropdown" class="settings-dropdown">
         <div class="settings-item" onclick="toggleTheme()">
-            <span class="icon">🌓</span> Тема
+            <span class="icon">🌓</span> Theme
         </div>
         <div class="settings-item" onclick="toggleLanguage()">
-            <span class="icon">🌐</span> <span id="langDisplay">Русский</span>
+            <span class="icon">🌐</span> <span id="langDisplay">English</span>
         </div>
         <div class="settings-divider"></div>
         <div class="settings-item" onclick="toggleViewMode()">
-            <span class="icon">📱</span> <span id="viewModeDisplay">ПК</span>
+            <span class="icon">📱</span> <span id="viewModeDisplay">PC</span>
         </div>
         <div class="settings-divider"></div>
         <div class="settings-item" onclick="logout()">
-            <span class="icon">🚪</span> Выйти
+            <span class="icon">🚪</span> Logout
         </div>
     </div>
 
@@ -79,31 +91,31 @@
         <div class="user-info">
             <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
             <div>
-                <div class="name" id="sName">Гость</div>
+                <div class="name" id="sName">Guest</div>
                 <div class="email" id="sEmail"></div>
             </div>
         </div>
-        <div class="menu-item" onclick="goToFeed();closeSidebar();"><span class="icon">🏠</span> Главная</div>
-        <div class="menu-item" onclick="goToProfile();closeSidebar();"><span class="icon">👤</span> Профиль</div>
-        <div class="menu-item" onclick="goToPeople();closeSidebar();"><span class="icon">👥</span> Люди</div>
-        <div class="menu-item" onclick="goToGroups();closeSidebar();"><span class="icon">📁</span> Группы</div>
+        <div class="menu-item" onclick="goToFeed();closeSidebar();"><span class="icon">🏠</span> Home</div>
+        <div class="menu-item" onclick="goToProfile();closeSidebar();"><span class="icon">👤</span> Profile</div>
+        <div class="menu-item" onclick="goToPeople();closeSidebar();"><span class="icon">👥</span> People</div>
+        <div class="menu-item" onclick="goToGroups();closeSidebar();"><span class="icon">📁</span> Groups</div>
         <div class="menu-divider"></div>
-        <div class="menu-item" onclick="openPage('foto');closeSidebar();"><span class="icon">📸</span> Фото</div>
-        <div class="menu-item" onclick="openPage('page');closeSidebar();"><span class="icon">📄</span> Страницы</div>
+        <div class="menu-item" onclick="openPage('foto');closeSidebar();"><span class="icon">📸</span> Photos</div>
+        <div class="menu-item" onclick="openPage('page');closeSidebar();"><span class="icon">📄</span> Pages</div>
         <div class="menu-divider"></div>
-        <div style="font-size:0.6rem;color:var(--muted-text);padding:4px 12px;text-transform:uppercase;">📂 Разделы</div>
+        <div style="font-size:0.6rem;color:var(--muted-text);padding:4px 12px;text-transform:uppercase;">📂 Sections</div>
         <div class="menu-sub">
-            <div class="menu-item" onclick="window.location.href='pages/news/novosti.html';closeSidebar();"><span class="icon">📰</span> Новости</div>
-            <div class="menu-item" onclick="window.location.href='pages/multimedia/video.html';closeSidebar();"><span class="icon">🎬</span> Видео</div>
-            <div class="menu-item" onclick="window.location.href='pages/multimedia/muzyka.html';closeSidebar();"><span class="icon">🎵</span> Музыка</div>
-            <div class="menu-item" onclick="window.location.href='pages/life/igry.html';closeSidebar();"><span class="icon">🎮</span> Игры</div>
-            <div class="menu-item" onclick="window.location.href='pages/life/sport.html';closeSidebar();"><span class="icon">⚽</span> Спорт</div>
+            <div class="menu-item" onclick="window.location.href='pages/news/novosti.html';closeSidebar();"><span class="icon">📰</span> News</div>
+            <div class="menu-item" onclick="window.location.href='pages/multimedia/video.html';closeSidebar();"><span class="icon">🎬</span> Video</div>
+            <div class="menu-item" onclick="window.location.href='pages/multimedia/muzyka.html';closeSidebar();"><span class="icon">🎵</span> Music</div>
+            <div class="menu-item" onclick="window.location.href='pages/life/igry.html';closeSidebar();"><span class="icon">🎮</span> Games</div>
+            <div class="menu-item" onclick="window.location.href='pages/life/sport.html';closeSidebar();"><span class="icon">⚽</span> Sports</div>
         </div>
         <div class="menu-divider"></div>
-        <div class="menu-item" onclick="openNotifications();closeSidebar();"><span class="icon">🔔</span> Уведомления</div>
-        <div class="menu-item" onclick="openChatList();closeSidebar();"><span class="icon">💬</span> Чаты</div>
+        <div class="menu-item" onclick="openNotifications();closeSidebar();"><span class="icon">🔔</span> Notifications</div>
+        <div class="menu-item" onclick="openChatList();closeSidebar();"><span class="icon">💬</span> Chats</div>
         <div class="menu-divider"></div>
-        <div class="menu-item" onclick="logout();closeSidebar();"><span class="icon">🚪</span> Выйти</div>
+        <div class="menu-item" onclick="logout();closeSidebar();"><span class="icon">🚪</span> Logout</div>
     </div>
 
     <!-- ===== КОНТЕЙНЕРЫ ===== -->
@@ -117,15 +129,15 @@
         <!-- ЛЕВАЯ ПАНЕЛЬ -->
         <div class="panel-left" id="panelLeft">
             <div class="panel-card">
-                <div class="panel-title">🔥 Тренды</div>
-                <div class="panel-item">#метаимперия</div>
-                <div class="panel-item">#новости</div>
-                <div class="panel-item">#музыка</div>
+                <div class="panel-title">🔥 Trending</div>
+                <div class="panel-item">#metaimperiya</div>
+                <div class="panel-item">#news</div>
+                <div class="panel-item">#music</div>
             </div>
             <div class="panel-card">
-                <div class="panel-title">📊 Статистика</div>
-                <div class="panel-item">👥 Онлайн: <span id="onlineCount">0</span></div>
-                <div class="panel-item">📰 Постов: <span id="totalPosts">0</span></div>
+                <div class="panel-title">📊 Statistics</div>
+                <div class="panel-item">👥 Online: <span id="onlineCount">0</span></div>
+                <div class="panel-item">📰 Posts: <span id="totalPosts">0</span></div>
             </div>
         </div>
 
@@ -135,10 +147,10 @@
             <!-- ПЛЕЕР -->
             <div class="player-drawer" id="playerDrawer">
                 <div class="handle" onclick="toggleDrawer()">
-                    <div class="bar"></div> 🎵 ПЛЕЕР <div class="bar"></div>
+                    <div class="bar"></div> 🎵 PLAYER <div class="bar"></div>
                 </div>
                 <div class="content" id="playerContent">
-                    <div class="track-info"><div class="track-name" id="currentTrackName">Выберите трек</div></div>
+                    <div class="track-info"><div class="track-name" id="currentTrackName">Select a track</div></div>
                     <div class="progress-wrap" id="progressWrap"><div class="progress-fill" id="progressFill"></div></div>
                     <div class="time-wrap"><span id="currentTime">0:00</span><span id="totalTime">0:00</span></div>
                     <div class="controls">
@@ -168,11 +180,11 @@
                             <button onclick="formatText('code')">&lt;/&gt;</button>
                             <button onclick="insertLink()">🔗</button>
                         </div>
-                        <div contenteditable="true" id="postEditor" class="post-editor" placeholder="Что у вас нового?"></div>
+                        <div contenteditable="true" id="postEditor" class="post-editor" placeholder="What's new?"></div>
                         <div class="post-actions">
-                            <label class="file-label" for="fileInput">📎 Фото</label>
-                            <button class="btn-submit" onclick="submitPost()">📤 Опубликовать</button>
-                            <button class="btn-cancel" onclick="clearPostForm()">Очистить</button>
+                            <label class="file-label" for="fileInput">📎 Photo</label>
+                            <button class="btn-submit" onclick="submitPost()">📤 Publish</button>
+                            <button class="btn-cancel" onclick="clearPostForm()">Clear</button>
                         </div>
                         <input type="file" id="fileInput" accept="image/*" class="hidden">
                         <div class="preview-box" id="previewBox">
@@ -186,12 +198,12 @@
 
             <!-- ГРУППЫ -->
             <div class="page" id="page-groups">
-                <div class="card"><h3>👥 Группы</h3><div class="group-list" id="groupList"></div></div>
+                <div class="card"><h3>👥 Groups</h3><div class="group-list" id="groupList"></div></div>
             </div>
 
             <!-- ЛЮДИ -->
             <div class="page" id="page-people">
-                <div class="card"><h3>👤 Все пользователи</h3><div class="people-list" id="peopleList"></div></div>
+                <div class="card"><h3>👤 All users</h3><div class="people-list" id="peopleList"></div></div>
             </div>
 
             <!-- ПРОФИЛЬ -->
@@ -201,9 +213,9 @@
                     <div class="name" id="profileName"></div>
                     <div class="bio" id="profileBio"></div>
                     <div class="profile-stats">
-                        <span>🤝 Друзья: <span id="friendsCount" class="stat-clickable">0</span></span>
-                        <span>👀 Подписчики: <span id="subscribersCount" class="stat-clickable">0</span></span>
-                        <span>📌 Подписки: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
+                        <span>🤝 Friends: <span id="friendsCount" class="stat-clickable">0</span></span>
+                        <span>👀 Subscribers: <span id="subscribersCount" class="stat-clickable">0</span></span>
+                        <span>📌 Subscriptions: <span id="subscriptionsCount" class="stat-clickable">0</span></span>
                     </div>
                     <div class="profile-actions" id="profileActions"></div>
                 </div>
@@ -220,11 +232,11 @@
                             <button onclick="formatText('code')">&lt;/&gt;</button>
                             <button onclick="insertLink()">🔗</button>
                         </div>
-                        <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="Что у вас нового в профиле?"></div>
+                        <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="What's new on your profile?"></div>
                         <div class="post-actions">
-                            <label class="file-label" for="fileInputProfile">📎 Фото</label>
-                            <button class="btn-submit" onclick="submitProfilePost()">📤 Опубликовать</button>
-                            <button class="btn-cancel" onclick="clearProfilePostForm()">Очистить</button>
+                            <label class="file-label" for="fileInputProfile">📎 Photo</label>
+                            <button class="btn-submit" onclick="submitProfilePost()">📤 Publish</button>
+                            <button class="btn-cancel" onclick="clearProfilePostForm()">Clear</button>
                         </div>
                         <input type="file" id="fileInputProfile" accept="image/*" class="hidden">
                         <div class="preview-box" id="previewBoxProfile">
@@ -233,15 +245,15 @@
                         </div>
                     </div>
                 </div>
-                <h4 style="margin:10px 0 6px;">📰 Мои посты</h4>
+                <h4 style="margin:10px 0 6px;">📰 My posts</h4>
                 <div id="profilePosts"></div>
             </div>
 
             <!-- ФОТО -->
             <div class="page" id="page-foto" style="display:none;">
                 <div style="padding-top:10px;">
-                    <button onclick="window.location.href='/'" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-weight:600;">← Назад</button>
-                    <h1>📸 Фото</h1>
+                    <button onclick="window.location.href='/'" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-weight:600;">← Back</button>
+                    <h1>📸 Photos</h1>
                     <div class="card" style="margin-top:10px;">
                         <div class="post-form">
                             <div class="editor-toolbar">
@@ -255,11 +267,11 @@
                                 <button onclick="formatText('code')">&lt;/&gt;</button>
                                 <button onclick="insertLink()">🔗</button>
                             </div>
-                            <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="Что нового в мире фото?"></div>
+                            <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="What's new in photos?"></div>
                             <div class="post-actions">
-                                <label class="file-label" for="fileInputFoto">📎 Фото</label>
-                                <button class="btn-submit" onclick="submitFotoPost()">📤 Опубликовать</button>
-                                <button class="btn-cancel" onclick="clearFotoPostForm()">Очистить</button>
+                                <label class="file-label" for="fileInputFoto">📎 Photo</label>
+                                <button class="btn-submit" onclick="submitFotoPost()">📤 Publish</button>
+                                <button class="btn-cancel" onclick="clearFotoPostForm()">Clear</button>
                             </div>
                             <input type="file" id="fileInputFoto" accept="image/*" class="hidden">
                             <div class="preview-box" id="previewBoxFoto">
@@ -274,24 +286,24 @@
 
             <!-- СТРАНИЦЫ -->
             <div class="page" id="page-page" style="display:none;">
-                <div style="padding:6px 0;"><button class="back-btn" onclick="window.location.href='/'">← Назад</button></div>
+                <div style="padding:6px 0;"><button class="back-btn" onclick="window.location.href='/'">← Back</button></div>
                 <div id="pageContainer"></div>
             </div>
 
             <!-- ЧАТ -->
             <div class="chat-view" id="chatView">
-                <button class="back-btn" onclick="closeChat()">← Назад</button>
+                <button class="back-btn" onclick="closeChat()">← Back</button>
                 <div class="chat-messages" id="chatMessages"></div>
-                <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Печатает...</div>
+                <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Typing...</div>
                 <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="Сообщение...">
+                    <input type="text" id="chatInput" placeholder="Message...">
                     <button onclick="sendChatMessage()">→</button>
                 </div>
             </div>
 
             <!-- ПОСТ -->
             <div class="page" id="postPage">
-                <div style="padding:6px 0;"><button class="back-btn" onclick="closePostPage()">← Назад</button></div>
+                <div style="padding:6px 0;"><button class="back-btn" onclick="closePostPage()">← Back</button></div>
                 <div id="postPageContainer"></div>
             </div>
 
@@ -300,10 +312,10 @@
         <!-- ПРАВАЯ ПАНЕЛЬ -->
         <div class="panel-right" id="panelRight">
             <div class="panel-card" style="min-height:300px;">
-                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">📦 Твой фрейм #1</div>
+                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">📦 Your frame #1</div>
             </div>
             <div class="panel-card" style="min-height:200px;">
-                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">📦 Твой фрейм #2</div>
+                <div style="color:var(--muted-text);font-size:0.65rem;text-align:center;padding:10px;">📦 Your frame #2</div>
             </div>
         </div>
 
@@ -315,8 +327,8 @@
     <div class="modal-overlay" id="loginModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeLogin()">✕</button>
-            <h3>👤 Вход</h3>
-            <button class="btn-primary" onclick="document.getElementById('googleBtn').click()" style="width:100%;padding:12px;font-size:1rem;">🔑 Войти через Google</button>
+            <h3>👤 Login</h3>
+            <button class="btn-primary" onclick="document.getElementById('googleBtn').click()" style="width:100%;padding:12px;font-size:1rem;">🔑 Login with Google</button>
             <button id="googleBtn" style="display:none;"></button>
         </div>
     </div>
@@ -324,33 +336,33 @@
     <div class="modal-overlay" id="editProfileModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeEditProfile()">✕</button>
-            <h3>✏️ Редактировать профиль</h3>
-            <input type="text" id="editName" placeholder="Имя...">
-            <textarea id="editBio" placeholder="О себе..."></textarea>
-            <button class="btn-primary" onclick="saveProfile()">💾 Сохранить</button>
-            <button class="btn-secondary" onclick="closeEditProfile()">Отмена</button>
+            <h3>✏️ Edit profile</h3>
+            <input type="text" id="editName" placeholder="Name...">
+            <textarea id="editBio" placeholder="About you..."></textarea>
+            <button class="btn-primary" onclick="saveProfile()">💾 Save</button>
+            <button class="btn-secondary" onclick="closeEditProfile()">Cancel</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeEdit()">✕</button>
-            <h3>✏️ Редактировать пост</h3>
-            <input type="text" id="editMarquee" placeholder="Бегущая строка...">
-            <textarea id="editText" placeholder="Текст поста..." style="min-height:80px;"></textarea>
-            <input type="text" id="editLink" placeholder="Ссылка для встраивания...">
-            <input type="text" id="editHashtags" placeholder="#хэштеги через пробел">
+            <h3>✏️ Edit post</h3>
+            <input type="text" id="editMarquee" placeholder="Marquee text...">
+            <textarea id="editText" placeholder="Post text..." style="min-height:80px;"></textarea>
+            <input type="text" id="editLink" placeholder="Embed link...">
+            <input type="text" id="editHashtags" placeholder="#hashtags separated by space">
             <div style="margin:8px 0;display:flex;gap:8px;align-items:center;">
-                <span style="font-size:0.7rem;color:var(--text-secondary);">Размер фрейма:</span>
-                <button id="frameSizeSmall" class="btn-secondary" onclick="setFrameSize('small')" style="padding:2px 12px;font-size:0.6rem;">📱 Маленький</button>
-                <button id="frameSizeLarge" class="btn-secondary" onclick="setFrameSize('large')" style="padding:2px 12px;font-size:0.6rem;">🖥️ Большой</button>
+                <span style="font-size:0.7rem;color:var(--text-secondary);">Frame size:</span>
+                <button id="frameSizeSmall" class="btn-secondary" onclick="setFrameSize('small')" style="padding:2px 12px;font-size:0.6rem;">📱 Small</button>
+                <button id="frameSizeLarge" class="btn-secondary" onclick="setFrameSize('large')" style="padding:2px 12px;font-size:0.6rem;">🖥️ Large</button>
             </div>
             <div id="editButtonsContainer"></div>
-            <button onclick="addEditBtn()" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-size:0.7rem;padding:4px 0;">➕ Добавить кнопку</button>
+            <button onclick="addEditBtn()" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-size:0.7rem;padding:4px 0;">➕ Add button</button>
             <div style="margin-top:8px;display:flex;gap:8px;">
-                <button class="btn-primary" onclick="saveEdit()">💾 Сохранить</button>
-                <button class="btn-secondary" onclick="closeEdit()">Отмена</button>
-                <button class="btn-danger" onclick="deleteEditPost()" style="margin-left:auto;">🗑 Удалить</button>
+                <button class="btn-primary" onclick="saveEdit()">💾 Save</button>
+                <button class="btn-secondary" onclick="closeEdit()">Cancel</button>
+                <button class="btn-danger" onclick="deleteEditPost()" style="margin-left:auto;">🗑 Delete</button>
             </div>
         </div>
     </div>
@@ -358,7 +370,7 @@
     <div class="modal-overlay" id="notificationsModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeNotifications()">✕</button>
-            <h3>🔔 Уведомления</h3>
+            <h3>🔔 Notifications</h3>
             <div id="notificationsList"></div>
         </div>
     </div>
@@ -366,13 +378,13 @@
     <div class="modal-overlay" id="repostModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeRepost()">✕</button>
-            <h3>🔄 Репост</h3>
+            <h3>🔄 Repost</h3>
             <input type="hidden" id="repostPostId">
             <input type="hidden" id="repostType">
-            <textarea id="repostText" placeholder="Напишите что-нибудь (необязательно)..." style="min-height:60px;"></textarea>
+            <textarea id="repostText" placeholder="Write something (optional)..." style="min-height:60px;"></textarea>
             <div style="display:flex;gap:8px;">
-                <button class="btn-primary" onclick="submitRepost()">🔄 Репостнуть</button>
-                <button class="btn-secondary" onclick="closeRepost()">Отмена</button>
+                <button class="btn-primary" onclick="submitRepost()">🔄 Repost</button>
+                <button class="btn-secondary" onclick="closeRepost()">Cancel</button>
             </div>
         </div>
     </div>
@@ -380,7 +392,7 @@
     <div class="modal-overlay" id="chatListModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeChatList()">✕</button>
-            <h3>💬 Чаты</h3>
+            <h3>💬 Chats</h3>
             <div id="chatListContainer"></div>
         </div>
     </div>
@@ -388,43 +400,29 @@
     <div class="modal-overlay" id="adminChatsModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeAdminChats()">✕</button>
-            <h3>🏴‍☠️ Все чаты (админ)</h3>
+            <h3>🏴‍☠️ All chats (admin)</h3>
             <div id="adminChatsList"></div>
         </div>
     </div>
 
 </div>
 
-<!-- ================================================================ -->
-<!-- ПОДКЛЮЧЕНИЕ JS-ФАЙЛОВ -->
-<!-- ================================================================ -->
-
-<!-- 1. CORE -->
-<script src="js/core/firebase.js"></script>
-<script src="js/core/auth.js"></script>
-<script src="js/core/app.js"></script>
-<script src="js/core/lang.js"></script>
-
-<!-- 2. МОДУЛИ -->
-<script src="js/modules/player.js"></script>
-
-<!-- 3. ЛЕНТА -->
-<script src="js/features/feed/feed-core.js"></script>
-<script src="js/features/feed/feed-actions.js"></script>
-<script src="js/features/feed/feed-edit.js"></script>
-
-<!-- 4. ОСТАЛЬНЫЕ ФИЧИ -->
-<script src="js/features/profile.js"></script>
-<script src="js/features/friends.js"></script>
-<script src="js/features/groups.js"></script>
-<script src="js/features/chat.js"></script>
-<script src="js/features/notifications.js"></script>
-<script src="js/features/admin.js"></script>
-<script src="js/features/page.js"></script>
-
-<!-- ================================================================ -->
-<!-- ВСТРОЕННЫЙ JS -->
-<!-- ================================================================ -->
+<!-- ===== JS ===== -->
+<script src="js/core/firebase.js?v=3.0"></script>
+<script src="js/core/auth.js?v=3.0"></script>
+<script src="js/core/app.js?v=3.0"></script>
+<script src="js/core/lang.js?v=3.0"></script>
+<script src="js/modules/player.js?v=3.0"></script>
+<script src="js/features/feed/feed-core.js?v=3.1"></script>
+<script src="js/features/feed/feed-actions.js?v=3.0"></script>
+<script src="js/features/feed/feed-edit.js?v=3.0"></script>
+<script src="js/features/profile.js?v=3.0"></script>
+<script src="js/features/friends.js?v=3.0"></script>
+<script src="js/features/groups.js?v=3.0"></script>
+<script src="js/features/chat.js?v=3.0"></script>
+<script src="js/features/notifications.js?v=3.0"></script>
+<script src="js/features/admin.js?v=3.0"></script>
+<script src="js/features/page.js?v=3.0"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -437,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (feed) {
             feed.classList.add('active');
             feed.style.display = 'block';
-            console.log('✅ Принудительно открыта лента');
+            console.log('✅ Feed opened');
         }
         if (typeof updateUI === 'function') updateUI();
         if (typeof updatePcTopbar === 'function') updatePcTopbar();
@@ -451,7 +449,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-console.log('✅ index.html загружен');
+console.log('✅ index.html loaded (v3.0)');
 </script>
 
 </body>

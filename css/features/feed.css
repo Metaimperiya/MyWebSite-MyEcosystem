@@ -157,6 +157,8 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 6px;
+    position: relative;
+    padding-right: 30px;
 }
 
 .post .author .avatar-wrap {
@@ -237,34 +239,22 @@
     background: var(--border-color);
 }
 
-/* ===== БЕГУЩАЯ СТРОКА ===== */
-.post .post-content .marquee {
-    background: var(--input-bg);
-    padding: 4px 8px;
-    border-radius: 6px;
-    margin-bottom: 4px;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    overflow: hidden;
-}
-
-.post .post-content .marquee span {
-    display: block;
-    animation: marquee 10s linear infinite;
-}
-
-@keyframes marquee {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-}
-
 /* ===== ПРЕВЬЮ ССЫЛКИ ===== */
 .post .post-content .link-preview {
     margin-top: 6px;
+    height: 250px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+}
+
+.post .post-content .link-preview.link-preview--large {
+    height: 450px;
 }
 
 .post .post-content .link-preview iframe {
     width: 100%;
+    height: 100%;
+    display: block;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     background: #fff;
@@ -377,307 +367,6 @@
 /* ===== МЕНЮ ПОСТА (ТРИ ТОЧКИ) ===== */
 .post .post-menu {
     position: absolute;
-    top: 8px;
-    right: 10px;
-}
-
-.post .post-menu .dots {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-    padding: 0 4px;
-    line-height: 1;
-}
-
-.post .post-menu .dots:hover {
-    color: var(--text-color);
-}
-
-.post .post-menu .dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 24px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    z-index: 60;
-    min-width: 140px;
-    padding: 4px 0;
-}
-
-.post .post-menu .dropdown.open {
-    display: block;
-}
-
-.post .post-menu .dropdown button {
-    display: block;
-    width: 100%;
-    padding: 6px 14px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.7rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: var(--transition);
-}
-
-.post .post-menu .dropdown button:hover {
-    background: var(--input-bg);
-}
-
-.post .post-menu .dropdown .edit-btn {
-    color: var(--warning);
-}
-
-.post .post-menu .dropdown .del-btn {
-    color: var(--danger);
-}
-
-.post .post-menu .dropdown .del-btn:hover {
-    background: #fde8e8;
-}
-
-/* ===== КОММЕНТАРИИ ===== */
-.post .comment-input-wrap {
-    display: flex;
-    gap: 6px;
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px solid var(--border-color);
-}
-
-.post .comment-input-wrap input {
-    flex: 1;
-    padding: 6px 10px;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    background: var(--input-bg);
-    font-size: 0.7rem;
-    outline: none;
-    color: var(--text-color);
-}
-
-.post .comment-input-wrap input:focus {
-    border-color: var(--link-color);
-}
-
-.post .comment-input-wrap button {
-    padding: 6px 12px;
-    background: var(--link-color);
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    cursor: pointer;
-    font-size: 0.7rem;
-}
-
-.post .comments-wrapper {
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px solid var(--border-color);
-}
-
-.post .comments-wrapper .comments .comments-body {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.post .comment-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 4px 0;
-    position: relative;
-}
-
-.post .comment-item .avatar-wrap {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: var(--avatar-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-top: 2px;
-}
-
-.post .comment-item .avatar-wrap .letter {
-    font-size: 0.5rem;
-    font-weight: 700;
-    color: var(--avatar-text);
-}
-
-.post .comment-item .avatar-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.post .comment-item .body {
-    flex: 1;
-    background: var(--input-bg);
-    padding: 4px 10px;
-    border-radius: 12px;
-    min-width: 0;
-}
-
-.post .comment-item .body .name {
-    font-weight: 600;
-    font-size: 0.65rem;
-    color: var(--text-color);
-}
-
-.post .comment-item .body .time {
-    font-size: 0.5rem;
-    color: var(--muted-text);
-    margin-left: 4px;
-}
-
-.post .comment-item .body .text {
-    font-size: 0.75rem;
-    color: var(--text-color);
-    word-wrap: break-word;
-}
-
-.post .comment-item .body .edit-comment-input {
-    width: 100%;
-    padding: 2px 6px;
-    border: 1px solid var(--link-color);
-    border-radius: 4px;
-    font-size: 0.75rem;
-    background: var(--card-bg);
-    color: var(--text-color);
-    outline: none;
-}
-
-.post .comment-item .comment-actions-row {
-    display: flex;
-    gap: 8px;
-    margin-top: 2px;
-}
-
-.post .comment-item .comment-actions-row button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 0.55rem;
-    color: var(--muted-text);
-    padding: 0 2px;
-}
-
-.post .comment-item .comment-actions-row button:hover {
-    color: var(--text-secondary);
-}
-
-.post .comment-item .comment-reply-input-wrap {
-    display: none;
-    gap: 4px;
-    margin-top: 4px;
-}
-
-.post .comment-item .comment-reply-input-wrap input {
-    flex: 1;
-    padding: 4px 8px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: var(--input-bg);
-    font-size: 0.65rem;
-    outline: none;
-    color: var(--text-color);
-}
-
-.post .comment-item .comment-reply-input-wrap input:focus {
-    border-color: var(--link-color);
-}
-
-.post .comment-item .comment-reply-input-wrap button {
-    padding: 4px 10px;
-    background: var(--link-color);
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 0.65rem;
-}
-
-.post .comment-item .comment-actions {
-    position: relative;
-    flex-shrink: 0;
-}
-
-.post .comment-item .comment-actions .more-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 0.8rem;
-    color: var(--muted-text);
-    padding: 0 4px;
-}
-
-.post .comment-item .comment-actions .dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 18px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
-    z-index: 50;
-    min-width: 100px;
-    padding: 4px 0;
-}
-
-.post .comment-item .comment-actions .dropdown.open {
-    display: block;
-}
-
-.post .comment-item .comment-actions .dropdown button {
-    display: block;
-    width: 100%;
-    padding: 4px 12px;
-    background: none;
-    border: none;
-    text-align: left;
-    font-size: 0.6rem;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: var(--transition);
-}
-
-.post .comment-item .comment-actions .dropdown button:hover {
-    background: var(--input-bg);
-}
-
-.post .comment-item .comment-actions .dropdown .edit-btn {
-    color: var(--warning);
-}
-
-.post .comment-item .comment-actions .dropdown .del-btn {
-    color: var(--danger);
-}
-
-.post .comment-item.comment-reply {
-    padding-left: 20px;
-}
-
-.post .no-comments {
-    text-align: center;
-    padding: 8px;
-    color: var(--muted-text);
-    font-size: 0.65rem;
-}
-
-/* ===== МЕНЮ ПОСТА (ТРОЕТОЧИЕ) ===== */
-.post .post-menu {
-    position: absolute;
     top: 4px;
     right: 4px;
     z-index: 10;
@@ -745,12 +434,405 @@
     background: #fde8e8;
 }
 
-/* Убедимся, что .author имеет position:relative для позиционирования меню */
-.post .author {
+/* ================================================================ */
+/* ===== КОММЕНТАРИИ — ИСПРАВЛЕННАЯ ВЕРСИЯ ===== */
+/* ================================================================ */
+
+.comments-wrapper {
+    display: none;
+    margin-top: 6px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 6px;
+    overflow-y: auto;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.comments-wrapper.open {
+    display: block !important;
+    max-height: 600px !important;
+    opacity: 1 !important;
+    overflow-y: auto;
+}
+
+.comments-wrapper[style*="display:block"] {
+    display: block !important;
+    max-height: 600px !important;
+    opacity: 1 !important;
+    overflow-y: auto;
+}
+
+.comments-body {
+    padding: 4px 0;
+}
+
+.comments-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.comments-list::-webkit-scrollbar {
+    width: 4px;
+}
+.comments-list::-webkit-scrollbar-track {
+    background: var(--input-bg);
+    border-radius: 4px;
+}
+.comments-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+.comments-list::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-text);
+}
+
+/* ЭЛЕМЕНТ КОММЕНТАРИЯ */
+.comment-item {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--comment-border);
+    align-items: flex-start;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-item .avatar-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--avatar-bg);
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.comment-item .avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comment-item .avatar-wrap .letter {
+    color: var(--avatar-text);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.comment-item .body {
+    flex: 1;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    min-width: 0;
+}
+
+.comment-item .body .name {
+    font-weight: 600;
+    color: var(--link-color);
+    font-size: 0.75rem;
+}
+
+.comment-item .body .time {
+    color: var(--muted-text);
+    font-size: 0.45rem;
+    margin-left: 4px;
+}
+
+.comment-item .body .text {
+    color: var(--text-color);
+    margin-top: 1px;
+    word-break: break-word;
+    font-size: 0.75rem;
+}
+
+.comment-item .body .text .edit-comment-input {
+    width: 100%;
+    padding: 4px 10px;
+    border: 1px solid var(--link-color);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    outline: none;
+    background: var(--card-bg);
+    color: var(--text-color);
+    margin: 2px 0;
+}
+
+/* ОТВЕТ НА КОММЕНТАРИЙ */
+.comment-reply {
+    margin-left: 24px;
+    border-left: 2px solid var(--link-color);
+    padding-left: 8px;
+    margin-top: 2px;
+    border-radius: 0 0 0 4px;
+}
+
+.comment-actions-row {
+    display: flex;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+
+.comment-like-btn {
+    background: none;
+    border: none;
+    color: var(--muted-text);
+    cursor: pointer;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 12px;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.comment-like-btn:hover {
+    background: var(--input-bg);
+    color: var(--link-color);
+}
+
+.comment-like-btn.liked {
+    color: var(--link-color);
+}
+
+.comment-reply-btn {
+    background: none;
+    border: none;
+    color: var(--link-color);
+    cursor: pointer;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.comment-reply-btn:hover {
+    background: var(--input-bg);
+}
+
+/* МЕНЮ КОММЕНТАРИЯ (ТРИ ТОЧКИ) */
+.comment-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 4px;
     position: relative;
-    padding-right: 30px;
+}
+
+.comment-actions .more-btn {
+    background: none;
+    border: none;
+    color: var(--muted-text);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 4px;
+    line-height: 1;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.comment-actions .more-btn:hover {
+    background: var(--input-bg);
+    color: var(--link-color);
+}
+
+.comment-actions .dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 60;
+    min-width: 140px;
+    padding: 4px 0;
+}
+
+.comment-actions .dropdown.open {
+    display: block;
+}
+
+.comment-actions .dropdown button {
+    display: block;
+    width: 100%;
+    padding: 6px 14px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: background 0.15s;
+}
+
+.comment-actions .dropdown button:hover {
+    background: var(--input-bg);
+}
+
+.comment-actions .dropdown .edit-btn {
+    color: #e67e22;
+}
+
+.comment-actions .dropdown .del-btn {
+    color: var(--danger);
+}
+
+.no-comments {
+    color: var(--muted-text);
+    font-size: 0.6rem;
+    padding: 4px 0;
+    text-align: center;
+}
+
+/* СТРОКА ВВОДА КОММЕНТАРИЯ */
+.comment-input-wrap {
+    display: flex;
+    gap: 4px;
+    padding: 6px 0 4px 0;
+    border-top: 1px solid var(--border-color);
+    margin-top: 6px;
+}
+
+.comment-input-wrap input {
+    flex: 1;
+    padding: 6px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 20px;
+    font-size: 0.7rem;
+    outline: none;
+    background: var(--input-bg);
+    color: var(--text-color);
+    transition: background 0.2s, border 0.2s, color 0.2s;
+}
+
+.comment-input-wrap input:focus {
+    border-color: var(--link-color);
+    background: var(--card-bg);
+}
+
+.comment-input-wrap input::placeholder {
+    color: var(--muted-text);
+}
+
+.comment-input-wrap button {
+    background: var(--link-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.comment-input-wrap button:hover {
+    background: var(--link-hover);
+}
+
+.comment-input-wrap button:disabled {
+    background: var(--muted-text);
+    cursor: not-allowed;
+}
+
+/* СТРОКА ВВОДА ОТВЕТА */
+.comment-reply-input-wrap {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.comment-reply-input-wrap .reply-input {
+    flex: 1;
+    padding: 4px 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 16px;
+    font-size: 0.65rem;
+    outline: none;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+.comment-reply-input-wrap .reply-input:focus {
+    border-color: var(--link-color);
+}
+
+.comment-reply-input-wrap .reply-send-btn {
+    background: var(--link-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.comment-reply-input-wrap .reply-send-btn:hover {
+    background: var(--link-hover);
+}
+
+/* ================================================================ */
+/* БЕГУЩАЯ СТРОКА — ФИКС (РАБОТАЕТ) */
+/* ================================================================ */
+
+.post .marquee {
+    background: var(--input-bg);
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    color: #e67e22;
+    font-weight: 700;
+    overflow: hidden;
+    white-space: nowrap;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.post .marquee span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marqueeScroll 12s linear infinite;
+    white-space: nowrap;
+}
+
+@keyframes marqueeScroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Для тёмной темы */
+[data-theme="dark"] .post .marquee {
+    color: #f39c12;
+    background: var(--input-bg);
+    border-color: var(--border-color);
 }

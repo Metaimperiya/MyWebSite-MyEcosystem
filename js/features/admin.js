@@ -1,47 +1,54 @@
 // ================================================================ */
-// АДМИН-ПАНЕЛЬ — ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ
+// АДМИН-ПАНЕЛЬ — ПОЛНАЯ ВЕРСИЯ С ТОЧКОЙ
 // ================================================================ */
 
-// ===== КНОПКА АДМИНКИ =====
+// ===== КНОПКА АДМИНКИ (ТОЧКА) =====
 window.adminLogin = function() {
     if (isAdmin) {
         adminLogout();
         return;
     }
-    document.getElementById('adminModal').classList.add('open');
-    document.getElementById('adminPass').value = '';
-};
-
-window.closeAdminModal = function() {
-    document.getElementById('adminModal').classList.remove('open');
-};
-
-window.checkAdmin = function() {
-    if (document.getElementById('adminPass').value.trim() === '12345') {
+    
+    var pass = prompt('🏴‍☠️ Введите пароль администратора:');
+    if (pass === null) return;
+    if (pass.trim() === '12345') {
         isAdmin = true;
         localStorage.setItem('dc_admin_' + SITE, '1');
-        document.getElementById('adminDot').classList.add('active');
-        closeAdminModal();
+        var dot = document.getElementById('adminDot');
+        if (dot) dot.classList.add('active');
         alert('🏴‍☠️ Админ-режим включён!');
         if (typeof loadFeed === 'function') loadFeed();
         if (typeof loadProfile === 'function') loadProfile();
+        if (typeof loadPeople === 'function') loadPeople();
+        updateAdminMenu();
     } else {
         alert('❌ Неверный пароль');
     }
 };
 
 // ===== ВЫХОД ИЗ АДМИНКИ =====
-window.adminLogout = function() {
+function adminLogout() {
     isAdmin = false;
     localStorage.removeItem('dc_admin_' + SITE);
-    document.getElementById('adminDot').classList.remove('active');
+    var dot = document.getElementById('adminDot');
+    if (dot) dot.classList.remove('active');
     alert('🏴‍☠️ Админ-режим выключен');
     if (typeof loadFeed === 'function') loadFeed();
     if (typeof loadProfile === 'function') loadProfile();
-};
+    if (typeof loadPeople === 'function') loadPeople();
+    updateAdminMenu();
+}
+
+// ===== ОБНОВЛЕНИЕ МЕНЮ АДМИНА =====
+function updateAdminMenu() {
+    var items = document.querySelectorAll('.admin-only');
+    items.forEach(function(el) {
+        el.style.display = isAdmin ? 'block' : 'none';
+    });
+}
 
 // ===== УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ =====
-function adminDeleteUser(uid) {
+window.adminDeleteUser = function(uid) {
     if (!isAdmin || !uid || uid === USER_UID) return;
     if (!confirm('Удалить пользователя? Это необратимо!')) return;
 
@@ -57,9 +64,10 @@ function adminDeleteUser(uid) {
         console.error(err);
         alert('Ошибка удаления');
     });
-}
+};
 
-function adminDeleteAllUsers() {
+// ===== УДАЛЕНИЕ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ =====
+window.adminDeleteAllUsers = function() {
     if (!isAdmin) return;
     if (!confirm('Удалить ВСЕХ пользователей, кроме админов? Это НЕОБРАТИМО!')) return;
 
@@ -85,25 +93,28 @@ function adminDeleteAllUsers() {
             alert('Ошибка удаления');
         });
     });
-}
+};
 
-function adminClearRooms() {
+// ===== ОЧИСТКА КОМНАТ =====
+window.adminClearRooms = function() {
     if (!isAdmin) return;
     if (!confirm('Очистить все комнаты?')) return;
     db.ref('sites/' + SITE + '/rooms').remove();
     db.ref('sites/' + SITE + '/room_users').remove();
     if (typeof loadGroups === 'function') loadGroups();
     alert('✅ Комнаты очищены');
-}
+};
 
-function adminClearNotifications() {
+// ===== ОЧИСТКА УВЕДОМЛЕНИЙ =====
+window.adminClearNotifications = function() {
     if (!isAdmin) return;
     if (!confirm('Очистить все уведомления?')) return;
     db.ref('sites/' + SITE + '/notifications').remove();
     alert('✅ Уведомления очищены');
-}
+};
 
-function adminExportData() {
+// ===== ЭКСПОРТ ДАННЫХ =====
+window.adminExportData = function() {
     if (!isAdmin) return;
     db.ref('sites/' + SITE).once('value', function(snap) {
         var data = snap.val();
@@ -116,7 +127,7 @@ function adminExportData() {
         a.click();
         URL.revokeObjectURL(url);
     });
-}
+};
 
 // ===== ОТКРЫТИЕ АДМИН-ЧАТОВ =====
 window.openAdminChats = function() {
@@ -196,13 +207,6 @@ window.adminViewChat = function(chatId) {
     loadChat(path);
 };
 
-window.updateAdminMenu = function() {
-    var item = document.getElementById('adminChatsMenuItem');
-    if (item) {
-        item.style.display = isAdmin ? 'block' : 'none';
-    }
-};
-
 // ===== СОЗДАТЬ СТРАНИЦУ АДМИНИСТРАТОРА =====
 window.createAdminPage = function() {
     if (!isAdmin) {
@@ -236,3 +240,17 @@ window.createAdminPage = function() {
             alert('❌ Ошибка: ' + err.message);
         });
 };
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем админ-статус при загрузке
+    if (localStorage.getItem('dc_admin_' + SITE) === '1') {
+        isAdmin = true;
+        var dot = document.getElementById('adminDot');
+        if (dot) dot.classList.add('active');
+    }
+    
+    updateAdminMenu();
+});
+
+console.log('✅ admin.js загружен');

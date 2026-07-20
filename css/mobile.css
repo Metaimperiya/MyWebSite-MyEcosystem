@@ -1,716 +1,433 @@
-/* ================================================================
-   МОБИЛЬНЫЙ АДАПТИВ — ПОЛНАЯ ВЕРСИЯ
-   ================================================================ */
+/* ================================================================ */
+/* МОБИЛЬНАЯ ВЕРСИЯ — ПОЛНЫЙ ФИКС */
+/* ================================================================ */
 
-/* ===== МЕДИА-ЗАПРОС ДЛЯ РЕАЛЬНЫХ МОБИЛЬНЫХ УСТРОЙСТВ ===== */
-@media (max-width: 480px) {
-    /* ===== ШАПКА ===== */
-    .topbar {
-        padding: 6px 8px;
+@media (max-width: 768px) {
+    
+    .app {
+        max-width: 100%;
+        padding: 0;
+        overflow-x: hidden;
     }
     
-    .topbar .left .logo {
-        font-size: 0.7rem;
+    .app-layout {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 0 8px 80px !important;
+        margin-top: 4px !important;
     }
     
-    .topbar .left .menu-btn {
-        font-size: 1rem;
+    .panel-left,
+    .panel-right {
+        display: none !important;
     }
     
-    .topbar .right .username {
-        display: none;
+    .panel-center {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
     }
     
-    .topbar .right .avatar-wrap {
-        width: 24px;
-        height: 24px;
+    .pc-topbar {
+        padding: 6px 10px !important;
+        height: 48px !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 9999 !important;
+        background: var(--card-bg) !important;
+        border-bottom: 1px solid var(--border-color) !important;
     }
     
-    /* ===== КОЛОКОЛЬЧИК ===== */
-    .notif-btn {
-        font-size: 0.8rem;
-        width: 24px;
-        height: 24px;
+    .pc-topbar .logo {
+        font-size: 0.75rem !important;
     }
     
-    #notifBadge {
-        font-size: 0.4rem;
-        min-width: 14px;
-        height: 14px;
-        line-height: 14px;
-        top: -3px;
-        right: -3px;
+    .pc-topbar .logo .menu-icon {
+        font-size: 1.2rem !important;
+        padding: 4px 6px !important;
     }
     
-    /* ===== ТРИ ТОЧКИ ===== */
-    .menu-dots {
-        font-size: 1.2rem;
+    .pc-topbar .search {
+        max-width: 80px !important;
+        margin: 0 4px !important;
+        font-size: 0.55rem !important;
+        padding: 4px 8px !important;
     }
     
-    .settings-dropdown {
-        min-width: 150px;
-        right: 4px;
-        top: 44px;
+    .pc-topbar .right {
+        gap: 4px !important;
     }
     
-    .settings-item {
-        font-size: 0.7rem;
-        padding: 6px 12px;
+    .pc-topbar .right .username {
+        display: none !important;
     }
     
-    /* ===== МИНИ-ПЛЕЕР В ШАПКЕ ===== */
-    .player-mini {
-        max-width: 130px;
-        padding: 2px 6px;
+    .pc-topbar .right .avatar-wrap {
+        width: 28px !important;
+        height: 28px !important;
     }
     
-    .player-mini .track-name {
-        max-width: 35px;
-        font-size: 0.45rem;
+    .pc-topbar .right button {
+        font-size: 0.9rem !important;
+        padding: 2px 4px !important;
     }
     
-    .player-mini .play-btn {
-        width: 18px;
-        height: 18px;
-        font-size: 7px;
-    }
-    
-    .player-mini .playlist-btn {
-        font-size: 0.6rem;
-    }
-    
-    .player-mini .track-time {
-        font-size: 0.4rem;
-    }
-    
-    /* ===== ТАБЫ ===== */
-    .tab-bar .tab {
-        font-size: 0.5rem;
-        padding: 4px 6px;
-    }
-    
-    /* ===== КОНТЕЙНЕР ===== */
-    .container {
-        padding: 6px 6px 50px;
-    }
-    
-    /* ===== ПОСТЫ ===== */
-    .post .link-preview iframe {
-        height: 160px;
-    }
-    
-    .post .post-img {
-        max-height: 300px;
-    }
-    
-    .post .stats button {
-        font-size: 0.5rem;
-        padding: 1px 4px;
-    }
-    
-    /* ===== ГРУППЫ ===== */
-    .group-list {
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-    }
-    
-    .group-card {
-        padding: 8px;
-    }
-    
-    .group-card .icon {
-        font-size: 1.2rem;
-    }
-    
-    .group-card .name {
-        font-size: 0.65rem;
-    }
-    
-    /* ===== ПЛЕЙЛИСТ ===== */
-    .playlist-dropdown {
-        min-width: 120px;
-        right: 0;
-        top: 44px;
-    }
-    
-    .playlist-dropdown .playlist-item {
-        font-size: 10px;
-        padding: 3px 8px;
-    }
-    
-    /* ===== САЙДБАР ===== */
     .sidebar {
-        width: 260px;
-        left: -260px;
-        top: 44px;
-        height: calc(100% - 44px);
+        width: 280px !important;
+        left: -290px !important;
+        top: 0 !important;
+        height: 100% !important;
+        padding: 16px 12px 80px !important;
+        z-index: 99999 !important;
+        background: var(--card-bg) !important;
+        border-right: 1px solid var(--border-color) !important;
+        box-shadow: 4px 0 30px rgba(0,0,0,0.3) !important;
     }
     
-    .sidebar .sidebar-header h3 {
-        font-size: 0.85rem;
+    .sidebar.open {
+        left: 0 !important;
     }
     
-    .sidebar .sidebar-user .name {
-        font-size: 0.75rem;
+    .sidebar .close-btn {
+        font-size: 1.6rem !important;
+        padding: 4px 8px !important;
+        position: absolute !important;
+        top: 8px !important;
+        right: 12px !important;
+        background: none !important;
+        border: none !important;
+        color: var(--text-secondary) !important;
+        cursor: pointer !important;
+        z-index: 10 !important;
     }
     
-    .sidebar .sidebar-nav .nav-item {
-        font-size: 0.7rem;
-        padding: 6px 14px;
+    .sidebar .user-info {
+        padding: 12px 0 !important;
+        margin-top: 8px !important;
     }
     
-    .sidebar .sidebar-title {
-        font-size: 0.5rem;
-        padding: 4px 14px;
+    .sidebar .user-info .avatar-wrap {
+        width: 44px !important;
+        height: 44px !important;
     }
     
-    .sidebar .sidebar-footer .create-btn {
-        font-size: 0.7rem;
-        padding: 6px;
+    .sidebar .user-info .name {
+        font-size: 0.85rem !important;
     }
     
-    /* ===== КОММЕНТАРИИ ===== */
-    .comment-item .avatar-wrap {
-        width: 24px;
-        height: 24px;
+    .sidebar .menu-item {
+        padding: 8px 12px !important;
+        font-size: 0.8rem !important;
     }
     
-    .comment-item .body .name {
-        font-size: 0.65rem;
+    .sidebar .menu-sub {
+        padding-left: 28px !important;
     }
     
-    .comment-item .body .text {
-        font-size: 0.65rem;
+    .sidebar .menu-sub .menu-item {
+        font-size: 0.7rem !important;
+        padding: 5px 10px !important;
     }
     
-    .comment-input-wrap input {
-        font-size: 0.65rem;
-        padding: 4px 10px;
+    .sidebar-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: rgba(0,0,0,0.5) !important;
+        z-index: 99998 !important;
+        display: none !important;
     }
     
-    .comment-input-wrap button {
-        width: 28px;
-        height: 28px;
-        font-size: 0.7rem;
+    .sidebar-overlay.show {
+        display: block !important;
     }
     
-    .comments-list {
-        max-height: 200px;
-    }
-    
-    .comment-like-btn {
-        font-size: 0.5rem;
-        padding: 1px 4px;
-    }
-    
-    /* ===== ПРОФИЛЬ ===== */
-    .profile-header .avatar-wrap {
-        width: 56px;
-        height: 56px;
-    }
-    
-    .profile-header .avatar-wrap .letter {
-        font-size: 1.5rem;
-    }
-    
-    .profile-header .name {
-        font-size: 0.85rem;
-    }
-    
-    .profile-header .bio {
-        font-size: 0.6rem;
-    }
-    
-    .profile-header .profile-stats {
-        font-size: 0.55rem;
-        gap: 8px;
-    }
-    
-    .profile-header .profile-actions button {
-        font-size: 0.5rem;
-        padding: 2px 10px;
-    }
-    
-    .friend-item {
-        font-size: 0.55rem;
-        padding: 1px 6px;
-    }
-    
-    .friend-item .avatar-wrap {
-        width: 14px;
-        height: 14px;
-    }
-    
-    /* ===== ЛЮДИ ===== */
-    .people-item {
-        padding: 6px 10px;
-    }
-    
-    .people-item .avatar-wrap {
-        width: 28px;
-        height: 28px;
-    }
-    
-    .people-item .info .name {
-        font-size: 0.65rem;
-    }
-    
-    .people-item .info .status {
-        font-size: 0.5rem;
-    }
-    
-    /* ===== ЧАТ ===== */
-    .chat-view {
-        height: 50vh;
-        padding: 8px;
-    }
-    
-    .chat-view .chat-messages .msg {
-        font-size: 0.65rem;
-        padding: 3px 6px;
-    }
-    
-    .chat-view .chat-input input {
-        font-size: 0.65rem;
-        padding: 3px 8px;
-    }
-    
-    .chat-view .chat-input button {
-        font-size: 0.6rem;
-        padding: 0 10px;
-    }
-    
-    /* ===== МОДАЛКИ ===== */
-    .modal .modal-box {
-        padding: 12px;
-        max-width: 340px;
-    }
-    
-    .modal .modal-box h3 {
-        font-size: 0.8rem;
-    }
-    
-    .modal .modal-box input,
-    .modal .modal-box textarea {
-        font-size: 0.7rem;
-        padding: 4px 8px;
-    }
-    
-    .modal .modal-actions button {
-        font-size: 0.6rem;
-        padding: 3px 12px;
-    }
-    
-    /* ===== ВЫДВИЖНОЙ ПЛЕЕР ===== */
     .player-drawer {
-        transform: translateY(calc(100% - 40px));
-        border-radius: 12px 12px 0 0;
+        position: relative !important;
+        top: 0 !important;
+        margin: 0 !important;
+        border-radius: 12px !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        transition: max-height 0.4s ease !important;
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+    }
+    
+    .player-drawer.open {
+        max-height: 400px !important;
+        padding: 8px 12px 12px !important;
     }
     
     .player-handle {
-        padding: 6px 0 2px 0;
+        position: relative !important;
+        top: 0 !important;
+        margin: 0 !important;
+        padding: 6px 0 !important;
+        background: transparent !important;
+        border-radius: 0 !important;
     }
     
-    .handle-bar {
-        width: 32px;
-        height: 3px;
+    .player-handle .handle-bar {
+        width: 40px !important;
+        height: 3px !important;
     }
     
-    .player-content {
-        padding: 0 12px 12px 12px;
+    .player-handle .handle-label {
+        font-size: 0.4rem !important;
     }
     
-    .player-content .player-track-name {
-        font-size: 0.8rem;
+    .player-content .controls button {
+        font-size: 0.9rem !important;
+        padding: 4px 6px !important;
     }
     
-    .player-content .player-artist {
-        font-size: 0.6rem;
+    .player-content .controls .play-btn {
+        font-size: 1.4rem !important;
     }
     
-    .player-content .player-controls {
-        gap: 4px;
+    .player-content .track-name {
+        font-size: 0.75rem !important;
     }
     
-    .player-content .player-btn {
-        font-size: 0.9rem;
-        padding: 3px 6px;
+    .player-content .playlist .playlist-item {
+        font-size: 0.55rem !important;
+        padding: 2px 6px !important;
     }
     
-    .player-content .player-btn.play-large {
-        font-size: 1.5rem;
+    .post {
+        padding: 10px 12px !important;
+        margin-bottom: 8px !important;
     }
     
-    .player-content .player-progress-bar {
-        height: 2px;
+    .post .author .avatar-wrap {
+        width: 28px !important;
+        height: 28px !important;
     }
     
-    .player-content .player-time {
-        font-size: 0.45rem;
+    .post .author .name {
+        font-size: 0.75rem !important;
     }
     
-    .player-content .player-playlist {
-        max-height: 120px;
-        padding-top: 6px;
+    .post .post-content {
+        font-size: 0.8rem !important;
     }
     
-    .player-content .player-playlist .playlist-item {
-        font-size: 0.55rem;
-        padding: 2px 6px;
+    .post .post-content img.post-img {
+        max-height: 250px !important;
     }
     
-    /* ===== РЕДАКТИРОВАНИЕ ПОСТА ===== */
-    .frame-size-toggle .label {
-        font-size: 0.6rem;
+    /* ===== IFRAME НА ТЕЛЕФОНЕ — ПРАВИЛЬНЫЙ ХАК ===== */
+    .post .post-content .link-preview {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 250px !important;
+        padding-bottom: 0 !important;
+        overflow: hidden !important;
+        margin: 6px 0 !important;
+        border-radius: 8px !important;
+    }
+
+    .post .post-content .link-preview.link-preview--large {
+        height: 450px !important;
     }
     
-    .frame-size-btn {
-        font-size: 0.5rem;
-        padding: 3px 10px;
+    .post .post-content .link-preview iframe {
+        position: static !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        border-radius: 8px !important;
+        border: none !important;
     }
     
-    .btn-group-edit input {
-        font-size: 0.6rem;
-        padding: 3px 6px;
+    .comment-item .avatar-wrap {
+        width: 24px !important;
+        height: 24px !important;
     }
     
-    .btn-add {
-        font-size: 0.55rem;
-        padding: 2px 10px;
+    .comment-item .body {
+        font-size: 0.65rem !important;
     }
     
-    .btn-remove {
-        font-size: 0.5rem;
-        padding: 3px 8px;
+    .comment-input-wrap input {
+        font-size: 0.6rem !important;
+        padding: 4px 10px !important;
+    }
+    
+    .comment-input-wrap button {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .post-form {
+        padding: 8px 10px !important;
+    }
+    
+    .post-editor {
+        min-height: 40px !important;
+        font-size: 0.8rem !important;
+        padding: 6px 8px !important;
+    }
+    
+    .editor-toolbar button {
+        font-size: 0.6rem !important;
+        padding: 2px 6px !important;
+    }
+    
+    .post-actions button,
+    .post-actions label {
+        font-size: 0.55rem !important;
+        padding: 3px 10px !important;
+    }
+    
+    .card {
+        padding: 10px 12px !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .modal-box {
+        max-width: 94% !important;
+        padding: 16px !important;
+    }
+    
+    .modal-box h3 {
+        font-size: 0.9rem !important;
+    }
+    
+    .modal-box input,
+    .modal-box textarea {
+        font-size: 0.75rem !important;
+        padding: 6px 10px !important;
+    }
+    
+    .chat-view {
+        height: 55vh !important;
+        padding: 8px !important;
+    }
+    
+    .chat-view .chat-messages .msg {
+        font-size: 0.7rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    .chat-view .chat-input input {
+        font-size: 0.65rem !important;
+        padding: 4px 8px !important;
+    }
+    
+    .chat-view .chat-input button {
+        font-size: 0.6rem !important;
+        padding: 0 10px !important;
+    }
+    
+    .profile-header {
+        padding: 12px !important;
+    }
+    
+    .profile-header .avatar-wrap {
+        width: 56px !important;
+        height: 56px !important;
+    }
+    
+    .profile-header .name {
+        font-size: 0.9rem !important;
+    }
+    
+    .profile-header .bio {
+        font-size: 0.65rem !important;
+    }
+    
+    .profile-header .profile-stats {
+        font-size: 0.55rem !important;
+        gap: 8px !important;
+    }
+    
+    .group-list {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 4px !important;
+    }
+    
+    .group-card {
+        padding: 8px !important;
+    }
+    
+    .group-card .icon {
+        font-size: 1.2rem !important;
+    }
+    
+    .group-card .name {
+        font-size: 0.6rem !important;
+    }
+    
+    .people-item {
+        padding: 6px 10px !important;
+    }
+    
+    .people-item .avatar-wrap {
+        width: 28px !important;
+        height: 28px !important;
+    }
+    
+    .people-item .info .name {
+        font-size: 0.65rem !important;
+    }
+    
+    .people-item .info .status {
+        font-size: 0.5rem !important;
+    }
+    
+    .admin-dot {
+        width: 10px !important;
+        height: 10px !important;
+        bottom: 8px !important;
+        right: 8px !important;
+    }
+    
+    .settings-dropdown {
+        min-width: 140px !important;
+        right: 4px !important;
+        top: 44px !important;
+    }
+    
+    .settings-item {
+        font-size: 0.65rem !important;
+        padding: 6px 12px !important;
     }
 }
 
-/* ================================================================ */
-/* ПРИНУДИТЕЛЬНЫЙ МОБИЛЬНЫЙ РЕЖИМ (класс .mobile-view) */
-/* ================================================================ */
-
-.mobile-view .panel-left,
-.mobile-view .panel-right {
-    display: none !important;
-}
-
-.mobile-view .app-layout {
-    grid-template-columns: 1fr !important;
-    gap: 6px !important;
-    padding: 0 4px 80px !important;
-}
-
-.mobile-view .panel-center {
-    max-width: 100% !important;
-    width: 100% !important;
-    padding: 0 !important;
-}
-
-.mobile-view .pc-topbar {
-    padding: 4px 8px !important;
-    height: 48px !important;
-}
-
-.mobile-view .pc-topbar .logo {
-    font-size: 0.75rem !important;
-}
-
-.mobile-view .pc-topbar .logo .menu-icon {
-    font-size: 1rem !important;
-}
-
-.mobile-view .pc-topbar .search {
-    max-width: 90px !important;
-    margin: 0 4px !important;
-    font-size: 0.55rem !important;
-    padding: 3px 6px !important;
-}
-
-.mobile-view .pc-topbar .right {
-    gap: 4px !important;
-}
-
-.mobile-view .pc-topbar .right .username {
-    display: none !important;
-}
-
-.mobile-view .pc-topbar .right .avatar-wrap {
-    width: 24px !important;
-    height: 24px !important;
-}
-
-.mobile-view .pc-topbar .right button {
-    font-size: 0.7rem !important;
-    padding: 2px 3px !important;
-}
-
-.mobile-view .post-form {
-    padding: 4px 6px !important;
-}
-
-.mobile-view .post {
-    padding: 6px 8px !important;
-    margin-bottom: 6px !important;
-}
-
-.mobile-view .post .link-preview iframe {
-    height: 160px !important;
-}
-
-.mobile-view .post .post-img {
-    max-height: 200px !important;
-}
-
-.mobile-view .post .stats button {
-    font-size: 0.5rem !important;
-    padding: 2px 4px !important;
-}
-
-.mobile-view .player-drawer {
-    margin-bottom: 6px !important;
-}
-
-.mobile-view .player-drawer .controls button {
-    font-size: 0.7rem !important;
-    padding: 2px 4px !important;
-}
-
-.mobile-view .player-drawer .controls .play-btn {
-    font-size: 1rem !important;
-}
-
-.mobile-view .group-list {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 4px !important;
-}
-
-.mobile-view .group-card {
-    padding: 6px !important;
-}
-
-.mobile-view .group-card .icon {
-    font-size: 1rem !important;
-}
-
-.mobile-view .group-card .name {
-    font-size: 0.6rem !important;
-}
-
-.mobile-view .profile-header .avatar-wrap {
-    width: 48px !important;
-    height: 48px !important;
-}
-
-.mobile-view .profile-header .name {
-    font-size: 0.75rem !important;
-}
-
-.mobile-view .profile-header .bio {
-    font-size: 0.55rem !important;
-}
-
-.mobile-view .profile-stats {
-    font-size: 0.5rem !important;
-    gap: 6px !important;
-}
-
-.mobile-view .profile-actions button {
-    font-size: 0.5rem !important;
-    padding: 2px 8px !important;
-}
-
-.mobile-view .sidebar {
-    width: 260px !important;
-}
-
-.mobile-view .settings-dropdown {
-    min-width: 140px !important;
-    right: 4px !important;
-    top: 44px !important;
-}
-
-.mobile-view .settings-item {
-    font-size: 0.65rem !important;
-    padding: 5px 10px !important;
-}
-
-.mobile-view .comments-list {
-    max-height: 120px !important;
-}
-
-.mobile-view .comment-item .avatar-wrap {
-    width: 20px !important;
-    height: 20px !important;
-}
-
-.mobile-view .comment-item .body {
-    font-size: 0.6rem !important;
-}
-
-.mobile-view .comment-input-wrap input {
-    font-size: 0.55rem !important;
-    padding: 3px 6px !important;
-}
-
-.mobile-view .comment-input-wrap button {
-    width: 22px !important;
-    height: 22px !important;
-    font-size: 0.55rem !important;
-}
-
-.mobile-view .chat-view {
-    height: 45vh !important;
-    padding: 6px !important;
-}
-
-.mobile-view .chat-view .chat-messages .msg {
-    font-size: 0.6rem !important;
-    padding: 3px 6px !important;
-}
-
-.mobile-view .chat-view .chat-input input {
-    font-size: 0.55rem !important;
-    padding: 3px 6px !important;
-}
-
-.mobile-view .chat-view .chat-input button {
-    font-size: 0.5rem !important;
-    padding: 0 8px !important;
-}
-
-.mobile-view .modal .modal-box {
-    padding: 12px !important;
-    max-width: 300px !important;
-}
-
-.mobile-view .modal .modal-box h3 {
-    font-size: 0.7rem !important;
-}
-
-.mobile-view .modal .modal-box input,
-.mobile-view .modal .modal-box textarea {
-    font-size: 0.6rem !important;
-    padding: 4px 6px !important;
-}
-
-.mobile-view .modal .modal-actions button {
-    font-size: 0.55rem !important;
-    padding: 3px 10px !important;
-}
-
-.mobile-view .people-item {
-    padding: 4px 6px !important;
-}
-
-.mobile-view .people-item .avatar-wrap {
-    width: 22px !important;
-    height: 22px !important;
-}
-
-.mobile-view .people-item .info .name {
-    font-size: 0.6rem !important;
-}
-
-.mobile-view .people-item .info .status {
-    font-size: 0.5rem !important;
-}
-
-.mobile-view .friend-item {
-    font-size: 0.5rem !important;
-    padding: 1px 4px !important;
-}
-
-.mobile-view .friend-item .avatar-wrap {
-    width: 12px !important;
-    height: 12px !important;
-}
-
-.mobile-view .editor-toolbar button {
-    font-size: 0.55rem !important;
-    padding: 2px 4px !important;
-}
-
-.mobile-view .post-editor {
-    font-size: 0.7rem !important;
-    min-height: 36px !important;
-    padding: 4px 6px !important;
-}
-
-.mobile-view .post-actions button,
-.mobile-view .post-actions label {
-    font-size: 0.5rem !important;
-    padding: 2px 8px !important;
-}
-
-.mobile-view .card {
-    padding: 6px 8px !important;
-    margin-bottom: 6px !important;
-}
-
-.mobile-view .card h3 {
-    font-size: 0.7rem !important;
-}
-
-.mobile-view .panel-card {
-    padding: 6px 8px !important;
-    margin-bottom: 4px !important;
-}
-
-.mobile-view .panel-title {
-    font-size: 0.5rem !important;
-}
-
-.mobile-view .panel-item {
-    font-size: 0.55rem !important;
-    padding: 2px 0 !important;
-}
-
-.mobile-view .player-drawer .track-info .track-name {
-    font-size: 0.65rem !important;
-}
-
-.mobile-view .player-drawer .time-wrap {
-    font-size: 0.4rem !important;
-}
-
-.mobile-view .player-drawer .playlist .playlist-item {
-    font-size: 0.5rem !important;
-    padding: 2px 4px !important;
-}
-
-.mobile-view .profile-header {
-    padding: 8px !important;
-}
-
-.mobile-view .profile-header .profile-stats span {
-    font-size: 0.45rem !important;
-}
-
-.mobile-view .link-input-wrap input {
-    font-size: 0.55rem !important;
-    padding: 3px 6px !important;
-}
-
-.mobile-view .link-input-wrap button {
-    font-size: 0.55rem !important;
-    padding: 3px 8px !important;
-}
-
-.mobile-view .profile-iframe {
-    height: 160px !important;
-}
-
-.mobile-view .friends-section {
-    padding: 4px 6px !important;
-}
-
-.mobile-view .friends-section h4 {
-    font-size: 0.6rem !important;
-}
-
-.mobile-view .admin-dot {
-    width: 8px !important;
-    height: 8px !important;
-    bottom: 4px !important;
-    right: 4px !important;
+/* ===== ОЧЕНЬ МАЛЕНЬКИЕ ТЕЛЕФОНЫ ===== */
+@media (max-width: 400px) {
+    .pc-topbar .search {
+        max-width: 50px !important;
+        font-size: 0.45rem !important;
+        padding: 2px 6px !important;
+    }
+    
+    .pc-topbar .logo {
+        font-size: 0.6rem !important;
+    }
+    
+    .pc-topbar .right button {
+        font-size: 0.7rem !important;
+    }
+    
+    .sidebar {
+        width: 240px !important;
+        left: -250px !important;
+    }
+    
+    .post .post-content {
+        font-size: 0.7rem !important;
+    }
+    
+    .post .post-content img.post-img {
+        max-height: 180px !important;
+    }
+    
+    .post .post-content .link-preview { height: 250px !important; }
+    .post .post-content .link-preview.link-preview--large { height: 450px !important; }
 }

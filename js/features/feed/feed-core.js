@@ -1,5 +1,5 @@
 // ================================================================
-// ЛЕНТА — ОПТИМИЗИРОВАННАЯ ВЕРСИЯ
+// ЛЕНТА — ОПТИМИЗИРОВАННАЯ ВЕРСИЯ С ПРАВИЛЬНЫМИ onclick
 // ================================================================
 
 var commentStates = {};
@@ -11,7 +11,7 @@ var POSTS_CACHE = {};
 var FEED_CONFIG = {
     limit: 50,
     maxRepostDepth: 5,
-    avatarCacheTTL: 300000 // 5 минут
+    avatarCacheTTL: 300000
 };
 
 // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
@@ -46,7 +46,7 @@ function formatPostTime(timestamp) {
     return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-// ===== РЕНДЕР ВЛОЖЕННОГО РЕПОСТА (С КЭШИРОВАНИЕМ) =====
+// ===== РЕНДЕР ВЛОЖЕННОГО РЕПОСТА =====
 var repostCache = {};
 
 function renderNestedRepost(repost, level) {
@@ -59,7 +59,7 @@ function renderNestedRepost(repost, level) {
     if (repostCache[cacheKey]) return repostCache[cacheKey];
     
     var textHtml = repost.text || '';
-    var imgHtml = repost.img ? '<img src="' + repost.img + '" class="repost-img" onclick="window.open(this.src)">' : '';
+    var imgHtml = repost.img ? '<img src="' + repost.img + '" class="repost-img" onclick="event.stopPropagation();window.open(this.src)">' : '';
     var marqueeHtml = repost.marquee ? '<div class="marquee"><span>' + esc(repost.marquee) + '</span></div>' : '';
     
     var buttonsHtml = '';
@@ -67,24 +67,24 @@ function renderNestedRepost(repost, level) {
         buttonsHtml = '<div class="buttons-wrap">';
         repost.buttons.forEach(function(btn) {
             if (btn.url) {
-                buttonsHtml += '<a href="' + esc(btn.url) + '" target="_blank" class="btn-item">' + esc(btn.label || '🔗 Перейти') + '</a>';
+                buttonsHtml += '<a href="' + esc(btn.url) + '" target="_blank" class="btn-item" onclick="event.stopPropagation();">' + esc(btn.label || '🔗 Перейти') + '</a>';
             }
         });
         buttonsHtml += '</div>';
     }
     
+    // ===== ФИКС: УБРАЛ ЖЁСТКУЮ ВЫСОТУ =====
     var linkHtml = '';
     if (repost.link) {
-        var frameSize = repost.frameSize || 'small';
-        var height = frameSize === 'large' ? '450px' : '250px';
-        linkHtml = '<div class="link-preview"><iframe src="' + repost.link + '" style="width:100%;height:' + height + ';border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
+        var repostFrameClass = repost.frameSize === 'large' ? ' link-preview--large' : '';
+        linkHtml = '<div class="link-preview' + repostFrameClass + '" onclick="event.stopPropagation();"><iframe src="' + repost.link + '" style="width:100%;border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
     
     var hashtagsHtml = '';
     if (repost.hashtags && repost.hashtags.length > 0) {
         hashtagsHtml = '<div class="hashtags">';
         repost.hashtags.forEach(function(tag) {
-            hashtagsHtml += '<span class="tag" onclick="searchByTag(\'' + esc(tag) + '\')">' + esc(tag) + '</span>';
+            hashtagsHtml += '<span class="tag" onclick="event.stopPropagation();searchByTag(\'' + esc(tag) + '\')">' + esc(tag) + '</span>';
         });
         hashtagsHtml += '</div>';
     }
@@ -124,7 +124,7 @@ function renderNestedRepost(repost, level) {
     return result;
 }
 
-// ===== КЭШИРОВАННЫЙ РЕНДЕР ПОСТА =====
+// ===== РЕНДЕР ПОСТА — С ПРАВИЛЬНЫМИ КАВЫЧКАМИ =====
 function renderPost(p, type) {
     var div = document.createElement('div');
     div.className = 'post';
@@ -135,8 +135,8 @@ function renderPost(p, type) {
         div.innerHTML = `
             <div style="padding:10px;text-align:center;color:var(--muted-text);background:var(--input-bg);border-radius:8px;border:1px solid var(--border-color);">
                 🗑 Пост удален 
-                <button onclick="restorePost('${p.id}', '${type}')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:6px;">↩️ Восстановить</button>
-                <button onclick="permanentDeletePost('${p.id}', '${type}')" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:4px;">✕ Удалить навсегда</button>
+                <button onclick="event.stopPropagation();window.restorePost('${p.id}', '${type}')" style="background:var(--link-color);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:6px;">↩️ Восстановить</button>
+                <button onclick="event.stopPropagation();window.permanentDeletePost('${p.id}', '${type}')" style="background:var(--danger);color:#fff;border:none;border-radius:12px;padding:2px 12px;cursor:pointer;font-size:0.6rem;margin-left:4px;">✕ Удалить навсегда</button>
             </div>
         `;
         return div;
@@ -168,11 +168,11 @@ function renderPost(p, type) {
         buttonsHtml += '</div>';
     }
     
+    // ===== ФИКС: УБРАЛ ЖЁСТКУЮ ВЫСОТУ =====
     var previewHtml = '';
     if (p.link) {
-        var frameSize = p.frameSize || 'small';
-        var height = frameSize === 'large' ? '450px' : '250px';
-        previewHtml = '<div class="link-preview" onclick="event.stopPropagation();"><iframe src="' + p.link + '" style="width:100%;height:' + height + ';border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
+        var frameClass = p.frameSize === 'large' ? ' link-preview--large' : '';
+        previewHtml = '<div class="link-preview' + frameClass + '" onclick="event.stopPropagation();"><iframe src="' + p.link + '" style="width:100%;border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
     
     var hashtagsHtml = '';
@@ -186,20 +186,22 @@ function renderPost(p, type) {
     
     var isAuthor = (p.authorUid === USER_UID);
     var canDelete = isAuthor || isAdmin;
+    
+    // ===== МЕНЮ ПОСТА — С ПРАВИЛЬНЫМИ КАВЫЧКАМИ =====
     var menuHtml = canDelete ? `
         <div class="post-menu">
-            <button class="dots" onclick="event.stopPropagation();togglePostMenu('${p.id}')">⋮</button>
+            <button class="dots" onclick="event.stopPropagation();window.togglePostMenu('${p.id}')">⋮</button>
             <div class="dropdown" id="menu_${p.id}">
-                <button class="edit-btn" onclick="event.stopPropagation();openEdit('${p.id}', '${type}')">✏️ Редактировать</button>
-                <button class="del-btn" onclick="event.stopPropagation();deletePost('${p.id}', '${type}')">🗑 Удалить</button>
+                <button class="edit-btn" onclick="event.stopPropagation();window.openEdit('${p.id}', '${type}')">✏️ Редактировать</button>
+                <button class="del-btn" onclick="event.stopPropagation();window.deletePost('${p.id}', '${type}')">🗑 Удалить</button>
             </div>
         </div>
     ` : '';
     
     var actionsHtml = '<div class="stats" onclick="event.stopPropagation();">' +
-        '<button class="' + (isLiked ? 'liked' : '') + '" onclick="event.stopPropagation();toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
-        '<button onclick="event.stopPropagation();toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
-        '<button onclick="event.stopPropagation();openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
+        '<button class="' + (isLiked ? 'liked' : '') + '" onclick="event.stopPropagation();window.toggleLike(\'' + p.id + '\', \'' + type + '\')">👍 <span id="likeCount_' + p.id + '">' + (p.likes || 0) + '</span></button>' +
+        '<button onclick="event.stopPropagation();window.toggleComments(\'' + p.id + '\', \'' + type + '\')">💬 <span id="commentCount_' + p.id + '">' + (p.commentCount || 0) + '</span></button>' +
+        '<button onclick="event.stopPropagation();window.openRepost(\'' + p.id + '\', \'' + type + '\')">🔁 <span id="repostCount_' + p.id + '">' + (p.reposts || 0) + '</span></button>' +
         '</div>';
     
     var commentsHtml = `
@@ -217,7 +219,7 @@ function renderPost(p, type) {
     var inputHtml = `
         <div class="comment-input-wrap" id="commentInputWrap_${p.id}" onclick="event.stopPropagation();">
             <input type="text" id="commentInput_${p.id}" placeholder="Написать комментарий...">
-            <button onclick="event.stopPropagation();submitComment('${p.id}', '${type}')">→</button>
+            <button onclick="event.stopPropagation();window.submitComment('${p.id}', '${type}')">→</button>
         </div>
     `;
     
@@ -234,7 +236,7 @@ function renderPost(p, type) {
     `;
     
     div.innerHTML = marqueeHtml + authorHtml +
-        '<div class="post-content" onclick="openPostPage(\'' + p.id + '\', \'' + type + '\')" style="cursor:pointer;">' + contentHtml + '</div>' +
+        '<div class="post-content" onclick="window.openPostPage(\'' + p.id + '\', \'' + type + '\')" style="cursor:pointer;">' + contentHtml + '</div>' +
         actionsHtml + commentsHtml + inputHtml;
     
     if (p.authorUid) {
@@ -299,7 +301,16 @@ function removeLoading(el) {
     if (spinner) spinner.remove();
 }
 
-// ===== ОПТИМИЗИРОВАННАЯ ЗАГРУЗКА ЛЕНТЫ =====
+// ================================================================
+// БЕСКОНЕЧНЫЙ СКРОЛЛ
+// ================================================================
+
+var feedPageSize = 10;
+var feedLastKey = null;
+var feedLoading = false;
+var feedHasMore = true;
+var scrollListenerAdded = false;
+
 function loadFeed() {
     var el = document.getElementById('feed');
     if (!el) return;
@@ -307,79 +318,106 @@ function loadFeed() {
         el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
         return;
     }
+
+    feedLastKey = null;
+    feedHasMore = true;
+    el.innerHTML = '';
     
-    if (!el.children.length) {
-        showLoading(el);
+    // Добавляем спиннер внизу
+    var spinner = document.createElement('div');
+    spinner.id = 'feedSpinner';
+    spinner.style.cssText = 'text-align:center;padding:20px;color:var(--muted-text);font-size:0.7rem;display:none;';
+    spinner.textContent = '⏳ Загрузка...';
+    el.appendChild(spinner);
+    
+    loadMorePosts();
+
+    // Добавляем слушатель скролла только один раз
+    if (!scrollListenerAdded) {
+        scrollListenerAdded = true;
+        window.addEventListener('scroll', function() {
+            var scrollTop = window.scrollY || window.pageYOffset;
+            var windowHeight = window.innerHeight;
+            var documentHeight = document.documentElement.scrollHeight;
+            
+            // Когда доскроллили до низа (осталось 200px)
+            if (scrollTop + windowHeight >= documentHeight - 200) {
+                if (!feedLoading && feedHasMore) {
+                    loadMorePosts();
+                }
+            }
+        });
     }
-    
-    if (feedListener) {
-        db.ref('sites/' + SITE + '/feed_posts').off('value', feedListener);
-        feedListener = null;
+}
+
+function loadMorePosts() {
+    var el = document.getElementById('feed');
+    if (!el) return;
+    if (feedLoading || !feedHasMore) return;
+    feedLoading = true;
+
+    var spinner = document.getElementById('feedSpinner');
+    if (spinner) spinner.style.display = 'block';
+
+    var query = db.ref('sites/' + SITE + '/feed_posts')
+        .orderByChild('timestamp')
+        .limitToLast(feedPageSize + 1);
+
+    if (feedLastKey) {
+        query = query.endAt(feedLastKey);
     }
-    
-    feedListener = function(snap) {
+
+    query.once('value', function(snap) {
         var data = snap.val() || {};
         var keys = Object.keys(data).sort(function(a, b) {
-            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
+            return (data[a].timestamp || 0) - (data[b].timestamp || 0);
         });
-        
-        // Ограничиваем количество постов
-        if (keys.length > FEED_CONFIG.limit) {
-            keys = keys.slice(0, FEED_CONFIG.limit);
+
+        if (keys.length > feedPageSize) {
+            keys = keys.slice(0, feedPageSize);
+            feedHasMore = true;
+        } else {
+            feedHasMore = false;
         }
-        
-        removeLoading(el);
-        if (!keys.length) {
-            el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Пока пусто</div>';
-            return;
+
+        if (keys.length > 0) {
+            feedLastKey = data[keys[keys.length - 1]].timestamp;
         }
-        
-        var existingIds = {};
-        el.querySelectorAll('.post').forEach(function(post) {
-            var id = post.dataset.id;
-            if (id) existingIds[id] = post;
-        });
-        
-        var newPosts = [];
-        keys.forEach(function(k) {
+
+        if (spinner) spinner.style.display = 'none';
+
+        var fragment = document.createDocumentFragment();
+        keys.reverse().forEach(function(k) {
             var p = data[k];
             p.id = k;
-            
-            if (p.deleted && p.deletedAt) {
-                db.ref('sites/' + SITE + '/feed_posts/' + k).remove();
-                if (p.authorUid) {
-                    db.ref('sites/' + SITE + '/user_posts/' + p.authorUid + '/' + k).remove();
-                }
-                return;
-            }
-            
-            if (existingIds[k]) {
-                updatePostStats(k, p);
-                delete existingIds[k];
-            } else {
-                newPosts.push(p);
-            }
+            var postEl = renderPost(p, 'feed');
+            fragment.appendChild(postEl);
         });
-        
-        removeLoading(el);
-        if (newPosts.length) {
-            var fragment = document.createDocumentFragment();
-            newPosts.reverse().forEach(function(p) {
-                var postEl = renderPost(p, 'feed');
-                fragment.insertBefore(postEl, fragment.firstChild);
-            });
-            el.insertBefore(fragment, el.firstChild);
+
+        // ===== ФИКС: проверяем, есть ли спиннер в DOM =====
+        if (spinner && spinner.parentNode === el) {
+            el.insertBefore(fragment, spinner);
+        } else {
+            el.appendChild(fragment);
         }
-        
-        Object.keys(existingIds).forEach(function(id) {
-            var post = existingIds[id];
-            if (post && post.parentNode) {
-                post.parentNode.removeChild(post);
+
+        if (!feedHasMore) {
+            var msg = document.createElement('div');
+            msg.style.cssText = 'text-align:center;padding:20px;color:var(--muted-text);font-size:0.7rem;';
+            msg.textContent = '✅ Все посты загружены';
+            if (spinner && spinner.parentNode === el) {
+                el.insertBefore(msg, spinner);
+            } else {
+                el.appendChild(msg);
             }
-        });
-    };
-    
-    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').limitToLast(FEED_CONFIG.limit).on('value', feedListener);
+        }
+
+        feedLoading = false;
+    }).catch(function(err) {
+        console.error('❌ Ошибка загрузки постов:', err);
+        feedLoading = false;
+        if (spinner) spinner.style.display = 'none';
+    });
 }
 
 function loadFotoFeed() {
@@ -438,3 +476,5 @@ function updatePostStats(postId, data) {
     if (commentCount) commentCount.textContent = data.commentCount || 0;
     if (repostCount) repostCount.textContent = data.reposts || 0;
 }
+
+console.log('✅ feed-core.js загружен (с правильными кавычками)');

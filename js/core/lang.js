@@ -1,275 +1,260 @@
-// ================================================================ */
-// ПЕРЕВОД НА ДВА ЯЗЫКА — С АВТООПРЕДЕЛЕНИЕМ
-// ================================================================ */
+// ================================================================
+// ГЛАВНЫЙ ФАЙЛ ЯЗЫКОВ — ПОДКЛЮЧАЕТ ВСЕ ЯЗЫКИ
+// ================================================================
 
-const LANGUAGES = {
-    ru: {
-        app_name: 'METAIMPERIYA',
-        menu: 'Меню',
-        messages: 'Сообщения',
-        profile: 'Профиль',
-        settings: 'Настройки',
-        logout: 'Выйти',
-        theme: 'Тема',
-        privacy: 'Приватность',
-        help: 'Помощь',
-        feed: 'Лента',
-        what_new: 'Что у вас нового?',
-        photo: 'Фото',
-        publish: 'Опубликовать',
-        clear: 'Очистить',
-        empty_feed: 'Пока пусто',
-        login_to_see: 'Войдите, чтобы видеть ленту',
-        guest: 'Гость',
-        setup_profile: 'Настройте профиль',
-        edit_profile: 'Редактировать профиль',
-        change_avatar: 'Сменить аватар',
-        go_home: 'На главную',
-        friends: 'Друзья',
-        subscribers: 'Подписчики',
-        subscriptions: 'Подписки',
-        no_posts: '📝 Нет постов. Напишите что-нибудь!',
-        loading: 'Загрузка...',
-        my_posts: 'Мои посты',
-        friends_title: '🤝 Друзья',
-        no_friends: 'Нет друзей',
-        enter_link: 'Вставьте ссылку для встраивания...',
-        embedded_page: 'Встроенная страница',
-        collapse: 'Свернуть',
-        expand: 'Развернуть',
-        link_saved: '✅ Ссылка сохранена!',
-        avatar_updated: '✅ Аватарка обновлена!',
-        groups: 'Группы',
-        create_group: 'Создать группу',
-        new_group: 'Новая группа',
-        group_name: 'Название...',
-        create: 'Создать',
-        people: 'Люди',
-        all_users: 'Все пользователи',
-        add_friend: '➕ Добавить в друзья',
-        already_friends: '🤝 В друзьях',
-        request_sent: '⏳ Запрос отправлен',
-        request_received: '📩 Заявка получена',
-        accept: 'Принять',
-        decline: 'Отклонить',
-        remove_from_friends: 'Удалить из друзей',
-        chat: 'Чат',
-        back: 'Назад',
-        message: 'Сообщение...',
-        no_messages: 'Сообщений нет',
-        delete_message: 'Удалить сообщение',
-        chat_list_empty: '🤝 Добавьте друзей, чтобы начать общение',
-        cannot_write_self: 'Нельзя писать себе',
-        notifications: 'Уведомления',
-        no_notifications: 'Нет уведомлений',
-        admin: 'Админ',
-        admin_password: 'Пароль...',
-        admin_login: 'Войти',
-        all_chats: 'Все чаты',
-        no_chats: 'Нет личных чатов',
-        edit_post: '✏️ Редактировать',
-        delete_post: '🗑 Удалить',
-        restore_post: '↩️ Восстановить',
-        post_deleted: '🗑 Пост удален',
-        enter_link_placeholder: 'Введите ссылку:',
-        link_text: 'ссылка',
-        login_title: '👤 Вход',
-        login_google: 'Войти через Google',
-        or: 'или',
-        enter_name_placeholder: 'Введите имя...',
-        cancel: 'Отмена',
-        login: 'Войти',
-        player: 'ПЛЕЕР',
-        playlist: 'Плейлист',
-        download: 'Скачать',
-        visualizer: 'Визуализация',
-        online: 'онлайн',
-        edit: 'Редактировать',
-        delete: 'Удалить',
-        save: 'Сохранить',
-        close: 'Закрыть',
-        confirm: 'Подтвердить',
-        post_updated: '✅ Пост обновлён!',
-        repost_created: '✅ Репост создан!',
-        search: 'Поиск',
-        add: 'Добавить',
-        remove: 'Удалить',
-    },
-    en: {
-        app_name: 'METAIMPERIYA',
-        menu: 'Menu',
-        messages: 'Messages',
-        profile: 'Profile',
-        settings: 'Settings',
-        logout: 'Logout',
-        theme: 'Theme',
-        privacy: 'Privacy',
-        help: 'Help',
-        feed: 'Feed',
-        what_new: "What's new?",
-        photo: 'Photo',
-        publish: 'Publish',
-        clear: 'Clear',
-        empty_feed: 'Nothing yet',
-        login_to_see: 'Login to see feed',
-        guest: 'Guest',
-        setup_profile: 'Set up your profile',
-        edit_profile: 'Edit profile',
-        change_avatar: 'Change avatar',
-        go_home: 'Go home',
-        friends: 'Friends',
-        subscribers: 'Subscribers',
-        subscriptions: 'Subscriptions',
-        no_posts: '📝 No posts. Write something!',
-        loading: 'Loading...',
-        my_posts: 'My posts',
-        friends_title: '🤝 Friends',
-        no_friends: 'No friends',
-        enter_link: 'Enter a link to embed...',
-        embedded_page: 'Embedded page',
-        collapse: 'Collapse',
-        expand: 'Expand',
-        link_saved: '✅ Link saved!',
-        avatar_updated: '✅ Avatar updated!',
-        groups: 'Groups',
-        create_group: 'Create group',
-        new_group: 'New group',
-        group_name: 'Name...',
-        create: 'Create',
-        people: 'People',
-        all_users: 'All users',
-        add_friend: '➕ Add friend',
-        already_friends: '🤝 Friends',
-        request_sent: '⏳ Request sent',
-        request_received: '📩 Request received',
-        accept: 'Accept',
-        decline: 'Decline',
-        remove_from_friends: 'Remove from friends',
-        chat: 'Chat',
-        back: 'Back',
-        message: 'Message...',
-        no_messages: 'No messages',
-        delete_message: 'Delete message',
-        chat_list_empty: '🤝 Add friends to start chatting',
-        cannot_write_self: "Can't write to yourself",
-        notifications: 'Notifications',
-        no_notifications: 'No notifications',
-        admin: 'Admin',
-        admin_password: 'Password...',
-        admin_login: 'Login',
-        all_chats: 'All chats',
-        no_chats: 'No private chats',
-        edit_post: '✏️ Edit',
-        delete_post: '🗑 Delete',
-        restore_post: '↩️ Restore',
-        post_deleted: '🗑 Post deleted',
-        enter_link_placeholder: 'Enter link:',
-        link_text: 'link',
-        login_title: '👤 Login',
-        login_google: 'Login with Google',
-        or: 'or',
-        enter_name_placeholder: 'Enter name...',
-        cancel: 'Cancel',
-        login: 'Login',
-        player: 'PLAYER',
-        playlist: 'Playlist',
-        download: 'Download',
-        visualizer: 'Visualizer',
-        online: 'online',
-        edit: 'Edit',
-        delete: 'Delete',
-        save: 'Save',
-        close: 'Close',
-        confirm: 'Confirm',
-        post_updated: '✅ Post updated!',
-        repost_created: '✅ Repost created!',
-        search: 'Search',
-        add: 'Add',
-        remove: 'Remove',
+// ===== ПОДКЛЮЧАЕМ ВСЕ ЯЗЫКИ =====
+var LANGUAGES = {};
+
+function loadLanguage(langCode) {
+    var script = document.createElement('script');
+    script.src = 'js/core/languages/' + langCode + '.js';
+    script.onload = function() {
+        console.log('✅ Язык загружен:', langCode);
+    };
+    script.onerror = function() {
+        console.error('❌ Ошибка загрузки языка:', langCode);
+    };
+    document.head.appendChild(script);
+}
+
+// Загружаем все языки
+loadLanguage('en');
+loadLanguage('ru');
+loadLanguage('uk');
+loadLanguage('es');
+loadLanguage('de');
+loadLanguage('tr');
+loadLanguage('hi');
+loadLanguage('bn');
+loadLanguage('ur');
+loadLanguage('fa');
+loadLanguage('he');
+loadLanguage('ar');
+
+// ===== ОПРЕДЕЛЕНИЕ СТРАНЫ ПО IP =====
+function detectCountry() {
+    return new Promise(function(resolve) {
+        fetch('https://ipapi.co/json/')
+            .then(function(response) {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
+            .then(function(data) {
+                var country = data.country_code || 'US';
+                console.log('🌍 Определена страна:', country);
+                resolve(country);
+            })
+            .catch(function() {
+                fetch('https://ip-api.com/json/')
+                    .then(function(response) {
+                        if (!response.ok) throw new Error('Network error');
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        var country = data.countryCode || 'US';
+                        console.log('🌍 Определена страна (fallback):', country);
+                        resolve(country);
+                    })
+                    .catch(function() {
+                        console.log('🌍 Не удалось определить страну, ставим US');
+                        resolve('US');
+                    });
+            });
+    });
+}
+
+// ===== ОПРЕДЕЛЕНИЕ ЯЗЫКА ПО СТРАНЕ =====
+function getLanguageByCountry(country) {
+    var map = {
+        'UA': 'uk',
+        'RU': 'ru', 
+        'BY': 'ru', 
+        'KZ': 'ru',
+        'ES': 'es', 
+        'MX': 'es', 
+        'AR': 'es', 
+        'CO': 'es', 
+        'CL': 'es', 
+        'PE': 'es', 
+        'VE': 'es',
+        'DE': 'de', 
+        'AT': 'de', 
+        'CH': 'de',
+        'TR': 'tr',
+        'IN': 'hi',
+        'BD': 'bn',
+        'PK': 'ur',
+        'IR': 'fa',
+        'IL': 'he',
+        'QA': 'ar', 
+        'SA': 'ar', 
+        'AE': 'ar', 
+        'KW': 'ar', 
+        'BH': 'ar', 
+        'OM': 'ar',
+        'YE': 'ar', 
+        'JO': 'ar', 
+        'LB': 'ar', 
+        'EG': 'ar', 
+        'DZ': 'ar', 
+        'MA': 'ar',
+        'TN': 'ar', 
+        'LY': 'ar', 
+        'SD': 'ar', 
+        'SY': 'ar', 
+        'IQ': 'ar',
+        'US': 'en', 
+        'GB': 'en', 
+        'AU': 'en', 
+        'CA': 'en', 
+        'NZ': 'en', 
+        'IE': 'en', 
+        'ZA': 'en'
+    };
+    return map[country] || 'en';
+}
+
+// ===== УСТАНОВКА ЯЗЫКА =====
+var currentLang = localStorage.getItem('lang') || 'en';
+var availableLanguages = ['en', 'ru', 'uk', 'es', 'de', 'tr', 'hi', 'bn', 'ur', 'fa', 'he', 'ar'];
+
+function getLanguageObject(lang) {
+    var key = 'LANG_' + lang.toUpperCase();
+    return window[key] || window.LANG_EN || {};
+}
+
+// ===== ГЛОБАЛЬНАЯ ФУНКЦИЯ ДЛЯ СМЕНЫ ЯЗЫКА =====
+window.setLanguage = function(lang) {
+    console.log('🔵 setLanguage вызвана с:', lang);
+    
+    if (availableLanguages.indexOf(lang) === -1) {
+        console.warn('⚠️ Язык не найден, ставим en');
+        lang = 'en';
     }
+    
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    
+    // Переводим страницу
+    translatePage();
+    updateLangDisplay();
+    closeLanguageMenu();
+    
+    console.log('🌍 Язык установлен:', lang);
 };
 
-// ================================================================ */
-// АВТООПРЕДЕЛЕНИЕ ЯЗЫКА
-// ================================================================ */
-
-function getBrowserLang() {
-    var lang = navigator.language || navigator.userLanguage || 'ru';
-    if (lang.startsWith('en')) {
-        return 'en';
-    }
-    return 'ru';
+function setLanguageInternal(lang) {
+    window.setLanguage(lang);
 }
-
-let currentLang = localStorage.getItem('lang') || getBrowserLang();
-
-// ================================================================ */
-// ФУНКЦИИ ПЕРЕВОДА
-// ================================================================ */
 
 function t(key) {
-    return LANGUAGES[currentLang]?.[key] || key;
-}
-
-function setLanguage(lang) {
-    if (LANGUAGES[lang]) {
-        currentLang = lang;
-        localStorage.setItem('lang', lang);
-        translatePage();
-        updateLangDisplay();
-    }
+    var langObj = getLanguageObject(currentLang);
+    var result = langObj[key] || window.LANG_EN[key] || key;
+    return result;
 }
 
 function translatePage() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        const translation = t(key);
+    console.log('🔄 translatePage вызвана, текущий язык:', currentLang);
+    
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        var translation = t(key);
         if (translation !== key) {
             if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                 if (el.getAttribute('data-i18n-placeholder')) {
                     el.placeholder = translation;
                 }
-            } else if (el.tagName === 'BUTTON') {
-                // Для кнопок с иконками не меняем текст
             } else {
                 el.textContent = translation;
             }
         }
     });
 
-    document.title = t('app_name') + ' — ' + (currentLang === 'ru' ? 'Социальная платформа' : 'Social Platform');
+    document.title = t('app_name') + ' — Social Platform';
+    console.log('✅ Перевод применён');
 }
 
 function updateLangDisplay() {
     var display = document.getElementById('langDisplay');
     if (display) {
-        display.textContent = currentLang === 'ru' ? 'Русский' : 'English';
+        var names = {
+            'en': 'English', 
+            'ru': 'Русский', 
+            'uk': 'Українська',
+            'es': 'Español',
+            'de': 'Deutsch', 
+            'tr': 'Türkçe', 
+            'hi': 'हिन्दी',
+            'bn': 'বাংলা', 
+            'ur': 'اردو', 
+            'fa': 'فارسی',
+            'he': 'עברית', 
+            'ar': 'العربية'
+        };
+        display.textContent = names[currentLang] || 'English';
+        console.log('🔄 langDisplay обновлён:', display.textContent);
     }
 }
 
-// ================================================================ */
-// ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
-// ================================================================ */
-
-window.toggleLanguage = function() {
-    var newLang = currentLang === 'ru' ? 'en' : 'ru';
-    setLanguage(newLang);
+// ===== ОТКРЫТИЕ/ЗАКРЫТИЕ МЕНЮ ЯЗЫКОВ =====
+window.toggleLanguageMenu = function() {
+    var menu = document.getElementById('languageMenu');
+    if (!menu) {
+        console.error('❌ languageMenu не найден');
+        return;
+    }
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    console.log('🔄 Меню языков:', menu.style.display);
 };
 
-// ================================================================ */
-// АВТОПЕРЕВОД ПРИ ЗАГРУЗКЕ
-// ================================================================ */
+window.closeLanguageMenu = function() {
+    var menu = document.getElementById('languageMenu');
+    if (menu) menu.style.display = 'none';
+};
 
+// Закрываем меню при клике вне
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.settings-item') && !e.target.closest('#languageMenu')) {
+        var menu = document.getElementById('languageMenu');
+        if (menu) menu.style.display = 'none';
+    }
+});
+
+// ===== ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА (для обратной совместимости) =====
+window.toggleLanguage = function() {
+    console.log('🔄 toggleLanguage вызвана');
+    var currentIndex = availableLanguages.indexOf(currentLang);
+    var nextIndex = (currentIndex + 1) % availableLanguages.length;
+    window.setLanguage(availableLanguages[nextIndex]);
+};
+
+// ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
+    console.log('🔄 DOMContentLoaded — инициализация языков');
+    
+    var savedLang = localStorage.getItem('lang');
+    if (savedLang && availableLanguages.indexOf(savedLang) !== -1) {
+        currentLang = savedLang;
         translatePage();
         updateLangDisplay();
-    }, 500);
+        console.log('🌍 Используем сохранённый язык:', currentLang);
+        return;
+    }
+
+    detectCountry().then(function(country) {
+        var detectedLang = getLanguageByCountry(country);
+        window.setLanguage(detectedLang);
+    }).catch(function() {
+        window.setLanguage('en');
+    });
 });
 
 window.addEventListener('load', function() {
     setTimeout(function() {
         translatePage();
         updateLangDisplay();
-    }, 300);
+    }, 500);
 });
+
+console.log('✅ lang.js загружен (языки в отдельных файлах)');
+console.log('🌍 Доступные языки:', availableLanguages);

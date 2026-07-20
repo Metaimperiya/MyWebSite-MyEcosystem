@@ -21,7 +21,7 @@
     gap: 8px;
     cursor: pointer;
     user-select: none;
-    padding: 4px 0;
+    padding: 8px 0 4px 0;
     font-weight: 600;
     font-size: 0.8rem;
     color: var(--text-secondary);
@@ -32,6 +32,12 @@
     height: 3px;
     background: var(--text-secondary);
     border-radius: 4px;
+}
+
+.player-drawer .handle .handle-label {
+    font-size: 0.5rem;
+    letter-spacing: 1.5px;
+    padding-top: 2px;
 }
 
 .player-drawer .content {
@@ -112,6 +118,8 @@
 .player-drawer .controls .play-btn {
     font-size: 1.8rem;
     color: var(--link-color);
+    line-height: 1.2;
+    padding: 4px 8px;
 }
 
 .player-drawer .controls .play-btn:hover {
@@ -174,4 +182,62 @@
 
 .player-drawer .playlist .playlist-item .pl-download:hover {
     color: #2ecc71;
+}
+
+/* ================================================================ */
+/* ===== ФИКС ДЛЯ МОБИЛЬНЫХ ===== */
+/* ================================================================ */
+
+@media (max-width: 768px) {
+    .player-drawer {
+        padding: 8px 12px;
+    }
+    
+    .player-drawer .handle {
+        padding: 10px 0 4px 0;
+        font-size: 0.7rem;
+    }
+    
+    .player-drawer .handle .handle-label {
+        font-size: 0.45rem;
+        letter-spacing: 1px;
+    }
+    
+    .player-drawer .controls .play-btn {
+        font-size: 1.6rem;
+    }
+    
+    .player-drawer .controls button {
+        font-size: 1rem;
+        padding: 3px 6px;
+    }
+    
+    .player-drawer .track-info .track-name {
+        font-size: 0.75rem;
+    }
+    
+    .player-drawer .playlist .playlist-item {
+        font-size: 0.6rem;
+        padding: 3px 6px;
+    }
+}
+
+@media (max-width: 400px) {
+    .player-drawer .handle {
+        padding: 12px 0 4px 0;
+        font-size: 0.6rem;
+    }
+    
+    .player-drawer .handle .handle-label {
+        font-size: 0.4rem;
+    }
+    
+    .player-drawer .controls .play-btn {
+        font-size: 1.4rem;
+    }
+    
+    .player-drawer .controls button {
+        font-size: 0.85rem;
+        padding: 2px 4px;
+    }
 }
