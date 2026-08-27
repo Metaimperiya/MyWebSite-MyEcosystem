@@ -1,9 +1,5 @@
-# ========================================
-# ПОЛНОСТЬЮ ЗАКРЫВАЕМ САЙТ ОТ ПОИСКОВИКОВ
-# ========================================
-
+# METAIMPERIYA is available to search crawlers.
 User-agent: *
-Disallow: /
+Allow: /
 
-# Запрещаем индексацию ВСЕХ страниц
-# Сайт будет виден только по прямой ссылке
+Sitemap: https://metaimperiya.vercel.app/sitemap.xml

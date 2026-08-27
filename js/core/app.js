@@ -557,6 +557,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // Единая пустая заготовка для тематических разделов из сайдбара.
+    window.openSectionPage = function(sectionId) {
+        var sections = {
+            news: { title: 'Новости', icon: '📰' },
+            video: { title: 'Видео', icon: '🎬' },
+            music: { title: 'Музыка', icon: '🎵' },
+            games: { title: 'Игры', icon: '🎮' },
+            sport: { title: 'Спорт', icon: '⚽' },
+            cinema: { title: 'Кино', icon: '🎥' },
+            programming: { title: 'Программирование', icon: '💻' },
+            business: { title: 'Бизнес', icon: '💼' },
+            dating: { title: 'Знакомства', icon: '❤️' }
+        };
+        var section = sections[sectionId];
+        if (!section) return;
+
+        var title = document.getElementById('sectionPageTitle');
+        var icon = document.getElementById('sectionPageIcon');
+        if (title) title.textContent = section.title;
+        if (icon) icon.textContent = section.icon;
+        window.setActivePage('section');
+        var chatView = document.getElementById('chatView');
+        if (chatView) chatView.classList.remove('active');
+    };
+
     // ================================================================
     // ИНИЦИАЛИЗАЦИЯ
     // ================================================================

@@ -209,10 +209,27 @@
         return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
     }
 
-    function handleNotificationClick(key) {
-        markNotificationRead(key);
-        console.log('📬 Клик по уведомлению:', key);
-    }
+    window.handleNotificationClick = function(key) {
+        if (!USER_UID || !key) return;
+
+        var notificationRef = db.ref('sites/' + SITE + '/notifications/' + USER_UID + '/' + key);
+        notificationRef.once('value', function(snap) {
+            var notification = snap.val();
+            if (!notification) return;
+
+            markNotificationRead(key);
+
+            // Уведомление о сообщении ведёт прямо в соответствующий диалог.
+            if (notification.type === 'message' && notification.chatId) {
+                var participants = notification.chatId.split('_');
+                var targetUid = participants[0] === USER_UID ? participants[1] : participants[0];
+                if (targetUid && typeof window.openPrivateChat === 'function') {
+                    window.closeNotifications();
+                    window.openPrivateChat(targetUid);
+                }
+            }
+        });
+    };
 
     function markNotificationRead(key) {
         if (!USER_UID || !key) return;

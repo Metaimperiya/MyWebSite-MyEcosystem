@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="robots" content="index, follow">
     
     <!-- ===== ПОЛНОСТЬЮ ОТКЛЮЧАЕМ КЭШ ===== -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -105,11 +105,15 @@
         <div class="menu-divider"></div>
         <div style="font-size:0.6rem;color:var(--muted-text);padding:4px 12px;text-transform:uppercase;">📂 Sections</div>
         <div class="menu-sub">
-            <div class="menu-item" onclick="window.location.href='pages/news/novosti.html';closeSidebar();"><span class="icon">📰</span> News</div>
-            <div class="menu-item" onclick="window.location.href='pages/multimedia/video.html';closeSidebar();"><span class="icon">🎬</span> Video</div>
-            <div class="menu-item" onclick="window.location.href='pages/multimedia/muzyka.html';closeSidebar();"><span class="icon">🎵</span> Music</div>
-            <div class="menu-item" onclick="window.location.href='pages/life/igry.html';closeSidebar();"><span class="icon">🎮</span> Games</div>
-            <div class="menu-item" onclick="window.location.href='pages/life/sport.html';closeSidebar();"><span class="icon">⚽</span> Sports</div>
+        <div class="menu-item" onclick="openSectionPage('news');closeSidebar();"><span class="icon">📰</span> News</div>
+        <div class="menu-item" onclick="openSectionPage('video');closeSidebar();"><span class="icon">🎬</span> Video</div>
+        <div class="menu-item" onclick="openSectionPage('music');closeSidebar();"><span class="icon">🎵</span> Music</div>
+        <div class="menu-item" onclick="openSectionPage('games');closeSidebar();"><span class="icon">🎮</span> Games</div>
+        <div class="menu-item" onclick="openSectionPage('sport');closeSidebar();"><span class="icon">⚽</span> Sports</div>
+        <div class="menu-item" onclick="openSectionPage('cinema');closeSidebar();"><span class="icon">🎥</span> Cinema</div>
+        <div class="menu-item" onclick="openSectionPage('programming');closeSidebar();"><span class="icon">💻</span> Programming</div>
+        <div class="menu-item" onclick="openSectionPage('business');closeSidebar();"><span class="icon">💼</span> Business</div>
+        <div class="menu-item" onclick="openSectionPage('dating');closeSidebar();"><span class="icon">❤️</span> Dating</div>
         </div>
         <div class="menu-divider"></div>
         <div class="menu-item" onclick="openNotifications();closeSidebar();"><span class="icon">🔔</span> Notifications</div>
@@ -297,6 +301,15 @@
                 <div id="pageContainer"></div>
             </div>
 
+            <!-- ШАБЛОН РАЗДЕЛОВ САЙДБАРА -->
+            <div class="page" id="page-section" style="display:none;">
+                <div class="card" style="margin-top:10px;padding:28px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+                    <div id="sectionPageIcon" style="font-size:3rem;margin-bottom:12px;">📦</div>
+                    <h1 id="sectionPageTitle" style="margin:0 0 8px;"></h1>
+                    <p style="margin:0;max-width:440px;color:var(--muted-text);">Раздел готов. Здесь можно разместить любые щиты, карточки и материалы.</p>
+                </div>
+            </div>
+
             <!-- ЧАТ -->
             <div class="chat-view" id="chatView">
                 <button class="back-btn" onclick="closeChat()">← Back</button>
@@ -417,7 +430,7 @@
 <!-- ===== JS ===== -->
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.1"></script>
-<script src="js/core/app.js?v=3.1"></script>
+<script src="js/core/app.js?v=3.2"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
 <script src="js/features/feed/feed-core.js?v=3.1"></script>
@@ -427,7 +440,7 @@
 <script src="js/features/friends.js?v=3.1"></script>
 <script src="js/features/groups.js?v=3.0"></script>
 <script src="js/features/chat.js?v=3.1"></script>
-<script src="js/features/notifications.js?v=3.0"></script>
+<script src="js/features/notifications.js?v=3.1"></script>
 <script src="js/features/admin.js?v=3.0"></script>
 <script src="js/features/page.js?v=3.0"></script>
 
