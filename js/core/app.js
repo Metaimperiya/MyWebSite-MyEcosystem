@@ -464,59 +464,69 @@ document.addEventListener('DOMContentLoaded', function() {
 
         container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>';
 
-        db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value', function(snap) {
-            var friends = snap.val() || {};
-            var friendIds = Object.keys(friends).filter(function(k) { return friends[k] === true; });
+        // Входящие диалоги не обязаны быть от друзей. Раньше здесь читался
+        // только список друзей, из-за чего уведомление приходило, а сам чат
+        // в разделе «Чаты» не показывался.
+        db.ref('dms/' + SITE).once('value', function(snap) {
+            var rawChats = [];
+            snap.forEach(function(chatSnap) {
+                var chatId = chatSnap.key || '';
+                var participants = chatId.split('_');
+                if (participants.indexOf(USER_UID) === -1) return;
 
-            if (!friendIds.length) {
-                container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">🤝 Добавьте друзей, чтобы начать общение</div>';
+                var uid = participants[0] === USER_UID ? participants[1] : participants[0];
+                if (!uid) return;
+
+                var messages = chatSnap.child('messages').val() || {};
+                var messageIds = Object.keys(messages).sort(function(a, b) {
+                    return (messages[b].timestamp || 0) - (messages[a].timestamp || 0);
+                });
+                var last = messageIds.length ? messages[messageIds[0]] : null;
+                var unread = messageIds.filter(function(id) {
+                    var message = messages[id];
+                    return message.senderUid && message.senderUid !== USER_UID &&
+                        (!message.readBy || message.readBy[USER_UID] !== true);
+                }).length;
+                rawChats.push({ uid: uid, last: last, unread: unread });
+            });
+
+            if (!rawChats.length) {
+                container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">💬 Сообщений пока нет</div>';
                 return;
             }
 
             var chats = [];
             var loaded = 0;
+            rawChats.forEach(function(chat) {
+                db.ref('sites/' + SITE + '/all_users/' + chat.uid).once('value', function(userSnap) {
+                    var user = userSnap.val() || {};
+                    var name = user.name || 'Аноним';
+                    chats.push({
+                        uid: chat.uid,
+                        name: name,
+                        letter: name.charAt(0).toUpperCase(),
+                        last: chat.last,
+                        unread: chat.unread
+                    });
 
-            friendIds.forEach(function(uid) {
-                db.ref('sites/' + SITE + '/all_users/' + uid).once('value', function(usnap) {
-                    var u = usnap.val() || {};
-                    var name = u.name || 'Аноним';
-                    var letter = name.charAt(0).toUpperCase();
+                    loaded++;
+                    if (loaded !== rawChats.length) return;
 
-                    var chatId = [USER_UID, uid].sort().join('_');
-                    var path = 'dms/' + SITE + '/' + chatId + '/messages';
-
-                    db.ref(path).once('value', function(msgSnap) {
-                        var messages = msgSnap.val() || {};
-                        var messageIds = Object.keys(messages).sort(function(a, b) {
-                            return (messages[b].timestamp || 0) - (messages[a].timestamp || 0);
-                        });
-                        var last = messageIds.length ? messages[messageIds[0]] : null;
-                        var unread = messageIds.filter(function(id) {
-                            var message = messages[id];
-                            return message.senderUid && message.senderUid !== USER_UID &&
-                                (!message.readBy || message.readBy[USER_UID] !== true);
-                        }).length;
-                        chats.push({ uid: uid, name: name, letter: letter, last: last, unread: unread });
-
-                        loaded++;
-                        if (loaded === friendIds.length) {
-                            chats.sort(function(a, b) {
-                                return ((b.last && b.last.timestamp) || 0) - ((a.last && a.last.timestamp) || 0);
-                            });
-                            container.innerHTML = chats.map(function(chat) {
-                                var preview = chat.last ? chat.last.text || '' : 'Нет сообщений';
-                                return '<button type="button" class="chat-list-item' + (chat.unread ? ' unread' : '') + '" onclick="openPrivateChat(\'' + chat.uid + '\');closeChatList();">' +
-                                    '<span class="avatar-wrap" id="clava-' + chat.uid + '"><span class="letter">' + esc(chat.letter) + '</span></span>' +
-                                    '<span class="chat-list-info"><span class="chat-list-name">' + esc(chat.name) + '</span>' +
-                                    '<span class="chat-list-last">' + esc(preview.slice(0, 44)) + '</span></span>' +
-                                    (chat.unread ? '<span class="chat-list-unread">' + (chat.unread > 99 ? '99+' : chat.unread) + '</span>' : '') +
-                                    '</button>';
-                            }).join('');
-                            chats.forEach(function(chat) {
-                                var el = document.getElementById('clava-' + chat.uid);
-                                if (el) renderAvatar(chat.uid, el, '?');
-                            });
-                        }
+                    chats.sort(function(a, b) {
+                        return ((b.last && b.last.timestamp) || 0) - ((a.last && a.last.timestamp) || 0);
+                    });
+                    container.innerHTML = chats.map(function(item) {
+                        var preview = item.last ? item.last.text || '' : 'Нет сообщений';
+                        return '<button type="button" class="chat-list-item' + (item.unread ? ' unread' : '') + '" onclick="openPrivateChat(\'' + item.uid + '\');closeChatList();">' +
+                            '<span class="avatar-wrap" id="clava-' + item.uid + '"><span class="letter">' + esc(item.letter) + '</span></span>' +
+                            '<span class="chat-list-info"><span class="chat-list-name">' + esc(item.name) + '</span>' +
+                            '<span class="chat-list-last">' + esc(preview.slice(0, 44)) + '</span></span>' +
+                            (item.unread ? '<span class="chat-list-unread">' + (item.unread > 99 ? '99+' : item.unread) + '</span>' : '') +
+                            '</button>';
+                    }).join('');
+                    chats.forEach(function(item) {
+                        var avatar = document.getElementById('clava-' + item.uid);
+                        if (avatar) renderAvatar(item.uid, avatar, '?');
                     });
                 });
             });
@@ -555,31 +565,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof closeSidebar === 'function') {
             closeSidebar();
         }
-    };
-
-    // Единая пустая заготовка для тематических разделов из сайдбара.
-    window.openSectionPage = function(sectionId) {
-        var sections = {
-            news: { title: 'Новости', icon: '📰' },
-            video: { title: 'Видео', icon: '🎬' },
-            music: { title: 'Музыка', icon: '🎵' },
-            games: { title: 'Игры', icon: '🎮' },
-            sport: { title: 'Спорт', icon: '⚽' },
-            cinema: { title: 'Кино', icon: '🎥' },
-            programming: { title: 'Программирование', icon: '💻' },
-            business: { title: 'Бизнес', icon: '💼' },
-            dating: { title: 'Знакомства', icon: '❤️' }
-        };
-        var section = sections[sectionId];
-        if (!section) return;
-
-        var title = document.getElementById('sectionPageTitle');
-        var icon = document.getElementById('sectionPageIcon');
-        if (title) title.textContent = section.title;
-        if (icon) icon.textContent = section.icon;
-        window.setActivePage('section');
-        var chatView = document.getElementById('chatView');
-        if (chatView) chatView.classList.remove('active');
     };
 
     // ================================================================

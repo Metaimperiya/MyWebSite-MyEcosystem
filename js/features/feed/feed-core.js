@@ -170,7 +170,11 @@ function renderPost(p, type) {
     
     // ===== ФИКС: УБРАЛ ЖЁСТКУЮ ВЫСОТУ =====
     var previewHtml = '';
-    if (p.link) {
+    if (p.articleUrl) {
+        previewHtml = '<a href="' + esc(p.articleUrl) + '" class="article-feed-card" onclick="event.stopPropagation();" style="display:block;margin-top:8px;padding:12px;border:1px solid var(--border-color);border-radius:10px;text-decoration:none;color:inherit;background:var(--input-bg);">' +
+            (p.articleCover ? '<img src="' + esc(p.articleCover) + '" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:7px;margin-bottom:8px;">' : '') +
+            '<strong style="display:block;font-size:.9rem;">' + esc(p.articleTitle || p.text) + '</strong><span style="display:block;color:var(--muted-text);font-size:.7rem;margin-top:4px;">' + esc(p.articleDescription || '') + '</span><span style="display:block;color:var(--link-color);font-size:.7rem;margin-top:8px;">Читать статью →</span></a>';
+    } else if (p.link) {
         var frameClass = p.frameSize === 'large' ? ' link-preview--large' : '';
         previewHtml = '<div class="link-preview' + frameClass + '" onclick="event.stopPropagation();"><iframe src="' + p.link + '" style="width:100%;border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }

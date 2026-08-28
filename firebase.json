@@ -6,11 +6,25 @@
     "rules": "storage.rules.txt"
   },
   "hosting": {
+    "predeploy": [
+      "node scripts/generate-content-pages.mjs"
+    ],
     "public": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      { "source": "/news/**", "destination": "/content/article.html" },
+      { "source": "/video/**", "destination": "/content/article.html" },
+      { "source": "/music/**", "destination": "/content/article.html" },
+      { "source": "/games/**", "destination": "/content/article.html" },
+      { "source": "/sport/**", "destination": "/content/article.html" },
+      { "source": "/cinema/**", "destination": "/content/article.html" },
+      { "source": "/programming/**", "destination": "/content/article.html" },
+      { "source": "/business/**", "destination": "/content/article.html" },
+      { "source": "/dating/**", "destination": "/content/article.html" }
     ],
     "headers": [
       {

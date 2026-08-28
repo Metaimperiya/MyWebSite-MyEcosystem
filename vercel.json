@@ -8,6 +8,15 @@
     { "src": "music/**/*", "use": "@vercel/static" }
   ],
   "rewrites": [
+    { "source": "/news/:slug*", "destination": "/content/article.html" },
+    { "source": "/video/:slug*", "destination": "/content/article.html" },
+    { "source": "/music/:slug*", "destination": "/content/article.html" },
+    { "source": "/games/:slug*", "destination": "/content/article.html" },
+    { "source": "/sport/:slug*", "destination": "/content/article.html" },
+    { "source": "/cinema/:slug*", "destination": "/content/article.html" },
+    { "source": "/programming/:slug*", "destination": "/content/article.html" },
+    { "source": "/business/:slug*", "destination": "/content/article.html" },
+    { "source": "/dating/:slug*", "destination": "/content/article.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

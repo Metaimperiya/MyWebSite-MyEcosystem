@@ -17,8 +17,24 @@
         "feed_posts": {
           ".read": "auth != null",
           "$postId": {
+            "comments": {
+              ".read": true,
+              "$commentId": {
+                ".write": "auth != null && ((!data.exists() && newData.child('authorUid').val() === auth.uid) || (data.exists() && data.child('authorUid').val() === auth.uid) || auth.token.admin === true)"
+              }
+            },
             ".write": "( !data.exists() && newData.child('authorUid').val() === auth.uid ) || ( data.exists() && data.child('authorUid').val() === auth.uid ) || auth.token.admin === true"
           }
+        },
+        "articles": {
+          ".read": true,
+          "$articleId": {
+            ".write": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')"
+          }
+        },
+        "article_slugs": {
+          ".read": true,
+          ".write": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')"
         },
         "user_posts": {
           ".read": "auth != null",

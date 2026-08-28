@@ -121,6 +121,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof loadFriendRequests === 'function') loadFriendRequests();
             if (typeof startDirectMessageUnreadTracking === 'function') startDirectMessageUnreadTracking();
 
+            // Публичные статьи возвращают гостя сюда после входа, чтобы он мог
+            // сразу поделиться материалом или оставить комментарий.
+            var returnTo = new URLSearchParams(window.location.search).get('returnTo');
+            if (returnTo && returnTo.charAt(0) === '/' && returnTo.indexOf('//') !== 0) {
+                window.location.replace(returnTo);
+                return;
+            }
+
             console.log('✅ Пользователь авторизован:', USER);
         } else {
             USER = null;

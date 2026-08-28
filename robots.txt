@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://metaimperiya.vercel.app/sitemap.xml
+Sitemap: https://metaimperiya.com/sitemap.xml

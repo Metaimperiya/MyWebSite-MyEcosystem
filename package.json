@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "start": "vercel dev",
-    "build": "vercel build",
+    "build": "node scripts/generate-content-pages.mjs && vercel build",
     "deploy": "vercel --prod"
   },
   "keywords": ["social", "network", "firebase", "metaimperiya"],
