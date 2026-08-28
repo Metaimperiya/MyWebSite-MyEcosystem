@@ -69,3 +69,40 @@
 .panel-item:hover {
     color: var(--link-color);
 }
+
+/* Карточка TikTok показывается только в правой колонке ПК-версии. */
+.tiktok-widget {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(145deg, #101014, #26242c);
+    border-color: #302d38;
+    color: #fff;
+}
+
+.tiktok-widget::before,
+.tiktok-widget::after {
+    content: '';
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    filter: blur(22px);
+    opacity: .34;
+}
+
+.tiktok-widget::before { background: #25f4ee; top: -54px; left: -56px; }
+.tiktok-widget::after { background: #fe2c55; right: -52px; bottom: -60px; }
+.tiktok-widget > * { position: relative; z-index: 1; }
+.tiktok-widget__eyebrow { font-size: .6rem; text-transform: uppercase; letter-spacing: .12em; color: #d3d1dc; }
+.tiktok-widget__logo { margin: 10px 0 6px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: #000; box-shadow: 3px 3px 0 #fe2c55, -3px -3px 0 #25f4ee; font-size: 1.7rem; }
+.tiktok-widget h2 { margin: 2px 0 6px; font-size: 1rem; }
+.tiktok-widget p { margin: 0 0 14px; max-width: 190px; color: #ddd9e6; font-size: .67rem; line-height: 1.45; }
+.tiktok-widget__button { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 10px; background: #fff; color: #15131a; text-decoration: none; font-weight: 700; font-size: .67rem; transition: transform .15s ease, background .15s ease; }
+.tiktok-widget__button:hover { transform: translateY(-1px); background: #f4f2f8; }
+.tiktok-widget__hint { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: .66rem; line-height: 1.35; }
