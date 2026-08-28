@@ -68,8 +68,11 @@ function loadChat(path) {
     box.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
     chatUnsub = path;
 
-    if (CURRENT_ROOM && CURRENT_ROOM.includes('_')) {
-        setupTypingIndicator(CURRENT_ROOM);
+    // Индикатор набора текста является необязательным модулем. Раньше здесь
+    // вызывалась несуществующая функция setupTypingIndicator(), из-за чего
+    // чат останавливался на «Загрузка…» ещё до подключения к сообщениям.
+    if (CURRENT_ROOM && CURRENT_ROOM.includes('_') && typeof window.setupTypingIndicator === 'function') {
+        window.setupTypingIndicator(CURRENT_ROOM);
     }
 
     db.ref(path).orderByChild('timestamp').on('value', function(snap) {
@@ -125,6 +128,9 @@ function loadChat(path) {
             box.appendChild(div);
         });
         box.scrollTop = box.scrollHeight;
+    }, function(error) {
+        console.error('Не удалось загрузить сообщения:', error);
+        box.innerHTML = '<div style="color:#b91c1c;text-align:center;padding:10px;font-size:0.75rem;">Не удалось загрузить сообщения. Обновите страницу или войдите заново.</div>';
     });
 }
 
