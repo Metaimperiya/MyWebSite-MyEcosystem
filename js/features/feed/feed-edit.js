@@ -94,8 +94,11 @@
             var savePost = function(imgData) {
                 if (imgData) postData.img = imgData;
 
-                db.ref('sites/' + SITE + '/feed_posts').push(postData);
-                db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
+                var postId = db.ref('sites/' + SITE + '/feed_posts').push().key;
+                var updates = {};
+                updates['sites/' + SITE + '/feed_posts/' + postId] = postData;
+                updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + postId] = postData;
+                db.ref().update(updates);
                 clearEditor('postEditor');
                 window.clearPostForm();
 
@@ -184,8 +187,11 @@
             var savePost = function(imgData) {
                 if (imgData) postData.img = imgData;
 
-                db.ref('sites/' + SITE + '/feed_posts').push(postData);
-                db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(postData);
+                var postId = db.ref('sites/' + SITE + '/feed_posts').push().key;
+                var updates = {};
+                updates['sites/' + SITE + '/feed_posts/' + postId] = postData;
+                updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + postId] = postData;
+                db.ref().update(updates);
                 clearEditor('postEditorProfile');
                 window.clearProfilePostForm();
 

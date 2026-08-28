@@ -70,35 +70,70 @@ function loadProfile() {
 }
 
 // ===== ОСТАЛЬНЫЕ ФУНКЦИИ ПРОФИЛЯ =====
+var profilePostsUserRef = null;
+var profilePostsFeedRef = null;
+
 function loadProfilePosts(uid) {
     var container = document.getElementById('profilePosts');
     if (!container) return;
 
+    if (profilePostsUserRef) profilePostsUserRef.off('value');
+    if (profilePostsFeedRef) profilePostsFeedRef.off('value');
     container.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
 
-    var postsRef = db.ref('sites/' + SITE + '/user_posts/' + uid);
+    var profileData = null;
+    var feedData = null;
 
-    postsRef.orderByChild('timestamp').on('value', function(snap) {
-        container.innerHTML = '';
-        var data = snap.val() || {};
-        var keys = Object.keys(data).sort(function(a, b) {
-            return (data[b].timestamp || 0) - (data[a].timestamp || 0);
+    function fingerprint(post) {
+        return [post.authorUid || '', post.timestamp || '', post.text || '', post.img || '', post.repost ? JSON.stringify(post.repost) : ''].join('|');
+    }
+
+    function render() {
+        if (profileData === null && feedData === null) return;
+        var posts = [];
+        var known = {};
+        Object.keys(profileData || {}).forEach(function(id) {
+            var post = profileData[id];
+            if (!post) return;
+            known[fingerprint(post)] = true;
+            post.id = id;
+            post._profileSource = true;
+            posts.push(post);
         });
 
-        if (!keys.length) {
+        // Старые публикации могли сохраниться только в общей ленте. Добавляем
+        // их в профиль как резервный источник, без дублей новых постов.
+        Object.keys(feedData || {}).forEach(function(id) {
+            var post = feedData[id];
+            if (!post || post.authorUid !== uid || known[fingerprint(post)]) return;
+            post.id = id;
+            post._profileSource = false;
+            posts.push(post);
+        });
+
+        posts.sort(function(a, b) { return (b.timestamp || 0) - (a.timestamp || 0); });
+        container.innerHTML = '';
+        if (!posts.length) {
             container.innerHTML = '<div style="text-align:center;padding:12px;color:#bbb;font-size:0.65rem;">📝 Нет постов. Напишите что-нибудь!</div>';
             return;
         }
-
-        keys.forEach(function(k) {
-            var p = data[k];
-            p.id = k;
-            var postEl = renderPost(p, 'profile');
+        posts.forEach(function(post) {
+            var postEl = renderPost(post, post._profileSource ? 'profile' : 'feed');
             if (postEl) container.appendChild(postEl);
         });
-    }, function(error) {
-        console.error('❌ Ошибка загрузки постов:', error);
-        container.innerHTML = '<div style="text-align:center;padding:12px;color:#e74c3c;font-size:0.65rem;">❌ Ошибка загрузки постов</div>';
+    }
+
+    profilePostsUserRef = db.ref('sites/' + SITE + '/user_posts/' + uid);
+    profilePostsFeedRef = db.ref('sites/' + SITE + '/feed_posts').orderByChild('authorUid').equalTo(uid);
+    profilePostsUserRef.on('value', function(snap) { profileData = snap.val() || {}; render(); }, function(error) {
+        console.error('❌ Ошибка загрузки постов профиля:', error);
+        profileData = {};
+        render();
+    });
+    profilePostsFeedRef.on('value', function(snap) { feedData = snap.val() || {}; render(); }, function(error) {
+        console.error('❌ Ошибка загрузки общей ленты профиля:', error);
+        feedData = {};
+        render();
     });
 }
 

@@ -16,6 +16,7 @@
         },
         "feed_posts": {
           ".read": "auth != null",
+          ".indexOn": ["authorUid"],
           "$postId": {
             "comments": {
               ".read": true,

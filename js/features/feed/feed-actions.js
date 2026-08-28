@@ -461,8 +461,11 @@ window.submitRepost = function() {
                 deleted: null,
                 deletedAt: null
             };
-            db.ref('sites/' + SITE + '/feed_posts').push(repostData);
-            db.ref('sites/' + SITE + '/user_posts/' + USER_UID).push(repostData);
+            var repostId = db.ref('sites/' + SITE + '/feed_posts').push().key;
+            var repostUpdates = {};
+            repostUpdates['sites/' + SITE + '/feed_posts/' + repostId] = repostData;
+            repostUpdates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + repostId] = repostData;
+            db.ref().update(repostUpdates);
             db.ref('sites/' + SITE + '/' + path + '/' + postId + '/reposts').transaction(function(current) { return (current || 0) + 1; });
             closeRepost();
             setTimeout(function() {
