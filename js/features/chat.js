@@ -4,6 +4,19 @@
 
 var dmUnreadRef = null;
 
+function getDirectChatTargetUid() {
+    if (!CURRENT_ROOM || CURRENT_ROOM.indexOf('_') === -1 || !USER_UID) return null;
+    var parts = CURRENT_ROOM.split('_');
+    if (parts.length !== 2) return null;
+    return parts[0] === USER_UID ? parts[1] : (parts[1] === USER_UID ? parts[0] : null);
+}
+
+function updateChatReportButton() {
+    var button = document.getElementById('chatReportBtn');
+    if (!button) return;
+    button.hidden = !getDirectChatTargetUid();
+}
+
 function isUnreadDirectMessage(message) {
     return message && message.senderUid && message.senderUid !== USER_UID &&
         (!message.readBy || message.readBy[USER_UID] !== true);
@@ -67,6 +80,7 @@ function loadChat(path) {
     if (!box) return;
     box.innerHTML = '<div style="color:#bbb;text-align:center;padding:6px;font-size:0.65rem;">⏳ Загрузка...</div>';
     chatUnsub = path;
+    updateChatReportButton();
 
     // Индикатор набора текста является необязательным модулем. Раньше здесь
     // вызывалась несуществующая функция setupTypingIndicator(), из-за чего
@@ -179,26 +193,38 @@ window.sendChatMessage = function() {
         path = 'rooms/' + SITE + '_' + CURRENT_ROOM + '/messages';
     }
 
-    db.ref(path).push({
-        nick: USER,
-        senderUid: USER_UID,
-        recipientUid: targetUid || null,
-        text: text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-    });
+    var moderationPaths = ['sites/' + SITE + '/moderation_blocks/' + USER_UID];
+    if (targetUid) moderationPaths.push('sites/' + SITE + '/moderation_blocks/' + targetUid);
 
-    if (targetUid) {
-        sendNotification(targetUid, {
-            type: 'message',
-            from: USER_UID,
-            text: USER + ': ' + text,
-            chatId: CURRENT_ROOM,
+    Promise.all(moderationPaths.map(function(blockPath) { return db.ref(blockPath).once('value'); })).then(function(blocks) {
+        if (blocks.some(function(snap) { return snap.exists(); })) {
+            alert('Отправка сообщений недоступна: один из участников заблокирован администрацией.');
+            return;
+        }
+
+        return db.ref(path).push({
+            nick: USER,
+            senderUid: USER_UID,
+            recipientUid: targetUid || null,
+            text: text,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             timestamp: Date.now()
+        }).then(function() {
+            if (targetUid) {
+                sendNotification(targetUid, {
+                    type: 'message',
+                    from: USER_UID,
+                    text: USER + ': ' + text,
+                    chatId: CURRENT_ROOM,
+                    timestamp: Date.now()
+                });
+            }
+            input.value = '';
         });
-    }
-
-    input.value = '';
+    }).catch(function(error) {
+        console.error('Не удалось отправить сообщение:', error);
+        alert('Не удалось отправить сообщение. Попробуйте ещё раз.');
+    });
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -217,6 +243,7 @@ window.closeChat = function() {
         chatUnsub = null;
     }
     CURRENT_ROOM = null;
+    updateChatReportButton();
     openChatList();
 };
 
@@ -224,9 +251,13 @@ window.openPrivateChat = function(targetUid) {
     if (!USER_UID) { alert('Войдите!'); return; }
     if (targetUid === USER_UID) { alert('Нельзя писать себе'); return; }
 
-    db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).once('value', function(blockSnap) {
-        if (blockSnap.exists()) {
-            alert('Сначала снимите блокировку с этого пользователя.');
+    Promise.all([
+        db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).once('value'),
+        db.ref('sites/' + SITE + '/moderation_blocks/' + USER_UID).once('value'),
+        db.ref('sites/' + SITE + '/moderation_blocks/' + targetUid).once('value')
+    ]).then(function(snaps) {
+        if (snaps.some(function(snap) { return snap.exists(); })) {
+            alert('Невозможно открыть диалог: один из пользователей заблокирован.');
             return;
         }
 
@@ -238,5 +269,45 @@ window.openPrivateChat = function(targetUid) {
         document.getElementById('chatView').classList.add('active');
         setActivePage(null);
         loadChat(path);
+    });
+};
+
+window.openChatReport = function() {
+    var targetUid = getDirectChatTargetUid();
+    if (!USER_UID || !targetUid) {
+        alert('Жалобу можно отправить только из личного диалога.');
+        return;
+    }
+    document.getElementById('reportReason').value = 'spam';
+    document.getElementById('reportDetails').value = '';
+    document.getElementById('chatReportModal').classList.add('open');
+};
+
+window.closeChatReport = function() {
+    document.getElementById('chatReportModal').classList.remove('open');
+};
+
+window.submitChatReport = function() {
+    var targetUid = getDirectChatTargetUid();
+    if (!USER_UID || !targetUid) return;
+
+    var details = document.getElementById('reportDetails').value.trim();
+    var report = {
+        reporterUid: USER_UID,
+        reportedUid: targetUid,
+        chatId: CURRENT_ROOM,
+        reason: document.getElementById('reportReason').value,
+        details: details.slice(0, 1000),
+        status: 'new',
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    };
+
+    db.ref('sites/' + SITE + '/chat_reports').push(report).then(function() {
+        closeChatReport();
+        alert('Спасибо. Жалоба отправлена администратору на рассмотрение.');
+    }).catch(function(error) {
+        console.error('Не удалось отправить жалобу:', error);
+        alert('Не удалось отправить жалобу. Попробуйте ещё раз.');
     });
 };

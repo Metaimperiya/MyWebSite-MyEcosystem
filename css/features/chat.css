@@ -17,6 +17,25 @@
     display: flex;
 }
 
+.chat-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.chat-report-btn {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 5px 8px;
+    background: transparent;
+    color: var(--danger, #c62828);
+    font-size: 0.68rem;
+    cursor: pointer;
+}
+
+.chat-report-btn:hover { background: var(--input-bg); }
+
 .chat-messages {
     flex: 1;
     overflow-y: auto;

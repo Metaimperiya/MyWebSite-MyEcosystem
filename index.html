@@ -21,6 +21,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
 
     <!-- ===== CSS (mobile.css ТОЛЬКО ЧЕРЕЗ style.css) ===== -->
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
@@ -28,6 +29,7 @@
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=3.1">
     <link rel="stylesheet" href="css/features/profile.css?v=3.3">
+    <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
     <link rel="stylesheet" href="css/features/modals.css?v=3.0">
@@ -77,6 +79,10 @@
         <div class="settings-divider"></div>
         <div class="settings-item" onclick="toggleViewMode()">
             <span class="icon">📱</span> <span id="viewModeDisplay">PC</span>
+        </div>
+        <div class="settings-divider admin-only" style="display:none;"></div>
+        <div class="settings-item admin-only" onclick="openAdminReports();closeSettingsMenu();" style="display:none;">
+            <span class="icon">🛡️</span> Жалобы
         </div>
         <div class="settings-divider"></div>
         <div class="settings-item" onclick="logout()">
@@ -215,6 +221,8 @@
                 <div class="profile-header">
                     <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
                     <div class="name" id="profileName"></div>
+                    <div class="profile-badges" id="profileBadges" aria-label="Статусы профиля"></div>
+                    <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
                     <div class="bio" id="profileBio"></div>
                     <div class="profile-stats" aria-label="Статистика профиля">
                         <button type="button" class="profile-stat" id="friendsStat">🤝 <span>Друзья</span><strong id="friendsCount">0</strong></button>
@@ -230,6 +238,7 @@
                     </div>
                     <div class="profile-user-list" id="profileUserList"></div>
                 </section>
+                <div class="profile-reputation" id="profileReputation" hidden></div>
                 <div class="card" style="margin-top:8px;">
                     <div class="post-form">
                         <div class="editor-toolbar">
@@ -312,7 +321,10 @@
 
             <!-- ЧАТ -->
             <div class="chat-view" id="chatView">
-                <button class="back-btn" onclick="closeChat()">← Back</button>
+                <div class="chat-toolbar">
+                    <button class="back-btn" onclick="closeChat()">← Back</button>
+                    <button class="chat-report-btn" id="chatReportBtn" onclick="openChatReport()" hidden>⚑ Пожаловаться</button>
+                </div>
                 <div class="chat-messages" id="chatMessages"></div>
                 <div id="typingIndicator" style="display:none;color:var(--text-secondary);font-size:0.6rem;padding:4px 8px;">✍️ Typing...</div>
                 <div class="chat-input">
@@ -429,6 +441,33 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="chatReportModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeChatReport()">✕</button>
+            <h3>⚑ Жалоба на пользователя</h3>
+            <p class="report-modal-note">Администратор увидит этот диалог и сможет принять меры.</p>
+            <label for="reportReason">Причина</label>
+            <select id="reportReason">
+                <option value="spam">Спам</option>
+                <option value="fraud">Мошенничество</option>
+                <option value="harassment">Оскорбления или травля</option>
+                <option value="unsafe">Опасный контент</option>
+                <option value="other">Другое</option>
+            </select>
+            <label for="reportDetails">Комментарий (необязательно)</label>
+            <textarea id="reportDetails" maxlength="1000" placeholder="Опишите, что произошло..."></textarea>
+            <button class="btn-danger" onclick="submitChatReport()">Отправить жалобу</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="adminReportsModal">
+        <div class="modal-box admin-reports-modal">
+            <button class="close-btn" onclick="closeAdminReports()">✕</button>
+            <h3>🛡️ Жалобы на переписки</h3>
+            <div id="adminReportsList"></div>
+        </div>
+    </div>
+
 </div>
 
 <!-- ===== JS ===== -->
@@ -441,11 +480,12 @@
 <script src="js/features/feed/feed-actions.js?v=3.0"></script>
 <script src="js/features/feed/feed-edit.js?v=3.0"></script>
 <script src="js/features/profile.js?v=3.3"></script>
+<script src="js/features/reputation.js?v=1.0"></script>
 <script src="js/features/friends.js?v=3.1"></script>
 <script src="js/features/groups.js?v=3.0"></script>
-<script src="js/features/chat.js?v=3.1"></script>
+<script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
-<script src="js/features/admin.js?v=3.0"></script>
+<script src="js/features/admin.js?v=3.2"></script>
 <script src="js/features/page.js?v=3.0"></script>
 
 <script>

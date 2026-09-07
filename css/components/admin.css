@@ -29,6 +29,44 @@
     box-shadow: 0 0 20px rgba(230, 126, 34, 0.6);
 }
 
+.report-modal-note {
+    margin: -4px 0 12px;
+    color: var(--muted-text);
+    font-size: 0.76rem;
+    line-height: 1.4;
+}
+
+#chatReportModal label {
+    display: block;
+    margin: 10px 0 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+#chatReportModal select,
+#chatReportModal textarea {
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    font: inherit;
+}
+
+#chatReportModal textarea { min-height: 86px; resize: vertical; }
+#chatReportModal .btn-danger { width: 100%; margin-top: 14px; }
+.admin-reports-modal { max-width: 620px; }
+.admin-report-card { border-bottom: 1px solid var(--border-color); padding: 12px 2px; }
+.admin-report-card:last-child { border-bottom: 0; }
+.admin-report-meta { color: var(--muted-text); font-size: 0.68rem; line-height: 1.45; }
+.admin-report-text { margin: 7px 0; font-size: 0.78rem; white-space: pre-wrap; }
+.admin-report-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+.admin-report-actions button { border: 0; border-radius: 7px; padding: 6px 9px; cursor: pointer; font-size: 0.68rem; }
+.admin-report-view { background: var(--link-color); color: #fff; }
+.admin-report-resolve { background: var(--input-bg); color: var(--text-color); }
+.admin-report-block { background: var(--danger, #c62828); color: #fff; }
+
 @media (max-width: 480px) {
     .admin-dot {
         width: 10px;

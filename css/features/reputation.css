@@ -1,0 +1,26 @@
+.profile-badges { display:inline-flex; gap:6px; vertical-align:middle; margin-left:7px; }
+.profile-badge { display:inline-flex; align-items:center; justify-content:center; font-weight:800; line-height:1; }
+.profile-badge.verified { width:18px; height:18px; border-radius:50%; color:#fff; background:#1688ed; font-size:13px; }
+.profile-badge.pro { padding:3px 6px; border-radius:5px; color:#271900; background:linear-gradient(135deg,#ffd866,#ecac20); font-size:10px; letter-spacing:.4px; }
+.profile-level { display:flex; align-items:baseline; gap:7px; margin-top:5px; color:var(--text-color, #fff); font-size:.86rem; }
+.profile-level strong { color:#f7b733; }
+.profile-level small { color:var(--text-secondary, #999); font-size:.72rem; }
+.profile-reputation { margin:14px 0; padding:14px; border:1px solid var(--border-color, #333); border-radius:10px; background:var(--card-bg, rgba(255,255,255,.03)); }
+.profile-reputation h4 { margin:0 0 8px; font-size:.92rem; }
+.profile-rating-summary { display:flex; align-items:center; gap:6px; color:var(--text-secondary, #aaa); }
+.profile-rating-summary strong { color:var(--text-color, #fff); font-size:1.2rem; }
+.rating-stars { color:#f7b733; letter-spacing:1px; white-space:nowrap; }
+.profile-review-form, .profile-reviews, .profile-status-admin { margin-top:16px; }
+.profile-rating-choice { display:inline-flex; direction:rtl; margin-bottom:8px; }
+.profile-rating-choice input { display:none; }
+.profile-rating-choice label { cursor:pointer; color:#6b6b6b; font-size:25px; line-height:1; }
+.profile-rating-choice input:checked ~ label, .profile-rating-choice label:hover, .profile-rating-choice label:hover ~ label { color:#f7b733; }
+.profile-review-form textarea { display:block; width:100%; min-height:68px; margin:0 0 8px; resize:vertical; }
+.profile-review { padding:10px 0; border-top:1px solid var(--border-color, #333); }
+.profile-review-head { display:flex; justify-content:space-between; gap:8px; }
+.profile-review p { margin:6px 0; white-space:pre-wrap; overflow-wrap:anywhere; }
+.profile-review-footer { display:flex; justify-content:space-between; color:var(--text-secondary, #999); font-size:.75rem; }
+.profile-review-footer button, .profile-status-admin button { border:0; color:var(--accent-color, #6ea8fe); background:transparent; cursor:pointer; }
+.profile-review-empty { color:var(--text-secondary, #999); font-size:.85rem; }
+.profile-status-admin { padding-top:12px; border-top:1px dashed var(--border-color, #444); }
+.profile-status-admin button { margin:0 8px 7px 0; padding:6px 8px; border:1px solid var(--border-color, #555); border-radius:5px; }

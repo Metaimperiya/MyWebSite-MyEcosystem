@@ -47,6 +47,8 @@ function loadProfile() {
             if (avatarEl) {
                 avatarEl.innerHTML = '<span class="letter">?</span>';
             }
+            var badgesEl = document.getElementById('profileBadges');
+            if (badgesEl) badgesEl.innerHTML = '';
             return;
         }
 
@@ -62,6 +64,7 @@ function loadProfile() {
         showProfileActions(uid);
         makeStatsClickable(uid);
         loadProfileLink(uid);
+        if (typeof loadProfileReputation === 'function') loadProfileReputation(uid);
     });
 
     loadFriends(uid);

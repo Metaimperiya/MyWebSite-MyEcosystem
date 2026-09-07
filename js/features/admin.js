@@ -4,26 +4,14 @@
 
 // ===== КНОПКА АДМИНКИ (ТОЧКА) =====
 window.adminLogin = function() {
-    if (isAdmin) {
-        adminLogout();
+    if (!USER_UID || !ADMIN_UIDS.includes(USER_UID)) {
+        alert('Этот аккаунт не имеет прав администратора.');
         return;
     }
-    
-    var pass = prompt('🏴‍☠️ Введите пароль администратора:');
-    if (pass === null) return;
-    if (pass.trim() === '12345') {
-        isAdmin = true;
-        localStorage.setItem('dc_admin_' + SITE, '1');
-        var dot = document.getElementById('adminDot');
-        if (dot) dot.classList.add('active');
-        alert('🏴‍☠️ Админ-режим включён!');
-        if (typeof loadFeed === 'function') loadFeed();
-        if (typeof loadProfile === 'function') loadProfile();
-        if (typeof loadPeople === 'function') loadPeople();
-        updateAdminMenu();
-    } else {
-        alert('❌ Неверный пароль');
-    }
+    isAdmin = true;
+    localStorage.setItem('dc_admin_' + SITE, '1');
+    updateAdminMenu();
+    openAdminReports();
 };
 
 // ===== ВЫХОД ИЗ АДМИНКИ =====
@@ -207,6 +195,127 @@ window.adminViewChat = function(chatId) {
     loadChat(path);
 };
 
+var reportReasonLabels = {
+    spam: 'Спам', fraud: 'Мошенничество', harassment: 'Оскорбления или травля',
+    unsafe: 'Опасный контент', other: 'Другое'
+};
+
+function isAdminAccount() {
+    return !!USER_UID && ADMIN_UIDS.includes(USER_UID);
+}
+
+function reportStatusLabel(status) {
+    return { new: 'Новая', reviewing: 'На рассмотрении', resolved: 'Решена', blocked: 'Пользователь заблокирован' }[status] || status;
+}
+
+function getReportUserName(uid) {
+    return db.ref('sites/' + SITE + '/users/' + uid + '/name').once('value').then(function(snap) {
+        return snap.val() || 'Пользователь';
+    });
+}
+
+window.openAdminReports = function() {
+    if (!isAdminAccount()) {
+        alert('Только для администратора.');
+        return;
+    }
+    isAdmin = true;
+    document.getElementById('adminReportsModal').classList.add('open');
+    loadAdminReports();
+};
+
+window.closeAdminReports = function() {
+    document.getElementById('adminReportsModal').classList.remove('open');
+};
+
+function loadAdminReports() {
+    var container = document.getElementById('adminReportsList');
+    if (!container) return;
+    container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">⏳ Загрузка...</div>';
+    db.ref('sites/' + SITE + '/chat_reports').orderByChild('createdAt').once('value').then(function(snap) {
+        var reports = [];
+        snap.forEach(function(item) { reports.push({ id: item.key, data: item.val() || {} }); });
+        reports.reverse();
+        if (!reports.length) {
+            container.innerHTML = '<div style="color:#bbb;text-align:center;padding:12px;font-size:0.75rem;">Жалоб пока нет</div>';
+            return;
+        }
+        return Promise.all(reports.map(function(report) {
+            return Promise.all([getReportUserName(report.data.reporterUid), getReportUserName(report.data.reportedUid)]).then(function(names) {
+                return '<div class="admin-report-card">' +
+                    '<strong style="font-size:0.82rem;">' + esc(names[0]) + ' → ' + esc(names[1]) + '</strong>' +
+                    '<div class="admin-report-meta">' + esc(reportReasonLabels[report.data.reason] || report.data.reason || 'Не указана') + ' · ' +
+                    esc(reportStatusLabel(report.data.status || 'new')) + ' · ' + new Date(report.data.createdAt || Date.now()).toLocaleString() + '</div>' +
+                    (report.data.details ? '<div class="admin-report-text">' + esc(report.data.details) + '</div>' : '') +
+                    '<div class="admin-report-actions">' +
+                    '<button class="admin-report-view" onclick="adminReviewReport(\'' + report.id + '\')">Открыть переписку</button>' +
+                    '<button class="admin-report-resolve" onclick="adminResolveReport(\'' + report.id + '\')">Закрыть жалобу</button>' +
+                    '<button class="admin-report-block" onclick="adminBlockReportedUser(\'' + report.id + '\')">Заблокировать</button>' +
+                    '<button class="admin-report-resolve" onclick="adminUnblockReportedUser(\'' + report.id + '\')">Снять блокировку</button>' +
+                    '</div></div>';
+            });
+        })).then(function(cards) { container.innerHTML = cards.join(''); });
+    }).catch(function(error) {
+        console.error('Не удалось загрузить жалобы:', error);
+        container.innerHTML = '<div style="color:var(--danger);padding:12px;">Не удалось загрузить жалобы.</div>';
+    });
+}
+
+window.adminReviewReport = function(reportId) {
+    if (!isAdminAccount()) return;
+    db.ref('sites/' + SITE + '/chat_reports/' + reportId).once('value').then(function(snap) {
+        var report = snap.val();
+        if (!report || !report.chatId) return alert('Жалоба не найдена.');
+        db.ref('sites/' + SITE + '/chat_reports/' + reportId).update({ status: 'reviewing', updatedAt: Date.now(), reviewedBy: USER_UID });
+        closeAdminReports();
+        CURRENT_ROOM = report.chatId;
+        document.getElementById('chatView').classList.add('active');
+        setActivePage(null);
+        loadChat('dms/' + SITE + '/' + report.chatId + '/messages');
+    });
+};
+
+window.adminResolveReport = function(reportId) {
+    if (!isAdminAccount()) return;
+    db.ref('sites/' + SITE + '/chat_reports/' + reportId).update({ status: 'resolved', updatedAt: Date.now(), reviewedBy: USER_UID }).then(loadAdminReports);
+};
+
+window.adminBlockReportedUser = function(reportId) {
+    if (!isAdminAccount()) return;
+    db.ref('sites/' + SITE + '/chat_reports/' + reportId).once('value').then(function(snap) {
+        var report = snap.val();
+        if (!report || !report.reportedUid) return alert('Жалоба не найдена.');
+        if (!confirm('Заблокировать этого пользователя на всей платформе? Он не сможет писать личные сообщения.')) return;
+        var updates = {};
+        updates['sites/' + SITE + '/moderation_blocks/' + report.reportedUid] = {
+            blockedAt: Date.now(), blockedBy: USER_UID, reportId: reportId, reason: report.reason || 'other'
+        };
+        updates['sites/' + SITE + '/chat_reports/' + reportId + '/status'] = 'blocked';
+        updates['sites/' + SITE + '/chat_reports/' + reportId + '/updatedAt'] = Date.now();
+        updates['sites/' + SITE + '/chat_reports/' + reportId + '/reviewedBy'] = USER_UID;
+        return db.ref().update(updates).then(function() { alert('Пользователь заблокирован.'); loadAdminReports(); });
+    }).catch(function(error) {
+        console.error('Не удалось заблокировать пользователя:', error);
+        alert('Не удалось заблокировать пользователя.');
+    });
+};
+
+window.adminUnblockReportedUser = function(reportId) {
+    if (!isAdminAccount()) return;
+    db.ref('sites/' + SITE + '/chat_reports/' + reportId).once('value').then(function(snap) {
+        var report = snap.val();
+        if (!report || !report.reportedUid) return alert('Жалоба не найдена.');
+        if (!confirm('Снять административную блокировку с этого пользователя?')) return;
+        return db.ref('sites/' + SITE + '/moderation_blocks/' + report.reportedUid).remove().then(function() {
+            alert('Блокировка снята.');
+            loadAdminReports();
+        });
+    }).catch(function(error) {
+        console.error('Не удалось снять блокировку:', error);
+        alert('Не удалось снять блокировку.');
+    });
+};
+
 // ===== СОЗДАТЬ СТРАНИЦУ АДМИНИСТРАТОРА =====
 window.createAdminPage = function() {
     if (!isAdmin) {
@@ -244,7 +353,7 @@ window.createAdminPage = function() {
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
     // Проверяем админ-статус при загрузке
-    if (localStorage.getItem('dc_admin_' + SITE) === '1') {
+    if (USER_UID && ADMIN_UIDS.includes(USER_UID) && localStorage.getItem('dc_admin_' + SITE) === '1') {
         isAdmin = true;
         var dot = document.getElementById('adminDot');
         if (dot) dot.classList.add('active');
