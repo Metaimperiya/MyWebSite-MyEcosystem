@@ -99,6 +99,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 slug: slug
             });
 
+            setTimeout(function() {
+                if (typeof window.loadTopProfileRating === 'function') window.loadTopProfileRating(USER_UID);
+                if (typeof window.loadTopProfileStatus === 'function') window.loadTopProfileStatus(USER_UID);
+            }, 0);
+
             isAdmin = ADMIN_UIDS.includes(USER_UID);
             if (isAdmin) {
                 localStorage.setItem('dc_admin_' + SITE, 'true');

@@ -247,6 +247,32 @@
     border-radius: var(--radius-sm);
 }
 
+.post .author .post-author-avatar {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1px;
+    flex:0 0 32px;
+}
+
+.post .author .inline-profile-rating {
+    color:#f7b733;
+    font-size:8px;
+    line-height:8px;
+    letter-spacing:-1px;
+    white-space:nowrap;
+}
+
+.post .author .inline-profile-status {
+    display:flex;
+    gap:2px;
+    min-height:9px;
+    align-items:center;
+}
+
+.inline-verified { display:inline-flex; align-items:center; justify-content:center; width:9px; height:9px; border-radius:50%; background:#1688ed; color:#fff; font-size:7px; font-weight:800; line-height:1; }
+.inline-pro { display:inline-block; padding:1px 3px; border-radius:3px; background:#f2bd36; color:#241600; font-size:6px; font-weight:800; line-height:1.15; }
+
 .post .post-content .link-preview.link-preview--large {
     height: 450px;
 }

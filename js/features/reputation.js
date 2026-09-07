@@ -5,6 +5,8 @@
 var reputationReviewRef = null;
 var profileLevelRef = null;
 var profileFunctions = null;
+var inlineRatingCache = {};
+var inlineStatusCache = {};
 
 function isProfileAdmin() {
     return !!USER_UID && ADMIN_UIDS.includes(USER_UID);
@@ -24,10 +26,46 @@ function renderProfileBadges(status) {
         (isPro ? '<span class="profile-badge pro" title="PRO-аккаунт">PRO</span>' : '');
 }
 
+function statusBadgesHtml(status) {
+    var isPro = !!status.pro && (!status.proExpiresAt || status.proExpiresAt > Date.now());
+    return (status.verified ? '<span class="inline-verified" title="Проверенный аккаунт">✓</span>' : '') +
+        (isPro ? '<span class="inline-pro" title="PRO-аккаунт">PRO</span>' : '');
+}
+
+function renderInlineStatus(element, status) {
+    if (!element) return;
+    element.innerHTML = statusBadgesHtml(status);
+}
+
+function refreshInlineStatuses(uid, status) {
+    inlineStatusCache[uid] = status;
+    document.querySelectorAll('[data-profile-status="' + uid + '"]').forEach(function(element) {
+        renderInlineStatus(element, status);
+    });
+}
+
+window.loadInlineProfileStatus = function(uid, element) {
+    if (!uid || !element) return;
+    if (inlineStatusCache[uid]) return renderInlineStatus(element, inlineStatusCache[uid]);
+    db.ref(reputationPath('profile_status/' + uid)).once('value', function(snap) {
+        var status = snap.val() || {};
+        refreshInlineStatuses(uid, status);
+    });
+};
+
+window.loadTopProfileStatus = function(uid) {
+    var element = document.getElementById('topAvatarStatus');
+    if (!element || !uid) return;
+    element.setAttribute('data-profile-status', uid);
+    window.loadInlineProfileStatus(uid, element);
+};
+
 function loadProfileStatus(uid) {
     if (!uid) return;
     db.ref(reputationPath('profile_status/' + uid)).once('value', function(snap) {
-        renderProfileBadges(snap.val() || {});
+        var status = snap.val() || {};
+        renderProfileBadges(status);
+        refreshInlineStatuses(uid, status);
     });
 }
 
@@ -70,9 +108,47 @@ function stars(value) {
         '</span>';
 }
 
+function ratingDataFromReviews(reviews) {
+    var values = Object.keys(reviews || {}).map(function(id) { return reviews[id] || {}; })
+        .filter(function(review) { return review.rating >= 1 && review.rating <= 5; });
+    var average = values.length ? values.reduce(function(sum, review) { return sum + Number(review.rating); }, 0) / values.length : 0;
+    return { average: average, count: values.length };
+}
+
+function renderInlineRating(element, data) {
+    if (!element) return;
+    element.innerHTML = stars(data.average);
+    element.title = data.count ? 'Рейтинг ' + data.average.toFixed(1) + ' из 5 (' + data.count + ')' : 'Пока нет отзывов';
+    element.setAttribute('aria-label', element.title);
+}
+
+function refreshInlineRatings(uid, data) {
+    inlineRatingCache[uid] = data;
+    document.querySelectorAll('[data-profile-rating="' + uid + '"]').forEach(function(element) {
+        renderInlineRating(element, data);
+    });
+}
+
+window.loadInlineProfileRating = function(uid, element) {
+    if (!uid || !element) return;
+    if (inlineRatingCache[uid]) return renderInlineRating(element, inlineRatingCache[uid]);
+    db.ref(reputationPath('profile_reviews/' + uid)).once('value', function(snap) {
+        var data = ratingDataFromReviews(snap.val() || {});
+        refreshInlineRatings(uid, data);
+    });
+};
+
+window.loadTopProfileRating = function(uid) {
+    var element = document.getElementById('topAvatarRating');
+    if (!element || !uid) return;
+    element.setAttribute('data-profile-rating', uid);
+    window.loadInlineProfileRating(uid, element);
+};
+
 function renderReviews(uid, reviews) {
     var summary = document.getElementById('profileRatingSummary');
     var list = document.getElementById('profileReviewsList');
+    var avatarRating = document.getElementById('profileAvatarRating');
     if (!summary || !list) return;
     var values = Object.keys(reviews || {}).map(function(id) {
         var review = reviews[id] || {};
@@ -81,6 +157,11 @@ function renderReviews(uid, reviews) {
     }).filter(function(review) { return review.rating >= 1 && review.rating <= 5; });
     values.sort(function(a, b) { return (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0); });
     var average = values.length ? values.reduce(function(sum, review) { return sum + Number(review.rating); }, 0) / values.length : 0;
+    refreshInlineRatings(uid, { average: average, count: values.length });
+    if (avatarRating) {
+        avatarRating.innerHTML = stars(average) + (values.length ? '<small>' + average.toFixed(1) + '</small>' : '');
+        avatarRating.setAttribute('aria-label', values.length ? 'Рейтинг ' + average.toFixed(1) + ' из 5' : 'Пока нет оценок');
+    }
     summary.innerHTML = values.length
         ? '<strong>' + average.toFixed(1) + '</strong> ' + stars(average) + ' <span>(' + values.length + ' ' + pluralReviews(values.length) + ')</span>'
         : '<span>Пока нет отзывов</span>';

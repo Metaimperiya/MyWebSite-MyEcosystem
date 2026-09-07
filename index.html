@@ -60,8 +60,12 @@
         <div class="right">
             <button class="topbar-icon-button" onclick="openChatList()" aria-label="Личные сообщения">💬<span id="chatUnreadBadge" class="count-badge" hidden></span></button>
             <button onclick="openNotifications()">🔔</button>
-            <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
-                <span class="letter">?</span>
+            <div class="top-profile-mark">
+                <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
+                    <span class="letter">?</span>
+                </div>
+                <div class="top-avatar-rating" id="topAvatarRating" aria-label="Рейтинг профиля">☆☆☆☆☆</div>
+                <div class="top-avatar-status" id="topAvatarStatus" aria-label="Статус профиля"></div>
             </div>
             <span class="username" id="topName" onclick="goToProfile()"></span>
             <button onclick="toggleSettingsMenu()">⋮</button>
@@ -220,6 +224,7 @@
             <div class="page" id="page-profile">
                 <div class="profile-header">
                     <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
+                    <div class="profile-avatar-rating" id="profileAvatarRating" aria-label="Рейтинг профиля">☆☆☆☆☆</div>
                     <div class="name" id="profileName"></div>
                     <div class="profile-badges" id="profileBadges" aria-label="Статусы профиля"></div>
                     <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>

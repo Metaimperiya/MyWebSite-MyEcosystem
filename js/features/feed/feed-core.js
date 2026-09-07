@@ -146,9 +146,12 @@ function renderPost(p, type) {
     var letter = (p.author || '?').charAt(0).toUpperCase();
     
     var avatarOnClick = "navigateToProfile('" + (p.authorUid || '') + "')";
-    var avatarHtml = p.authorAvatar 
+    var avatarOnlyHtml = p.authorAvatar
         ? '<span class="avatar-wrap" id="post-avatar-' + p.id + '" style="cursor:pointer;" onclick="event.stopPropagation();' + avatarOnClick + '"><img src="' + p.authorAvatar + '" /></span>'
         : '<span class="avatar-wrap" id="post-avatar-' + p.id + '" style="cursor:pointer;" onclick="event.stopPropagation();' + avatarOnClick + '"><span class="letter">' + letter + '</span></span>';
+    var avatarHtml = '<span class="post-author-avatar">' + avatarOnlyHtml +
+        '<span class="inline-profile-rating" data-profile-rating="' + esc(p.authorUid || '') + '">☆☆☆☆☆</span>' +
+        '<span class="inline-profile-status" data-profile-status="' + esc(p.authorUid || '') + '"></span></span>';
     
     var nameOnClick = "navigateToProfile('" + (p.authorUid || '') + "')";
     
@@ -244,9 +247,15 @@ function renderPost(p, type) {
         actionsHtml + commentsHtml + inputHtml;
     
     if (p.authorUid) {
-        var avatarEl = document.getElementById('post-avatar-' + p.id);
+        var avatarEl = div.querySelector('#post-avatar-' + p.id);
         if (avatarEl && !p.authorAvatar) {
             renderAvatar(p.authorUid, avatarEl, letter);
+        }
+        if (typeof window.loadInlineProfileRating === 'function') {
+            window.loadInlineProfileRating(p.authorUid, div.querySelector('.inline-profile-rating'));
+        }
+        if (typeof window.loadInlineProfileStatus === 'function') {
+            window.loadInlineProfileStatus(p.authorUid, div.querySelector('.inline-profile-status'));
         }
     }
     
