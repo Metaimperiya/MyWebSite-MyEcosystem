@@ -58,7 +58,23 @@
     };
 
     window.dossGoToLogin = function () {
-        window.location.href = '/?returnTo=' + encodeURIComponent('/doss/');
+        if (typeof auth === 'undefined' || !auth || typeof provider === 'undefined' || !provider) {
+            console.error('DOSS: Google Auth недоступен');
+            alert('Не удалось подключить авторизацию. Обновите страницу и попробуйте ещё раз.');
+            return;
+        }
+
+        // Вход выполняется на странице DOSS через тот же auth/provider, что и на главной.
+        // Переход на /?returnTo= больше не нужен и не может оставить пользователя на белой странице.
+        auth.signInWithPopup(provider).catch(function (error) {
+            console.error('DOSS: ошибка входа через Google', error);
+            if (error.code === 'auth/popup-closed-by-user') return;
+            if (error.code === 'auth/popup-blocked') {
+                alert('Браузер заблокировал окно входа. Разрешите всплывающие окна для этого сайта.');
+                return;
+            }
+            alert('Не удалось войти: ' + (error.message || 'неизвестная ошибка'));
+        });
     };
 
     function boot() {
