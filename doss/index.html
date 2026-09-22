@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOSS OS — Personal Operating System</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="icon" href="/assets/icons/metaimperiya.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/assets/images/metaimperiya-192x192.png">
+    <link rel="manifest" href="/doss/manifest.webmanifest">
+    <meta name="theme-color" content="#1a1c22">
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+    <script src="/js/core/firebase.js?v=3.0"></script>
+    <script src="/js/core/auth.js?v=3.1"></script>
+
+    <link rel="stylesheet" href="/css/core/reset.css?v=3.0">
+    <link rel="stylesheet" href="/css/core/variables.css?v=3.0">
+    <link rel="stylesheet" href="/css/core/base.css?v=3.0">
+
+    <link rel="stylesheet" href="/css/features/doss/doss.css?v=1.0">
+    <link rel="stylesheet" href="/css/features/doss/doss-dashboard.css?v=1.0">
+    <link rel="stylesheet" href="/css/features/doss/doss-calculator.css?v=1.0">
+</head>
+<body class="doss-body">
+
+<div class="doss-app" id="dossApp">
+
+    <header class="doss-topbar">
+        <div class="doss-topbar__left">
+            <span class="doss-topbar__burger" onclick="dossToggleSidebar()">☰</span>
+            <a class="doss-topbar__brand" href="/">🧠 DOSS OS</a>
+        </div>
+        <div class="doss-topbar__right">
+            <span class="doss-topbar__date" id="dossTopbarDate"></span>
+            <span class="doss-topbar__time" id="dossTopbarTime"></span>
+            <a class="doss-topbar__back" href="/" title="Вернуться в METAIMPERIYA">← Назад</a>
+            <div class="doss-topbar__avatar" id="dossTopAvatar" title="Профиль"><span class="letter">?</span></div>
+        </div>
+    </header>
+
+    <aside class="doss-sidebar" id="dossSidebar">
+        <nav class="doss-nav">
+            <a class="doss-nav__item" data-doss-route="dashboard"     href="#/dashboard">🏠 <span>Dashboard</span></a>
+            <a class="doss-nav__item" data-doss-route="calendar"      href="#/calendar">📅 <span>Calendar</span></a>
+            <a class="doss-nav__item" data-doss-route="tasks"         href="#/tasks">✅ <span>Tasks</span></a>
+            <a class="doss-nav__item" data-doss-route="notes"         href="#/notes">📝 <span>Notes</span></a>
+            <a class="doss-nav__item" data-doss-route="diary"         href="#/diary">📔 <span>Diary</span></a>
+            <a class="doss-nav__item" data-doss-route="contacts"      href="#/contacts">👤 <span>Contacts</span></a>
+            <a class="doss-nav__item" data-doss-route="alarms"        href="#/alarms">⏰ <span>Alarms</span></a>
+            <a class="doss-nav__item" data-doss-route="calculator"    href="#/calculator">🧮 <span>Calculator</span></a>
+            <a class="doss-nav__item" data-doss-route="charts"        href="#/charts">📊 <span>Charts</span></a>
+            <a class="doss-nav__item" data-doss-route="finance"       href="#/finance">💰 <span>Finance</span></a>
+            <a class="doss-nav__item" data-doss-route="files"         href="#/files">📁 <span>Files</span></a>
+            <a class="doss-nav__item" data-doss-route="bookmarks"     href="#/bookmarks">🔖 <span>Bookmarks</span></a>
+            <a class="doss-nav__item" data-doss-route="notifications" href="#/notifications">🔔 <span>Notifications</span></a>
+            <a class="doss-nav__item" data-doss-route="settings"      href="#/settings">⚙️ <span>Settings</span></a>
+        </nav>
+    </aside>
+
+    <main class="doss-main" id="dossMain">
+        <div class="doss-loading" id="dossLoading">
+            <div class="doss-loading__spinner"></div>
+            <p>Загрузка DOSS OS…</p>
+        </div>
+    </main>
+
+    <div class="doss-authguard" id="dossAuthGuard" hidden>
+        <div class="doss-authguard__box">
+            <h2>🔒 Требуется вход</h2>
+            <p>DOSS OS использует авторизацию METAIMPERIYA.</p>
+            <button class="doss-btn doss-btn--primary" onclick="dossGoToLogin()">Войти в METAIMPERIYA</button>
+        </div>
+    </div>
+
+    <div class="doss-sidebar-overlay" id="dossSidebarOverlay" onclick="dossCloseSidebar()"></div>
+</div>
+
+<script src="/js/features/doss/doss-data.js?v=1.0"></script>
+<script src="/js/features/doss/doss-router.js?v=1.0"></script>
+<script src="/js/features/doss/doss-dashboard.js?v=1.0"></script>
+<script src="/js/features/doss/doss-calendar.js?v=1.0"></script>
+<script src="/js/features/doss/doss-tasks.js?v=1.0"></script>
+<script src="/js/features/doss/doss-notes.js?v=1.0"></script>
+<script src="/js/features/doss/doss-diary.js?v=1.0"></script>
+<script src="/js/features/doss/doss-contacts.js?v=1.0"></script>
+<script src="/js/features/doss/doss-alarms.js?v=1.0"></script>
+<script src="/js/features/doss/doss-calculator.js?v=1.0"></script>
+<script src="/js/features/doss/doss-charts.js?v=1.0"></script>
+<script src="/js/features/doss/doss-finance.js?v=1.0"></script>
+<script src="/js/features/doss/doss-files.js?v=1.0"></script>
+<script src="/js/features/doss/doss-bookmarks.js?v=1.0"></script>
+<script src="/js/features/doss/doss-notifications.js?v=1.0"></script>
+<script src="/js/features/doss/doss-settings.js?v=1.0"></script>
+<script src="/js/features/doss/doss-core.js?v=1.0"></script>
+
+</body>
+</html>

@@ -203,6 +203,17 @@
           }
         }
       }
+    },
+    "doss": {
+      "users": {
+        "$uid": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid",
+          "settings": {
+            ".validate": "!newData.exists() || (newData.hasChildren(['theme', 'language', 'createdAt']) && newData.child('theme').isString() && newData.child('language').isString() && newData.child('createdAt').isNumber())"
+          }
+        }
+      }
     }
   }
 }

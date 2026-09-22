@@ -7,7 +7,9 @@
     { "src": "assets/**/*", "use": "@vercel/static" },
     { "src": "music/**/*", "use": "@vercel/static" }
   ],
-  "rewrites": [
+    "rewrites": [
+    { "source": "/doss", "destination": "/doss/index.html" },
+    { "source": "/doss/:path*", "destination": "/doss/index.html" },
     { "source": "/news/:slug*", "destination": "/content/article.html" },
     { "source": "/video/:slug*", "destination": "/content/article.html" },
     { "source": "/music/:slug*", "destination": "/content/article.html" },

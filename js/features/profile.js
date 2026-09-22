@@ -104,8 +104,6 @@ function loadProfilePosts(uid) {
             posts.push(post);
         });
 
-        // Старые публикации могли сохраниться только в общей ленте. Добавляем
-        // их в профиль как резервный источник, без дублей новых постов.
         Object.keys(feedData || {}).forEach(function(id) {
             var post = feedData[id];
             if (!post || post.authorUid !== uid || known[fingerprint(post)]) return;
@@ -311,7 +309,6 @@ window.toggleProfileSubscription = function(targetUid, subscribed, button) {
     if (!USER_UID || !targetUid || targetUid === USER_UID) return;
     if (button) button.disabled = true;
 
-    // A subscription must never be created when either participant has blocked the other.
     Promise.all([
         db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).once('value'),
         db.ref('sites/' + SITE + '/blocks/' + targetUid + '/' + USER_UID).once('value')
@@ -352,7 +349,6 @@ window.blockUser = function(targetUid) {
     updates['sites/' + SITE + '/friends/' + targetUid + '/' + USER_UID] = null;
     updates['sites/' + SITE + '/friend_requests/' + USER_UID + '/' + targetUid] = null;
     updates['sites/' + SITE + '/friend_requests/' + targetUid + '/' + USER_UID] = null;
-    // Blocking also breaks a follow relationship in both denormalized indexes.
     updates['sites/' + SITE + '/subscriptions/' + USER_UID + '/' + targetUid] = null;
     updates['sites/' + SITE + '/subscribers/' + targetUid + '/' + USER_UID] = null;
     db.ref().update(updates).then(function() {
@@ -384,6 +380,17 @@ function showProfileActions(uid) {
     if (uid === USER_UID) {
         var header = document.querySelector('.profile-header');
         if (!header) return;
+
+        // ===== DOSS OS: точка входа из своего профиля =====
+        var dossBtn = document.createElement('a');
+        dossBtn.href = '/doss/';
+        dossBtn.textContent = '🧠 DOSS OS';
+        dossBtn.style.cssText =
+            'display:inline-block;margin:8px auto 0;padding:6px 14px;' +
+            'border-radius:20px;background:var(--link-color);color:#fff;' +
+            'font-size:0.7rem;font-weight:600;text-decoration:none;' +
+            'position:relative;z-index:9;';
+        actions.appendChild(dossBtn);
 
         var container = document.createElement('div');
         container.style.cssText = 'position:absolute;top:12px;right:16px;z-index:10;';
@@ -462,9 +469,6 @@ function showProfileActions(uid) {
     });
     watchProfileSubscription(uid, subscribeBtn);
     watchProfileBlock(uid, blockBtn, [mainBtn, msgBtn, subscribeBtn]);
-
-    // Остальной код showProfileActions...
-    // (полная версия есть в твоём profile.js, я просто добавил недостающие функции)
 }
 
 window.viewUser = function(uid) {

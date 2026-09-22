@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="Digital / IT специалист METAIMPERIYA. Создаю сайты, Telegram-ботов, автоматизацию и цифровые экосистемы.">
+    <title>METAIMPERIYA — Digital / IT специалист</title>
+    <link rel="icon" href="../../assets/icons/metaimperiya.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../assets/icons/metaimperiya-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../../assets/icons/metaimperiya-32x32.png">
+    <link rel="apple-touch-icon" href="../../assets/images/metaimperiya-192x192.png">
+    <link rel="manifest" href="../../site.webmanifest">
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+    <link rel="stylesheet" href="../../css/core/base.css?v=3.0">
+    <link rel="stylesheet" href="../../css/core/reset.css?v=3.0">
+    <link rel="stylesheet" href="../../css/core/variables.css?v=3.0">
+    <link rel="stylesheet" href="../../css/features/feed.css?v=3.1">
+    <link rel="stylesheet" href="../../css/features/profile.css?v=3.3">
+    <link rel="stylesheet" href="../../css/features/reputation.css?v=1.0">
+    <link rel="stylesheet" href="../../css/features/friends.css?v=3.1">
+    <link rel="stylesheet" href="../../css/features/chat.css?v=3.1">
+    <link rel="stylesheet" href="../../css/features/modals.css?v=3.0">
+    <link rel="stylesheet" href="../../css/features/notifications.css?v=3.0">
+    <link rel="stylesheet" href="../../css/layout/grid.css?v=3.0">
+    <link rel="stylesheet" href="../../css/layout/panels.css?v=3.0">
+    <link rel="stylesheet" href="../../css/layout/sidebar.css?v=3.0">
+    <link rel="stylesheet" href="../../css/layout/topbar.css?v=3.1">
+    <link rel="stylesheet" href="../../css/modules/player.css?v=3.0">
+    <link rel="stylesheet" href="../../css/components/admin.css?v=3.0">
+    <link rel="stylesheet" href="../../css/style.css?v=3.1">
+
+    <style>
+        /* Мини-стили только для контента этой страницы, в цветах METAIMPERIYA */
+        .landing-wrap { max-width: 900px; margin: 0 auto; padding: 24px 16px 80px; }
+        .landing-hero {
+            text-align: center;
+            padding: 48px 24px;
+            background: var(--card-bg, #111);
+            border: 1px solid var(--border-color, #222);
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+        .landing-hero h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 900; margin-bottom: 16px; line-height: 1.1; }
+        .landing-hero .accent { color: var(--accent, #ff4444); }
+        .landing-hero p { color: var(--muted-text, #888); max-width: 620px; margin: 0 auto 16px; }
+        .landing-flow { color: var(--accent, #ff4444); font-weight: 700; letter-spacing: 2px; font-size: 13px; margin: 20px 0; }
+        .landing-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+        .landing-btn {
+            display: inline-block; padding: 14px 32px; border-radius: 10px;
+            font-weight: 700; font-size: 15px; text-decoration: none; transition: 0.2s;
+            border: none; cursor: pointer;
+        }
+        .landing-btn-primary { background: var(--accent, #ff4444); color: #fff; }
+        .landing-btn-primary:hover { opacity: 0.85; }
+        .landing-btn-outline { background: transparent; color: inherit; border: 2px solid var(--border-color, #222); }
+        .landing-btn-outline:hover { border-color: var(--accent, #ff4444); color: var(--accent, #ff4444); }
+
+        .landing-section { margin-bottom: 40px; }
+        .landing-section h2 { font-size: clamp(22px, 3vw, 32px); font-weight: 800; margin-bottom: 16px; }
+        .landing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+        .landing-card {
+            background: var(--card-bg, #111);
+            border: 1px solid var(--border-color, #222);
+            border-radius: 14px;
+            padding: 24px;
+            transition: 0.25s;
+        }
+        .landing-card:hover { border-color: var(--accent, #ff4444); transform: translateY(-4px); }
+        .landing-card .icon { font-size: 30px; margin-bottom: 12px; }
+        .landing-card h3 { font-size: 17px; margin-bottom: 8px; }
+        .landing-card p { font-size: 14px; color: var(--muted-text, #888); }
+
+        .landing-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+        .landing-stat {
+            text-align: center; padding: 24px 16px;
+            background: var(--card-bg, #111); border: 1px solid var(--border-color, #222); border-radius: 14px;
+        }
+        .landing-stat .num { font-size: 32px; font-weight: 900; color: var(--accent, #ff4444); }
+        .landing-stat .label { font-size: 13px; color: var(--muted-text, #888); margin-top: 6px; }
+
+        .landing-cta {
+            text-align: center; padding: 48px 24px; border-radius: 20px;
+            background: var(--card-bg, #111); border: 1px solid var(--border-color, #222);
+        }
+        .landing-cta h2 { font-size: clamp(22px, 3vw, 32px); margin-bottom: 12px; }
+        .landing-cta p { color: var(--muted-text, #888); margin-bottom: 24px; }
+
+        .lead-form { max-width: 460px; margin: 0 auto 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .lead-form input {
+            flex: 1; min-width: 160px; padding: 12px 16px;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border-color, #222);
+            border-radius: 10px; color: inherit; font-size: 15px; outline: none;
+        }
+        .lead-form input:focus { border-color: var(--accent, #ff4444); }
+        .lead-form button {
+            padding: 12px 24px; background: var(--accent, #ff4444); color: #fff;
+            border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
+        }
+        .lead-form button:hover { opacity: 0.85; }
+        .lead-msg { font-size: 14px; min-height: 20px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<!-- ===== ВЕРХНЯЯ ПАНЕЛЬ METAIMPERIYA ===== -->
+<header class="pc-topbar" id="topbar">
+    <div class="logo">
+        <span class="menu-icon" onclick="goHome()">←</span>
+        <span onclick="goHome()">METAIMPERIYA 🏴‍☠️</span>
+    </div>
+    <div class="right" style="margin-left:auto;">
+        <a href="https://metaimperiya.com/" class="landing-btn landing-btn-primary" style="padding:10px 20px;font-size:14px;">На главную →</a>
+    </div>
+</header>
+
+<div class="app-layout" id="appLayout">
+    <div class="landing-wrap">
+
+        <!-- HERO -->
+        <section class="landing-hero">
+            <h1>Создаю сайты, ботов,<br>автоматизацию и <span class="accent">цифровые миры</span>.</h1>
+            <p>Разработка → продвижение → автоматизация → развитие. Объединяю технологии, контент и аудиторию в единую digital-экосистему.</p>
+            <div class="landing-flow">СОЗДАНИЕ → ПРОДВИЖЕНИЕ → АВТОМАТИЗАЦИЯ → РАЗВИТИЕ</div>
+            <div class="landing-buttons">
+                <a href="https://metaimperiya.com/" class="landing-btn landing-btn-primary">Обсудить проект</a>
+                <a href="#services" class="landing-btn landing-btn-outline">Посмотреть услуги</a>
+            </div>
+        </section>
+
+        <!-- ОБО МНЕ -->
+        <section class="landing-section" id="about">
+            <h2>Обо мне</h2>
+            <p style="color:var(--muted-text,#888);margin-bottom:12px;">
+                Digital / IT специалист, разработчик и создатель цифровых проектов. Работаю на пересечении разработки, социальных сетей, продвижения, автоматизации и digital-комьюнити.
+            </p>
+            <p style="color:var(--muted-text,#888);">
+                Создаю не отдельные инструменты, а связанные между собой цифровые системы, которые помогают проектам развиваться и находить свою аудиторию.
+            </p>
+        </section>
+
+        <!-- УСЛУГИ -->
+        <section class="landing-section" id="services">
+            <h2>Что я делаю</h2>
+            <div class="landing-grid">
+                <div class="landing-card"><div class="icon">🌐</div><h3>Сайты и веб-платформы</h3><p>Кастомные сайты и лендинги на чистом HTML, CSS и JS.</p></div>
+                <div class="landing-card"><div class="icon">🤖</div><h3>Telegram-боты</h3><p>Боты для бизнеса, воронок и автоматизации коммуникаций.</p></div>
+                <div class="landing-card"><div class="icon">⚡</div><h3>AI и автоматизация</h3><p>CRM-интеграции и AI-решения для работы с клиентами.</p></div>
+                <div class="landing-card"><div class="icon">📈</div><h3>SMM и SEO</h3><p>Продвижение в соцсетях и поисковая оптимизация.</p></div>
+                <div class="landing-card"><div class="icon">🌌</div><h3>Виртуальные миры</h3><p>Интерактивные digital-пространства и экосистемы.</p></div>
+                <div class="landing-card"><div class="icon">🎨</div><h3>Контент и брендинг</h3><p>Книги, руководства и мультимедиа без воды.</p></div>
+            </div>
+        </section>
+
+        <!-- СЕТЬ -->
+        <section class="landing-section" id="network">
+            <h2>Моя digital-сеть</h2>
+            <p style="color:var(--muted-text,#888);margin-bottom:20px;">Опыт администрирования Facebook-сообществ и групп, развитие онлайн-комьюнити.</p>
+            <div class="landing-stats">
+                <div class="landing-stat"><div class="num" data-target="50" data-suffix="+">0</div><div class="label">сообществ</div></div>
+                <div class="landing-stat"><div class="num" data-target="100" data-suffix="K+">0</div><div class="label">участников</div></div>
+                <div class="landing-stat"><div class="num" data-target="7" data-suffix="+">0</div><div class="label">лет в digital</div></div>
+                <div class="landing-stat"><div class="num" data-target="360" data-suffix="°">0</div><div class="label">полный цикл</div></div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="landing-cta">
+            <h2>Есть идея? Превратим её в <span class="accent">цифровой проект</span>.</h2>
+            <p>Сайт, бот, автоматизация или целая экосистема — соберу всё в единую систему.</p>
+
+            <form class="lead-form" id="leadForm">
+                <input type="text" id="leadName" placeholder="Ваше имя" required>
+                <input type="text" id="leadContact" placeholder="Email или Telegram" required>
+                <button type="submit" id="leadSubmit">Отправить →</button>
+            </form>
+            <div class="lead-msg" id="leadMsg"></div>
+
+            <a href="https://metaimperiya.com/" class="landing-btn landing-btn-primary" style="margin-top:16px;">Начать проект →</a>
+        </section>
+
+    </div>
+</div>
+
+<!-- ===== JS METAIMPERIYA (для топбара, темы и т.д.) ===== -->
+<script src="../../js/core/firebase.js?v=3.0"></script>
+<script src="../../js/core/auth.js?v=3.1"></script>
+<script src="../../js/core/app.js?v=3.3"></script>
+<script src="../../js/core/lang.js?v=3.0"></script>
+
+<script>
+// ===== FIREBASE CONFIG — берётся из js/core/firebase.js =====
+// Если там уже инициализировано — не трогаем. Если нет — форма покажет ошибку.
+
+function goHome() { window.location.href = 'https://metaimperiya.com/'; }
+
+// ===== АНИМИРОВАННЫЕ ЦИФРЫ =====
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.querySelectorAll('.num[data-target]').forEach(el => {
+            if (el.dataset.done) return;
+            const target = +el.dataset.target;
+            const suffix = el.dataset.suffix || '';
+            let cur = 0;
+            const step = Math.max(1, Math.floor(target / 50));
+            const t = setInterval(() => {
+                cur += step;
+                if (cur >= target) { cur = target; clearInterval(t); el.dataset.done = '1'; }
+                el.textContent = cur + suffix;
+            }, 30);
+        });
+        observer.unobserve(e.target);
+    });
+}, { threshold: 0.2 });
+document.querySelectorAll('.landing-section').forEach(s => observer.observe(s));
+
+// ===== ФОРМА ЗАЯВКИ =====
+document.getElementById('leadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('leadName').value.trim();
+    const contact = document.getElementById('leadContact').value.trim();
+    const msg = document.getElementById('leadMsg');
+    const btn = document.getElementById('leadSubmit');
+
+    if (!name || !contact) {
+        msg.style.color = '#ff4444';
+        msg.textContent = 'Заполните все поля.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Отправка...';
+
+    try {
+        const db = firebase.database();
+        db.ref('leads/digital-page').push({
+            name, contact,
+            date: new Date().toISOString(),
+            page: 'prodazhi-bez-davleniya'
+        }).then(() => {
+            msg.style.color = '#00f0ff';
+            msg.textContent = '✅ Заявка отправлена! Свяжусь с вами.';
+            document.getElementById('leadForm').reset();
+            btn.disabled = false;
+            btn.textContent = 'Отправить →';
+        }).catch(err => {
+            msg.style.color = '#ff4444';
+            msg.textContent = 'Ошибка отправки. Попробуйте позже.';
+            btn.disabled = false;
+            btn.textContent = 'Отправить →';
+            console.error(err);
+        });
+    } catch (err) {
+        msg.style.color = '#ff4444';
+        msg.textContent = 'Ошибка. Попробуйте позже.';
+        btn.disabled = false;
+        btn.textContent = 'Отправить →';
+        console.error(err);
+    }
+});
+
+console.log('✅ Digital page (METAIMPERIYA styles) loaded');
+</script>
+
+</body>
+</html>

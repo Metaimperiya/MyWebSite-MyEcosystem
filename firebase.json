@@ -19,6 +19,7 @@
       "**/node_modules/**"
     ],
     "rewrites": [
+      { "source": "/doss/**", "destination": "/doss/index.html" },
       { "source": "/news/**", "destination": "/content/article.html" },
       { "source": "/video/**", "destination": "/content/article.html" },
       { "source": "/music/**", "destination": "/content/article.html" },

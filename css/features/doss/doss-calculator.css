@@ -1,0 +1,52 @@
+/* DOSS OS — Calculator */
+
+.doss-calculator { max-width: 420px; }
+.doss-calculator h1 { margin: 0 0 12px; font-size: 1.3rem; }
+
+.doss-calc__display {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    text-align: right;
+}
+.doss-calc__expr {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    min-height: 1.2em;
+    word-break: break-all;
+}
+.doss-calc__result {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-top: 6px;
+    color: var(--text-color);
+    word-break: break-all;
+}
+
+.doss-calc__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+.doss-calc__btn {
+    padding: 14px 0;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+}
+.doss-calc__btn:hover { background: var(--hover-bg); }
+.doss-calc__btn.is-op { color: var(--link-color); font-weight: 600; }
+.doss-calc__btn.is-eq { background: var(--link-color); color: #fff; border-color: var(--link-color); }
+.doss-calc__btn.is-fn { color: var(--danger); }
+
+.doss-calc__note {
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}

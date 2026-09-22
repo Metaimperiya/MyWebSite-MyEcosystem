@@ -6,12 +6,26 @@
     <meta name="google-site-verification" content="7ZXKvfMi1rU0OC1CV1sObHTmeRaiVQvkxVFe7Ge63-A">
     <meta name="robots" content="index, follow">
     
-    <!-- ===== ПОЛНОСТЬЮ ОТКЛЮЧАЕМ КЭШ ===== -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
     <title>METAIMPERIYA — Social Platform</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="METAIMPERIYA">
+    <meta property="og:title" content="METAIMPERIYA — Social Platform">
+    <meta property="og:description" content="METAIMPERIYA — социальная платформа. Новости, музыка, видео, игры и общение.">
+    <meta property="og:image" content="https://metaimperiya.com/assets/images/metaimperiya-com.png">
+    <meta property="og:image:secure_url" content="https://metaimperiya.com/assets/images/metaimperiya-com.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="METAIMPERIYA">
+    <meta property="og:url" content="https://metaimperiya.com/">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="METAIMPERIYA — Social Platform">
+    <meta name="twitter:description" content="METAIMPERIYA — социальная платформа. Новости, музыка, видео, игры и общение.">
+    <meta name="twitter:image" content="https://metaimperiya.com/assets/images/metaimperiya-com.png">
+    <meta name="twitter:image:alt" content="METAIMPERIYA">
+
     <link rel="icon" href="assets/icons/metaimperiya.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/metaimperiya-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/metaimperiya-32x32.png">
@@ -24,7 +38,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-functions-compat.js"></script>
 
-    <!-- ===== CSS (mobile.css ТОЛЬКО ЧЕРЕЗ style.css) ===== -->
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
@@ -41,17 +54,11 @@
     <link rel="stylesheet" href="css/layout/topbar.css?v=3.1">
     <link rel="stylesheet" href="css/modules/player.css?v=3.0">
     <link rel="stylesheet" href="css/components/admin.css?v=3.0">
-    
-    <!-- ===== ГЛАВНЫЙ СТИЛЬ — mobile.css ПОДТЯНЕТСЯ ПОСЛЕДНИМ ===== -->
     <link rel="stylesheet" href="css/style.css?v=3.1">
 </head>
 <body>
 
-<!-- ===== ВЕСЬ ТВОЙ HTML КАК БЫЛ ===== -->
-<!-- ... (просто копируй сюда ВЕСЬ свой старый index.html без head) ... -->
-
 <div class="app" id="app">
-    <!-- ===== ТОП-БАР ===== -->
     <header class="pc-topbar" id="topbar">
         <div class="logo">
             <span class="menu-icon" onclick="toggleSidebar()">☰</span>
@@ -61,6 +68,7 @@
         <div class="right">
             <button class="topbar-icon-button" onclick="openChatList()" aria-label="Личные сообщения">💬<span id="chatUnreadBadge" class="count-badge" hidden></span></button>
             <button onclick="openNotifications()">🔔</button>
+            <a href="/doss/" title="DOSS OS" style="text-decoration:none;font-size:1rem;padding:0 4px;">🧠</a>
             <div class="top-profile-mark">
                 <div class="avatar-wrap" id="topAvatar" onclick="goToProfile()">
                     <span class="letter">?</span>
@@ -73,7 +81,6 @@
         </div>
     </header>
 
-    <!-- ===== ВЫПАДАЮЩЕЕ МЕНЮ НАСТРОЕК ===== -->
     <div id="settingsDropdown" class="settings-dropdown">
         <div class="settings-item" onclick="toggleTheme()">
             <span class="icon">🌓</span> Theme
@@ -95,7 +102,6 @@
         </div>
     </div>
 
-    <!-- ===== САЙДБАР ===== -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="closeSidebar()">✕</button>
@@ -110,6 +116,9 @@
         <div class="menu-item" onclick="goToProfile();closeSidebar();"><span class="icon">👤</span> Profile</div>
         <div class="menu-item" onclick="goToPeople();closeSidebar();"><span class="icon">👥</span> People</div>
         <div class="menu-item" onclick="goToGroups();closeSidebar();"><span class="icon">📁</span> Groups</div>
+
+        <a class="menu-item" href="/doss/" onclick="closeSidebar();"><span class="icon">🧠</span> DOSS OS</a>
+
         <div class="menu-divider"></div>
         <div class="menu-item" onclick="openPage('foto');closeSidebar();"><span class="icon">📸</span> Photos</div>
         <div class="menu-item" onclick="openPage('page');closeSidebar();"><span class="icon">📄</span> Pages</div>
@@ -133,15 +142,12 @@
         <div class="menu-item" onclick="logout();closeSidebar();"><span class="icon">🚪</span> Logout</div>
     </div>
 
-    <!-- ===== КОНТЕЙНЕРЫ ===== -->
     <div id="settingsContainer"></div>
     <div id="modalsContainer"></div>
     <div id="playerContainer"></div>
 
-    <!-- ===== ОСНОВНОЙ ЛЭЙАУТ ===== -->
     <div class="app-layout" id="appLayout">
 
-        <!-- ЛЕВАЯ ПАНЕЛЬ -->
         <div class="panel-left" id="panelLeft">
             <div class="panel-card">
                 <div class="panel-title">🔥 Trending</div>
@@ -156,10 +162,8 @@
             </div>
         </div>
 
-        <!-- ЦЕНТР -->
         <div class="panel-center">
 
-            <!-- ПЛЕЕР -->
             <div class="player-drawer" id="playerDrawer">
                 <div class="handle" onclick="toggleDrawer()">
                     <div class="bar"></div> 🎵 PLAYER <div class="bar"></div>
@@ -178,9 +182,6 @@
                 </div>
             </div>
 
-            <!-- ===== СТРАНИЦЫ ===== -->
-            
-            <!-- ЛЕНТА -->
             <div class="page active" id="page-feed">
                 <div class="card">
                     <div class="post-form">
@@ -211,17 +212,14 @@
                 <div id="feed"></div>
             </div>
 
-            <!-- ГРУППЫ -->
             <div class="page" id="page-groups">
                 <div class="card"><h3>👥 Groups</h3><div class="group-list" id="groupList"></div></div>
             </div>
 
-            <!-- ЛЮДИ -->
             <div class="page" id="page-people">
                 <div class="card"><h3>👤 All users</h3><div class="people-list" id="peopleList"></div></div>
             </div>
 
-            <!-- ПРОФИЛЬ -->
             <div class="page" id="page-profile">
                 <div class="profile-header">
                     <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
@@ -275,7 +273,6 @@
                 <div id="profilePosts"></div>
             </div>
 
-            <!-- ФОТО -->
             <div class="page" id="page-foto" style="display:none;">
                 <div style="padding-top:10px;">
                     <button onclick="window.location.href='/'" style="background:none;border:none;color:var(--link-color);cursor:pointer;font-weight:600;">← Back</button>
@@ -310,13 +307,11 @@
                 </div>
             </div>
 
-            <!-- СТРАНИЦЫ -->
             <div class="page" id="page-page" style="display:none;">
                 <div style="padding:6px 0;"><button class="back-btn" onclick="window.location.href='/'">← Back</button></div>
                 <div id="pageContainer"></div>
             </div>
 
-            <!-- ШАБЛОН РАЗДЕЛОВ САЙДБАРА -->
             <div class="page" id="page-section" style="display:none;">
                 <div class="card" style="margin-top:10px;padding:28px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
                     <div id="sectionPageIcon" style="font-size:3rem;margin-bottom:12px;">📦</div>
@@ -325,7 +320,6 @@
                 </div>
             </div>
 
-            <!-- ЧАТ -->
             <div class="chat-view" id="chatView">
                 <div class="chat-toolbar">
                     <button class="back-btn" onclick="closeChat()">← Back</button>
@@ -339,7 +333,6 @@
                 </div>
             </div>
 
-            <!-- ПОСТ -->
             <div class="page" id="postPage">
                 <div style="padding:6px 0;"><button class="back-btn" onclick="closePostPage()">← Back</button></div>
                 <div id="postPageContainer"></div>
@@ -347,7 +340,6 @@
 
         </div>
 
-        <!-- ПРАВАЯ ПАНЕЛЬ -->
         <div class="panel-right" id="panelRight">
             <aside class="panel-card tiktok-widget" aria-label="TikTok METAIMPERIYA">
                 <div class="tiktok-widget__eyebrow">TikTok</div>
@@ -365,7 +357,6 @@
 
     <div class="admin-dot" id="adminDot" onclick="adminLogin()"></div>
 
-    <!-- ===== МОДАЛКИ ===== -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeLogin()">✕</button>
@@ -476,7 +467,6 @@
 
 </div>
 
-<!-- ===== JS ===== -->
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.1"></script>
 <script src="js/core/app.js?v=3.3"></script>
@@ -519,7 +509,7 @@ document.addEventListener('click', function(e) {
     }
 });
 
-console.log('✅ index.html loaded (v3.0)');
+console.log('✅ index.html loaded (v3.0 + DOSS link)');
 </script>
 
 </body>

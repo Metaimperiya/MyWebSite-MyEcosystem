@@ -1,0 +1,203 @@
+/* ================================================================
+ * DOSS OS — LAYOUT
+ * ================================================================ */
+
+.doss-body {
+    margin: 0;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+}
+
+.doss-app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 56px 1fr;
+    grid-template-areas:
+        "topbar topbar"
+        "sidebar main";
+    min-height: 100vh;
+}
+
+.doss-topbar {
+    grid-area: topbar;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.doss-topbar__left, .doss-topbar__right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.doss-topbar__burger { display: none; cursor: pointer; font-size: 1.2rem; }
+.doss-topbar__brand {
+    font-weight: 700;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1rem;
+}
+.doss-topbar__date, .doss-topbar__time {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.doss-topbar__back {
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+.doss-topbar__avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--avatar-bg);
+    color: var(--avatar-text);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    font-weight: 600;
+}
+.doss-topbar__avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+
+.doss-sidebar {
+    grid-area: sidebar;
+    background: var(--card-bg);
+    border-right: 1px solid var(--border-color);
+    padding: 12px 8px;
+    overflow-y: auto;
+}
+.doss-nav { display: flex; flex-direction: column; gap: 2px; }
+.doss-nav__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+.doss-nav__item:hover { background: var(--hover-bg); }
+.doss-nav__item.is-active {
+    background: var(--link-color);
+    color: #fff;
+}
+
+.doss-main {
+    grid-area: main;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.doss-loading {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 40vh; gap: 12px;
+    color: var(--text-secondary);
+}
+.doss-loading__spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--link-color);
+    border-radius: 50%;
+    animation: doss-spin 0.8s linear infinite;
+}
+@keyframes doss-spin { to { transform: rotate(360deg); } }
+
+.doss-authguard {
+    position: fixed; inset: 0;
+    background: var(--bg-color);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+}
+.doss-authguard__box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    max-width: 360px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+.doss-authguard__box h2 { margin: 0 0 8px; }
+.doss-authguard__box p { margin: 0 0 16px; color: var(--text-secondary); font-size: 0.9rem; }
+
+.doss-btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.doss-btn:hover { background: var(--hover-bg); }
+.doss-btn--primary {
+    background: var(--link-color);
+    color: #fff;
+    border-color: var(--link-color);
+}
+
+.doss-module h1 { margin: 0 0 12px; font-size: 1.4rem; }
+.doss-module__stub {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    background: var(--card-bg);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 8px;
+}
+.doss-module__stub code {
+    background: var(--input-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+.doss-error {
+    color: var(--danger);
+    padding: 16px;
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+}
+
+.doss-sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 90;
+}
+.doss-sidebar-overlay.is-visible { display: block; }
+
+@media (max-width: 1024px) {
+    .doss-app {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "topbar"
+            "main";
+    }
+    .doss-sidebar {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        bottom: 0;
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform var(--transition);
+        z-index: 95;
+    }
+    .doss-sidebar.is-open { transform: translateX(0); }
+    .doss-topbar__burger { display: inline; }
+    .doss-topbar__date, .doss-topbar__time { display: none; }
+    .doss-main { padding: 12px; }
+}
