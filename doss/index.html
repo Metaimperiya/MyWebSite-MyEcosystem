@@ -6,22 +6,25 @@
   <title>DOSS OS</title>
   <meta name="theme-color" content="#1877f2">
   <link rel="icon" href="/assets/icons/metaimperiya.ico" sizes="any">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    :root{--bg:#f0f2f5;--card:#fff;--text:#1c1e21;--muted:#65676b;--border:#e4e6eb;--field:#f0f2f5;--accent:#1877f2;--danger:#e74c3c;--ok:#27ae60} [data-theme=dark]{--bg:#18191a;--card:#242526;--text:#e4e6eb;--muted:#b0b3b8;--border:#3a3b3c;--field:#3a3b3c;--accent:#2d88ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{min-height:100vh;display:grid;grid-template:56px 1fr/240px 1fr;grid-template-areas:"top top" "nav main"}.top{grid-area:top;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--card);border-bottom:1px solid var(--border)}.brand{font-weight:800}.nav{grid-area:nav;padding:10px 8px;background:var(--card);border-right:1px solid var(--border)}.nav button{display:block;width:100%;border:0;border-radius:8px;padding:10px;text-align:left;background:transparent;color:var(--text);cursor:pointer}.nav button:hover,.nav button.active{background:var(--accent);color:#fff}.main{grid-area:main;padding:20px}.view{display:none}.view.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin:12px 0}.label,.small{color:var(--muted);font-size:.8em}.value{font-size:1.55em;font-weight:700;margin-top:5px}.row{display:flex;gap:8px;flex-wrap:wrap}.input,.select{flex:1;min-width:140px;border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--field);color:var(--text)}.btn{border:1px solid var(--border);border-radius:8px;padding:9px 12px;background:var(--card);color:var(--text);cursor:pointer}.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.danger{background:var(--danger);color:#fff;border-color:var(--danger)}.item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}.item:last-child{border:0}.item>div{flex:1}.done{text-decoration:line-through;color:var(--muted)}.calc{max-width:420px}.display{background:var(--card);border:1px solid var(--border);padding:16px;border-radius:12px;text-align:right}.result{font-size:1.8em;font-weight:bold}.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.pad button{padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer}.pad .equal{background:var(--accent);color:#fff}@media(max-width:700px){.app{grid-template:56px auto 1fr/1fr;grid-template-areas:"top" "nav" "main"}.nav{display:flex;overflow:auto;padding:6px;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap;width:auto}.main{padding:12px}}
+    :root{--bg:#f0f2f5;--card:#fff;--text:#1c1e21;--muted:#65676b;--border:#e4e6eb;--field:#f0f2f5;--accent:#1877f2;--danger:#e74c3c;--ok:#27ae60} [data-theme=dark]{--bg:#18191a;--card:#242526;--text:#e4e6eb;--muted:#b0b3b8;--border:#3a3b3c;--field:#3a3b3c;--accent:#2d88ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{min-height:100vh;display:grid;grid-template:56px 1fr/240px 1fr;grid-template-areas:"top top" "nav main"}.top{grid-area:top;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--card);border-bottom:1px solid var(--border)}.brand{font-weight:800}.nav{grid-area:nav;padding:10px 8px;background:var(--card);border-right:1px solid var(--border)}.nav button{display:block;width:100%;border:0;border-radius:8px;padding:10px;text-align:left;background:transparent;color:var(--text);cursor:pointer}.nav button:hover,.nav button.active{background:var(--accent);color:#fff}.main{grid-area:main;padding:20px}.view{display:none}.view.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 7px 22px rgba(18,38,63,.06);transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(18,38,63,.1)}.label,.small{color:var(--muted);font-size:.8em}.value{font-size:1.55em;font-weight:700;margin-top:5px}.row{display:flex;gap:8px;flex-wrap:wrap}.input,.select{flex:1;min-width:140px;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--field);color:var(--text)}textarea.input{min-height:110px;resize:vertical}.chart-wrap{height:300px;position:relative}.btn{border:1px solid var(--border);border-radius:8px;padding:9px 12px;background:var(--card);color:var(--text);cursor:pointer}.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.danger{background:var(--danger);color:#fff;border-color:var(--danger)}.item{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}.item:last-child{border:0}.item>div{flex:1}.done{text-decoration:line-through;color:var(--muted)}.calc{max-width:420px}.display{background:var(--card);border:1px solid var(--border);padding:16px;border-radius:12px;text-align:right}.result{font-size:1.8em;font-weight:bold}.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.pad button{padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer}.pad .equal{background:var(--accent);color:#fff}@media(max-width:700px){.app{grid-template:56px auto 1fr/1fr;grid-template-areas:"top" "nav" "main"}.nav{display:flex;overflow:auto;padding:6px;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap;width:auto}.main{padding:12px}}
   </style>
 </head>
 <body>
 <div class="app">
-  <header class="top"><span class="brand">🧠 DOSS OS</span><span><button class="btn" onclick="theme()">🌓</button> <a class="btn" href="/">← METAIMPERIYA</a></span></header>
-  <nav class="nav"><button data-v="home">🏠 Dashboard</button><button data-v="tasks">✅ Tasks</button><button data-v="notes">📝 Notes</button><button data-v="diary">📔 Diary</button><button data-v="calendar">📅 Calendar</button><button data-v="contacts">👤 Contacts</button><button data-v="finance">💰 Finance</button><button data-v="bookmarks">🔖 Bookmarks</button><button data-v="calc">🧮 Calculator</button></nav>
+  <header class="top"><span class="brand">🧠 DOSS OS</span><span><button class="btn" onclick="theme()">🌓</button><button class="btn" onclick="exportData()">📤</button><button class="btn" onclick="importData()">📥</button> <a class="btn" href="/">← METAIMPERIYA</a></span></header>
+  <nav class="nav"><button data-v="home">🏠 Dashboard</button><button data-v="alarms">⏰ Alarms & Time</button><button data-v="tasks">✅ Tasks</button><button data-v="notes">📝 Notes</button><button data-v="diary">📔 Diary</button><button data-v="calendar">📅 Calendar</button><button data-v="contacts">👤 Contacts</button><button data-v="finance">💰 Finance</button><button data-v="bookmaker">🎯 Bookmaker</button><button data-v="charts">📊 Charts</button><button data-v="bookmarks">🔖 Bookmarks</button><button data-v="calc">🧮 Calculator</button></nav>
   <main class="main">
     <section class="view" id="home"><h1>🧠 DOSS OS</h1><p class="small">Персональное рабочее пространство. Данные сохраняются в этом браузере.</p><div class="grid"><div class="card"><div class="label">Сегодня</div><div class="value" id="today"></div></div><div class="card"><div class="label">Незакрытые задачи</div><div class="value" id="countTasks">0</div></div><div class="card"><div class="label">Заметки</div><div class="value" id="countNotes">0</div></div><div class="card"><div class="label">Баланс</div><div class="value" id="balance">0</div></div></div></section>
+    <section class="view" id="alarms"><h1>⏰ Часы и время</h1><div class="card"><div class="value" id="bigClock" style="font-size:3rem;text-align:center"></div><div class="small" id="bigDate" style="text-align:center"></div></div><div class="row"><input id="alarmTime" type="time" class="input"><input id="alarmLabel" class="input" placeholder="Название будильника"><button class="btn primary" onclick="addAlarm()">Добавить будильник</button></div><div class="card" id="alarmsList"></div><div class="card"><h3>⏳ Таймер</h3><div class="value" id="timerDisplay">00:00:00</div><div class="row"><input id="timerMin" type="number" min="0" class="input" placeholder="Минуты"><input id="timerSec" type="number" min="0" max="59" class="input" placeholder="Секунды"><button class="btn primary" onclick="startTimer()">Старт</button><button class="btn" onclick="pauseTimer()">Пауза</button><button class="btn danger" onclick="resetTimer()">Сброс</button></div></div><div class="card"><h3>⏱ Секундомер</h3><div class="value" id="stopwatchDisplay">00:00:00.00</div><div class="row"><button class="btn primary" onclick="startStopwatch()">Старт</button><button class="btn" onclick="pauseStopwatch()">Пауза</button><button class="btn" onclick="lapStopwatch()">Круг</button><button class="btn danger" onclick="resetStopwatch()">Сброс</button></div><div id="lapsList"></div></div><div class="card"><h3>🌍 Мировое время</h3><div id="worldClock"></div></div></section>
     <section class="view" id="tasks"><h1>✅ Tasks</h1><div class="row"><input id="task" class="input" placeholder="Что нужно сделать?"><button class="btn primary" onclick="addTask()">Добавить</button></div><div class="card" id="tasksList"></div></section>
-    <section class="view" id="notes"><h1>📝 Notes</h1><div class="row"><input id="note" class="input" placeholder="Текст заметки"><button class="btn primary" onclick="addNote()">Добавить</button></div><div class="card" id="notesList"></div></section>
+    <section class="view" id="notes"><h1>📝 Notes</h1><div class="card"><div class="row"><input id="noteTitle" class="input" placeholder="Заголовок"><button class="btn primary" id="noteSave" onclick="addNote()">Добавить</button></div><textarea id="noteBody" class="input" placeholder="Текст заметки"></textarea></div><div class="card" id="notesList"></div></section>
     <section class="view" id="diary"><h1>📔 Diary</h1><div class="row"><select id="mood" class="select"><option>😄</option><option>🙂</option><option>😐</option><option>😔</option></select><input id="diaryText" class="input" placeholder="Что произошло сегодня?"><button class="btn primary" onclick="addDiary()">Добавить</button></div><div class="card" id="diaryList"></div></section>
     <section class="view" id="calendar"><h1>📅 Calendar</h1><div class="row"><input id="eventDate" class="input" type="date"><input id="eventTitle" class="input" placeholder="Событие"><button class="btn primary" onclick="addEvent()">Добавить</button></div><div class="card" id="eventsList"></div></section>
-    <section class="view" id="contacts"><h1>👤 Contacts</h1><div class="row"><input id="contact" class="input" placeholder="Имя"><input id="phone" class="input" placeholder="Телефон"><button class="btn primary" onclick="addContact()">Добавить</button></div><div class="card" id="contactsList"></div></section>
+    <section class="view" id="contacts"><h1>👤 Contacts</h1><div class="row"><input id="contact" class="input" placeholder="Имя"><input id="phone" class="input" placeholder="Телефон"><input id="email" class="input" placeholder="Email"><input id="telegram" class="input" placeholder="Telegram без @"><button class="btn primary" onclick="addContact()">Добавить</button></div><div class="card" id="contactsList"></div></section>
     <section class="view" id="finance"><h1>💰 Finance</h1><div class="row"><select id="financeType" class="select"><option value="income">Доход</option><option value="expense">Расход</option></select><input id="amount" type="number" min="0" class="input" placeholder="Сумма"><input id="financeNote" class="input" placeholder="Комментарий"><button class="btn primary" onclick="addFinance()">Добавить</button></div><div class="card" id="financeList"></div></section>
+    <section class="view" id="bookmaker"><h1>🎯 Bookmaker</h1><div class="row"><input id="betEvent" class="input" placeholder="Событие"><input id="betAmount" type="number" min="0" class="input" placeholder="Сумма"><input id="betOdds" type="number" min="1.01" step="0.01" class="input" placeholder="Коэффициент"><button class="btn primary" onclick="addBet()">Добавить</button></div><div class="card" id="betsList"></div></section><section class="view" id="charts"><h1>📊 Charts</h1><div class="card"><div class="chart-wrap"><canvas id="financeChart"></canvas></div></div><div class="card"><div class="chart-wrap"><canvas id="tasksChart"></canvas></div></div></section>
     <section class="view" id="bookmarks"><h1>🔖 Bookmarks</h1><div class="row"><input id="bookmark" class="input" placeholder="Название"><input id="url" class="input" placeholder="https://..."><button class="btn primary" onclick="addBookmark()">Добавить</button></div><div class="card" id="bookmarksList"></div></section>
     <section class="view" id="calc"><h1>🧮 Calculator</h1><div class="calc"><div class="display"><div class="small" id="expr">0</div><div class="result" id="result">0</div></div><div class="pad" id="pad"></div></div></section>
   </main>
@@ -29,6 +32,169 @@
 <script>
 /* Автономный DOSS: вход не требуется, а данные изолированы в localStorage данного браузера. */
 var KEY='doss_os_v1',DB;try{DB=JSON.parse(localStorage.getItem(KEY))}catch(e){}DB=DB||{tasks:[],notes:[],diary:[],events:[],contacts:[],finance:[],bookmarks:[],theme:'light'};function save(){localStorage.setItem(KEY,JSON.stringify(DB))}function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}function remove(group,id){DB[group]=DB[group].filter(function(x){return x.id!==id});save();render()}function list(id,data,empty,fn){document.getElementById(id).innerHTML=data.length?data.map(fn).join(''):'<div class="small">'+empty+'</div>'}function render(){document.getElementById('today').textContent=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long'});document.getElementById('countTasks').textContent=DB.tasks.filter(function(x){return!x.done}).length;document.getElementById('countNotes').textContent=DB.notes.length;var bal=DB.finance.reduce(function(s,x){return s+(x.type==='income'?x.amount:-x.amount)},0);document.getElementById('balance').textContent=bal.toFixed(2);list('tasksList',DB.tasks,'Пока пусто.',function(x){return'<div class="item"><input type="checkbox" '+(x.done?'checked':'')+' onchange="toggleTask(\''+x.id+'\')"><div class="'+(x.done?'done':'')+'">'+esc(x.text)+'</div><button class="btn danger" onclick="remove(\'tasks\',\''+x.id+'\')">✕</button></div>'});list('notesList',DB.notes,'Заметок нет.',function(x){return'<div class="item"><div>'+esc(x.text)+'</div><button class="btn danger" onclick="remove(\'notes\',\''+x.id+'\')">✕</button></div>'});list('diaryList',DB.diary,'Записей нет.',function(x){return'<div class="item"><b>'+x.mood+'</b><div>'+esc(x.text)+'</div><button class="btn danger" onclick="remove(\'diary\',\''+x.id+'\')">✕</button></div>'});list('eventsList',DB.events,'Событий нет.',function(x){return'<div class="item"><b>'+esc(x.date)+'</b><div>'+esc(x.title)+'</div><button class="btn danger" onclick="remove(\'events\',\''+x.id+'\')">✕</button></div>'});list('contactsList',DB.contacts,'Контактов нет.',function(x){return'<div class="item"><div>'+esc(x.name)+'<div class="small">'+esc(x.phone)+'</div></div><button class="btn danger" onclick="remove(\'contacts\',\''+x.id+'\')">✕</button></div>'});list('financeList',DB.finance,'Операций нет.',function(x){return'<div class="item"><b>'+ (x.type==='income'?'+':'−')+x.amount.toFixed(2)+'</b><div>'+esc(x.note)+'</div><button class="btn danger" onclick="remove(\'finance\',\''+x.id+'\')">✕</button></div>'});list('bookmarksList',DB.bookmarks,'Закладок нет.',function(x){return'<div class="item"><div><a href="'+esc(x.url)+'" target="_blank" rel="noopener">'+esc(x.title)+'</a><div class="small">'+esc(x.url)+'</div></div><button class="btn danger" onclick="remove(\'bookmarks\',\''+x.id+'\')">✕</button></div>'})}function take(id){var e=document.getElementById(id),v=e.value.trim();e.value='';return v}function addTask(){var v=take('task');if(v)DB.tasks.unshift({id:uid(),text:v,done:false})}function addNote(){var v=take('note');if(v)DB.notes.unshift({id:uid(),text:v})}function addDiary(){var v=take('diaryText');if(v)DB.diary.unshift({id:uid(),mood:document.getElementById('mood').value,text:v})}function addEvent(){var d=take('eventDate'),t=take('eventTitle');if(d&&t)DB.events.unshift({id:uid(),date:d,title:t})}function addContact(){var n=take('contact'),p=take('phone');if(n)DB.contacts.unshift({id:uid(),name:n,phone:p})}function addFinance(){var a=parseFloat(take('amount')),n=take('financeNote');if(a>0)DB.finance.unshift({id:uid(),type:document.getElementById('financeType').value,amount:a,note:n})}function addBookmark(){var t=take('bookmark'),u=take('url');if(t&&u)DB.bookmarks.unshift({id:uid(),title:t,url:u})}['addTask','addNote','addDiary','addEvent','addContact','addFinance','addBookmark'].forEach(function(n){var f=window[n];window[n]=function(){f();save();render()}});function toggleTask(id){DB.tasks.forEach(function(x){if(x.id===id)x.done=!x.done});save();render()}function theme(){DB.theme=DB.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=DB.theme;save()}document.documentElement.dataset.theme=DB.theme;document.querySelectorAll('.nav button').forEach(function(b){b.onclick=function(){document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('active',v.id===b.dataset.v)});document.querySelectorAll('.nav button').forEach(function(x){x.classList.toggle('active',x===b)})}});document.querySelector('.nav button').click();document.getElementById('eventDate').value=new Date().toISOString().slice(0,10);var expr='',out='0';function draw(){document.getElementById('expr').textContent=expr||'0';document.getElementById('result').textContent=out}['C','⌫','(',')','7','8','9','/','4','5','6','*','1','2','3','-','0','.','=','+'].forEach(function(x){var b=document.createElement('button');b.textContent=x;if(x==='=')b.className='equal';b.onclick=function(){if(x==='C'){expr='';out='0'}else if(x==='⌫')expr=expr.slice(0,-1);else if(x==='='){try{out=/^[0-9+\-*/(). ]+$/.test(expr)?String(Function('return ('+expr+')')()):'Ошибка'}catch(e){out='Ошибка'}}else expr+=x;draw()};document.getElementById('pad').appendChild(b)});draw();render();
+</script>
+<script>
+/* Дополнительные инструменты времени, контактов и резервных копий DOSS. */
+(function () {
+    'use strict';
+    DB.alarms = DB.alarms || [];
+    var timer = { remaining: 0, interval: null };
+    var stopwatch = { startedAt: 0, elapsed: 0, interval: null, laps: [] };
+    var savedRender = render;
+
+    function pad(value) { return String(value).padStart(2, '0'); }
+    function timeText(seconds) {
+        return pad(Math.floor(seconds / 3600)) + ':' +
+            pad(Math.floor((seconds % 3600) / 60)) + ':' + pad(seconds % 60);
+    }
+    function renderAlarms() {
+        var root = document.getElementById('alarmsList');
+        if (!root) return;
+        if (!DB.alarms.length) { root.innerHTML = '<div class="small">Будильников нет.</div>'; return; }
+        root.innerHTML = DB.alarms.slice().sort(function(a, b) { return a.time.localeCompare(b.time); }).map(function (alarm) {
+            return '<div class="item"><input type="checkbox" ' + (alarm.enabled ? 'checked' : '') +
+                ' onchange="toggleAlarm(\'' + alarm.id + '\')"><div><b>' + esc(alarm.time) + '</b><div class="small">' + esc(alarm.label) +
+                '</div></div><button class="btn danger" onclick="deleteAlarm(\'' + alarm.id + '\')">✕</button></div>';
+        }).join('');
+    }
+    function renderContacts() {
+        var root = document.getElementById('contactsList');
+        if (!root) return;
+        if (!DB.contacts.length) { root.innerHTML = '<div class="small">Контактов нет.</div>'; return; }
+        root.innerHTML = DB.contacts.map(function (contact) {
+            var phone = String(contact.phone || '').replace(/[^\d+]/g, '');
+            var actions = phone ? '<a class="btn primary" href="tel:' + esc(phone) + '">📞 Позвонить</a> <a class="btn" href="sms:' + esc(phone) + '">💬 SMS</a>' : '';
+            if (contact.email) actions += ' <a class="btn" href="mailto:' + esc(contact.email) + '">✉️ Email</a>';
+            if (contact.telegram) actions += ' <a class="btn" target="_blank" rel="noopener" href="https://t.me/' + esc(contact.telegram) + '">✈️ Telegram</a>';
+            return '<div class="item"><div><b>' + esc(contact.name) + '</b><div class="small">' + esc(contact.phone) +
+                (contact.email ? ' · ' + esc(contact.email) : '') + '</div><div class="row" style="margin-top:6px">' + actions +
+                '</div></div><button class="btn danger" onclick="remove(\'contacts\',\'' + contact.id + '\')">✕</button></div>';
+        }).join('');
+    }
+    render = function () { savedRender(); renderAlarms(); renderContacts(); };
+
+    window.addAlarm = function () {
+        var time = document.getElementById('alarmTime').value;
+        var label = document.getElementById('alarmLabel').value.trim();
+        if (!time) return;
+        DB.alarms.push({ id: uid(), time: time, label: label, enabled: true });
+        document.getElementById('alarmLabel').value = '';
+        save(); render();
+    };
+    window.toggleAlarm = function (id) {
+        DB.alarms.forEach(function (alarm) { if (alarm.id === id) alarm.enabled = !alarm.enabled; });
+        save(); render();
+    };
+    window.deleteAlarm = function (id) { DB.alarms = DB.alarms.filter(function (alarm) { return alarm.id !== id; }); save(); render(); };
+    window.addContact = function () {
+        var name = take('contact');
+        var phone = take('phone');
+        var email = take('email');
+        var telegram = take('telegram').replace('@', '');
+        if (!name) return;
+        DB.contacts.unshift({ id: uid(), name: name, phone: phone, email: email, telegram: telegram });
+        save(); render();
+    };
+    window.startTimer = function () {
+        if (!timer.remaining) timer.remaining = (parseInt(document.getElementById('timerMin').value, 10) || 0) * 60 + (parseInt(document.getElementById('timerSec').value, 10) || 0);
+        if (!timer.remaining || timer.interval) return;
+        timer.interval = setInterval(function () {
+            timer.remaining--;
+            document.getElementById('timerDisplay').textContent = timeText(timer.remaining);
+            if (!timer.remaining) { clearInterval(timer.interval); timer.interval = null; alert('⏳ Таймер завершён!'); }
+        }, 1000);
+    };
+    window.pauseTimer = function () { clearInterval(timer.interval); timer.interval = null; };
+    window.resetTimer = function () { clearInterval(timer.interval); timer.interval = null; timer.remaining = 0; document.getElementById('timerDisplay').textContent = '00:00:00'; };
+    function renderStopwatch() {
+        var ms = stopwatch.elapsed, h = Math.floor(ms / 3600000), m = Math.floor(ms % 3600000 / 60000), s = Math.floor(ms % 60000 / 1000), cs = Math.floor(ms % 1000 / 10);
+        document.getElementById('stopwatchDisplay').textContent = pad(h) + ':' + pad(m) + ':' + pad(s) + '.' + pad(cs);
+        document.getElementById('lapsList').innerHTML = stopwatch.laps.map(function (lap, index) { return '<div class="small">Круг ' + (index + 1) + ': ' + lap + '</div>'; }).join('');
+    }
+    window.startStopwatch = function () {
+        if (stopwatch.interval) return;
+        stopwatch.startedAt = Date.now() - stopwatch.elapsed;
+        stopwatch.interval = setInterval(function () { stopwatch.elapsed = Date.now() - stopwatch.startedAt; renderStopwatch(); }, 30);
+    };
+    window.pauseStopwatch = function () { clearInterval(stopwatch.interval); stopwatch.interval = null; };
+    window.resetStopwatch = function () { clearInterval(stopwatch.interval); stopwatch = { startedAt: 0, elapsed: 0, interval: null, laps: [] }; renderStopwatch(); };
+    window.lapStopwatch = function () { if (stopwatch.elapsed) { stopwatch.laps.push(document.getElementById('stopwatchDisplay').textContent); renderStopwatch(); } };
+    window.exportData = function () {
+        var blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
+        var link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'doss-backup-' + Date.now() + '.json'; link.click(); URL.revokeObjectURL(link.href);
+    };
+    window.importData = function () {
+        var input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+        input.onchange = function () { var file = input.files[0]; if (!file) return; var reader = new FileReader(); reader.onload = function () { try { var data = JSON.parse(reader.result); if (!data || typeof data !== 'object') throw new Error(); Object.assign(DB, data); save(); render(); } catch (e) { alert('Не удалось прочитать резервную копию.'); } }; reader.readAsText(file); };
+        input.click();
+    };
+    function tickClocks() {
+        var now = new Date();
+        document.getElementById('bigClock').textContent = now.toLocaleTimeString('ru-RU');
+        document.getElementById('bigDate').textContent = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        var zones = [['🇷🇺 Москва', 'Europe/Moscow'], ['🇬🇧 Лондон', 'Europe/London'], ['🇺🇸 Нью-Йорк', 'America/New_York'], ['🇯🇵 Токио', 'Asia/Tokyo'], ['🇦🇪 Дубай', 'Asia/Dubai']];
+        document.getElementById('worldClock').innerHTML = zones.map(function (zone) { return '<div class="item"><div>' + zone[0] + '</div><b>' + now.toLocaleTimeString('ru-RU', { timeZone: zone[1], hour: '2-digit', minute: '2-digit' }) + '</b></div>'; }).join('');
+    }
+    render(); tickClocks(); setInterval(tickClocks, 1000);
+})();
+</script>
+<script>
+/* Версия хранилища DOSS v3: переносит старые локальные данные один раз. */
+(function () {
+    'use strict';
+    var stored;
+    try { stored = JSON.parse(localStorage.getItem('doss_v3')); } catch (e) { stored = null; }
+    if (stored && typeof stored === 'object') DB = stored;
+    KEY = 'doss_v3';
+    DB.bets = DB.bets || [];
+    save();
+
+    var editingId = null;
+    var baseRender = render;
+    render = function () { baseRender(); renderNotes(); renderBets(); renderCharts(); };
+    window.addNote = function () {
+        var title = take('noteTitle'), body = take('noteBody');
+        if (!title && !body) return;
+        if (editingId) {
+            DB.notes.forEach(function (note) { if (note.id === editingId) { note.title = title; note.body = body; } });
+            editingId = null;
+            document.getElementById('noteSave').textContent = 'Добавить';
+        } else DB.notes.unshift({ id: uid(), title: title || 'Без названия', body: body, createdAt: Date.now() });
+        save(); render();
+    };
+    window.editNote = function (id) {
+        var note = DB.notes.filter(function (item) { return item.id === id; })[0];
+        if (!note) return;
+        editingId = id; document.getElementById('noteTitle').value = note.title || ''; document.getElementById('noteBody').value = note.body || '';
+        document.getElementById('noteSave').textContent = 'Сохранить';
+    };
+    window.deleteNote = function (id) { DB.notes = DB.notes.filter(function (note) { return note.id !== id; }); save(); render(); };
+    function renderNotes() {
+        var root = document.getElementById('notesList'); if (!root) return;
+        root.innerHTML = DB.notes.length ? DB.notes.map(function (note) { return '<div class="item"><div><b>' + esc(note.title || note.text) + '</b><div class="small">' + esc(note.body || '') + '</div></div><button class="btn" onclick="editNote(\'' + note.id + '\')">✏️</button><button class="btn danger" onclick="deleteNote(\'' + note.id + '\')">✕</button></div>'; }).join('') : '<div class="small">Заметок нет.</div>';
+    }
+    window.addBet = function () {
+        var event = take('betEvent'), amount = parseFloat(take('betAmount')), odds = parseFloat(take('betOdds'));
+        if (!event || !(amount > 0) || !(odds > 1)) return;
+        DB.bets.unshift({ id: uid(), event: event, amount: amount, odds: odds, status: 'pending' }); save(); render();
+    };
+    window.setBetStatus = function (id, status) { DB.bets.forEach(function (bet) { if (bet.id === id) bet.status = status; }); save(); render(); };
+    window.deleteBet = function (id) { DB.bets = DB.bets.filter(function (bet) { return bet.id !== id; }); save(); render(); };
+    function renderBets() {
+        var root = document.getElementById('betsList'); if (!root) return;
+        root.innerHTML = DB.bets.length ? DB.bets.map(function (bet) { return '<div class="item"><div><b>' + esc(bet.event) + '</b><div class="small">' + bet.amount + ' × ' + bet.odds + ' · ' + bet.status + '</div></div><button class="btn primary" onclick="setBetStatus(\'' + bet.id + '\',\'won\')">✅</button><button class="btn danger" onclick="setBetStatus(\'' + bet.id + '\',\'lost\')">❌</button><button class="btn danger" onclick="deleteBet(\'' + bet.id + '\')">✕</button></div>'; }).join('') : '<div class="small">Ставок нет.</div>';
+    }
+    var charts = {};
+    function renderCharts() {
+        if (typeof Chart === 'undefined') return;
+        Object.keys(charts).forEach(function (key) { charts[key].destroy(); }); charts = {};
+        var income = DB.finance.filter(function (item) { return item.type === 'income'; }).reduce(function (sum, item) { return sum + item.amount; }, 0);
+        var expense = DB.finance.filter(function (item) { return item.type === 'expense'; }).reduce(function (sum, item) { return sum + item.amount; }, 0);
+        charts.finance = new Chart(document.getElementById('financeChart'), { type: 'doughnut', data: { labels: ['Доходы', 'Расходы'], datasets: [{ data: [income, expense], backgroundColor: ['#27ae60', '#e74c3c'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+        charts.tasks = new Chart(document.getElementById('tasksChart'), { type: 'bar', data: { labels: ['Выполнено', 'В работе'], datasets: [{ label: 'Задачи', data: [DB.tasks.filter(function (item) { return item.done; }).length, DB.tasks.filter(function (item) { return !item.done; }).length], backgroundColor: ['#27ae60', '#1877f2'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+    }
+    render();
+})();
 </script>
 </body>
 </html>

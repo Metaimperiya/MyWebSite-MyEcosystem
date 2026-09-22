@@ -281,6 +281,19 @@ window.adjustProfileExperience = function(uid) {
         .catch(function(error) { alert('Не удалось изменить опыт: ' + (error.message || error.code)); });
 };
 
+window.setProfileLevel = function(uid) {
+    if (!isProfileAdmin()) return alert('Только администратор может менять уровень.');
+    var raw = prompt('Укажите уровень от 1 до 86.', '1');
+    if (raw === null) return;
+    var level = Number(raw);
+    if (!Number.isInteger(level) || level < 1 || level > 86) return alert('Введите целое число от 1 до 86.');
+    var functions = getProfileFunctions();
+    if (!functions) return alert('Модуль Firebase Functions не подключён.');
+    functions.httpsCallable('setProfileLevel')({ site: SITE, uid: uid, level: level })
+        .then(function(result) { renderProfileLevel(result.data || {}); })
+        .catch(function(error) { alert('Не удалось установить уровень: ' + (error.message || error.code)); });
+};
+
 window.rebuildProfileExperience = function(uid) {
     if (!isProfileAdmin()) return alert('Только администратор может пересчитать опыт.');
     if (!confirm('Пересчитать опыт из всех существующих постов и комментариев этого пользователя?')) return;
@@ -306,7 +319,7 @@ function renderReputationPanel(uid) {
     if (isProfileAdmin()) {
         var controls = document.createElement('section');
         controls.className = 'profile-status-admin';
-        controls.innerHTML = '<h4>Управление статусами</h4><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',true)">Выдать галочку</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',false)">Снять галочку</button><button type="button" onclick="setProfilePro(\'' + uid + '\')">Выдать PRO</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'pro\',false)">Снять PRO</button><button type="button" onclick="adjustProfileExperience(\'' + uid + '\')">Изменить опыт</button><button type="button" onclick="rebuildProfileExperience(\'' + uid + '\')">Пересчитать уровень</button>';
+        controls.innerHTML = '<h4>Управление статусами</h4><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',true)">Выдать галочку</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',false)">Снять галочку</button><button type="button" onclick="setProfilePro(\'' + uid + '\')">Выдать PRO</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'pro\',false)">Снять PRO</button><button type="button" onclick="setProfileLevel(\'' + uid + '\')">Установить уровень</button><button type="button" onclick="adjustProfileExperience(\'' + uid + '\')">Изменить опыт</button><button type="button" onclick="rebuildProfileExperience(\'' + uid + '\')">Пересчитать уровень</button>';
         panel.appendChild(controls);
     }
     loadProfileReviews(uid);

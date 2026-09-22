@@ -115,6 +115,38 @@ exports.adjustProfileExperience = onCall(async (request) => {
   return { level: state.level, experience: state.experience };
 });
 
+exports.setProfileLevel = onCall(async (request) => {
+  if (!request.auth || !ADMIN_UIDS.has(request.auth.uid)) {
+    throw new HttpsError('permission-denied', 'Только администратор может менять уровень.');
+  }
+  const data = request.data || {};
+  const site = String(data.site || '');
+  const uid = String(data.uid || '');
+  const targetLevel = Number(data.level);
+  if (!site || !uid || !Number.isInteger(targetLevel) || targetLevel < 1 || targetLevel > MAX_LEVEL) {
+    throw new HttpsError('invalid-argument', 'Уровень должен быть целым числом от 1 до 86.');
+  }
+  const ref = db.ref(`sites/${site}/profile_levels/${uid}`);
+  const result = await ref.transaction((current) => {
+    const state = current || { experience: 0, posts: 0, comments: 0, activeDays: 0, manualExperience: 0 };
+    let required = 0;
+    for (let level = 1; level < targetLevel; level += 1) {
+      required += Math.round(20 + level * 12 + level * level * 2);
+    }
+    const earned = Math.max(0, Number(state.posts || 0)) * XP.post +
+      Math.max(0, Number(state.comments || 0)) * XP.comment +
+      Math.max(0, Number(state.activeDays || 0)) * XP.visit;
+    state.manualExperience = required - earned;
+    state.experience = required;
+    state.level = targetLevel;
+    state.updatedAt = Date.now();
+    return state;
+  });
+  const state = result.snapshot.val();
+  logger.info('Profile level set', { uid, level: targetLevel, by: request.auth.uid });
+  return { level: state.level, experience: state.experience };
+});
+
 exports.rebuildProfileExperience = onCall(async (request) => {
   if (!request.auth || !ADMIN_UIDS.has(request.auth.uid)) {
     throw new HttpsError('permission-denied', 'Только администратор может пересчитать опыт.');

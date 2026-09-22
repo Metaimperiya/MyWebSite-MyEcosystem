@@ -15,7 +15,7 @@
           }
         },
         "profile_status": {
-          ".read": "auth != null",
+          ".read": true,
           "$uid": {
             ".write": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')",
             ".validate": "!newData.exists() || (newData.child('verified').isBoolean() && newData.child('pro').isBoolean() && (!newData.child('proExpiresAt').exists() || newData.child('proExpiresAt').isNumber() || newData.child('proExpiresAt').val() === null) && newData.child('updatedAt').isNumber() && newData.child('updatedBy').val() === auth.uid)"
@@ -23,7 +23,7 @@
         },
         "profile_reviews": {
           "$profileUid": {
-            ".read": "auth != null",
+            ".read": true,
             "$reviewerUid": {
               ".write": "auth != null && ((auth.uid === $reviewerUid && auth.uid !== $profileUid && (!data.exists() || data.child('authorUid').val() === auth.uid)) || auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')",
               ".validate": "!newData.exists() || (newData.hasChildren(['authorUid', 'authorName', 'rating', 'text', 'createdAt', 'updatedAt']) && newData.child('authorUid').val() === $reviewerUid && newData.child('authorName').isString() && newData.child('authorName').val().length <= 120 && newData.child('rating').isNumber() && newData.child('rating').val() >= 1 && newData.child('rating').val() <= 5 && newData.child('text').isString() && newData.child('text').val().length >= 3 && newData.child('text').val().length <= 1000 && newData.child('createdAt').isNumber() && newData.child('updatedAt').isNumber())"
@@ -32,7 +32,7 @@
         },
         "profile_levels": {
           "$uid": {
-            ".read": "auth != null",
+            ".read": true,
             ".write": false
           }
         },
