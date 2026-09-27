@@ -48,6 +48,29 @@ function setupDatingCountries() {
     if (list) list.innerHTML = datingCountries().map(function(country) { return '<option value="' + datingEscape(country.name) + '"></option>'; }).join('');
 }
 
+var DATING_CITY_SUGGESTIONS = {
+    UA: ['Киев', 'Харьков', 'Одесса', 'Днепр', 'Львов', 'Запорожье', 'Винница', 'Полтава', 'Черкассы', 'Чернигов', 'Сумы', 'Житомир', 'Ровно', 'Луцк', 'Ужгород', 'Ивано-Франковск', 'Тернополь', 'Кропивницкий', 'Николаев', 'Херсон', 'Кременчуг', 'Белая Церковь'],
+    PL: ['Варшава', 'Краков', 'Вроцлав', 'Познань', 'Гданьск', 'Лодзь'],
+    DE: ['Берлин', 'Гамбург', 'Мюнхен', 'Кёльн', 'Франкфурт-на-Майне'],
+    US: ['Нью-Йорк', 'Лос-Анджелес', 'Чикаго', 'Хьюстон', 'Майами', 'Сан-Франциско'],
+    CA: ['Торонто', 'Монреаль', 'Ванкувер', 'Оттава', 'Калгари'],
+    GB: ['Лондон', 'Манчестер', 'Бирмингем', 'Ливерпуль', 'Глазго'],
+    FR: ['Париж', 'Марсель', 'Лион', 'Тулуза', 'Ницца'],
+    ES: ['Мадрид', 'Барселона', 'Валенсия', 'Севилья', 'Малага'],
+    IT: ['Рим', 'Милан', 'Неаполь', 'Турин', 'Флоренция'],
+    TR: ['Стамбул', 'Анкара', 'Измир', 'Анталья'],
+    RU: ['Москва', 'Санкт-Петербург', 'Казань', 'Екатеринбург', 'Новосибирск']
+};
+
+function updateDatingCityOptions() {
+    var countryField = document.getElementById('datingCountry');
+    var options = document.getElementById('datingCityOptions');
+    if (!countryField || !options) return;
+    var country = datingCountryCode(countryField.value);
+    var cities = country ? (DATING_CITY_SUGGESTIONS[country.code] || []) : [];
+    options.innerHTML = cities.map(function(city) { return '<option value="' + datingEscape(city) + '"></option>'; }).join('');
+}
+
 window.loadDating = function() {
     var grid = document.getElementById('datingGrid');
     if (!grid) return;
@@ -139,8 +162,10 @@ window.openDatingProfileModal = function() {
     document.getElementById('datingActive').checked = profile.isActive !== false;
     document.getElementById('datingAdultConfirmed').checked = profile.ageConfirmed === true;
     document.getElementById('datingError').textContent = '';
+    document.getElementById('datingUploadStatus').textContent = '';
     document.getElementById('datingPhotoInput').value = '';
     renderDatingPhotoPreview(profile.photoUrl || '');
+    updateDatingCityOptions();
     document.getElementById('datingProfileModal').classList.add('open');
 };
 
@@ -162,9 +187,23 @@ window.closeDatingProfileModal = function() {
     datingPhotoPreviewUrl = null;
 };
 
-window.saveDatingProfile = function() {
+function datingStorageErrorMessage(error) {
+    var messages = {
+        'storage/bucket-not-found': 'Хранилище Firebase не настроено.',
+        'storage/unauthorized': 'Firebase Storage отклонил загрузку. Проверь опубликованные Storage Rules.',
+        'storage/unauthenticated': 'Сессия входа истекла. Войди в аккаунт и попробуй снова.',
+        'storage/quota-exceeded': 'В хранилище Firebase закончилась квота.',
+        'storage/retry-limit-exceeded': 'Загрузка прервалась из-за соединения. Попробуй ещё раз.',
+        'storage/canceled': 'Загрузка фотографии отменена.'
+    };
+    return messages[error && error.code] || 'Загрузка фото не завершилась (' + ((error && error.code) || 'ошибка сети') + ').';
+}
+
+window.saveDatingProfile = function(shareAfterSave) {
     var error = document.getElementById('datingError');
     var saveButton = document.getElementById('datingSaveButton');
+    var shareSaveButton = document.getElementById('datingSaveAndShareButton');
+    var uploadStatus = document.getElementById('datingUploadStatus');
     var name = document.getElementById('datingName').value.trim();
     var gender = document.getElementById('datingGender').value;
     var seeking = document.getElementById('datingSeeking').value;
@@ -175,20 +214,39 @@ window.saveDatingProfile = function() {
     var photoFile = document.getElementById('datingPhotoInput').files[0];
     var bio = document.getElementById('datingBio').value.trim();
     var ageConfirmed = document.getElementById('datingAdultConfirmed').checked;
+    var isActive = document.getElementById('datingActive').checked;
     if (!name || !gender || !seeking || !country || !city || !goal) { error.textContent = 'Заполни имя, кто ты, кого ищешь, страну, город и цель знакомства.'; return; }
     if (!ageConfirmed) { error.textContent = 'Для раздела знакомств нужно подтвердить, что тебе исполнилось 18 лет.'; return; }
+    if (shareAfterSave && !isActive) { error.textContent = 'Включи показ анкеты в поиске, чтобы поделиться ею.'; return; }
     if (photoUrl && !datingSafeImage(photoUrl) && !photoFile) { error.textContent = 'Укажи прямую ссылку на фото с https:// или http://.'; return; }
     if (photoFile && (!photoFile.type.match(/^image\//i) || photoFile.size >= 5 * 1024 * 1024)) { error.textContent = 'Выбери изображение размером меньше 5 МБ.'; return; }
     var profile = {
         name: name, gender: gender, seeking: seeking, countryCode: country.code, country: country.name,
         city: city, goal: goal, bio: bio, photoUrl: photoFile ? '' : (datingSafeImage(photoUrl) || ''),
-        ageConfirmed: true, isActive: document.getElementById('datingActive').checked, updatedAt: Date.now()
+        ageConfirmed: true, isActive: isActive, updatedAt: Date.now()
     };
     saveButton.disabled = true;
-    saveButton.textContent = photoFile ? 'Загружаю фото…' : 'Сохраняю…';
-    var photoPromise = photoFile
-        ? storage.ref('dating-photos/' + USER_UID + '/main').put(photoFile, { contentType: photoFile.type }).then(function(snapshot) { return snapshot.ref.getDownloadURL(); })
-        : Promise.resolve(profile.photoUrl);
+    if (shareSaveButton) shareSaveButton.disabled = true;
+    var photoUploadWarning = '';
+    saveButton.textContent = photoFile ? 'Подготовка фото…' : 'Сохраняю…';
+    var photoPromise = Promise.resolve(profile.photoUrl);
+    if (photoFile) {
+        photoPromise = new Promise(function(resolve, reject) {
+            var uploadTask = storage.ref('dating-photos/' + USER_UID + '/main').put(photoFile, { contentType: photoFile.type });
+            uploadTask.on('state_changed', function(snapshot) {
+                var percent = snapshot.totalBytes ? Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100) : 0;
+                saveButton.textContent = 'Фото · ' + percent + '%';
+                if (uploadStatus) uploadStatus.textContent = 'Загружаю фотографию: ' + percent + '%';
+            }, reject, function() {
+                uploadTask.snapshot.ref.getDownloadURL().then(resolve, reject);
+            });
+        }).catch(function(uploadError) {
+            console.error('Не удалось загрузить фото анкеты:', uploadError);
+            photoUploadWarning = datingStorageErrorMessage(uploadError);
+            if (uploadStatus) uploadStatus.textContent = photoUploadWarning + ' Анкету сохраню без новой фотографии.';
+            return datingSafeImage((datingProfiles[USER_UID] || {}).photoUrl) || '';
+        });
+    }
     photoPromise.then(function(url) {
         profile.photoUrl = url;
         var updates = {};
@@ -199,12 +257,16 @@ window.saveDatingProfile = function() {
         datingProfiles[USER_UID] = profile;
         window.closeDatingProfileModal();
         renderDatingProfiles();
+        if (photoUploadWarning) alert('Анкета сохранена, но фото не загрузилось. ' + photoUploadWarning + ' Её всё ещё можно опубликовать без фото или добавить ссылку позже.');
+        if (shareAfterSave) window.shareMyDatingProfile();
     }).catch(function(saveError) {
         console.error('Не удалось сохранить анкету знакомств:', saveError);
-        error.textContent = saveError.code === 'storage/bucket-not-found' || saveError.code === 'storage/unauthorized' || saveError.code === 'storage/unauthenticated'
-            ? 'Firebase Storage ещё не настроено. Пока вставь прямую ссылку на фото; загрузка с устройства заработает после включения Storage.'
-            : saveError.code === 'PERMISSION_DENIED' ? 'Firebase запретил запись. Опубликуй Database Rules для знакомств.' : 'Не удалось сохранить анкету. Попробуй ещё раз.';
-    }).finally(function() { saveButton.disabled = false; saveButton.textContent = 'Сохранить анкету'; });
+        error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Firebase запретил запись. Опубликуй Database Rules для знакомств.' : 'Не удалось сохранить анкету. ' + (saveError.message || 'Проверь подключение и попробуй ещё раз.');
+    }).finally(function() {
+        saveButton.disabled = false;
+        saveButton.textContent = 'Сохранить анкету';
+        if (shareSaveButton) shareSaveButton.disabled = false;
+    });
 };
 
 function openDatingDetail(uid) {
@@ -265,7 +327,11 @@ if (datingPhotoUrlInput) datingPhotoUrlInput.addEventListener('input', function(
     if (datingPhotoPreviewUrl) URL.revokeObjectURL(datingPhotoPreviewUrl);
     datingPhotoPreviewUrl = null;
     renderDatingPhotoPreview(datingPhotoUrlInput.value.trim());
+    var uploadStatus = document.getElementById('datingUploadStatus');
+    if (uploadStatus) uploadStatus.textContent = datingPhotoUrlInput.value.trim() ? 'Фото по ссылке выбрано.' : '';
 });
+var datingCountryInput = document.getElementById('datingCountry');
+if (datingCountryInput) datingCountryInput.addEventListener('input', updateDatingCityOptions);
 var datingPhotoInput = document.getElementById('datingPhotoInput');
 if (datingPhotoInput) datingPhotoInput.addEventListener('change', function() {
     var file = datingPhotoInput.files && datingPhotoInput.files[0];
@@ -277,6 +343,8 @@ if (datingPhotoInput) datingPhotoInput.addEventListener('change', function() {
         return;
     }
     error.textContent = '';
+    var uploadStatus = document.getElementById('datingUploadStatus');
+    if (uploadStatus) uploadStatus.textContent = 'Фото выбрано. Загрузка начнётся при сохранении анкеты.';
     document.getElementById('datingPhotoUrl').value = '';
     if (datingPhotoPreviewUrl) URL.revokeObjectURL(datingPhotoPreviewUrl);
     datingPhotoPreviewUrl = URL.createObjectURL(file);

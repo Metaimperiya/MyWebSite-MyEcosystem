@@ -41,6 +41,11 @@
 .dating-age-check { color:var(--text-color); font-weight:650; }
 .dating-error { min-height:18px; margin:7px 0 4px; color:var(--danger); font-size:.72rem; }
 .dating-submit { width:100%; }
+.dating-submit-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.dating-submit-row .dating-submit { width:100%; }
+.dating-share-submit { border-color:color-mix(in srgb,#e54491 35%,var(--border-color)); color:#d6418b; font-weight:750; }
+.dating-upload-status { min-height:16px; margin-top:5px; color:var(--text-secondary); font-size:.66rem; }
+.dating-upload-status:empty { display:none; }
 .dating-detail-head { display:flex; align-items:center; gap:13px; }
 .dating-detail-head>img,.dating-detail-initial { display:grid; place-items:center; width:92px; height:112px; flex:0 0 92px; overflow:hidden; border-radius:12px; object-fit:cover; background:linear-gradient(145deg,color-mix(in srgb,#e54491 18%,var(--card-bg)),var(--input-bg)); color:#d6418b; font-size:2rem; font-weight:800; }
 .dating-detail-head h2 { margin:5px 0; font-size:1.05rem; }
@@ -62,6 +67,7 @@
     .dating-card-name { font-size:.78rem; }
     .dating-card-meta,.dating-card-bio { font-size:.61rem; }
     .dating-form-row { grid-template-columns:1fr; gap:0; }
+    .dating-submit-row { grid-template-columns:1fr; }
     .dating-detail-head>img,.dating-detail-initial { width:78px; height:96px; flex-basis:78px; }
 }
 .dating-heading-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }

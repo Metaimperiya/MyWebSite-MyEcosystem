@@ -452,6 +452,17 @@ document.addEventListener('click', function(event) {
         catch (error) { console.error('Некорректные данные карточки:', error); }
         return;
     }
+    var previewButton = event.target.closest('[data-preview-group]');
+    if (previewButton) {
+        event.preventDefault(); event.stopPropagation();
+        var preview = previewButton.closest('.shared-group-wrap').querySelector('.shared-group-preview');
+        var expanded = previewButton.getAttribute('aria-expanded') === 'true';
+        previewButton.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        previewButton.querySelector('.shared-entity-copy em').innerHTML = expanded ? 'Показать группу <span aria-hidden="true">⌄</span>' : 'Скрыть превью <span aria-hidden="true">⌃</span>';
+        preview.hidden = expanded;
+        if (!expanded && preview.dataset.loaded !== 'true') loadGroupInlinePreview(previewButton.getAttribute('data-preview-group'), preview);
+        return;
+    }
     var openButton = event.target.closest('[data-open-shared]');
     if (!openButton) return;
     event.preventDefault(); event.stopPropagation();
@@ -461,17 +472,55 @@ document.addEventListener('click', function(event) {
     } catch (error) { console.error('Некорректная ссылка на карточку:', error); }
 });
 
+function loadGroupInlinePreview(groupId, container) {
+    if (!groupId || !container) return;
+    container.innerHTML = '<div class="shared-group-preview-loading">Загружаем группу…</div>';
+    var base = 'sites/' + SITE + '/';
+    Promise.all([
+        db.ref(base + 'groups/' + groupId).once('value'),
+        db.ref(base + 'group_members/' + groupId).once('value'),
+        db.ref(base + 'group_posts/' + groupId).orderByChild('createdAt').limitToLast(5).once('value')
+    ]).then(function(snapshots) {
+        var group = snapshots[0].val();
+        if (!group) {
+            container.innerHTML = '<div class="shared-group-preview-loading">Эта группа больше не существует.</div>';
+            return;
+        }
+        var members = snapshots[1].val() || {};
+        var posts = Object.keys(snapshots[2].val() || {}).map(function(id) {
+            return Object.assign({ id: id }, snapshots[2].val()[id] || {});
+        }).sort(function(a, b) { return Number(b.createdAt || 0) - Number(a.createdAt || 0); });
+        var cover = /^https?:\/\//i.test(group.coverUrl || '') ? '<img class="shared-group-cover" src="' + esc(group.coverUrl) + '" alt="Обложка ' + esc(group.name || 'группы') + '" loading="lazy">' : '<div class="shared-group-cover shared-group-cover--empty"><span>👥</span></div>';
+        var avatar = /^https?:\/\//i.test(group.avatarUrl || '') ? '<img src="' + esc(group.avatarUrl) + '" alt="" loading="lazy">' : '<span>' + esc(Array.from((group.name || 'Группа').trim())[0] || '👥') + '</span>';
+        var postsHtml = posts.length ? posts.map(function(post) {
+            var postText = String(post.text || '').trim();
+            return '<article class="shared-group-post"><small>' + esc(post.authorName || 'Участник') + (post.createdAt ? ' · ' + esc(new Date(post.createdAt).toLocaleDateString('ru-RU')) : '') + '</small><p>' + esc(postText || 'Запись без текста') + '</p></article>';
+        }).join('') : '<div class="shared-group-no-posts">В группе пока нет записей.</div>';
+        container.innerHTML = '<div class="shared-group-preview-scroll">' + cover + '<div class="shared-group-summary"><div class="shared-group-avatar">' + avatar + '</div><div><strong>' + esc(group.name || 'Группа') + '</strong><span>👥 ' + Object.keys(members).length + ' участников</span></div></div><p class="shared-group-description">' + esc(group.description || 'Описание пока не добавлено.') + '</p><div class="shared-group-recent"><strong>Последние записи</strong>' + postsHtml + '</div></div><button type="button" class="shared-group-open" data-open-shared="' + encodeURIComponent(JSON.stringify({ kind: 'group', id: groupId })) + '" onclick="event.stopPropagation();">Перейти в группу <span aria-hidden="true">→</span></button>';
+        container.dataset.loaded = 'true';
+    }).catch(function(error) {
+        console.error('Не удалось загрузить превью группы:', error);
+        container.innerHTML = '<div class="shared-group-preview-loading">Не удалось загрузить группу. Проверь подключение и попробуй ещё раз.</div>';
+    });
+}
+
 window.openSharedEntity = function(item) {
     if (!item) return;
     var go = window.setActivePage;
     if (item.kind === 'group' || item.kind === 'group_post') {
         if (go) go('groups');
+        if (typeof window.loadGroups === 'function') window.loadGroups();
         var groupId = item.kind === 'group_post' ? item.parentId : item.id;
+        if (!groupId) { alert('Не удалось определить группу для перехода.'); return; }
         db.ref('sites/' + SITE + '/groups/' + groupId).once('value').then(function(snapshot) {
             if (!snapshot.exists()) { alert('Эта группа уже удалена.'); return; }
             if (window.groupsCache) window.groupsCache[groupId] = snapshot.val();
             if (item.kind === 'group_post' && typeof pendingSharedGroupPostId !== 'undefined') pendingSharedGroupPostId = item.id;
             if (typeof window.openGroup === 'function') window.openGroup(groupId);
+            else alert('Раздел групп ещё загружается. Попробуй нажать ещё раз.');
+        }).catch(function(error) {
+            console.error('Не удалось открыть группу из ленты:', error);
+            alert('Не удалось открыть группу. Проверь подключение и попробуй ещё раз.');
         });
     } else if (item.kind === 'vacancy' || item.kind === 'resume') {
         if (go) go('work');

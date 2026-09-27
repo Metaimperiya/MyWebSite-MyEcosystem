@@ -256,7 +256,11 @@ function renderPost(p, type) {
         var labels = { group: 'ГРУППА', group_post: 'ЗАПИСЬ В ГРУППЕ', vacancy: 'ВАКАНСИЯ', resume: 'РЕЗЮМЕ', dating: 'АНКЕТА' };
         var openData = encodeURIComponent(JSON.stringify({ kind: entity.kind, id: entity.id || '', parentId: entity.parentId || '' }));
         var image = entity.image && /^https?:\/\//i.test(entity.image) ? '<img class="shared-entity-image" src="' + esc(entity.image) + '" alt="" loading="lazy">' : '';
-        sharedHtml = '<button type="button" class="shared-entity-card" data-open-shared="' + openData + '" onclick="event.stopPropagation();">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind] || 'ПУБЛИКАЦИЯ') + '</small><strong>' + esc(entity.title || 'Открыть публикацию') + '</strong><span>' + esc(entity.description || '') + '</span><em>Открыть →</em></span></button>';
+        if (entity.kind === 'group') {
+            sharedHtml = '<div class="shared-entity-wrap shared-group-wrap"><button type="button" class="shared-entity-card" data-preview-group="' + esc(entity.id || '') + '" aria-expanded="false" onclick="event.stopPropagation();">' + image + '<span class="shared-entity-copy"><small>' + esc(labels.group) + '</small><strong>' + esc(entity.title || 'Группа') + '</strong><span>' + esc(entity.description || 'Посмотри обложку, описание и последние записи группы.') + '</span><em>Показать группу <span aria-hidden="true">⌄</span></em></span></button><div class="shared-group-preview" hidden></div></div>';
+        } else {
+            sharedHtml = '<button type="button" class="shared-entity-card" data-open-shared="' + openData + '" onclick="event.stopPropagation();">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind] || 'ПУБЛИКАЦИЯ') + '</small><strong>' + esc(entity.title || 'Открыть публикацию') + '</strong><span>' + esc(entity.description || '') + '</span><em>Открыть →</em></span></button>';
+        }
     }
     var adHtml = '';
     if (p.ad && p.ad.enabled) {
