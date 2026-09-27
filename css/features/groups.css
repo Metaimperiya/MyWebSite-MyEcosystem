@@ -1,0 +1,54 @@
+.groups-page { padding:4px 0 28px; color:var(--text-color); }
+.groups-page [hidden] { display:none !important; }
+.groups-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; padding:18px; border:1px solid var(--border-color); border-radius:16px; background:var(--card-bg); box-shadow:var(--shadow); }
+.groups-kicker { color:var(--link-color); font-size:.65rem; font-weight:800; letter-spacing:.1em; }
+.groups-heading h2 { margin:4px 0; font-size:1.35rem; }
+.groups-heading p { margin:0; color:var(--text-secondary); font-size:.8rem; }
+.groups-create-button,.community-join-button,.group-composer-footer button,.groups-empty button { min-height:38px; padding:8px 15px; border:0; border-radius:11px; background:var(--link-color); color:#fff; font:inherit; font-size:.78rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+#page-groups .group-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+.community-card { min-width:0; padding:14px; border:1px solid var(--border-color); border-radius:15px; background:var(--card-bg); box-shadow:var(--shadow); }
+.community-card-main { display:flex; align-items:flex-start; width:100%; gap:11px; padding:0; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+.community-card-icon,.group-detail-icon { display:grid; place-items:center; flex:0 0 42px; height:42px; border-radius:13px; background:color-mix(in srgb,var(--link-color) 12%,var(--card-bg)); font-size:1.25rem; }
+.community-card-copy { display:grid; min-width:0; gap:4px; }
+.community-card-copy strong { overflow:hidden; font-size:.9rem; text-overflow:ellipsis; white-space:nowrap; }
+.community-card-copy>span { display:-webkit-box; overflow:hidden; color:var(--text-secondary); font-size:.75rem; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+.community-card-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:13px; padding-top:10px; border-top:1px solid var(--border-color); color:var(--text-secondary); font-size:.7rem; }
+.community-member-label { color:var(--link-color); font-weight:700; }
+.community-card-footer .community-join-button { min-height:30px; padding:5px 11px; font-size:.7rem; }
+.groups-empty,.group-feed-empty { display:grid; justify-items:center; gap:7px; padding:30px 15px; border:1px dashed var(--border-color); border-radius:14px; color:var(--text-secondary); text-align:center; }
+.groups-empty>span { font-size:1.7rem; }
+.groups-empty strong { color:var(--text-color); }
+.groups-empty p { margin:0 0 5px; font-size:.78rem; }
+.group-back-button { margin:0 0 12px; padding:7px 11px; border:1px solid var(--border-color); border-radius:10px; background:var(--card-bg); color:var(--text-color); font:inherit; font-size:.75rem; cursor:pointer; }
+.group-detail-header { display:flex; align-items:center; gap:13px; padding:17px; border:1px solid var(--border-color); border-radius:15px; background:var(--card-bg); box-shadow:var(--shadow); }
+.group-detail-icon { flex-basis:52px; height:52px; font-size:1.55rem; }
+.group-detail-copy h2 { margin:0 0 4px; font-size:1.12rem; }
+.group-detail-copy p { margin:0 0 6px; color:var(--text-secondary); font-size:.78rem; }
+.group-detail-copy>span { color:var(--muted-text); font-size:.68rem; }
+.group-membership { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0; padding:10px 12px; border-radius:12px; background:var(--card-bg); color:var(--text-secondary); font-size:.75rem; }
+.group-membership>span { font-size:.7rem; }
+.group-membership .community-join-button,.group-leave-button { min-height:31px; padding:6px 12px; border:0; border-radius:9px; background:var(--link-color); color:#fff; font:inherit; font-size:.72rem; font-weight:700; cursor:pointer; }
+.group-leave-button { border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-secondary); }
+.group-post-composer { margin:10px 0; padding:12px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); }
+.group-post-composer textarea { display:block; width:100%; min-height:80px; padding:10px 12px; border:1px solid var(--border-color); border-radius:10px; outline:none; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.82rem; resize:vertical; }
+.group-post-composer textarea:focus { border-color:var(--link-color); }
+.group-composer-footer { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px; }
+.group-composer-footer span { color:var(--text-secondary); font-size:.7rem; }
+.group-composer-footer button { min-height:32px; padding:6px 12px; font-size:.72rem; }
+.group-composer-footer button:disabled,.groups-create-button:disabled { opacity:.6; cursor:wait; }
+.group-feed { display:grid; gap:9px; margin-top:12px; }
+.group-post { padding:13px 15px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); box-shadow:var(--shadow); }
+.group-post-author { display:block; padding:0; border:0; background:none; color:var(--link-color); font:inherit; font-size:.8rem; font-weight:750; cursor:pointer; }
+.group-post-date { display:block; margin-top:2px; color:var(--muted-text); font-size:.65rem; }
+.group-post-text { margin-top:10px; color:var(--text-color); font-size:.85rem; line-height:1.55; overflow-wrap:anywhere; white-space:pre-wrap; }
+.group-create-modal textarea { min-height:90px; resize:vertical; }
+.group-create-modal label { display:block; margin:10px 0 5px; color:var(--text-secondary); font-size:.78rem; }
+.group-create-modal label span { color:var(--muted-text); }
+.group-create-error { min-height:18px; margin:5px 0; color:var(--danger); font-size:.75rem; }
+.group-create-modal #createGroupButton { width:100%; }
+@media(max-width:600px) {
+    .groups-heading { align-items:flex-start; flex-direction:column; padding:14px; }
+    .groups-create-button { width:100%; }
+    #page-groups .group-list { grid-template-columns:1fr !important; gap:10px !important; }
+    .group-membership { align-items:flex-start; flex-wrap:wrap; }
+}

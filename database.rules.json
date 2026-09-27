@@ -14,6 +14,32 @@
             ".write": "$uid === auth.uid || auth.token.admin === true"
           }
         },
+        "groups": {
+          ".read": "auth != null",
+          "$groupId": {
+            ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || (data.exists() && data.child('ownerUid').val() === auth.uid))",
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'description', 'ownerUid', 'ownerName', 'createdAt']) && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 60 && newData.child('description').isString() && newData.child('description').val().length <= 300 && newData.child('ownerUid').val() === auth.uid && newData.child('ownerName').isString() && newData.child('createdAt').isNumber())"
+          }
+        },
+        "group_members": {
+          ".read": "auth != null",
+          "$groupId": {
+            "$uid": {
+              ".write": "auth != null && $uid === auth.uid",
+              ".validate": "!newData.exists() || newData.val() === true"
+            }
+          }
+        },
+        "group_posts": {
+          "$groupId": {
+            ".read": "auth != null && root.child('sites').child($site).child('groups').child($groupId).exists()",
+            ".indexOn": ["createdAt"],
+            "$postId": {
+              ".write": "auth != null && root.child('sites').child($site).child('groups').child($groupId).exists() && root.child('sites').child($site).child('group_members').child($groupId).child(auth.uid).val() === true && ((!data.exists() && newData.child('authorUid').val() === auth.uid) || (data.exists() && data.child('authorUid').val() === auth.uid))",
+              ".validate": "!newData.exists() || (newData.hasChildren(['authorUid', 'authorName', 'text', 'createdAt']) && newData.child('authorUid').val() === auth.uid && newData.child('authorName').isString() && newData.child('authorName').val().length <= 120 && newData.child('text').isString() && newData.child('text').val().length >= 1 && newData.child('text').val().length <= 3000 && newData.child('createdAt').isNumber())"
+            }
+          }
+        },
         "profile_status": {
           ".read": true,
           "$uid": {

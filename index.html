@@ -43,6 +43,7 @@
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=4.6">
     <link rel="stylesheet" href="css/features/profile.css?v=3.6">
+    <link rel="stylesheet" href="css/features/groups.css?v=1.0">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -231,7 +232,20 @@
             </div>
 
             <div class="page" id="page-groups">
-                <div class="card"><h3>👥 Groups</h3><div class="group-list" id="groupList"></div></div>
+                <section class="groups-page">
+                    <div class="groups-heading"><div><span class="groups-kicker">СООБЩЕСТВА</span><h2>Группы</h2><p>Создавай сообщества и общайся в отдельной ленте каждой группы.</p></div><button type="button" class="groups-create-button" onclick="openCreateGroup()">＋ Создать группу</button></div>
+                    <div class="groups-directory" id="groupsDirectory"><div class="group-list" id="groupList"></div></div>
+                    <section class="group-detail" id="groupDetail" hidden>
+                        <button type="button" class="group-back-button" onclick="closeGroup()">← Все группы</button>
+                        <div class="group-detail-header" id="groupDetailHeader"></div>
+                        <div class="group-membership" id="groupMembership"></div>
+                        <div class="group-post-composer" id="groupPostComposer" hidden>
+                            <textarea id="groupPostText" maxlength="3000" placeholder="Напиши что-нибудь в группу…"></textarea>
+                            <div class="group-composer-footer"><span id="groupPostStatus" role="status" aria-live="polite"></span><button type="button" onclick="publishGroupPost()">Опубликовать</button></div>
+                        </div>
+                        <div class="group-feed" id="groupFeed"></div>
+                    </section>
+                </section>
             </div>
 
             <div class="page" id="page-people">
@@ -461,6 +475,19 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="createCommunityModal">
+        <div class="modal-box group-create-modal">
+            <button class="close-btn" type="button" onclick="closeCreateGroup()">✕</button>
+            <h3>Создать группу</h3>
+            <label for="newGroupName">Название</label>
+            <input id="newGroupName" maxlength="60" placeholder="Например, любители кино">
+            <label for="newGroupDescription">О чём эта группа? <span>(необязательно)</span></label>
+            <textarea id="newGroupDescription" maxlength="300" placeholder="Короткое описание сообщества"></textarea>
+            <div class="group-create-error" id="newGroupError" role="alert"></div>
+            <button class="btn-primary" id="createGroupButton" type="button" onclick="createGroup()">Создать</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeEdit()">✕</button>
@@ -580,7 +607,7 @@
 <script src="js/features/profile.js?v=3.8"></script>
 <script src="js/features/reputation.js?v=1.1"></script>
 <script src="js/features/friends.js?v=3.1"></script>
-<script src="js/features/groups.js?v=3.0"></script>
+<script src="js/features/groups.js?v=4.0"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
 <script src="js/features/admin.js?v=3.2"></script>
