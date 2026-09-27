@@ -49,6 +49,7 @@ function profileSocialHref(key, value) {
 function renderProfileContacts(user) {
     var row = document.getElementById('profileContactRow');
     var emailLink = document.getElementById('profileEmail');
+    var phoneActions = document.getElementById('profilePhoneActions');
     var phoneNumber = document.getElementById('profilePhoneNumber');
     var callLink = document.getElementById('profileCallButton');
     var socialContainer = document.getElementById('profileSocialLinks');
@@ -68,6 +69,7 @@ function renderProfileContacts(user) {
         phoneNumber.hidden = !phone;
         phoneNumber.textContent = phone;
     }
+    if (phoneActions) phoneActions.hidden = !phone;
     if (row) row.hidden = !email && !phone;
     if (!socialContainer) return;
     socialContainer.replaceChildren();

@@ -50,8 +50,10 @@
     margin: 4px 0;
 }
 
-.profile-contact-row { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px 12px; margin:5px 0 3px; }
+.profile-contact-row { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; margin:7px 0 4px; }
 .profile-contact-row[hidden], .profile-social-links[hidden] { display:none; }
+.profile-phone-actions { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:9px; }
+.profile-phone-actions[hidden] { display:none; }
 .profile-email { color:var(--text-secondary); font-size:.78rem; text-decoration:none; overflow-wrap:anywhere; }
 .profile-email:hover { color:var(--link-color); text-decoration:underline; }
 .profile-phone-number { color:var(--text-color); font-size:.8rem; font-weight:650; text-decoration:none; font-variant-numeric:tabular-nums; }

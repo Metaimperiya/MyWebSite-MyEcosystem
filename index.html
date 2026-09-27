@@ -42,7 +42,7 @@
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=4.6">
-    <link rel="stylesheet" href="css/features/profile.css?v=3.5">
+    <link rel="stylesheet" href="css/features/profile.css?v=3.6">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -247,8 +247,10 @@
                     <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
                     <div class="profile-contact-row" id="profileContactRow" hidden>
                         <a class="profile-email" id="profileEmail" hidden></a>
-                        <a class="profile-phone-number" id="profilePhoneNumber" hidden></a>
-                        <a class="profile-call-btn" id="profileCallButton" aria-label="Позвонить" title="Позвонить" hidden><span aria-hidden="true">☎</span> Позвонить</a>
+                        <div class="profile-phone-actions" id="profilePhoneActions" hidden>
+                            <a class="profile-phone-number" id="profilePhoneNumber" hidden></a>
+                            <a class="profile-call-btn" id="profileCallButton" aria-label="Позвонить" title="Позвонить" hidden><span aria-hidden="true">☎</span> Позвонить</a>
+                        </div>
                     </div>
                     <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
                     <div class="bio" id="profileBio"></div>
@@ -575,7 +577,7 @@
 <script src="js/features/feed/feed-core.js?v=4.5"></script>
 <script src="js/features/feed/feed-actions.js?v=4.0"></script>
 <script src="js/features/feed/feed-edit.js?v=5.1"></script>
-<script src="js/features/profile.js?v=3.7"></script>
+<script src="js/features/profile.js?v=3.8"></script>
 <script src="js/features/reputation.js?v=1.1"></script>
 <script src="js/features/friends.js?v=3.1"></script>
 <script src="js/features/groups.js?v=3.0"></script>
