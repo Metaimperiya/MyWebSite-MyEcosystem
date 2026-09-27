@@ -68,6 +68,16 @@
         });
     }
 
+    function blobsMatch(first, second) {
+        if (!first || !second || first.size !== second.size) return Promise.resolve(false);
+        return Promise.all([first.arrayBuffer(), second.arrayBuffer()]).then(function(buffers) {
+            var left = new Uint8Array(buffers[0]);
+            var right = new Uint8Array(buffers[1]);
+            for (var i = 0; i < left.length; i++) if (left[i] !== right[i]) return false;
+            return true;
+        });
+    }
+
     function withTimeout(promise, milliseconds, message) {
         return new Promise(function(resolve, reject) {
             var timer = setTimeout(function() { reject(new Error(message)); }, milliseconds);
@@ -115,10 +125,23 @@
                 var upload = ref.put(blob, { contentType: blob.type || source.type || 'image/png' })
                     .then(function() { return ref.getDownloadURL(); });
                 return withTimeout(upload, 12000, 'Хранилище не ответило за 12 секунд')
-                    .then(function(url) { return { type: 'image', url: url }; })
+                    .then(function(url) {
+                        setPostPublishStatus('Проверяю загруженное фото…');
+                        return withTimeout(fetch(url, { cache: 'reload' }), 12000, 'Не удалось проверить загруженное фото')
+                            .then(function(response) {
+                                if (!response.ok) throw new Error('Не удалось проверить загруженное фото');
+                                return response.blob();
+                            })
+                            .then(function(downloaded) {
+                                return blobsMatch(blob, downloaded).then(function(matches) {
+                                    if (!matches) throw new Error('Содержимое загруженного фото не совпадает с выбранным');
+                                    return { type: 'image', url: url };
+                                });
+                            });
+                    })
                     .catch(function(storageError) {
-                        console.warn('Firebase Storage upload failed; using compressed image data in post:', storageError);
-                        setPostPublishStatus('Хранилище фото недоступно — добавляю сжатую копию прямо в пост…');
+                        console.warn('Firebase Storage upload or image verification failed; using the selected image data in post:', storageError);
+                        setPostPublishStatus('Не удалось подтвердить фото в хранилище — сохраняю выбранное изображение напрямую…');
                         return withTimeout(compressPostImage(blob), 20000, 'Не удалось сжать фото') .then(function(compact) {
                             return blobToDataUrl(compact).then(function(dataUrl) { return { type: 'image', url: dataUrl }; });
                         });
