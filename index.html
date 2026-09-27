@@ -45,7 +45,7 @@
     <link rel="stylesheet" href="css/features/profile.css?v=3.8">
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
     <link rel="stylesheet" href="css/features/work.css?v=1.2">
-    <link rel="stylesheet" href="css/features/dating.css?v=1.3">
+    <link rel="stylesheet" href="css/features/dating.css?v=1.4">
     <link rel="stylesheet" href="css/features/referrals.css?v=1.0">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
@@ -664,10 +664,10 @@
             <label for="datingCountry">Страна</label><input id="datingCountry" list="datingCountryOptions" maxlength="80" autocomplete="country-name" placeholder="Начни вводить страну">
             <label for="datingCity">Город</label><input id="datingCity" list="datingCityOptions" maxlength="80" autocomplete="address-level2" placeholder="Например, Киев"><datalist id="datingCityOptions"></datalist>
             <label for="datingGoal">Цель знакомства</label><select id="datingGoal"><option value="">Выбери</option><option>Серьёзные отношения</option><option>Дружба</option><option>Общение</option><option>Свидания</option></select>
-            <label for="datingPhotoUrl">Фотография по ссылке (необязательно)</label><input id="datingPhotoUrl" type="url" placeholder="https://…">
+            <label for="datingPhotoUrl">Фотография по ссылке</label><input id="datingPhotoUrl" type="url" placeholder="https://…">
             <label class="dating-photo-picker" for="datingPhotoInput">📷 Или выбери фото с устройства</label><input class="hidden" id="datingPhotoInput" type="file" accept="image/*">
             <div id="datingPhotoPreview" class="dating-photo-preview" hidden></div>
-            <div id="datingUploadStatus" class="dating-upload-status" role="status" aria-live="polite"></div>
+            <div id="datingUploadStatus" class="dating-upload-status" role="status" aria-live="polite"></div><button type="button" class="dating-upload-cancel" id="datingUploadCancel" onclick="cancelDatingPhotoUpload()" hidden>Остановить загрузку и выбрать другое фото</button>
             <label for="datingBio">Немного о себе</label><textarea id="datingBio" maxlength="1200" placeholder="Что тебе нравится и кого ты хотел(а) бы встретить?"></textarea>
             <label class="dating-check"><input id="datingActive" type="checkbox" checked> Показывать мою анкету в поиске</label>
             <label class="dating-check dating-age-check"><input id="datingAdultConfirmed" type="checkbox"> Подтверждаю, что мне уже исполнилось 18 лет</label>
@@ -814,7 +814,7 @@
 <script src="js/features/friends.js?v=3.2"></script>
 <script src="js/features/groups.js?v=4.5"></script>
 <script src="js/features/work.js?v=1.2"></script>
-<script src="js/features/dating.js?v=1.4"></script>
+<script src="js/features/dating.js?v=1.5"></script>
 <script src="js/features/marketplace.js?v=1.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
