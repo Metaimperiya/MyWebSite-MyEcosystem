@@ -10,6 +10,7 @@
         },
         "all_users": {
           ".read": "auth != null",
+          ".indexOn": ["name", "lastLogin"],
           "$uid": {
             ".write": "$uid === auth.uid || auth.token.admin === true"
           }
@@ -127,6 +128,20 @@
             ".read": "$uid === auth.uid || auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42'",
             ".write": false
           }
+        },
+        "referral_codes": { ".read": false, ".write": false },
+        "referral_code_by_uid": {
+          "$uid": { ".read": "$uid === auth.uid", ".write": false }
+        },
+        "referred_by": {
+          "$uid": { ".read": "$uid === auth.uid", ".write": false }
+        },
+        "referrals": {
+          "$uid": { ".read": "$uid === auth.uid", ".write": false }
+        },
+        "referral_ancestors": { ".read": false, ".write": false },
+        "referral_team": {
+          "$uid": { ".read": "$uid === auth.uid", ".write": false }
         },
         "feed_posts": {
           ".read": "auth != null",

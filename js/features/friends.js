@@ -49,16 +49,16 @@ function getFriendStatusRealtime(myUid, targetUid, callback) {
 
 function friendActionHtml(status, targetUid) {
     if (status === 'friend') {
-        return '<button class="people-action secondary" onclick="event.stopPropagation();removeFriend(\'' + targetUid + '\')">Remove</button>';
+        return '<button class="people-action secondary" onclick="event.stopPropagation();removeFriend(\'' + targetUid + '\')">В друзьях</button>';
     }
     if (status === 'pending_sent') {
-        return '<button class="people-action secondary" onclick="event.stopPropagation();cancelFriendRequest(\'' + targetUid + '\')">Requested</button>';
+        return '<button class="people-action secondary" onclick="event.stopPropagation();cancelFriendRequest(\'' + targetUid + '\')">Заявка отправлена</button>';
     }
     if (status === 'pending_received') {
-        return '<button class="people-action" onclick="event.stopPropagation();acceptFriendRequest(\'' + targetUid + '\')">Accept</button>' +
-            '<button class="people-action secondary" onclick="event.stopPropagation();declineFriendRequest(\'' + targetUid + '\')">Decline</button>';
+        return '<button class="people-action" onclick="event.stopPropagation();acceptFriendRequest(\'' + targetUid + '\')">Принять</button>' +
+            '<button class="people-action secondary" onclick="event.stopPropagation();declineFriendRequest(\'' + targetUid + '\')">Отклонить</button>';
     }
-    return '<button class="people-action" onclick="event.stopPropagation();sendFriendRequest(\'' + targetUid + '\')">Add friend</button>';
+    return '<button class="people-action" onclick="event.stopPropagation();sendFriendRequest(\'' + targetUid + '\')">＋ Добавить</button>';
 }
 
 function canInteractWithUser(targetUid, callback) {
@@ -84,58 +84,177 @@ function setProfileFriendAction(button, status, targetUid) {
     }
 }
 
-function loadPeople() {
-    if (!USER_UID) {
-        document.getElementById('peopleList').innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
+var peopleDirectoryUsers = [];
+var peopleLoadRequest = 0;
+var peopleFilterTimer = null;
+var peopleCursor = null;
+var peopleHasMore = false;
+var peoplePageBusy = false;
+var peopleStatusCache = {};
+
+function peopleNormalize(value) { return String(value || '').trim().toLocaleLowerCase('ru'); }
+
+function peopleProfileDetails(user) { return user && user.profileDetails || {}; }
+
+function updatePeopleFilterOptions() {
+    var countries = {};
+    var cities = {};
+    peopleDirectoryUsers.forEach(function(user) {
+        var details = peopleProfileDetails(user);
+        if (details.country) countries[details.country] = true;
+        if (details.city) cities[details.city] = true;
+    });
+    var countryList = document.getElementById('peopleCountryOptions');
+    var cityList = document.getElementById('peopleCityOptions');
+    if (countryList) countryList.innerHTML = Object.keys(countries).sort(function(a,b) { return a.localeCompare(b, 'ru'); }).map(function(value) { return '<option value="' + esc(value) + '"></option>'; }).join('');
+    if (cityList) cityList.innerHTML = Object.keys(cities).sort(function(a,b) { return a.localeCompare(b, 'ru'); }).map(function(value) { return '<option value="' + esc(value) + '"></option>'; }).join('');
+}
+
+function getFilteredPeople() {
+    return peopleDirectoryUsers;
+}
+
+function renderPeopleDirectory() {
+    var container = document.getElementById('peopleList');
+    if (!container) return;
+    var filtered = getFilteredPeople();
+    var page = filtered;
+    var count = document.getElementById('peopleResultsCount');
+    var moreButton = document.getElementById('peopleLoadMore');
+    if (count) count.textContent = 'Показано: ' + filtered.length;
+    if (moreButton) { moreButton.hidden = !peopleHasMore; moreButton.disabled = peoplePageBusy; moreButton.textContent = peoplePageBusy ? 'Загружаю…' : 'Показать ещё'; }
+    if (!filtered.length) {
+        container.innerHTML = '<div class="people-directory-empty"><strong>Никого не нашли</strong><span>Попробуй изменить имя, страну или город.</span></div>';
         return;
     }
-
-    db.ref('sites/' + SITE + '/all_users').once('value', function(snap) {
-        var users = snap.val() || {};
-        var keys = Object.keys(users).filter(function(k) { return k !== USER_UID; });
-        var el = document.getElementById('peopleList');
-
-        if (!keys.length) {
-            el.innerHTML = '<div style="text-align:center;padding:6px;color:#bbb;font-size:0.65rem;">Нет других пользователей</div>';
-            return;
+    container.innerHTML = page.map(function(person) {
+        var id = person.uid;
+        var user = person.user;
+        var name = user.name || 'Участник';
+        var details = peopleProfileDetails(user);
+        var location = [details.city || user.city, details.country || user.country].filter(Boolean).join(', ');
+        return '<article class="people-item" data-people-id="' + esc(id) + '"><button type="button" class="people-item-main" onclick="viewUser(\'' + esc(id) + '\')"><span class="avatar-wrap" id="pava-' + esc(id) + '"><span class="letter">' + esc(Array.from(name)[0] || '?') + '</span></span><span class="info"><strong class="name">' + esc(name) + '</strong>' + (location ? '<span class="people-location">⌖ ' + esc(location) + '</span>' : '') + '<span class="status" id="pstatus-' + esc(id) + '">Проверяем связь…</span></span></button><div class="people-actions" id="paction-' + esc(id) + '"></div></article>';
+    }).join('');
+    page.forEach(function(person) {
+        var id = person.uid;
+        var avatar = document.getElementById('pava-' + id);
+        if (avatar) renderAvatar(id, avatar, (person.user.name || '?').charAt(0));
+        var cached = peopleStatusCache[id];
+        if (cached) {
+            var statusEl = document.getElementById('pstatus-' + id);
+            var actionEl = document.getElementById('paction-' + id);
+            var labels = { friend: '🤝 Уже друзья', pending_sent: '⏳ Заявка отправлена', pending_received: '📩 Заявка тебе', none: 'Новый участник' };
+            if (statusEl) statusEl.textContent = labels[cached] || '';
+            if (actionEl) actionEl.innerHTML = friendActionHtml(cached, id);
         }
+    });
 
-        var html = '';
-        keys.forEach(function(k) {
-            var u = users[k];
-            var name = u.name || 'Аноним';
-            var letter = name.charAt(0).toUpperCase();
-            html += '<div class="people-item" onclick="viewUser(\'' + k + '\')">';
-            html += '<span class="avatar-wrap" id="pava-' + k + '"><span class="letter">' + letter + '</span></span>';
-            html += '<div class="info"><div class="name">' + esc(name) + '</div><div class="status" id="pstatus-' + k + '">Загрузка...</div></div>';
-            html += '<div class="people-actions" id="paction-' + k + '"></div>';
-            html += '</div>';
+    var unresolved = page.filter(function(person) { return !peopleStatusCache[person.uid]; });
+    if (!unresolved.length) return;
+    Promise.all([
+        db.ref('sites/' + SITE + '/friends/' + USER_UID).once('value'),
+        db.ref('sites/' + SITE + '/friend_requests/' + USER_UID).once('value')
+    ]).then(function(snapshots) {
+        var friends = snapshots[0].val() || {};
+        var incoming = snapshots[1].val() || {};
+        return Promise.all(unresolved.map(function(person) {
+            var id = person.uid;
+            if (friends[id] === true) return Promise.resolve({ uid: id, status: 'friend' });
+            var incomingRequest = incoming[id];
+            if (incomingRequest && incomingRequest.from === id && incomingRequest.status === 'pending') return Promise.resolve({ uid: id, status: 'pending_received' });
+            return db.ref('sites/' + SITE + '/friend_requests/' + id + '/' + USER_UID).once('value').then(function(snapshot) {
+                var outgoing = snapshot.val();
+                return { uid: id, status: outgoing && outgoing.from === USER_UID && outgoing.status === 'pending' ? 'pending_sent' : 'none' };
+            }).catch(function() { return { uid: id, status: 'none' }; });
+        }));
+    }).then(function(statuses) {
+        if (!statuses) return;
+        statuses.forEach(function(entry) {
+            peopleStatusCache[entry.uid] = entry.status;
+            var statusEl = document.getElementById('pstatus-' + entry.uid);
+            var actionEl = document.getElementById('paction-' + entry.uid);
+            var labels = { friend: '🤝 Уже друзья', pending_sent: '⏳ Заявка отправлена', pending_received: '📩 Заявка тебе', none: 'Новый участник' };
+            if (statusEl) statusEl.textContent = labels[entry.status] || '';
+            if (actionEl) actionEl.innerHTML = friendActionHtml(entry.status, entry.uid);
         });
-        el.innerHTML = html;
+    }).catch(function(error) { console.warn('Не удалось обновить статусы участников:', error); });
+}
 
-        keys.forEach(function(k) {
-            var el2 = document.getElementById('pava-' + k);
-            if (el2) renderAvatar(k, el2, '?');
+function loadMorePeople() {
+    if (peoplePageBusy || !peopleHasMore) return;
+    fetchPeoplePage(false);
+}
 
-            getFriendStatusRealtime(USER_UID, k, function(status) {
-                var statusEl = document.getElementById('pstatus-' + k);
-                if (!statusEl) return;
-
-                var labels = {
-                    'friend': '🤝 В друзьях',
-                    'pending_sent': '⏳ Запрос отправлен',
-                    'pending_received': '📩 Заявка от вас',
-                    'none': '➕ Добавить в друзья',
-                    'self': '👤 Это вы'
-                };
-                statusEl.textContent = labels[status] || '❓ Неизвестно';
-                statusEl.style.color = status === 'friend' ? '#1877f2' : '#888';
-                var actionEl = document.getElementById('paction-' + k);
-                if (actionEl) actionEl.innerHTML = friendActionHtml(status, k);
-            });
-        });
+function fetchPeoplePage(reset) {
+    if (!USER_UID) {
+        document.getElementById('peopleList').innerHTML = '<div class="people-directory-empty">Войди, чтобы находить участников.</div>';
+        return;
+    }
+    var searchInput = document.getElementById('peopleSearch');
+    var countryInput = document.getElementById('peopleCountryFilter');
+    var cityInput = document.getElementById('peopleCityFilter');
+    var sortInput = document.getElementById('peopleSort');
+    var filters = {
+        query: searchInput ? searchInput.value.trim() : '',
+        country: countryInput ? countryInput.value.trim() : '',
+        city: cityInput ? cityInput.value.trim() : '',
+        sort: sortInput ? sortInput.value : 'recent'
+    };
+    var filterKey = JSON.stringify(filters);
+    if (reset || filterKey !== peopleFilterKey) {
+        peopleFilterKey = filterKey;
+        peopleDirectoryUsers = [];
+        peopleCursor = null;
+        peopleHasMore = false;
+        peopleStatusCache = {};
+        var list = document.getElementById('peopleList');
+        if (list) list.innerHTML = '<div class="people-directory-empty">Ищем участников…</div>';
+    }
+    var requestId = ++peopleLoadRequest;
+    peoplePageBusy = true;
+    renderPeopleDirectory();
+    var button = document.getElementById('peopleLoadMore');
+    if (button) { button.hidden = false; button.disabled = true; button.textContent = 'Загружаю…'; }
+    firebase.functions().httpsCallable('searchPeople')({ site: SITE, query: filters.query, country: filters.country, city: filters.city, sort: filters.sort, cursor: peopleCursor }).then(function(result) {
+        if (requestId !== peopleLoadRequest) return;
+        var data = result.data || {};
+        peopleDirectoryUsers = peopleDirectoryUsers.concat(data.people || []);
+        peopleCursor = data.cursor || null;
+        peopleHasMore = !!data.hasMore;
+        peoplePageBusy = false;
+        updatePeopleFilterOptions();
+        renderPeopleDirectory();
+        if (!peopleDirectoryUsers.length && peopleHasMore) {
+            var more = document.getElementById('peopleLoadMore');
+            if (more) more.textContent = 'Искать дальше';
+        }
+    }).catch(function(error) {
+        if (requestId !== peopleLoadRequest) return;
+        peoplePageBusy = false;
+        var list = document.getElementById('peopleList');
+        if (list) list.innerHTML = '<div class="people-directory-empty"><strong>Не удалось загрузить список</strong><span>Проверь подключение и публикацию Cloud Functions.</span></div>';
+        if (button) { button.hidden = true; }
+        console.error('Не удалось загрузить каталог участников:', error);
     });
 }
+
+var peopleFilterKey = '';
+function loadPeople() { fetchPeoplePage(true); }
+
+window.loadMorePeople = loadMorePeople;
+window.loadPeople = loadPeople;
+
+document.addEventListener('DOMContentLoaded', function() {
+    ['peopleSearch', 'peopleCountryFilter', 'peopleCityFilter'].forEach(function(id) {
+        var input = document.getElementById(id);
+        if (input) input.addEventListener('input', function() {
+            clearTimeout(peopleFilterTimer);
+            peopleFilterTimer = setTimeout(function() { loadPeople(); }, 250);
+        });
+    });
+    var sort = document.getElementById('peopleSort');
+    if (sort) sort.addEventListener('change', function() { loadPeople(); });
+});
 
 // ================================================================ */
 // 3. ОТПРАВКА ЗАЯВКИ

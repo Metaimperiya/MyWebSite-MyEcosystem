@@ -378,6 +378,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof loadDating === 'function') loadDating();
     };
 
+    window.goToReferrals = function() {
+        if (!window.checkAccess()) return;
+        if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
+            window.location.href = '/?page=referrals';
+            return;
+        }
+        window.setActivePage('referrals');
+        document.getElementById('chatView').classList.remove('active');
+        if (typeof loadReferralDashboard === 'function') loadReferralDashboard();
+    };
+
     window.goToMarketplace = function() {
         if (!window.checkAccess()) return;
         if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {

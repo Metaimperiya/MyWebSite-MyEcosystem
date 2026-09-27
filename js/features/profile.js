@@ -99,6 +99,43 @@ function renderProfileContacts(user) {
     socialContainer.hidden = !socialCount;
 }
 
+function setProfileHeaderCollapsed(collapsed) {
+    var header = document.querySelector('.profile-header');
+    var toggle = document.getElementById('profileHeaderToggle');
+    if (!header || !toggle) return;
+    header.classList.toggle('is-collapsed', collapsed);
+    toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    toggle.setAttribute('aria-label', collapsed ? 'Развернуть шапку профиля' : 'Свернуть шапку профиля');
+    var label = toggle.querySelector('.profile-header-toggle-label');
+    if (label) label.textContent = collapsed ? 'Развернуть шапку' : 'Свернуть шапку';
+    try { localStorage.setItem('profileHeaderCollapsed', collapsed ? '1' : '0'); } catch (ignore) {}
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var toggle = document.getElementById('profileHeaderToggle');
+    if (!toggle) return;
+    var startY = null;
+    var swipeFinishedAt = 0;
+    toggle.addEventListener('pointerdown', function(event) {
+        startY = event.clientY;
+    });
+    toggle.addEventListener('pointerup', function(event) {
+        if (startY === null) return;
+        var delta = event.clientY - startY;
+        startY = null;
+        if (Math.abs(delta) < 18) return;
+        swipeFinishedAt = Date.now();
+        setProfileHeaderCollapsed(delta < 0);
+    });
+    toggle.addEventListener('pointercancel', function() { startY = null; });
+    toggle.addEventListener('click', function() {
+        if (Date.now() - swipeFinishedAt < 350) return;
+        setProfileHeaderCollapsed(!document.querySelector('.profile-header').classList.contains('is-collapsed'));
+    });
+    try { setProfileHeaderCollapsed(localStorage.getItem('profileHeaderCollapsed') === '1'); }
+    catch (ignore) { setProfileHeaderCollapsed(false); }
+});
+
 function validateSocialLinksWithoutBlockingSave() {
     var invalidCount = 0;
     PROFILE_SOCIAL_SERVICES.forEach(function(service) {

@@ -42,13 +42,14 @@
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=4.7">
-    <link rel="stylesheet" href="css/features/profile.css?v=3.6">
+    <link rel="stylesheet" href="css/features/profile.css?v=3.7">
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
     <link rel="stylesheet" href="css/features/work.css?v=1.2">
     <link rel="stylesheet" href="css/features/dating.css?v=1.2">
+    <link rel="stylesheet" href="css/features/referrals.css?v=1.0">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
-    <link rel="stylesheet" href="css/features/friends.css?v=3.1">
+    <link rel="stylesheet" href="css/features/friends.css?v=3.2">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
     <link rel="stylesheet" href="css/features/modals.css?v=3.1">
     <link rel="stylesheet" href="css/features/notifications.css?v=3.0">
@@ -58,7 +59,7 @@
     <link rel="stylesheet" href="css/layout/topbar.css?v=3.1">
     <link rel="stylesheet" href="css/modules/player.css?v=3.0">
     <link rel="stylesheet" href="css/components/admin.css?v=3.0">
-    <link rel="stylesheet" href="css/style.css?v=3.1">
+    <link rel="stylesheet" href="css/style.css?v=3.2">
 </head>
 <body>
 
@@ -122,6 +123,7 @@
         <div class="menu-item" onclick="goToGroups();closeSidebar();"><span class="icon">📁</span> Groups</div>
         <div class="menu-item" onclick="goToWork();closeSidebar();"><span class="icon">💼</span> Работа</div>
         <div class="menu-item" onclick="goToDating();closeSidebar();"><span class="icon">💗</span> Знакомства</div>
+        <div class="menu-item" onclick="goToReferrals();closeSidebar();"><span class="icon">🔗</span> Моя команда</div>
         <div class="menu-item" onclick="goToMarketplace();closeSidebar();"><span class="icon">🛍️</span> Маркетплейс</div>
 
         <a class="menu-item" href="/doss/" onclick="closeSidebar();"><span class="icon">🧠</span> DOSS OS</a>
@@ -245,6 +247,17 @@
                 <div id="feed"></div>
             </div>
 
+            <div class="page" id="page-referrals">
+                <section class="referrals-page">
+                    <header class="referrals-heading"><div><span class="referrals-kicker">METAIMPERIYA · СООБЩЕСТВО</span><h1>Моя команда</h1><p>Приглашай людей по своей ссылке, смотри прямые приглашения и публикации команды.</p></div><button type="button" class="referrals-refresh" onclick="loadReferralDashboard()">↻ Обновить</button></header>
+                    <section class="referrals-link-card"><div><span class="referrals-kicker">ТВОЯ ССЫЛКА-ПРИГЛАШЕНИЕ</span><p id="referralLinkValue">Готовим персональную ссылку…</p></div><button type="button" id="copyReferralLink" onclick="copyReferralLink()">⧉ Скопировать</button></section>
+                    <div class="referrals-stats"><article><strong id="referralDirectCount">—</strong><span>приглашены тобой</span></article><article><strong id="referralTeamCount">—</strong><span>всего в команде</span></article></div>
+                    <div class="referrals-tabs"><button type="button" class="active" data-referral-tab="members" onclick="showReferralTab('members')">Участники</button><button type="button" data-referral-tab="feed" onclick="showReferralTab('feed')">Лента команды</button></div>
+                    <div class="referral-members-list" id="referralMembersList"><div class="referrals-empty">Загружаем приглашения…</div></div>
+                    <div class="referral-team-feed" id="referralTeamFeed" hidden><div class="referrals-empty">Лента команды появится здесь.</div></div>
+                </section>
+            </div>
+
             <div class="page" id="page-groups">
                 <section class="groups-page">
                     <div class="groups-heading"><div><span class="groups-kicker">СООБЩЕСТВА</span><h2>Группы</h2><p>Создавай сообщества и общайся в отдельной ленте каждой группы.</p></div><button type="button" class="groups-create-button" onclick="openCreateGroup()">＋ Создать группу</button></div>
@@ -271,7 +284,19 @@
             </div>
 
             <div class="page" id="page-people">
-                <div class="card"><h3>👤 All users</h3><div class="people-list" id="peopleList"></div></div>
+                <section class="people-directory card">
+                    <header class="people-directory-heading"><div><span class="people-directory-kicker">METAIMPERIYA · СООБЩЕСТВО</span><h2>Люди</h2><p>Найди участников по имени и городу.</p></div><span class="people-results-count" id="peopleResultsCount"></span></header>
+                    <div class="people-directory-tools">
+                        <label class="people-search"><span aria-hidden="true">⌕</span><input id="peopleSearch" type="search" placeholder="Поиск по имени, профессии или интересам" autocomplete="off"></label>
+                        <div class="people-filters">
+                            <label><span>Страна</span><input id="peopleCountryFilter" list="peopleCountryOptions" placeholder="Любая страна" autocomplete="off"><datalist id="peopleCountryOptions"></datalist></label>
+                            <label><span>Город</span><input id="peopleCityFilter" list="peopleCityOptions" placeholder="Любой город" autocomplete="off"><datalist id="peopleCityOptions"></datalist></label>
+                            <label><span>Сортировка</span><select id="peopleSort"><option value="recent">Недавно активные</option><option value="name">По имени</option></select></label>
+                        </div>
+                    </div>
+                    <div class="people-list" id="peopleList"><div class="people-directory-empty">Загружаем участников…</div></div>
+                    <button type="button" class="people-load-more" id="peopleLoadMore" onclick="loadMorePeople()" hidden>Показать ещё</button>
+                </section>
             </div>
 
             <div class="page" id="page-work">
@@ -324,26 +349,33 @@
 
             <div class="page" id="page-profile">
                 <div class="profile-header">
-                    <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
-                    <div class="profile-avatar-rating" id="profileAvatarRating" aria-label="Рейтинг профиля">☆☆☆☆☆</div>
-                    <div class="name" id="profileName"></div>
-                    <div class="profile-badges" id="profileBadges" aria-label="Статусы профиля"></div>
-                    <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
-                    <div class="profile-contact-row" id="profileContactRow" hidden>
-                        <a class="profile-email" id="profileEmail" hidden></a>
-                        <div class="profile-phone-actions" id="profilePhoneActions" hidden>
-                            <a class="profile-phone-number" id="profilePhoneNumber" hidden></a>
-                            <a class="profile-call-btn" id="profileCallButton" aria-label="Позвонить" title="Позвонить" hidden><span aria-hidden="true">📞</span>&nbsp;Позвонить</a>
+                    <div class="profile-identity" id="profileIdentity">
+                        <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
+                        <div class="profile-identity-copy">
+                            <div class="profile-avatar-rating" id="profileAvatarRating" aria-label="Рейтинг профиля">☆☆☆☆☆</div>
+                            <div class="name" id="profileName"></div>
+                            <div class="profile-badges" id="profileBadges" aria-label="Статусы профиля"></div>
+                            <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
                         </div>
                     </div>
-                    <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
-                    <div class="bio" id="profileBio"></div>
-                    <div class="profile-stats" aria-label="Статистика профиля">
-                        <button type="button" class="profile-stat" id="friendsStat">🤝 <span>Друзья</span><strong id="friendsCount">0</strong></button>
-                        <button type="button" class="profile-stat" id="subscribersStat">👀 <span>Подписчики</span><strong id="subscribersCount">0</strong></button>
-                        <button type="button" class="profile-stat" id="subscriptionsStat">📌 <span>Подписки</span><strong id="subscriptionsCount">0</strong></button>
+                    <div class="profile-header-details" id="profileHeaderDetails">
+                        <div class="profile-contact-row" id="profileContactRow" hidden>
+                            <a class="profile-email" id="profileEmail" hidden></a>
+                            <div class="profile-phone-actions" id="profilePhoneActions" hidden>
+                                <a class="profile-phone-number" id="profilePhoneNumber" hidden></a>
+                                <a class="profile-call-btn" id="profileCallButton" aria-label="Позвонить" title="Позвонить" hidden><span aria-hidden="true">📞</span>&nbsp;Позвонить</a>
+                            </div>
+                        </div>
+                        <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
+                        <div class="bio" id="profileBio"></div>
+                        <div class="profile-stats" aria-label="Статистика профиля">
+                            <button type="button" class="profile-stat" id="friendsStat">🤝 <span>Друзья</span><strong id="friendsCount">0</strong></button>
+                            <button type="button" class="profile-stat" id="subscribersStat">👀 <span>Подписчики</span><strong id="subscribersCount">0</strong></button>
+                            <button type="button" class="profile-stat" id="subscriptionsStat">📌 <span>Подписки</span><strong id="subscriptionsCount">0</strong></button>
+                        </div>
+                        <div class="profile-actions" id="profileActions"></div>
                     </div>
-                    <div class="profile-actions" id="profileActions"></div>
+                    <button type="button" class="profile-header-toggle" id="profileHeaderToggle" aria-expanded="true" aria-controls="profileHeaderDetails" aria-label="Свернуть шапку профиля"><span class="profile-header-grip" aria-hidden="true"></span><span class="profile-header-toggle-label">Свернуть шапку</span><span class="profile-header-chevron" aria-hidden="true">⌃</span></button>
                 </div>
                 <section class="profile-list-section" id="profileListSection" hidden aria-live="polite">
                     <div class="profile-list-heading">
@@ -770,9 +802,10 @@
 <script src="js/features/feed/feed-core.js?v=4.6"></script>
 <script src="js/features/feed/feed-actions.js?v=4.1"></script>
 <script src="js/features/feed/feed-edit.js?v=5.2"></script>
-<script src="js/features/profile.js?v=3.8"></script>
+<script src="js/features/referrals.js?v=1.0"></script>
+<script src="js/features/profile.js?v=3.9"></script>
 <script src="js/features/reputation.js?v=1.1"></script>
-<script src="js/features/friends.js?v=3.1"></script>
+<script src="js/features/friends.js?v=3.2"></script>
 <script src="js/features/groups.js?v=4.5"></script>
 <script src="js/features/work.js?v=1.2"></script>
 <script src="js/features/dating.js?v=1.2"></script>
@@ -790,13 +823,14 @@ document.addEventListener('DOMContentLoaded', function() {
             el.style.display = 'none';
         });
         var requestedPage = new URLSearchParams(window.location.search).get('page');
-        var initialPage = requestedPage === 'work' || requestedPage === 'dating' || requestedPage === 'marketplace' ? requestedPage : 'feed';
+        var initialPage = requestedPage === 'work' || requestedPage === 'dating' || requestedPage === 'marketplace' || requestedPage === 'referrals' || requestedPage === 'people' ? requestedPage : 'feed';
         var initialPageElement = document.getElementById('page-' + initialPage);
         if (initialPageElement) {
             initialPageElement.classList.add('active');
             initialPageElement.style.display = 'block';
             console.log('✅ Initial page opened:', initialPage);
         }
+        if (initialPage === 'referrals' && typeof window.loadReferralDashboard === 'function') window.loadReferralDashboard();
         if (typeof updateUI === 'function') updateUI();
         if (typeof updatePcTopbar === 'function') updatePcTopbar();
         if (typeof updateNotifBadge === 'function') updateNotifBadge();

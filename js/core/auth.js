@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     auth.onAuthStateChanged(function(user) {
         if (user) {
             USER_UID = user.uid;
+            if (typeof window.handleReferralAfterLogin === 'function') window.handleReferralAfterLogin(user);
             USER = user.displayName || user.email || 'User';
             localStorage.setItem('dc_u_' + SITE, USER);
             var avatarUrl = user.photoURL || null;

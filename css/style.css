@@ -398,6 +398,15 @@
     }
 }
 
+.profile-header.is-collapsed {
+    padding: 8px 12px 6px !important;
+}
+
+.profile-header.is-collapsed .avatar-wrap {
+    width: 42px !important;
+    height: 42px !important;
+}
+
 @media (max-width: 400px) {
     .pc-topbar .search {
         max-width: 50px !important;
