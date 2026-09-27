@@ -767,6 +767,7 @@ if (embeddedEditor) {
     if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return;
     const imageBlob = dataUrlToBlob(dataUrl);
     const imageFile = new File([imageBlob], 'post-image.png', { type: imageBlob.type || 'image/png' });
+    reset.click();
     processFile(imageFile);
   });
   window.parent.postMessage({ type: 'post-editor:ready' }, '*');

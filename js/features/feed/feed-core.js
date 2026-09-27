@@ -58,7 +58,7 @@ function renderNestedRepost(repost, level) {
     var cacheKey = JSON.stringify(repost) + '_' + level;
     if (repostCache[cacheKey]) return repostCache[cacheKey];
     
-    var textHtml = repost.text || '';
+    var textHtml = window.sanitizePostHtml ? window.sanitizePostHtml(repost.text || '') : (repost.text || '');
     var repostSlides = Array.isArray(repost.media) ? repost.media : [];
     if (!repostSlides.length) {
         if (repost.img) repostSlides.push({ type: 'image', url: repost.img });
@@ -161,7 +161,7 @@ function renderPost(p, type) {
     var nameOnClick = "navigateToProfile('" + (p.authorUid || '') + "')";
     
     var marqueeHtml = p.marquee ? '<div class="marquee"><span>' + esc(p.marquee) + '</span></div>' : '';
-    var textHtml = p.text || '';
+    var textHtml = window.sanitizePostHtml ? window.sanitizePostHtml(p.text || '') : (p.text || '');
     var mediaSlides = Array.isArray(p.media) ? p.media.filter(function(item) { return item && (item.type === 'image' ? item.url : item.url); }) : [];
     if (!mediaSlides.length) {
         if (p.img) mediaSlides.push({ type: 'image', url: p.img });

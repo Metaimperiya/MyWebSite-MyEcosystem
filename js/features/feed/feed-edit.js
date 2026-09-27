@@ -128,7 +128,7 @@
     function getEditorText(id) {
         var editor = document.getElementById(id);
         if (!editor) return '';
-        return editor.innerHTML;
+        return window.sanitizePostHtml ? window.sanitizePostHtml(editor.innerHTML) : editor.innerHTML;
     }
 
     function setPostPublishStatus(message, type) {

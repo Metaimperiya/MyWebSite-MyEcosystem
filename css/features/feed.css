@@ -57,6 +57,14 @@
     color: var(--muted-text);
 }
 
+.post-editor h1,.post .post-content h1{font-size:1.35em;line-height:1.25;margin:.35em 0;font-weight:800}
+.post-editor h2,.post .post-content h2{font-size:1.15em;line-height:1.3;margin:.3em 0;font-weight:700}
+.post-editor blockquote,.post .post-content blockquote{margin:.4em 0;padding:.25em .75em;border-left:3px solid var(--link-color);color:var(--text-secondary);background:var(--input-bg);border-radius:0 6px 6px 0}
+.post-editor pre,.post .post-content pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:.4em 0;padding:8px 10px;border-radius:7px;background:var(--input-bg);font: .82em/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.post-editor code,.post .post-content code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--input-bg);border-radius:4px;padding:1px 4px}
+.post-editor pre code,.post .post-content pre code{padding:0;background:transparent}
+.post .post-content a{color:var(--link-color);text-decoration:underline;overflow-wrap:anywhere}
+
 .post-actions {
     display: flex;
     flex-wrap: wrap;

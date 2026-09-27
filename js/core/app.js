@@ -374,75 +374,86 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.setAttribute('data-theme', savedTheme);
     })();
 
-    // ===== РЕДАКТОР =====
-    window.formatText = function(type) {
-        var editor = document.getElementById('postEditor');
-        if (!editor) return;
-
-        var selection = window.getSelection();
-        if (!selection.rangeCount) return;
-
-        var range = selection.getRangeAt(0);
-        var selectedText = range.toString();
-
-        if (!selectedText) {
-            var templates = {
-                'bold': '**жирный текст**',
-                'italic': '*курсив*',
-                'underline': '__подчёркнутый__',
-                'strike': '~~зачёркнутый~~',
-                'h1': '# Заголовок',
-                'h2': '## Подзаголовок',
-                'quote': '> Цитата',
-                'code': '```код```'
-            };
-
-            var template = templates[type] || '';
-            if (template) {
-                document.execCommand('insertText', false, template);
+    // ===== РЕДАКТОР ПОСТА =====
+    window.sanitizePostHtml = function(html) {
+        var doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+        var allowed = { A: 1, B: 1, STRONG: 1, I: 1, EM: 1, U: 1, S: 1, STRIKE: 1, P: 1, DIV: 1, BR: 1, H1: 1, H2: 1, BLOCKQUOTE: 1, PRE: 1, CODE: 1, UL: 1, OL: 1, LI: 1 };
+        Array.from(doc.body.querySelectorAll('*')).reverse().forEach(function(el) {
+            if (!allowed[el.tagName]) { el.replaceWith.apply(el, Array.from(el.childNodes)); return; }
+            var rawHref = el.tagName === 'A' ? el.getAttribute('href') || '' : '';
+            Array.from(el.attributes).forEach(function(attr) { el.removeAttribute(attr.name); });
+            if (el.tagName === 'A') {
+                try {
+                    var url = new URL(rawHref, window.location.href);
+                    if (url.protocol === 'http:' || url.protocol === 'https:') {
+                        el.setAttribute('href', url.href);
+                        el.setAttribute('target', '_blank');
+                        el.setAttribute('rel', 'noopener noreferrer');
+                    } else el.replaceWith.apply(el, Array.from(el.childNodes));
+                } catch (_) { el.replaceWith.apply(el, Array.from(el.childNodes)); }
             }
-            return;
+        });
+        return doc.body.innerHTML;
+    };
+
+    function getSelectedPostEditor() {
+        var selection = window.getSelection();
+        var node = selection && selection.anchorNode;
+        var element = node && (node.nodeType === 1 ? node : node.parentElement);
+        return element && element.closest ? element.closest('.post-editor') : null;
+    }
+
+    window.formatText = function(type) {
+        var editor = getSelectedPostEditor();
+        if (!editor) return;
+        editor.focus();
+        var selection = window.getSelection();
+        if (!selection || !selection.rangeCount || !editor.contains(selection.anchorNode)) {
+            editor.focus();
+            selection = window.getSelection();
         }
-
-        var wrappers = {
-            'bold': '**',
-            'italic': '*',
-            'underline': '__',
-            'strike': '~~',
-            'h1': '# ',
-            'h2': '## ',
-            'quote': '> ',
-            'code': '```'
-        };
-
-        var wrapper = wrappers[type];
-        if (!wrapper) return;
-
-        var newText;
-        if (type === 'h1' || type === 'h2' || type === 'quote') {
-            newText = wrapper + selectedText;
-        } else {
-            var closeWrapper = wrapper;
-            if (type === 'code') closeWrapper = '```';
-            newText = wrapper + selectedText + closeWrapper;
+        if (type === 'bold') document.execCommand('bold', false);
+        else if (type === 'italic') document.execCommand('italic', false);
+        else if (type === 'underline') document.execCommand('underline', false);
+        else if (type === 'strike') document.execCommand('strikeThrough', false);
+        else if (type === 'h1' || type === 'h2') document.execCommand('formatBlock', false, type.toUpperCase());
+        else if (type === 'quote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+        else if (type === 'code') {
+            var range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
+            var code = document.createElement('code');
+            if (range && !range.collapsed && editor.contains(range.commonAncestorContainer)) {
+                code.appendChild(range.extractContents());
+                range.insertNode(code);
+                range.selectNodeContents(code);
+                selection.removeAllRanges(); selection.addRange(range);
+            } else {
+                document.execCommand('insertHTML', false, '<pre><code>код</code></pre><p><br></p>');
+            }
         }
-
-        document.execCommand('insertText', false, newText);
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
     };
 
     window.insertLink = function() {
-        var url = prompt('Введите ссылку:');
-        if (!url) return;
-
-        var editor = document.getElementById('postEditor');
+        var editor = getSelectedPostEditor();
         if (!editor) return;
-
+        var rawUrl = prompt('Введите ссылку (https://…):');
+        if (!rawUrl) return;
+        var url;
+        try { url = new URL(rawUrl.trim()); } catch (_) { alert('Введите полный адрес ссылки, начиная с https://'); return; }
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') { alert('Разрешены только ссылки http:// и https://'); return; }
+        editor.focus();
         var selection = window.getSelection();
-        if (selection.rangeCount) {
-            var text = selection.toString() || 'ссылка';
-            document.execCommand('insertText', false, '[' + text + '](' + url + ')');
+        if (selection && selection.rangeCount && editor.contains(selection.anchorNode) && !selection.isCollapsed) {
+            document.execCommand('createLink', false, url.href);
+        } else {
+            document.execCommand('insertHTML', false, '<a href="' + url.href.replace(/&/g, '&amp;').replace(/\"/g, '&quot;') + '" target="_blank" rel="noopener noreferrer">' + url.hostname + '</a>');
         }
+        editor.dispatchEvent(new Event('input', { bubbles: true }));
     };
+
+    document.addEventListener('mousedown', function(event) {
+        if (event.target.closest('.editor-toolbar button')) event.preventDefault();
+    });
 
     // ================================================================
     // СПИСОК ЧАТОВ
