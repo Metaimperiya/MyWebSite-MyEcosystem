@@ -452,6 +452,7 @@ window.submitRepost = function() {
                     timestamp: original.timestamp || Date.now(),
                     img: original.img || null,
                     link: original.link || null,
+                    media: original.media || null,
                     buttons: original.buttons || [],
                     marquee: original.marquee || null,
                     hashtags: original.hashtags || [],

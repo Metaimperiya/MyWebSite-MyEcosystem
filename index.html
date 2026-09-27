@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
-    <link rel="stylesheet" href="css/features/feed.css?v=3.1">
+    <link rel="stylesheet" href="css/features/feed.css?v=4.0">
     <link rel="stylesheet" href="css/features/profile.css?v=3.3">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
@@ -198,11 +198,17 @@
                         </div>
                         <div contenteditable="true" id="postEditor" class="post-editor" placeholder="What's new?"></div>
                         <div class="post-actions">
-                            <label class="file-label" for="fileInput">📎 Photo</label>
+                            <label class="file-label" for="fileInput">📎 Фото для карусели</label>
                             <button class="btn-submit" onclick="submitPost()">📤 Publish</button>
                             <button class="btn-cancel" onclick="clearPostForm()">Clear</button>
                         </div>
-                        <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        <div class="post-media-tools">
+                            <input type="url" id="postFrameUrl" placeholder="Ссылка для фрейма (необязательно)">
+                            <button type="button" class="btn-secondary" onclick="addPostFrame()">＋ Добавить фрейм</button>
+                            <span>Фото и фрейм станут слайдами одной карусели</span>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" multiple class="hidden">
+                        <div class="post-media-list" id="postMediaList"></div>
                         <div class="preview-box" id="previewBox">
                             <img id="previewImg"><span id="previewName"></span>
                             <button class="remove-pic" onclick="removeImage()">✕</button>
@@ -383,7 +389,16 @@
             <h3>✏️ Edit post</h3>
             <input type="text" id="editMarquee" placeholder="Marquee text...">
             <textarea id="editText" placeholder="Post text..." style="min-height:80px;"></textarea>
-            <input type="text" id="editLink" placeholder="Embed link...">
+            <div class="edit-media-section">
+                <strong>Медиа карусели</strong>
+                <label class="file-label" for="editMediaInput">＋ Добавить фото</label>
+                <input type="file" id="editMediaInput" accept="image/*" multiple class="hidden">
+                <div class="post-media-list" id="editMediaList"></div>
+                <div class="edit-media-actions">
+                    <input type="url" id="editFrameUrl" placeholder="Добавить фрейм по ссылке">
+                    <button type="button" class="btn-secondary" onclick="addEditFrame()">＋ Фрейм</button>
+                </div>
+            </div>
             <input type="text" id="editHashtags" placeholder="#hashtags separated by space">
             <div style="margin:8px 0;display:flex;gap:8px;align-items:center;">
                 <span style="font-size:0.7rem;color:var(--text-secondary);">Frame size:</span>
@@ -397,6 +412,14 @@
                 <button class="btn-secondary" onclick="closeEdit()">Cancel</button>
                 <button class="btn-danger" onclick="deleteEditPost()" style="margin-left:auto;">🗑 Delete</button>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="postImageEditorModal">
+        <div class="modal-box image-editor-modal">
+            <button class="close-btn" onclick="closePostImageEditor()">✕</button>
+            <h3>🎨 Редактор изображения</h3>
+            <iframe id="postImageEditorFrame" title="Редактор изображения" src="about:blank"></iframe>
         </div>
     </div>
 
@@ -472,9 +495,9 @@
 <script src="js/core/app.js?v=3.3"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
-<script src="js/features/feed/feed-core.js?v=3.1"></script>
-<script src="js/features/feed/feed-actions.js?v=3.0"></script>
-<script src="js/features/feed/feed-edit.js?v=3.0"></script>
+<script src="js/features/feed/feed-core.js?v=4.0"></script>
+<script src="js/features/feed/feed-actions.js?v=4.0"></script>
+<script src="js/features/feed/feed-edit.js?v=4.0"></script>
 <script src="js/features/profile.js?v=3.3"></script>
 <script src="js/features/reputation.js?v=1.0"></script>
 <script src="js/features/friends.js?v=3.1"></script>

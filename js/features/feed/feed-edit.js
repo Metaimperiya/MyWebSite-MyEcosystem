@@ -9,6 +9,60 @@
     var pendingImageData_Feed = null;
     var pendingProfileImageFile_Feed = null;
     var pendingFotoImageFile_Feed = null;
+    var composeMedia = [];
+    var editMedia = [];
+    var editorSlideIndex = -1;
+    var postEditorReady = false;
+    var postEditorLoaded = false;
+
+    function mediaUrl(item) { return item.type === 'frame' ? item.url : (item.url || item.preview); }
+
+    function renderMediaList(containerId, items, editable) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = items.map(function(item, index) {
+            var url = mediaUrl(item) || '';
+            var preview = item.type === 'frame'
+                ? '<div class="media-frame-placeholder">🔗</div>'
+                : '<img src="' + esc(item.preview || url) + '" alt="">';
+            return '<div class="post-media-item">' + preview + '<span class="media-kind">' + (item.type === 'frame' ? 'Фрейм' : (index + 1) + '/' + items.length) + '</span>' +
+                (editable ? (item.type === 'image' ? '<button type="button" class="media-edit" onclick="editPostMedia(' + index + ')">Править</button>' : '') + '<button type="button" onclick="removePostMedia(' + index + ')">×</button>' : '') + '</div>';
+        }).join('');
+    }
+
+    function dataUrlToBlob(dataUrl) {
+        var parts = dataUrl.split(',');
+        var mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/png';
+        var binary = atob(parts[1]);
+        var bytes = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        return new Blob([bytes], { type: mime });
+    }
+
+    function toDataUrl(item) {
+        if (item.source instanceof File) return new Promise(function(resolve, reject) {
+            var reader = new FileReader(); reader.onload = function() { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(item.source);
+        });
+        if (item.source && item.source.startsWith('data:')) return Promise.resolve(item.source);
+        return fetch(item.source || item.url).then(function(response) { if (!response.ok) throw new Error('Не удалось открыть изображение'); return response.blob(); }).then(function(blob) {
+            return new Promise(function(resolve, reject) { var reader = new FileReader(); reader.onload = function() { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(blob); });
+        });
+    }
+
+    function uploadPostImage(item, index) {
+        if (item.type === 'frame') return Promise.resolve({ type: 'frame', url: item.url, frameSize: item.frameSize || 'small' });
+        if (item.source instanceof File && !item.edited) {
+            var rawFile = item.source;
+            if (rawFile.size >= 5 * 1024 * 1024) return Promise.reject(new Error('Фото должно быть меньше 5 МБ'));
+            var rawRef = storage.ref('posts/' + USER_UID + '/' + Date.now() + '_' + index + '_' + rawFile.name.replace(/[^\w.-]/g, '_'));
+            return rawRef.put(rawFile).then(function() { return rawRef.getDownloadURL(); }).then(function(url) { return { type: 'image', url: url }; });
+        }
+        if (item.source && /^https?:\/\//.test(item.source) && !item.edited) return Promise.resolve({ type: 'image', url: item.source });
+        var blob = dataUrlToBlob(item.source || item.url);
+        if (blob.size >= 5 * 1024 * 1024) return Promise.reject(new Error('Изображение после обработки больше 5 МБ. Уменьшите его в редакторе.'));
+        var ref = storage.ref('posts/' + USER_UID + '/' + Date.now() + '_' + index + '.png');
+        return ref.put(blob, { contentType: blob.type || 'image/png' }).then(function() { return ref.getDownloadURL(); }).then(function(url) { return { type: 'image', url: url }; });
+    }
 
     function esc(str) {
         if (!str) return '';
@@ -57,7 +111,7 @@
         }
 
         var text = getEditorText('postEditor').trim();
-        if (!text && !pendingImageFile_Feed) {
+        if (!text && !composeMedia.length) {
             alert('Введите текст или добавьте фото');
             return;
         }
@@ -83,17 +137,19 @@
                 frameSize: 'small',
                 edited: false,
                 img: null,
+                media: [],
                 repost: null,
                 deleted: null,
                 deletedAt: null
             };
 
+            var mediaItems = composeMedia.slice();
             var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
-            if (linkMatch) postData.link = linkMatch[1];
-
-            var savePost = function(imgData) {
-                if (imgData) postData.img = imgData;
-
+            if (!mediaItems.some(function(item) { return item.type === 'frame'; }) && linkMatch) mediaItems.push({ type: 'frame', url: linkMatch[1], frameSize: 'small' });
+            Promise.all(mediaItems.map(uploadPostImage)).then(function(savedMedia) {
+                postData.media = savedMedia;
+                postData.img = (savedMedia.find(function(item) { return item.type === 'image'; }) || {}).url || null;
+                postData.link = (savedMedia.find(function(item) { return item.type === 'frame'; }) || {}).url || null;
                 var postId = db.ref('sites/' + SITE + '/feed_posts').push().key;
                 var updates = {};
                 updates['sites/' + SITE + '/feed_posts/' + postId] = postData;
@@ -106,17 +162,7 @@
                 setTimeout(function() {
                     if (typeof loadFeed === 'function') loadFeed();
                 }, 300);
-            };
-
-            if (pendingImageFile_Feed) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    savePost(e.target.result);
-                };
-                reader.readAsDataURL(pendingImageFile_Feed);
-            } else {
-                savePost(null);
-            }
+            }).catch(function(error) { alert('Не удалось загрузить медиа: ' + (error.message || error)); });
         });
     };
 
@@ -124,6 +170,10 @@
         clearEditor('postEditor');
         pendingImageFile_Feed = null;
         pendingImageData_Feed = null;
+        composeMedia.forEach(function(item) { if (item.preview && item.preview.startsWith('blob:')) URL.revokeObjectURL(item.preview); });
+        composeMedia = [];
+        renderMediaList('postMediaList', composeMedia, true);
+        var frameInput = document.getElementById('postFrameUrl'); if (frameInput) frameInput.value = '';
         var box = document.getElementById('previewBox');
         if (box) box.classList.remove('visible');
         var input = document.getElementById('fileInput');
@@ -137,6 +187,59 @@
         if (box) box.classList.remove('visible');
         var input = document.getElementById('fileInput');
         if (input) input.value = '';
+    };
+
+    window.removePostMedia = function(index) {
+        var target = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
+        var item = target[index];
+        if (item && item.preview && item.preview.startsWith('blob:')) URL.revokeObjectURL(item.preview);
+        target.splice(index, 1);
+        renderMediaList(target === editMedia ? 'editMediaList' : 'postMediaList', target, true);
+    };
+
+    window.addPostFrame = function() {
+        var input = document.getElementById('postFrameUrl');
+        var url = input && input.value.trim();
+        if (!url) return;
+        try { var parsed = new URL(url); if (!/^https?:$/.test(parsed.protocol)) throw new Error(); }
+        catch (_) { alert('Введите корректную ссылку, начинающуюся с https://'); return; }
+        if (composeMedia.length >= 10) { alert('В карусели может быть не больше 10 слайдов'); return; }
+        composeMedia.push({ type: 'frame', url: url, frameSize: 'small' });
+        input.value = ''; renderMediaList('postMediaList', composeMedia, true);
+    };
+
+    window.addEditFrame = function() {
+        var input = document.getElementById('editFrameUrl');
+        var url = input && input.value.trim();
+        if (!url) return;
+        try { var parsed = new URL(url); if (!/^https?:$/.test(parsed.protocol)) throw new Error(); }
+        catch (_) { alert('Введите корректную ссылку, начинающуюся с https://'); return; }
+        if (editMedia.length >= 10) { alert('В карусели может быть не больше 10 слайдов'); return; }
+        editMedia.push({ type: 'frame', url: url, frameSize: 'small' });
+        input.value = ''; renderMediaList('editMediaList', editMedia, true);
+    };
+
+    window.editPostMedia = function(index) {
+        var target = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
+        if (!target[index] || target[index].type !== 'image') return;
+        editorSlideIndex = index;
+        var modal = document.getElementById('postImageEditorModal');
+        var frame = document.getElementById('postImageEditorFrame');
+        modal.classList.add('open');
+        if (!postEditorLoaded) frame.src = 'post-image-editor.html';
+        else if (postEditorReady) loadEditorImage(target[index]);
+    };
+
+    function loadEditorImage(item) {
+        toDataUrl(item).then(function(dataUrl) {
+            var frame = document.getElementById('postImageEditorFrame');
+            if (frame && frame.contentWindow) frame.contentWindow.postMessage({ type: 'post-editor:load-image', dataUrl: dataUrl }, window.location.origin);
+        }).catch(function(error) { alert('Не получилось открыть фото в редакторе: ' + (error.message || error)); });
+    }
+
+    window.closePostImageEditor = function() {
+        var modal = document.getElementById('postImageEditorModal'); if (modal) modal.classList.remove('open');
+        editorSlideIndex = -1;
     };
 
     // ================================================================
@@ -389,7 +492,10 @@
             // ЗАПОЛНЯЕМ ВСЕ ПОЛЯ, ВКЛЮЧАЯ БЕГУЩУЮ СТРОКУ
             document.getElementById('editMarquee').value = p.marquee || '';
             document.getElementById('editText').value = p.text || '';
-            document.getElementById('editLink').value = p.link || '';
+            editMedia = Array.isArray(p.media) ? p.media.map(function(item) { return Object.assign({}, item, { source: item.url }); }) : [];
+            if (!editMedia.length && p.img) editMedia.push({ type: 'image', url: p.img, source: p.img });
+            if (p.link && !editMedia.some(function(item) { return item.type === 'frame' && item.url === p.link; })) editMedia.push({ type: 'frame', url: p.link, frameSize: p.frameSize || 'small' });
+            renderMediaList('editMediaList', editMedia, true);
             document.getElementById('editHashtags').value = (p.hashtags || []).join(' ');
 
             var frameSize = p.frameSize || 'small';
@@ -439,7 +545,6 @@
         // ===== БЕРЁМ ЗНАЧЕНИЯ ИЗ ПОЛЕЙ =====
         var marquee = document.getElementById('editMarquee').value.trim();
         var text = document.getElementById('editText').value.trim();
-        var link = document.getElementById('editLink').value.trim();
         var hashtagsRaw = document.getElementById('editHashtags').value.trim();
         var hashtags = hashtagsRaw ? hashtagsRaw.split(/\s+/).filter(function(t) { return t.startsWith('#'); }) : [];
 
@@ -460,7 +565,7 @@
         var updates = {
             marquee: marquee || null,  // <-- БЕГУЩАЯ СТРОКА
             text: text || '📝',
-            link: link || null,
+            link: null,
             hashtags: hashtags,
             buttons: buttons,
             frameSize: frameSize,
@@ -476,30 +581,22 @@
             }
 
             var authorUid = postData.authorUid;
-
-            // ОБНОВЛЯЕМ В ОСНОВНОЙ ЛЕНТЕ
-            db.ref('sites/' + SITE + '/' + path + '/' + id).update(updates);
-
-            // ОБНОВЛЯЕМ В ПОСТАХ ПОЛЬЗОВАТЕЛЯ
-            if (path !== 'foto_posts' && !path.startsWith('group_posts/')) {
-                if (authorUid) {
+            Promise.all(editMedia.map(uploadPostImage)).then(function(savedMedia) {
+                savedMedia.forEach(function(item) { if (item.type === 'frame') item.frameSize = frameSize; });
+                updates.media = savedMedia;
+                updates.img = (savedMedia.find(function(item) { return item.type === 'image'; }) || {}).url || null;
+                updates.link = (savedMedia.find(function(item) { return item.type === 'frame'; }) || {}).url || null;
+                db.ref('sites/' + SITE + '/' + path + '/' + id).update(updates);
+                if (path !== 'foto_posts' && !path.startsWith('group_posts/') && authorUid) {
                     db.ref('sites/' + SITE + '/user_posts/' + authorUid + '/' + id).update(updates);
                 }
-            }
-
-            window.closeEdit();
-
-            // ===== ОБНОВЛЯЕМ ЛЕНТУ БЕЗ ПЕРЕЗАГРУЗКИ СТРАНИЦЫ =====
-            setTimeout(function() {
-                if (typeof loadFeed === 'function') loadFeed();
-                if (typeof loadProfile === 'function') loadProfile();
-                // Если открыта страница поста — обновляем её
-                if (window.CURRENT_POST_ID === id) {
-                    if (typeof window.openPostPage === 'function') {
-                        window.openPostPage(id, type);
-                    }
-                }
-            }, 300);
+                window.closeEdit();
+                setTimeout(function() {
+                    if (typeof loadFeed === 'function') loadFeed();
+                    if (typeof loadProfile === 'function') loadProfile();
+                    if (window.CURRENT_POST_ID === id && typeof window.openPostPage === 'function') window.openPostPage(id, type);
+                }, 300);
+            }).catch(function(error) { alert('Не удалось сохранить медиа: ' + (error.message || error)); });
         });
     };
 
@@ -510,6 +607,7 @@
     window.closeEdit = function() {
         var modal = document.getElementById('editModal');
         if (modal) modal.classList.remove('open');
+        editMedia.forEach(function(item) { if (item.preview && item.preview.startsWith('blob:')) URL.revokeObjectURL(item.preview); });
         window.EDITING_ID = null;
     };
 
@@ -716,7 +814,49 @@
     // ================================================================
 
     document.addEventListener('DOMContentLoaded', function() {
-        setupFileInput('fileInput', 'previewBox', 'previewImg', 'previewName', 'pendingImageFile_Feed');
+        var feedInput = document.getElementById('fileInput');
+        if (feedInput) feedInput.addEventListener('change', function(event) {
+            var files = Array.from(event.target.files || []);
+            event.target.value = '';
+            files.forEach(function(file) {
+                if (!file.type.startsWith('image/')) { alert('Можно добавить только изображения'); return; }
+                if (file.size >= 5 * 1024 * 1024) { alert('Максимальный размер одного фото — меньше 5 МБ'); return; }
+                if (composeMedia.length >= 10) { alert('В карусели может быть не больше 10 слайдов'); return; }
+                var preview = URL.createObjectURL(file);
+                composeMedia.push({ type: 'image', source: file, preview: preview });
+            });
+            renderMediaList('postMediaList', composeMedia, true);
+        });
+        var editInput = document.getElementById('editMediaInput');
+        if (editInput) editInput.addEventListener('change', function(event) {
+            Array.from(event.target.files || []).forEach(function(file) {
+                if (!file.type.startsWith('image/') || file.size >= 5 * 1024 * 1024) { alert('Добавьте изображение размером меньше 5 МБ'); return; }
+                if (editMedia.length >= 10) { alert('В карусели может быть не больше 10 слайдов'); return; }
+                editMedia.push({ type: 'image', source: file, preview: URL.createObjectURL(file) });
+            });
+            event.target.value = '';
+            renderMediaList('editMediaList', editMedia, true);
+        });
+        var editorFrame = document.getElementById('postImageEditorFrame');
+        if (editorFrame) editorFrame.addEventListener('load', function() { postEditorLoaded = editorFrame.src !== 'about:blank'; });
+        window.addEventListener('message', function(event) {
+            if (!editorFrame || event.source !== editorFrame.contentWindow || event.origin !== window.location.origin || !event.data) return;
+            if (event.data.type === 'post-editor:ready') {
+                postEditorReady = true;
+                var editing = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
+                if (editorSlideIndex >= 0 && editing[editorSlideIndex]) loadEditorImage(editing[editorSlideIndex]);
+            }
+            if (event.data.type === 'post-editor:result' && typeof event.data.dataUrl === 'string' && editorSlideIndex >= 0) {
+                var target = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
+                if (target[editorSlideIndex]) {
+                    target[editorSlideIndex].source = event.data.dataUrl;
+                    target[editorSlideIndex].preview = event.data.dataUrl;
+                    target[editorSlideIndex].edited = true;
+                    renderMediaList(target === editMedia ? 'editMediaList' : 'postMediaList', target, true);
+                    window.closePostImageEditor();
+                }
+            }
+        });
         setupFileInput('fileInputProfile', 'previewBoxProfile', 'previewImgProfile', 'previewNameProfile', 'pendingProfileImageFile_Feed');
         setupFileInput('fileInputFoto', 'previewBoxFoto', 'previewImgFoto', 'previewNameFoto', 'pendingFotoImageFile_Feed');
         

@@ -59,7 +59,12 @@ function renderNestedRepost(repost, level) {
     if (repostCache[cacheKey]) return repostCache[cacheKey];
     
     var textHtml = repost.text || '';
-    var imgHtml = repost.img ? '<img src="' + repost.img + '" class="repost-img" onclick="event.stopPropagation();window.open(this.src)">' : '';
+    var repostSlides = Array.isArray(repost.media) ? repost.media : [];
+    if (!repostSlides.length) {
+        if (repost.img) repostSlides.push({ type: 'image', url: repost.img });
+        if (repost.link) repostSlides.push({ type: 'frame', url: repost.link, frameSize: repost.frameSize });
+    }
+    var repostMediaHtml = renderPostMedia(repostSlides, 'repost-' + level);
     var marqueeHtml = repost.marquee ? '<div class="marquee"><span>' + esc(repost.marquee) + '</span></div>' : '';
     
     var buttonsHtml = '';
@@ -75,7 +80,7 @@ function renderNestedRepost(repost, level) {
     
     // ===== ФИКС: УБРАЛ ЖЁСТКУЮ ВЫСОТУ =====
     var linkHtml = '';
-    if (repost.link) {
+    if (repost.link && !repostSlides.some(function(item) { return item.type === 'frame'; })) {
         var repostFrameClass = repost.frameSize === 'large' ? ' link-preview--large' : '';
         linkHtml = '<div class="link-preview' + repostFrameClass + '" onclick="event.stopPropagation();"><iframe src="' + repost.link + '" style="width:100%;border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
@@ -111,7 +116,7 @@ function renderNestedRepost(repost, level) {
         ' <span class="repost-time">' + (repost.time || '') + '</span></div>' +
         '<div class="repost-text">' + textHtml + '</div>' +
         marqueeHtml +
-        imgHtml +
+        repostMediaHtml +
         linkHtml +
         buttonsHtml +
         hashtagsHtml +
@@ -157,7 +162,12 @@ function renderPost(p, type) {
     
     var marqueeHtml = p.marquee ? '<div class="marquee"><span>' + esc(p.marquee) + '</span></div>' : '';
     var textHtml = p.text || '';
-    var imgHtml = p.img ? '<img src="' + p.img + '" class="post-img" onclick="event.stopPropagation();window.open(this.src)">' : '';
+    var mediaSlides = Array.isArray(p.media) ? p.media.filter(function(item) { return item && (item.type === 'image' ? item.url : item.url); }) : [];
+    if (!mediaSlides.length) {
+        if (p.img) mediaSlides.push({ type: 'image', url: p.img });
+        if (!p.articleUrl && p.link) mediaSlides.push({ type: 'frame', url: p.link, frameSize: p.frameSize });
+    }
+    var mediaHtml = renderPostMedia(mediaSlides, p.id);
     var repostHtml = p.repost ? renderNestedRepost(p.repost, 1) : '';
     
     var buttonsHtml = '';
@@ -177,7 +187,7 @@ function renderPost(p, type) {
         previewHtml = '<a href="' + esc(p.articleUrl) + '" class="article-feed-card" onclick="event.stopPropagation();" style="display:block;margin-top:8px;padding:12px;border:1px solid var(--border-color);border-radius:10px;text-decoration:none;color:inherit;background:var(--input-bg);">' +
             (p.articleCover ? '<img src="' + esc(p.articleCover) + '" alt="" style="width:100%;max-height:220px;object-fit:cover;border-radius:7px;margin-bottom:8px;">' : '') +
             '<strong style="display:block;font-size:.9rem;">' + esc(p.articleTitle || p.text) + '</strong><span style="display:block;color:var(--muted-text);font-size:.7rem;margin-top:4px;">' + esc(p.articleDescription || '') + '</span><span style="display:block;color:var(--link-color);font-size:.7rem;margin-top:8px;">Читать статью →</span></a>';
-    } else if (p.link) {
+    } else if (p.link && !mediaSlides.some(function(item) { return item.type === 'frame'; })) {
         var frameClass = p.frameSize === 'large' ? ' link-preview--large' : '';
         previewHtml = '<div class="link-preview' + frameClass + '" onclick="event.stopPropagation();"><iframe src="' + p.link + '" style="width:100%;border:none;border-radius:8px;background:#fff;" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe></div>';
     }
@@ -230,7 +240,7 @@ function renderPost(p, type) {
         </div>
     `;
     
-    var contentHtml = textHtml + repostHtml + imgHtml + buttonsHtml + previewHtml + hashtagsHtml;
+    var contentHtml = textHtml + repostHtml + mediaHtml + buttonsHtml + previewHtml + hashtagsHtml;
     
     var authorHtml = `
         <div class="author">
@@ -245,6 +255,7 @@ function renderPost(p, type) {
     div.innerHTML = marqueeHtml + authorHtml +
         '<div class="post-content" onclick="window.openPostPage(\'' + p.id + '\', \'' + type + '\')" style="cursor:pointer;">' + contentHtml + '</div>' +
         actionsHtml + commentsHtml + inputHtml;
+    initPostCarousel(div);
     
     if (p.authorUid) {
         var avatarEl = div.querySelector('#post-avatar-' + p.id);
@@ -268,6 +279,62 @@ function renderPost(p, type) {
     }
     
     return div;
+}
+
+function renderPostMedia(slides, postId) {
+    if (!slides || !slides.length) return '';
+    var slidesHtml = slides.map(function(item, index) {
+        var body = item.type === 'frame'
+            ? '<div class="post-carousel-frame' + (item.frameSize === 'large' ? ' link-preview--large' : '') + '"><iframe src="' + esc(item.url) + '" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" loading="lazy" title="Встроенная страница"></iframe></div>'
+            : '<img src="' + esc(item.url) + '" class="post-img" alt="Фото ' + (index + 1) + '" loading="lazy" onclick="event.stopPropagation();window.open(this.src)">';
+        return '<div class="post-carousel-slide" data-slide-index="' + index + '">' + body + '</div>';
+    }).join('');
+    if (slides.length === 1) return '<div class="post-carousel single">' + slidesHtml + '</div>';
+    var dots = slides.map(function(_, index) {
+        return '<button type="button" class="post-carousel-dot' + (index === 0 ? ' active' : '') + '" data-carousel-dot="' + index + '" aria-label="Слайд ' + (index + 1) + '"></button>';
+    }).join('');
+    return '<div class="post-carousel" data-post-carousel="' + esc(postId || '') + '" onclick="event.stopPropagation();"><div class="post-carousel-viewport"><div class="post-carousel-track">' + slidesHtml + '</div></div><button type="button" class="post-carousel-arrow prev" data-carousel-prev aria-label="Предыдущий слайд">‹</button><button type="button" class="post-carousel-arrow next" data-carousel-next aria-label="Следующий слайд">›</button><div class="post-carousel-dots">' + dots + '</div></div>';
+}
+
+function initPostCarousel(root) {
+    root.querySelectorAll('.post-carousel:not(.single)').forEach(function(carousel) {
+        if (carousel.dataset.ready) return;
+        carousel.dataset.ready = '1';
+        var viewport = carousel.querySelector('.post-carousel-viewport');
+        var slides = Array.from(carousel.querySelectorAll('.post-carousel-slide'));
+        var dots = Array.from(carousel.querySelectorAll('.post-carousel-dot'));
+        var index = 0;
+        var timer;
+        var visible = !('IntersectionObserver' in window);
+        function goTo(next, smooth) {
+            index = (next + slides.length) % slides.length;
+            viewport.scrollTo({ left: index * viewport.clientWidth, behavior: smooth === false ? 'auto' : 'smooth' });
+            dots.forEach(function(dot, i) { dot.classList.toggle('active', i === index); });
+        }
+        carousel.querySelector('[data-carousel-prev]').addEventListener('click', function() { goTo(index - 1); });
+        carousel.querySelector('[data-carousel-next]').addEventListener('click', function() { goTo(index + 1); });
+        dots.forEach(function(dot) { dot.addEventListener('click', function() { goTo(Number(dot.dataset.carouselDot)); }); });
+        viewport.addEventListener('scroll', function() {
+            index = Math.max(0, Math.min(slides.length - 1, Math.round(viewport.scrollLeft / Math.max(1, viewport.clientWidth))));
+            dots.forEach(function(dot, i) { dot.classList.toggle('active', i === index); });
+        }, { passive: true });
+        carousel.addEventListener('mouseenter', function() { clearInterval(timer); });
+        carousel.addEventListener('mouseleave', start);
+        carousel.addEventListener('touchstart', function() { clearInterval(timer); }, { passive: true });
+        carousel.addEventListener('touchend', start, { passive: true });
+        function start() {
+            clearInterval(timer);
+            if (visible && !document.hidden) timer = setInterval(function() { goTo(index + 1); }, 5000);
+        }
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function(entries) {
+                visible = entries[0].isIntersecting;
+                if (visible) start(); else clearInterval(timer);
+            }, { threshold: 0.25 });
+            observer.observe(carousel);
+        }
+        start();
+    });
 }
 
 function getPostPath(type) {

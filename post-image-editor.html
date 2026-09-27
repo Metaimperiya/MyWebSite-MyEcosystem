@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Редактор: фон + стикеры + 3D-текст</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Roboto:wght@400;700;900&family=Montserrat:wght@400;700;900&family=Oswald:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=Bebas+Neue&family=Lobster&family=Pacifico&family=Caveat:wght@400;700&family=Permanent+Marker&family=Russo+One&family=Rubik+Mono+One&family=Alumni+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, system-ui, sans-serif;
+    background: #f5f5f7;
+    color: #222;
+    min-height: 100vh;
+    padding: 20px 12px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 { font-size: 20px; margin-bottom: 6px; text-align: center; }
+  .sub { color: #888; font-size: 12px; margin-bottom: 20px; text-align: center; padding: 0 10px; }
+
+  .drop {
+    width: 100%; max-width: 520px;
+    border: 2px dashed #c0c0c8;
+    border-radius: 16px;
+    padding: 28px 16px;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    transition: 0.15s;
+    font-size: 15px;
+    color: #444;
+  }
+  .drop:hover, .drop.over { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+  .drop small { display: block; color: #999; font-size: 12px; margin-top: 6px; }
+  input[type=file] { display: none; }
+
+  .status { margin-top: 14px; font-size: 13px; color: #666; min-height: 20px; text-align: center; padding: 0 10px; }
+  .status.err { color: #dc2626; }
+  .status.ok  { color: #16a34a; }
+
+  .panel { display: none; margin-top: 20px; width: 100%; max-width: 1400px; flex-direction: column; align-items: center; gap: 14px; }
+  .panel.show { display: flex; }
+
+  .size-bar {
+    display: flex; gap: 6px; align-items: center;
+    background: #fff; padding: 8px 12px; border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    font-size: 12px; color: #666; flex-wrap: wrap; justify-content: center;
+    width: 100%; max-width: 100%;
+  }
+  .size-bar button { padding: 5px 9px; font-size: 12px; border-radius: 6px; }
+
+  .main-area {
+    display: flex; gap: 16px; align-items: flex-start;
+    width: 100%; justify-content: center; flex-wrap: wrap;
+  }
+
+  .editor-wrap {
+    position: relative;
+    width: 500px; height: 500px;
+    min-width: 200px; min-height: 200px;
+    max-width: 100%; max-height: 80vh;
+    resize: both; overflow: hidden;
+    border: 2px solid #d0d0d8;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    flex-shrink: 0;
+    touch-action: none;
+  }
+  .editor-wrap::after {
+    content: '';
+    position: absolute; right: 0; bottom: 0;
+    width: 22px; height: 22px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, #3b82f6 50%);
+    border-bottom-right-radius: 10px;
+    z-index: 1000;
+    pointer-events: none;
+  }
+  .editor-stage {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+    overflow: hidden;
+  }
+
+  .frame-border {
+    position: absolute; inset: 0;
+    pointer-events: none; z-index: 900;
+    box-sizing: border-box;
+    display: none;
+  }
+
+  .cutout, .sticker {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    touch-action: none;
+  }
+  .cutout img, .sticker img {
+    display: block; width: 100%; height: 100%;
+    pointer-events: none; user-select: none;
+  }
+  .cutout:hover, .sticker:hover { outline: 1px dashed rgba(59,130,246,0.5); }
+  .cutout.active, .sticker.active { outline: 2px solid #3b82f6; }
+  .cutout .handle, .sticker .handle {
+    position: absolute; width: 18px; height: 18px;
+    background: #3b82f6; border: 2px solid #fff; border-radius: 50%;
+    display: none; z-index: 4;
+  }
+  .cutout.active .handle, .sticker.active .handle { display: block; }
+  .cutout .handle.br, .sticker .handle.br { right: -9px; bottom: -9px; cursor: nwse-resize; }
+  .cutout .handle.tl, .sticker .handle.tl { left: -9px; top: -9px; cursor: nwse-resize; }
+  .cutout .del, .sticker .del {
+    position: absolute; top: -12px; right: -12px;
+    width: 24px; height: 24px;
+    background: #ef4444; color: #fff;
+    border-radius: 50%; font-size: 14px; line-height: 24px;
+    text-align: center; cursor: pointer;
+    display: none; border: none; padding: 0;
+    z-index: 5;
+  }
+  .cutout.active .del, .sticker.active .del { display: block; }
+
+  .text-block {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    padding: 4px 8px;
+    border: 1px dashed transparent;
+    line-height: 1.2;
+    font-family: 'Inter', sans-serif;
+    touch-action: none;
+  }
+  .text-block:hover { border-color: rgba(59,130,246,0.5); }
+  .text-block.active { border-color: #3b82f6; background: rgba(59,130,246,0.06); }
+  .text-block .del {
+    position: absolute; top: -12px; right: -12px;
+    width: 24px; height: 24px;
+    background: #ef4444; color: #fff;
+    border-radius: 50%; font-size: 14px; line-height: 24px;
+    text-align: center; cursor: pointer;
+    display: none; border: none; padding: 0;
+    z-index: 5;
+  }
+  .text-block.active .del { display: block; }
+  .text-block .handle {
+    position: absolute; width: 18px; height: 18px;
+    background: #3b82f6; border: 2px solid #fff; border-radius: 50%;
+    display: none; z-index: 4;
+  }
+  .text-block.active .handle { display: block; }
+  .text-block .handle.br { right: -9px; bottom: -9px; cursor: nwse-resize; }
+  .text-block .handle.tl { left: -9px; top: -9px; cursor: nwse-resize; }
+  .text-block svg { display: block; overflow: visible; pointer-events: none; }
+
+  .color-block {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    min-width: 20px; min-height: 20px;
+    border: 1px dashed transparent;
+    touch-action: none;
+    background: #3b82f6;
+    border-radius: 12px;
+  }
+  .color-block:hover { border-color: rgba(59,130,246,0.6); }
+  .color-block.active { outline: 2px solid #3b82f6; outline-offset: 2px; border-color: transparent; }
+  .color-block .del {
+    position: absolute; top: -12px; right: -12px;
+    width: 24px; height: 24px;
+    background: #ef4444; color: #fff;
+    border-radius: 50%; font-size: 14px; line-height: 24px;
+    text-align: center; cursor: pointer;
+    display: none; border: none; padding: 0;
+    z-index: 5;
+  }
+  .color-block.active .del { display: block; }
+  .color-block .handle {
+    position: absolute; width: 18px; height: 18px;
+    background: #3b82f6; border: 2px solid #fff; border-radius: 50%;
+    display: none; z-index: 4;
+  }
+  .color-block.active .handle { display: block; }
+  .color-block .handle.br { right: -9px; bottom: -9px; cursor: nwse-resize; }
+  .color-block .handle.tl { left: -9px; top: -9px; cursor: nwse-resize; }
+
+  .layers-panel {
+    width: 260px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    flex-shrink: 0;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+  }
+  .layers-panel h3 {
+    font-size: 13px; color: #666; margin-bottom: 10px;
+    font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+  }
+  .layers-panel h3 span { font-size: 11px; color: #aaa; font-weight: normal; }
+  .layers-list { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; }
+  .layer-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    background: #f7f7fa; border-radius: 8px;
+    font-size: 13px; cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.1s; user-select: none;
+  }
+  .layer-item:hover { background: #eef2ff; }
+  .layer-item.active { background: #eff6ff; border-color: #3b82f6; }
+  .layer-item.dragging { opacity: 0.5; }
+  .layer-item.drag-over { border-top: 2px solid #3b82f6; }
+  .layer-item .icon {
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .layer-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .layer-item .btn {
+    width: 26px; height: 26px;
+    border: none; background: transparent;
+    cursor: pointer; font-size: 13px; padding: 0;
+    opacity: 0.7; transition: 0.1s;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .layer-item .btn:hover { opacity: 1; background: #dbeafe; }
+  .layer-item .btn.delete:hover { background: #fee2e2; }
+  .layer-item.hidden-layer { opacity: 0.5; }
+  .layer-item.hidden-layer .name { text-decoration: line-through; }
+
+  .controls {
+    display: none;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 1300px;
+  }
+  .controls.show { display: flex; }
+  .controls input[type=text] {
+    padding: 8px 12px; border: 1px solid #d0d0d8;
+    border-radius: 8px; font-size: 14px; width: 150px;
+  }
+  .controls input[type=number] {
+    padding: 8px; border: 1px solid #d0d0d8;
+    border-radius: 8px; font-size: 14px; width: 65px;
+  }
+  .controls input[type=color] {
+    width: 40px; height: 36px;
+    border: 1px solid #d0d0d8;
+    border-radius: 8px; cursor: pointer; padding: 2px;
+  }
+  .controls select {
+    padding: 8px 10px; border: 1px solid #d0d0d8;
+    border-radius: 8px; font-size: 14px;
+    background: #fff; cursor: pointer;
+    max-width: 160px;
+  }
+  .controls input[type=range] { cursor: pointer; }
+  .ctrl-label { font-size: 12px; color: #888; }
+  .ctrl-group { display: flex; align-items: center; gap: 6px; }
+  .ctrl-divider { width: 1px; height: 30px; background: #e0e0e8; margin: 0 4px; }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px; height: 22px;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider {
+    position: absolute; cursor: pointer;
+    inset: 0; background: #ccc;
+    transition: 0.2s; border-radius: 22px;
+  }
+  .switch .slider:before {
+    position: absolute; content: "";
+    height: 16px; width: 16px; left: 3px; bottom: 3px;
+    background: white; transition: 0.2s; border-radius: 50%;
+  }
+  .switch input:checked + .slider { background: #3b82f6; }
+  .switch input:checked + .slider:before { transform: translateX(18px); }
+
+  .emoji-section {
+    width: 100%; max-width: 900px;
+    background: #fff; border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .emoji-section h3 {
+    font-size: 13px; color: #666; margin-bottom: 10px;
+    font-weight: 500; text-align: center;
+  }
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+    gap: 5px;
+  }
+  .emoji-item {
+    aspect-ratio: 1;
+    font-size: 26px;
+    background: #f7f7fa;
+    border: none; border-radius: 8px;
+    cursor: pointer; transition: 0.1s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .emoji-item:hover { background: #eef2ff; transform: scale(1.1); }
+
+  .bg-section { width: 100%; max-width: 700px; margin-top: 8px; }
+  .bg-section h3 { font-size: 13px; color: #666; margin-bottom: 10px; text-align: center; font-weight: 500; }
+  .bg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+    gap: 8px;
+  }
+  .bg-item {
+    aspect-ratio: 1; border-radius: 10px; cursor: pointer;
+    border: 3px solid transparent; transition: 0.15s;
+    background-size: cover; background-position: center;
+    position: relative; overflow: hidden;
+  }
+  .bg-item:hover { transform: scale(1.05); }
+  .bg-item.active { border-color: #3b82f6; }
+  .bg-item.color-only { border: 3px solid #d0d0d8; }
+  .bg-item.color-only.active { border-color: #3b82f6; }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 10px; }
+  button, label.upload-btn {
+    font: inherit; font-size: 13px; padding: 9px 14px; border-radius: 9px;
+    border: 1px solid #d0d0d8; background: #fff; cursor: pointer; color: #222;
+    display: inline-block;
+  }
+  button.primary { background: #3b82f6; color: #fff; border-color: #3b82f6; font-weight: 600; }
+  button.primary:hover { background: #2563eb; }
+  button:disabled { opacity: 0.5; cursor: wait; }
+  label.upload-btn:hover { background: #f0f0f5; }
+
+  .spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid #ccc; border-top-color: #3b82f6; border-radius: 50%;
+    animation: spin 0.7s linear infinite; vertical-align: -2px; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 768px) {
+    body { padding: 12px 8px 30px; }
+    h1 { font-size: 17px; }
+    .sub { font-size: 11px; margin-bottom: 14px; }
+    .drop { padding: 22px 12px; font-size: 14px; }
+    .panel { gap: 10px; margin-top: 14px; }
+    .main-area { flex-direction: column; align-items: center; gap: 10px; }
+    .editor-wrap {
+      width: 100% !important; height: auto !important;
+      aspect-ratio: 1 / 1; max-height: 70vh; min-height: 280px;
+    }
+    .layers-panel { width: 100%; max-width: 100%; max-height: 220px; padding: 10px; }
+    .layers-list { max-height: 160px; }
+    .size-bar { padding: 6px 8px; font-size: 11px; gap: 4px; }
+    .size-bar button { padding: 4px 7px; font-size: 11px; }
+    .controls { padding: 10px 8px; gap: 8px; }
+    .controls input[type=text] { width: 110px; font-size: 13px; }
+    .controls input[type=number] { width: 55px; font-size: 13px; }
+    .controls select { font-size: 13px; max-width: 120px; padding: 7px 8px; }
+    .ctrl-divider { display: none; }
+    .ctrl-group { gap: 4px; }
+    .ctrl-label { font-size: 11px; }
+    .emoji-grid { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
+    .emoji-item { font-size: 22px; }
+    .bg-grid { grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 6px; }
+    button, label.upload-btn { font-size: 12px; padding: 8px 12px; }
+    .switch { width: 36px; height: 20px; }
+    .switch .slider:before { height: 14px; width: 14px; left: 3px; bottom: 3px; }
+    .switch input:checked + .slider:before { transform: translateX(16px); }
+  }
+
+  @media (max-width: 480px) {
+    .editor-wrap { max-height: 60vh; }
+    .size-bar span:first-child, .size-bar span:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🪄 Редактор: фон + стикеры + 3D-текст</h1>
+<div class="sub">Несколько картинок, стикеры, текст, плашки, слои, 3D-буквы, изгиб</div>
+
+<div class="drop" id="drop">
+  📁 Нажми или перетащи картинку
+  <small>Можно несколько раз — каждая станет отдельным слоем</small>
+</div>
+
+<input type="file" id="file" accept="image/*" multiple>
+<input type="file" id="bgUpload" accept="image/*">
+<input type="file" id="stickerUpload" accept="image/*">
+
+<div class="status" id="status"></div>
+
+<div class="panel" id="panel">
+
+  <div class="size-bar">
+    <span>Размер:</span>
+    <button id="sizeDown">−</button>
+    <span id="sizeLabel">500 × 500</span>
+    <button id="sizeUp">+</button>
+    <span style="color:#aaa">|</span>
+    <span>Пресеты:</span>
+    <button data-size="400x400">1:1</button>
+    <button data-size="600x800">3:4</button>
+    <button data-size="800x600">4:3</button>
+    <button data-size="540x960">9:16</button>
+    <button data-size="1280x720">16:9</button>
+  </div>
+
+  <div class="main-area">
+    <div class="editor-wrap" id="editorWrap">
+      <div class="editor-stage" id="editorStage"></div>
+      <div class="frame-border" id="frameBorder"></div>
+    </div>
+
+    <div class="layers-panel">
+      <h3>Слои <span>(перетащи для порядка)</span></h3>
+      <div class="layers-list" id="layersList"></div>
+    </div>
+  </div>
+
+  <div class="controls" id="imgControls">
+    <span style="font-size:12px;color:#888">Картинка:</span>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Масштаб:</span>
+      <input type="range" id="imgScale" min="20" max="400" value="100" style="width:120px">
+      <span id="imgScaleLabel" style="font-size:12px;color:#666;width:40px">100%</span>
+    </div>
+    <button id="imgCenter">Центр</button>
+    <button id="imgFit">Вписать</button>
+    <button id="imgDelete">🗑 Удалить</button>
+  </div>
+
+  <div class="controls" id="stickerControls">
+    <span class="ctrl-label">Стикер:</span>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Поворот:</span>
+      <input type="range" id="stkRotate" min="-180" max="180" value="0" style="width:100px">
+      <span id="stkRotateLabel" style="font-size:12px;color:#666;width:35px">0°</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Прозр.:</span>
+      <input type="range" id="stkOpacity" min="0" max="100" value="100" style="width:80px">
+      <span id="stkOpacityLabel" style="font-size:12px;color:#666;width:35px">100%</span>
+    </div>
+    <button id="stkFlipH">↔</button>
+    <button id="stkDelete">🗑 Удалить</button>
+  </div>
+
+  <!-- ТЕКСТ с 3D + изгибом + полный контроль -->
+  <div class="controls" id="textControls">
+    <span class="ctrl-label">Текст:</span>
+    <input type="text" id="txtContent" placeholder="Текст...">
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Шрифт:</span>
+      <select id="txtFont">
+        <option value="Inter">Inter</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Oswald">Oswald</option>
+        <option value="Playfair Display">Playfair Display</option>
+        <option value="Bebas Neue">Bebas Neue</option>
+        <option value="Lobster">Lobster</option>
+        <option value="Pacifico">Pacifico</option>
+        <option value="Caveat">Caveat</option>
+        <option value="Permanent Marker">Permanent Marker</option>
+        <option value="Russo One">Russo One (техно)</option>
+        <option value="Rubik Mono One">Rubik Mono One</option>
+        <option value="Alumni Sans">Alumni Sans</option>
+      </select>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Размер:</span>
+      <input type="range" id="txtSizeRange" min="10" max="300" value="60" style="width:120px">
+      <span id="txtSizeLabel" style="font-size:12px;color:#666;width:40px">60</span>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Лицо:</span>
+      <input type="color" id="txtColor" value="#ffffff">
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Бок:</span>
+      <input type="color" id="txtSideColor" value="#1e40af">
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Вес:</span>
+      <select id="txtWeight">
+        <option value="400">Тонкий</option>
+        <option value="600">Средний</option>
+        <option value="700">Жирный</option>
+        <option value="800" selected>Оч. жирный</option>
+        <option value="900">Чёрный</option>
+      </select>
+    </div>
+
+    <div class="ctrl-divider"></div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Стиль:</span>
+      <select id="txtStyle">
+        <option value="none">Обычный</option>
+        <option value="shadow">С тенью</option>
+        <option value="outline">Обводка</option>
+        <option value="3d-classic">3D классический</option>
+        <option value="3d-sphere">3D сфера</option>
+        <option value="3d-arc">3D полукруг</option>
+        <option value="3d-deep">3D глубокий</option>
+        <option value="neon">Неон</option>
+        <option value="glow">Свечение</option>
+        <option value="emboss">Тиснение</option>
+        <option value="gold">Золото</option>
+        <option value="fire">Огонь</option>
+      </select>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Глубина:</span>
+      <input type="range" id="txt3dDepth" min="1" max="20" value="6" style="width:100px">
+      <span id="txt3dLabel" style="font-size:12px;color:#666;width:30px">6</span>
+    </div>
+
+    <div class="ctrl-divider"></div>
+
+    <!-- ПОВОРОТЫ -->
+    <div class="ctrl-group">
+      <span class="ctrl-label">Поворот Z:</span>
+      <input type="range" id="txtRotate" min="-180" max="180" value="0" style="width:100px">
+      <span id="txtRotateLabel" style="font-size:12px;color:#666;width:38px">0°</span>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Поворот Y:</span>
+      <input type="range" id="txtRotateY" min="-80" max="80" value="0" style="width:100px">
+      <span id="txtRotateYLabel" style="font-size:12px;color:#666;width:38px">0°</span>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Поворот X:</span>
+      <input type="range" id="txtRotateX" min="-80" max="80" value="0" style="width:100px">
+      <span id="txtRotateXLabel" style="font-size:12px;color:#666;width:38px">0°</span>
+    </div>
+
+    <div class="ctrl-divider"></div>
+
+    <!-- ИЗГИБ -->
+    <div class="ctrl-group">
+      <span class="ctrl-label">Изгиб:</span>
+      <input type="range" id="txtCurve" min="-100" max="100" value="0" style="width:100px">
+      <span id="txtCurveLabel" style="font-size:12px;color:#666;width:35px">0</span>
+    </div>
+
+    <div class="ctrl-group">
+      <span class="ctrl-label">Ось:</span>
+      <select id="txtCurveAxis">
+        <option value="h">Горизонт.</option>
+        <option value="v">Вертикал.</option>
+      </select>
+    </div>
+
+    <button id="txtDelete">🗑 Удалить</button>
+  </div>
+
+  <div class="controls" id="blockControls">
+    <span class="ctrl-label">Плашка:</span>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Цвет:</span>
+      <input type="color" id="blkBg" value="#3b82f6">
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Скругл.:</span>
+      <input type="number" id="blkRadius" value="12" min="0" max="500">
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Прозр.:</span>
+      <input type="range" id="blkOpacity" min="0" max="100" value="100" style="width:80px">
+      <span id="blkOpacityLabel" style="font-size:12px;color:#666;width:35px">100%</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Поворот:</span>
+      <input type="range" id="blkRotate" min="-180" max="180" value="0" style="width:80px">
+      <span id="blkRotateLabel" style="font-size:12px;color:#666;width:35px">0°</span>
+    </div>
+    <button id="blkDelete">🗑 Удалить</button>
+  </div>
+
+  <div class="controls" id="frameControls">
+    <span class="ctrl-label">Рамка:</span>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Вкл:</span>
+      <label class="switch">
+        <input type="checkbox" id="frameOn">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Цвет:</span>
+      <input type="color" id="frameColor" value="#000000">
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Толщина:</span>
+      <input type="range" id="frameWidth" min="1" max="100" value="10" style="width:100px">
+      <span id="frameWidthLabel" style="font-size:12px;color:#666;width:35px">10px</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Скругл.:</span>
+      <input type="range" id="frameRadius" min="0" max="200" value="0" style="width:100px">
+      <span id="frameRadiusLabel" style="font-size:12px;color:#666;width:35px">0px</span>
+    </div>
+  </div>
+
+  <div class="emoji-section">
+    <h3>Смайлики — кликни, появится на холсте</h3>
+    <div class="emoji-grid" id="emojiGrid"></div>
+  </div>
+
+  <div class="bg-section">
+    <h3>Выбери фон</h3>
+    <div class="bg-grid" id="bgGrid">
+      <div class="bg-item" data-type="transparent" style="background-image:
+        linear-gradient(45deg, #e5e5e5 25%, transparent 25%),
+        linear-gradient(-45deg, #e5e5e5 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #e5e5e5 75%),
+        linear-gradient(-45deg, transparent 75%, #e5e5e5 75%);
+        background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0; background-color: #fff;"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#ffffff" style="background:#fff"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#000000" style="background:#000"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#3b82f6" style="background:#3b82f6"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#22c55e" style="background:#22c55e"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#ef4444" style="background:#ef4444"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#f59e0b" style="background:#f59e0b"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#a855f7" style="background:#a855f7"></div>
+      <div class="bg-item color-only" data-type="color" data-color="#ec4899" style="background:#ec4899"></div>
+      <div class="bg-item" data-type="gradient" data-grad="linear-gradient(135deg, #667eea, #764ba2)"></div>
+      <div class="bg-item" data-type="gradient" data-grad="linear-gradient(135deg, #f093fb, #f5576c)"></div>
+      <div class="bg-item" data-type="gradient" data-grad="linear-gradient(135deg, #4facfe, #00f2fe)"></div>
+      <div class="bg-item" data-type="gradient" data-grad="linear-gradient(135deg, #43e97b, #38f9d7)"></div>
+      <div class="bg-item" data-type="gradient" data-grad="linear-gradient(135deg, #fa709a, #fee140)"></div>
+      <div class="bg-item" data-type="gradient" data-grad="linear-gradient(135deg, #30cfd0, #330867)"></div>
+      <div class="bg-item" data-type="image" data-src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200&q=80"></div>
+      <div class="bg-item" data-type="image" data-src="https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1200&q=80"></div>
+      <div class="bg-item" data-type="image" data-src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200&q=80"></div>
+      <div class="bg-item" data-type="image" data-src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80"></div>
+      <div class="bg-item" data-type="image" data-src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80"></div>
+      <div class="bg-item" data-type="image" data-src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1200&q=80"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <label class="upload-btn" for="bgUpload">📷 Фон</label>
+    <label class="upload-btn" for="stickerUpload">🖼️ Стикер</label>
+    <button id="addText">➕ Текст</button>
+    <button id="addBlock">➕ Плашка</button>
+    <button id="addFrame">⬛ Рамка</button>
+    <button class="primary" id="dl">💾 Скачать PNG</button>
+    <button class="primary" id="useInPost" style="display:none">✓ Использовать в посте</button>
+    <button id="reset">Сбросить</button>
+  </div>
+</div>
+
+<script type="module">
+import { removeBackground } from 'https://esm.sh/@imgly/background-removal@1.7.0';
+
+const $ = id => document.getElementById(id);
+const drop = $('drop'), file = $('file'), status = $('status');
+const panel = $('panel'), editorWrap = $('editorWrap'), editorStage = $('editorStage');
+const dl = $('dl'), reset = $('reset');
+const useInPost = $('useInPost');
+const bgGrid = $('bgGrid'), bgUpload = $('bgUpload');
+const stickerUpload = $('stickerUpload');
+const imgControls = $('imgControls'), imgScale = $('imgScale'), imgScaleLabel = $('imgScaleLabel');
+const imgCenter = $('imgCenter'), imgFit = $('imgFit'), imgDelete = $('imgDelete');
+const stickerControls = $('stickerControls');
+const stkRotate = $('stkRotate'), stkRotateLabel = $('stkRotateLabel');
+const stkOpacity = $('stkOpacity'), stkOpacityLabel = $('stkOpacityLabel');
+const stkFlipH = $('stkFlipH'), stkDelete = $('stkDelete');
+const textControls = $('textControls');
+const txtContent = $('txtContent');
+const txtSizeRange = $('txtSizeRange'), txtSizeLabel = $('txtSizeLabel');
+const txtColor = $('txtColor'), txtSideColor = $('txtSideColor');
+const txtWeight = $('txtWeight'), txtFont = $('txtFont'), txtDelete = $('txtDelete');
+const txtStyle = $('txtStyle'), txt3dDepth = $('txt3dDepth'), txt3dLabel = $('txt3dLabel');
+const txtRotate = $('txtRotate'), txtRotateLabel = $('txtRotateLabel');
+const txtRotateY = $('txtRotateY'), txtRotateYLabel = $('txtRotateYLabel');
+const txtRotateX = $('txtRotateX'), txtRotateXLabel = $('txtRotateXLabel');
+const txtCurve = $('txtCurve'), txtCurveLabel = $('txtCurveLabel'), txtCurveAxis = $('txtCurveAxis');
+const addTextBtn = $('addText');
+const blockControls = $('blockControls');
+const blkBg = $('blkBg'), blkRadius = $('blkRadius'), blkOpacity = $('blkOpacity'), blkOpacityLabel = $('blkOpacityLabel');
+const blkRotate = $('blkRotate'), blkRotateLabel = $('blkRotateLabel');
+const blkDelete = $('blkDelete'), addBlockBtn = $('addBlock');
+const frameControls = $('frameControls'), frameBorder = $('frameBorder');
+const frameOn = $('frameOn'), frameColor = $('frameColor');
+const frameWidth = $('frameWidth'), frameWidthLabel = $('frameWidthLabel');
+const frameRadius = $('frameRadius'), frameRadiusLabel = $('frameRadiusLabel');
+const addFrameBtn = $('addFrame');
+const emojiGrid = $('emojiGrid');
+const sizeUp = $('sizeUp'), sizeDown = $('sizeDown'), sizeLabel = $('sizeLabel');
+const layersList = $('layersList');
+
+const MODEL_CDN = 'https://staticimgly.com/@imgly/background-removal-data/1.7.0/dist/';
+
+let currentBg = { type: 'transparent' };
+let activeText = null;
+let activeBlock = null;
+let activeSticker = null;
+let activeCutout = null;
+let zCounter = 10;
+
+const emojis = ['😀','😂','🥰','😎','🤩','🥳','😇','🤔','🤯','😴','🤖','👽','💀','👻','🎃','🐱','🐶','🦊','🐼','🦁','🐸','🦄','🐉','🌸','🌺','🌈','⭐','✨','💫','🔥','💧','❄️','⚡','💥','❤️','🧡','💛','💚','💙','💜','🖤','👍','👎','👏','🙏','💪','✌️','🤝','👑','💎','🎯','🎨','🎭','🎁','🎉','🎊','🏆','🥇','⚽','🏀','🎮','🎲','🍕','🍔','🍟','🍩','🍰','🍦','🍓','🍉','☕','🍺'];
+
+function setStatus(text, cls = '') {
+  status.className = 'status ' + cls;
+  status.innerHTML = text;
+}
+
+// ============ ЗАГРУЗКА ============
+drop.addEventListener('click', () => file.click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => {
+  e.preventDefault();
+  drop.classList.remove('over');
+  if (e.dataTransfer.files.length) {
+    [...e.dataTransfer.files].forEach(f => processFile(f));
+  }
+});
+file.addEventListener('change', e => {
+  if (e.target.files.length) {
+    [...e.target.files].forEach(f => processFile(f));
+    file.value = '';
+  }
+});
+
+// The same editor can run standalone or inside the post composer iframe.
+const embeddedEditor = window.parent !== window;
+if (embeddedEditor) {
+  dl.style.display = 'none';
+  useInPost.style.display = 'inline-flex';
+  window.addEventListener('message', event => {
+    if (event.origin !== window.location.origin || !event.data || event.data.type !== 'post-editor:load-image') return;
+    const dataUrl = event.data.dataUrl;
+    if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return;
+    const imageBlob = dataUrlToBlob(dataUrl);
+    const imageFile = new File([imageBlob], 'post-image.png', { type: imageBlob.type || 'image/png' });
+    processFile(imageFile);
+  });
+  window.parent.postMessage({ type: 'post-editor:ready' }, window.location.origin);
+}
+
+function dataUrlToBlob(dataUrl) {
+  const parts = dataUrl.split(',');
+  const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/png';
+  const binary = atob(parts[1]);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+
+useInPost.addEventListener('click', () => dl.click());
+
+async function processFile(f) {
+  if (!f.type.startsWith('image/')) { setStatus('❌ Не картинка', 'err'); return; }
+  panel.classList.add('show');
+  dl.disabled = true;
+  setStatus('<span class="spinner"></span> Обрабатываю…');
+
+  try {
+    const blob = await removeBackground(f, {
+      publicPath: MODEL_CDN,
+      model: 'isnet_fp16',
+      device: 'cpu',
+      progress: (key, cur, total) => {
+        const pct = Math.round(cur / total * 100);
+        setStatus(`<span class="spinner"></span> ${key}: ${pct}%`);
+      }
+    });
+    if (!blob || blob.size < 100) throw new Error('Пустой результат');
+    const dataUrl = await blobToDataURL(blob);
+    addCutout(dataUrl);
+    setStatus('✅ Добавлено! Можно ещё', 'ok');
+  } catch (err) {
+    console.error(err);
+    setStatus('❌ ' + (err.message || err), 'err');
+  }
+  dl.disabled = false;
+}
+
+function blobToDataURL(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+// ============ КАРТИНКА ============
+function addCutout(dataUrl) {
+  const el = document.createElement('div');
+  el.className = 'cutout';
+  el.style.left = '80px';
+  el.style.top = '80px';
+  el.style.zIndex = ++zCounter;
+  el.dataset.layerName = 'Картинка';
+
+  const img = document.createElement('img');
+  img.src = dataUrl;
+  el.appendChild(img);
+
+  const del = document.createElement('button');
+  del.className = 'del'; del.textContent = '×';
+  del.addEventListener('click', e => { e.stopPropagation(); el.remove(); hideAllControls(); rebuildLayers(); });
+  el.appendChild(del);
+  const h1 = document.createElement('div'); h1.className = 'handle tl'; el.appendChild(h1);
+  const h2 = document.createElement('div'); h2.className = 'handle br'; el.appendChild(h2);
+
+  editorStage.appendChild(el);
+
+  img.onload = () => {
+    const stageW = editorStage.clientWidth;
+    const stageH = editorStage.clientHeight;
+    const scale = Math.min(stageW / img.naturalWidth, stageH / img.naturalHeight) * 0.7;
+    const w = img.naturalWidth * scale;
+    const h = img.naturalHeight * scale;
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.left = ((stageW - w) / 2) + 'px';
+    el.style.top = ((stageH - h) / 2) + 'px';
+  };
+
+  makeDraggable(el, { onStart: () => selectCutout(el) });
+  makeResizable(el, null);
+  selectCutout(el);
+  rebuildLayers();
+}
+
+function selectCutout(el) {
+  activeCutout = el;
+  document.querySelectorAll('.cutout, .sticker, .color-block, .text-block').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  hideAllControls();
+  deselectText(); deselectBlock(); deselectSticker();
+  imgControls.classList.add('show');
+  highlightLayer(el);
+
+  const img = el.querySelector('img');
+  const w = el.offsetWidth;
+  const baseW = Math.min(editorStage.clientWidth / img.naturalWidth, editorStage.clientHeight / img.naturalHeight) * 0.7 * img.naturalWidth;
+  imgScale.value = Math.round(w / baseW * 100);
+  imgScaleLabel.textContent = imgScale.value + '%';
+}
+
+imgScale.addEventListener('input', () => {
+  if (!activeCutout) return;
+  const img = activeCutout.querySelector('img');
+  const pct = parseInt(imgScale.value);
+  imgScaleLabel.textContent = pct + '%';
+  const baseScale = Math.min(editorStage.clientWidth / img.naturalWidth, editorStage.clientHeight / img.naturalHeight) * 0.7;
+  const newScale = baseScale * (pct / 100);
+  const cx = activeCutout.offsetLeft + activeCutout.offsetWidth / 2;
+  const cy = activeCutout.offsetTop + activeCutout.offsetHeight / 2;
+  const w = img.naturalWidth * newScale;
+  const h = img.naturalHeight * newScale;
+  activeCutout.style.width = w + 'px';
+  activeCutout.style.height = h + 'px';
+  activeCutout.style.left = (cx - w / 2) + 'px';
+  activeCutout.style.top = (cy - h / 2) + 'px';
+});
+imgCenter.addEventListener('click', () => {
+  if (!activeCutout) return;
+  activeCutout.style.left = ((editorStage.clientWidth - activeCutout.offsetWidth) / 2) + 'px';
+  activeCutout.style.top = ((editorStage.clientHeight - activeCutout.offsetHeight) / 2) + 'px';
+});
+imgFit.addEventListener('click', () => {
+  if (!activeCutout) return;
+  const img = activeCutout.querySelector('img');
+  const scale = Math.min(editorStage.clientWidth / img.naturalWidth, editorStage.clientHeight / img.naturalHeight) * 0.85;
+  const w = img.naturalWidth * scale;
+  const h = img.naturalHeight * scale;
+  activeCutout.style.width = w + 'px';
+  activeCutout.style.height = h + 'px';
+  activeCutout.style.left = ((editorStage.clientWidth - w) / 2) + 'px';
+  activeCutout.style.top = ((editorStage.clientHeight - h) / 2) + 'px';
+});
+imgDelete.addEventListener('click', () => {
+  if (activeCutout) { activeCutout.remove(); hideAllControls(); activeCutout = null; rebuildLayers(); }
+});
+
+// ============ СТИКЕРЫ ============
+function addSticker(src) {
+  const el = document.createElement('div');
+  el.className = 'sticker';
+  el.style.width = '120px';
+  el.style.height = '120px';
+  el.style.left = '100px';
+  el.style.top = '100px';
+  el.style.zIndex = ++zCounter;
+  el.dataset.rotate = 0;
+  el.dataset.flip = 'off';
+
+  const img = document.createElement('img');
+  img.src = src;
+  el.appendChild(img);
+
+  const del = document.createElement('button');
+  del.className = 'del'; del.textContent = '×';
+  del.addEventListener('click', e => { e.stopPropagation(); el.remove(); hideAllControls(); rebuildLayers(); });
+  el.appendChild(del);
+  const h1 = document.createElement('div'); h1.className = 'handle tl'; el.appendChild(h1);
+  const h2 = document.createElement('div'); h2.className = 'handle br'; el.appendChild(h2);
+
+  editorStage.appendChild(el);
+  makeDraggable(el, { onStart: () => selectSticker(el) });
+  makeResizable(el, null);
+  selectSticker(el);
+  rebuildLayers();
+}
+
+function emojiToSvgUrl(emoji) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+    <text x="100" y="100" font-size="170" text-anchor="middle" dominant-baseline="central" font-family="Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji, sans-serif">${emoji}</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+emojis.forEach(e => {
+  const btn = document.createElement('button');
+  btn.className = 'emoji-item';
+  btn.textContent = e;
+  btn.addEventListener('click', () => addSticker(emojiToSvgUrl(e)));
+  emojiGrid.appendChild(btn);
+});
+
+stickerUpload.addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  addSticker(url);
+  stickerUpload.value = '';
+});
+
+function selectSticker(el) {
+  activeSticker = el;
+  document.querySelectorAll('.cutout, .sticker, .color-block, .text-block').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  deselectText(); deselectBlock();
+  hideAllControls();
+  stickerControls.classList.add('show');
+  const rot = parseFloat(el.dataset.rotate || 0);
+  stkRotate.value = rot;
+  stkRotateLabel.textContent = rot + '°';
+  const op = Math.round(parseFloat(el.style.opacity || 1) * 100);
+  stkOpacity.value = op;
+  stkOpacityLabel.textContent = op + '%';
+  highlightLayer(el);
+}
+function deselectSticker() {
+  document.querySelectorAll('.sticker').forEach(s => s.classList.remove('active'));
+  activeSticker = null;
+}
+function applyStickerTransform(el) {
+  const rot = parseFloat(el.dataset.rotate || 0);
+  const flip = el.dataset.flip === 'on';
+  el.style.transform = `rotate(${rot}deg) scaleX(${flip ? -1 : 1})`;
+}
+
+stkRotate.addEventListener('input', () => {
+  if (!activeSticker) return;
+  stkRotateLabel.textContent = stkRotate.value + '°';
+  activeSticker.dataset.rotate = stkRotate.value;
+  applyStickerTransform(activeSticker);
+});
+stkOpacity.addEventListener('input', () => {
+  if (!activeSticker) return;
+  stkOpacityLabel.textContent = stkOpacity.value + '%';
+  activeSticker.style.opacity = stkOpacity.value / 100;
+});
+stkFlipH.addEventListener('click', () => {
+  if (!activeSticker) return;
+  activeSticker.dataset.flip = activeSticker.dataset.flip === 'on' ? 'off' : 'on';
+  applyStickerTransform(activeSticker);
+});
+stkDelete.addEventListener('click', () => {
+  if (activeSticker) { activeSticker.remove(); hideAllControls(); activeSticker = null; rebuildLayers(); }
+});
+
+// ============ РАЗМЕР РЕДАКТОРА ============
+function updateSizeLabel() {
+  sizeLabel.textContent = editorWrap.clientWidth + ' × ' + editorWrap.clientHeight;
+}
+sizeUp.addEventListener('click', () => {
+  editorWrap.style.width = (editorWrap.clientWidth + 50) + 'px';
+  editorWrap.style.height = (editorWrap.clientHeight + 50) + 'px';
+  updateSizeLabel();
+});
+sizeDown.addEventListener('click', () => {
+  editorWrap.style.width = Math.max(200, editorWrap.clientWidth - 50) + 'px';
+  editorWrap.style.height = Math.max(200, editorWrap.clientHeight - 50) + 'px';
+  updateSizeLabel();
+});
+document.querySelectorAll('.size-bar button[data-size]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const [w, h] = btn.dataset.size.split('x').map(Number);
+    editorWrap.style.width = w + 'px';
+    editorWrap.style.height = h + 'px';
+    updateSizeLabel();
+  });
+});
+new ResizeObserver(updateSizeLabel).observe(editorWrap);
+
+// ============ РАМКА ============
+function applyFrame() {
+  const on = frameOn.checked;
+  const w = parseInt(frameWidth.value);
+  const r = parseInt(frameRadius.value);
+  const c = frameColor.value;
+  if (!on) { frameBorder.style.display = 'none'; return; }
+  frameBorder.style.display = 'block';
+  frameBorder.style.border = `${w}px solid ${c}`;
+  frameBorder.style.borderRadius = r + 'px';
+}
+frameOn.addEventListener('change', applyFrame);
+frameColor.addEventListener('input', applyFrame);
+frameWidth.addEventListener('input', () => {
+  frameWidthLabel.textContent = frameWidth.value + 'px';
+  applyFrame();
+});
+frameRadius.addEventListener('input', () => {
+  frameRadiusLabel.textContent = frameRadius.value + 'px';
+  applyFrame();
+});
+addFrameBtn.addEventListener('click', () => {
+  frameOn.checked = true;
+  applyFrame();
+  frameControls.classList.add('show');
+  frameControls.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+// ============ ФОНЫ ============
+bgGrid.addEventListener('click', e => {
+  const item = e.target.closest('.bg-item');
+  if (!item) return;
+  document.querySelectorAll('.bg-item').forEach(el => el.classList.remove('active'));
+  item.classList.add('active');
+
+  if (item.dataset.type === 'transparent') {
+    currentBg = { type: 'transparent' };
+    editorStage.style.background = '';
+    editorStage.style.backgroundImage = `
+      linear-gradient(45deg, #e5e5e5 25%, transparent 25%),
+      linear-gradient(-45deg, #e5e5e5 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #e5e5e5 75%),
+      linear-gradient(-45deg, transparent 75%, #e5e5e5 75%)`;
+    editorStage.style.backgroundSize = '20px 20px';
+    editorStage.style.backgroundPosition = '0 0, 0 10px, 10px -10px, -10px 0';
+  } else if (item.dataset.type === 'color') {
+    currentBg = { type: 'color', color: item.dataset.color };
+    editorStage.style.backgroundImage = 'none';
+    editorStage.style.background = item.dataset.color;
+  } else if (item.dataset.type === 'gradient') {
+    currentBg = { type: 'gradient', grad: item.dataset.grad };
+    editorStage.style.backgroundImage = 'none';
+    editorStage.style.background = item.dataset.grad;
+  } else if (item.dataset.type === 'image') {
+    currentBg = { type: 'image', src: item.dataset.src };
+    editorStage.style.background = `url(${item.dataset.src}) center/cover no-repeat`;
+  }
+});
+
+bgUpload.addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  currentBg = { type: 'image', src: url };
+  editorStage.style.background = `url(${url}) center/cover no-repeat`;
+  document.querySelectorAll('.bg-item').forEach(el => el.classList.remove('active'));
+  const item = document.createElement('div');
+  item.className = 'bg-item active';
+  item.style.backgroundImage = `url(${url})`;
+  item.dataset.type = 'image';
+  item.dataset.src = url;
+  bgGrid.prepend(item);
+});
+
+// ============ DRAG / RESIZE ============
+function makeDraggable(el, opts) {
+  let dragging = false, startX, startY, start;
+  const onDown = (cx, cy) => {
+    dragging = true;
+    startX = cx; startY = cy;
+    start = opts.getStart ? opts.getStart() : { x: el.offsetLeft, y: el.offsetTop };
+    el.style.zIndex = ++zCounter;
+    if (opts.onStart) opts.onStart();
+  };
+  const onMove = (cx, cy) => {
+    if (!dragging) return;
+    const dx = cx - startX;
+    const dy = cy - startY;
+    if (opts.onMove) opts.onMove(dx, dy, start);
+    else {
+      el.style.left = (start.x + dx) + 'px';
+      el.style.top = (start.y + dy) + 'px';
+    }
+  };
+  const onUp = () => { dragging = false; };
+
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('del') || e.target.classList.contains('handle')) return;
+    onDown(e.clientX, e.clientY);
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+  document.addEventListener('mouseup', onUp);
+
+  el.addEventListener('touchstart', e => {
+    if (e.target.classList.contains('del') || e.target.classList.contains('handle')) return;
+    const t = e.touches[0];
+    onDown(t.clientX, t.clientY);
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const t = e.touches[0];
+    onMove(t.clientX, t.clientY);
+  }, { passive: true });
+  document.addEventListener('touchend', onUp);
+}
+
+function makeResizable(el, onChange) {
+  const handles = el.querySelectorAll('.handle');
+  handles.forEach(h => {
+    let resizing = false, startX, startY, startW, startH, startL, startT, dir;
+    const start = (cx, cy) => {
+      resizing = true;
+      startX = cx; startY = cy;
+      startW = el.offsetWidth;
+      startH = el.offsetHeight;
+      startL = el.offsetLeft;
+      startT = el.offsetTop;
+      dir = h.classList.contains('tl') ? 'tl' : 'br';
+    };
+    const move = (cx, cy) => {
+      if (!resizing) return;
+      const dx = cx - startX;
+      const dy = cy - startY;
+      let w, hh, l, t;
+      if (dir === 'br') {
+        w = Math.max(20, startW + dx);
+        hh = Math.max(20, startH + dy);
+        l = startL; t = startT;
+      } else {
+        w = Math.max(20, startW - dx);
+        hh = Math.max(20, startH - dy);
+        l = startL + (startW - w);
+        t = startT + (startH - hh);
+      }
+      el.style.width = w + 'px';
+      el.style.height = hh + 'px';
+      el.style.left = l + 'px';
+      el.style.top = t + 'px';
+      if (onChange) onChange();
+    };
+    const end = () => { resizing = false; };
+
+    h.addEventListener('mousedown', e => {
+      start(e.clientX, e.clientY);
+      e.preventDefault(); e.stopPropagation();
+    });
+    document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+    document.addEventListener('mouseup', end);
+
+    h.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      start(t.clientX, t.clientY);
+      e.stopPropagation();
+    }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      if (!resizing) return;
+      const t = e.touches[0];
+      move(t.clientX, t.clientY);
+    }, { passive: true });
+    document.addEventListener('touchend', end);
+  });
+}
+
+// ============ СЛОИ ============
+function getLayers() {
+  const layers = [];
+  editorStage.querySelectorAll('.cutout').forEach(el => {
+    layers.push({ el, name: el.dataset.layerName || 'Картинка', icon: '🖼️' });
+  });
+  editorStage.querySelectorAll('.sticker, .text-block, .color-block').forEach(el => {
+    if (el.classList.contains('sticker')) {
+      layers.push({ el, name: 'Стикер', icon: '😀' });
+    } else if (el.classList.contains('text-block')) {
+      const text = el.dataset.text || '';
+      layers.push({ el, name: text.slice(0, 20) || 'Текст', icon: '📝' });
+    } else {
+      layers.push({ el, name: 'Плашка', icon: '🟦' });
+    }
+  });
+  layers.sort((a, b) => (parseInt(b.el.style.zIndex) || 0) - (parseInt(a.el.style.zIndex) || 0));
+  return layers;
+}
+
+function rebuildLayers() {
+  const layers = getLayers();
+  layersList.innerHTML = '';
+  layers.forEach(layer => {
+    const item = document.createElement('div');
+    item.className = 'layer-item';
+    if (layer.el.classList.contains('active')) item.classList.add('active');
+    if (layer.el.style.display === 'none') item.classList.add('hidden-layer');
+    item.draggable = true;
+    item.dataset.layerId = getLayerId(layer.el);
+
+    const icon = document.createElement('div');
+    icon.className = 'icon'; icon.textContent = layer.icon;
+    item.appendChild(icon);
+
+    const name = document.createElement('div');
+    name.className = 'name'; name.textContent = layer.name;
+    item.appendChild(name);
+
+    const eye = document.createElement('button');
+    eye.className = 'btn';
+    eye.textContent = layer.el.style.display === 'none' ? '🙈' : '👁';
+    eye.title = 'Скрыть/показать';
+    eye.addEventListener('click', e => {
+      e.stopPropagation();
+      layer.el.style.display = layer.el.style.display === 'none' ? '' : 'none';
+      rebuildLayers();
+    });
+    item.appendChild(eye);
+
+    const del = document.createElement('button');
+    del.className = 'btn delete';
+    del.textContent = '🗑';
+    del.title = 'Удалить';
+    del.addEventListener('click', e => {
+      e.stopPropagation();
+      layer.el.remove();
+      hideAllControls();
+      rebuildLayers();
+    });
+    item.appendChild(del);
+
+    item.addEventListener('click', () => selectLayer(layer.el));
+    item.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', item.dataset.layerId);
+      item.classList.add('dragging');
+    });
+    item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      const fromId = e.dataTransfer.getData('text/plain');
+      const toId = item.dataset.layerId;
+      if (fromId === toId) return;
+      reorderLayer(fromId, toId);
+    });
+
+    layersList.appendChild(item);
+  });
+}
+
+function getLayerId(el) {
+  if (!el.dataset.layerId) {
+    el.dataset.layerId = 'layer_' + Math.random().toString(36).slice(2, 9);
+  }
+  return el.dataset.layerId;
+}
+
+function reorderLayer(fromId, toId) {
+  const fromEl = editorStage.querySelector(`[data-layer-id="${fromId}"]`);
+  const toEl = editorStage.querySelector(`[data-layer-id="${toId}"]`);
+  if (!fromEl || !toEl) return;
+  const fromZ = parseInt(fromEl.style.zIndex) || 0;
+  const toZ = parseInt(toEl.style.zIndex) || 0;
+  if (fromZ < toZ) {
+    fromEl.style.zIndex = toZ + 1;
+  } else {
+    fromEl.style.zIndex = toZ - 1;
+  }
+  zCounter = Math.max(zCounter, ...getLayers().map(l => parseInt(l.el.style.zIndex) || 0)) + 1;
+  rebuildLayers();
+}
+
+function selectLayer(el) {
+  if (el.classList.contains('cutout')) { selectCutout(el); return; }
+  if (el.classList.contains('sticker')) { selectSticker(el); return; }
+  if (el.classList.contains('text-block')) { selectText(el); return; }
+  if (el.classList.contains('color-block')) { selectBlock(el); return; }
+}
+function highlightLayer(el) {
+  const id = getLayerId(el);
+  layersList.querySelectorAll('.layer-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.layerId === id);
+  });
+}
+
+// ============ ТЕКСТ ============
+function addText() {
+  const el = document.createElement('div');
+  el.className = 'text-block';
+  el.style.left = '60px'; el.style.top = '80px';
+  el.style.zIndex = ++zCounter;
+
+  el.dataset.text = 'Текст';
+  el.dataset.font = 'Russo One';
+  el.dataset.size = '60';
+  el.dataset.color = '#ffffff';
+  el.dataset.sideColor = '#1e40af';
+  el.dataset.weight = '800';
+  el.dataset.style = '3d-classic';
+  el.dataset.depth = '6';
+  el.dataset.curve = '0';
+  el.dataset.curveAxis = 'h';
+  el.dataset.rotate = '0';
+  el.dataset.rotateY = '0';
+  el.dataset.rotateX = '0';
+
+  const del = document.createElement('button');
+  del.className = 'del'; del.textContent = '×';
+  del.addEventListener('click', e => { e.stopPropagation(); el.remove(); hideAllControls(); rebuildLayers(); });
+  el.appendChild(del);
+
+  const h1 = document.createElement('div'); h1.className = 'handle tl'; el.appendChild(h1);
+  const h2 = document.createElement('div'); h2.className = 'handle br'; el.appendChild(h2);
+
+  editorStage.appendChild(el);
+  renderText(el);
+  makeDraggable(el, { onStart: () => selectText(el) });
+  makeTextResizable(el);
+  selectText(el);
+  rebuildLayers();
+}
+addTextBtn.addEventListener('click', addText);
+
+function renderText(el) {
+  const text = el.dataset.text || 'Текст';
+  const font = el.dataset.font || 'Russo One';
+  const size = parseFloat(el.dataset.size) || 60;
+  const color = el.dataset.color || '#ffffff';
+  const sideColor = el.dataset.sideColor || '#1e40af';
+  const weight = el.dataset.weight || '800';
+  const style = el.dataset.style || 'none';
+  const depth = parseInt(el.dataset.depth || 6);
+  const curve = parseInt(el.dataset.curve || 0);
+  const axis = el.dataset.curveAxis || 'h';
+  const rotZ = parseFloat(el.dataset.rotate || 0);
+  const rotY = parseFloat(el.dataset.rotateY || 0);
+  const rotX = parseFloat(el.dataset.rotateX || 0);
+
+  const pad = depth * 3 + 40;
+  const fontSize = size;
+  const textWidth = text.length * fontSize * 0.62 + pad * 2;
+  const textHeight = fontSize * 2 + pad * 2;
+  const W = Math.max(textWidth, 200);
+  const H = Math.max(textHeight, 150);
+
+  const curveAmount = curve / 100;
+  const bendY = curveAmount * fontSize * 1.2;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.style.display = 'block';
+  svg.style.overflow = 'visible';
+
+  const defs = document.createElementNS(svgNS, 'defs');
+  svg.appendChild(defs);
+
+  const textPathId = 'tp_' + Math.random().toString(36).slice(2, 8);
+  const textPathD = axis === 'h'
+    ? `M ${pad},${H/2} Q ${W/2},${H/2 - bendY*2} ${W - pad},${H/2}`
+    : `M ${pad},${H/2} Q ${W/2},${H/2 - bendY*2} ${W - pad},${H/2}`;
+
+  const pathDef = document.createElementNS(svgNS, 'path');
+  pathDef.setAttribute('id', textPathId);
+  pathDef.setAttribute('d', textPathD);
+  pathDef.setAttribute('fill', 'none');
+  defs.appendChild(pathDef);
+
+  const g = document.createElementNS(svgNS, 'g');
+  const cx = W / 2, cy = H / 2;
+
+  // 3D-перспектива через matrix (грубый аналог)
+  // Y — поворот вокруг вертикальной оси (псевдо 3D через scaleX)
+  // X — поворот вокруг горизонтальной оси (псевдо 3D через scaleY)
+  const scaleX = Math.cos(rotY * Math.PI / 180);
+  const scaleY = Math.cos(rotX * Math.PI / 180);
+  const skewX = Math.sin(rotY * Math.PI / 180) * 0.3;
+  const skewY = Math.sin(rotX * Math.PI / 180) * 0.3;
+
+  // Собираем матрицу: сначала сдвиг в центр, потом масштаб/skew, потом поворот Z, потом обратно
+  const cosZ = Math.cos(rotZ * Math.PI / 180);
+  const sinZ = Math.sin(rotZ * Math.PI / 180);
+
+  // Комбинируем вручную: T(-cx,-cy) * M * T(cx,cy)
+  // M = rotZ * scale*skew
+  const a = cosZ * scaleX;
+  const b = sinZ * scaleX + skewY;
+  const c2 = -sinZ * scaleY + skewX;
+  const d = cosZ * scaleY;
+  const e = cx - (a * cx + c2 * cy);
+  const f = cy - (b * cx + d * cy);
+
+  g.setAttribute('transform', `matrix(${a} ${b} ${c2} ${d} ${e} ${f})`);
+
+  const textAttrs = {
+    'font-family': `'${font}', sans-serif`,
+    'font-size': fontSize,
+    'font-weight': weight,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'middle'
+  };
+
+  function makeTextPath(fillColor, dx, dy) {
+    const t = document.createElementNS(svgNS, 'text');
+    for (const k in textAttrs) t.setAttribute(k, textAttrs[k]);
+    if (dx || dy) t.setAttribute('transform', `translate(${dx || 0} ${dy || 0})`);
+    t.setAttribute('fill', fillColor);
+    const tp = document.createElementNS(svgNS, 'textPath');
+    tp.setAttribute('href', '#' + textPathId);
+    tp.setAttribute('startOffset', '50%');
+    tp.setAttribute('text-anchor', 'middle');
+    tp.textContent = text;
+    t.appendChild(tp);
+    return t;
+  }
+
+  // 3D-эффекты
+  if (style === '3d-classic' || style === '3d-deep' || style === '3d-arc' || style === '3d-sphere' || style === 'gold' || style === 'fire' || style === 'emboss') {
+    const layers = style === '3d-deep' ? depth * 2 : depth;
+    for (let i = layers; i >= 1; i--) {
+      let col = sideColor;
+      let dx = i, dy = i;
+      if (style === '3d-deep') {
+        col = shadeColor(sideColor, -30 * (i / (depth*2)));
+      } else if (style === '3d-arc') {
+        const ang = Math.PI * i / (depth + 1);
+        dx = Math.cos(ang) * i * 1.5;
+        dy = Math.sin(ang) * i * 1.5;
+      } else if (style === '3d-sphere') {
+        col = shadeColor(sideColor, -20 * (i / depth));
+      } else if (style === 'gold') {
+        col = '#b45309';
+      } else if (style === 'fire') {
+        col = i < depth / 2 ? '#f59e0b' : '#dc2626';
+        dx = 0; dy = i;
+      } else if (style === 'emboss') {
+        col = i % 2 ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)';
+      }
+      g.appendChild(makeTextPath(col, dx, dy));
+      if (style === '3d-arc') {
+        g.appendChild(makeTextPath(col, -dx, dy));
+      }
+      if (style === '3d-sphere') {
+        g.appendChild(makeTextPath(shadeColor(sideColor, 30), -i * 0.7, -i * 0.7));
+      }
+    }
+    // Лицевая сторона
+    g.appendChild(makeTextPath(color, 0, 0));
+  } else if (style === 'outline') {
+    for (let r = 1; r <= depth; r++) {
+      for (let ang = 0; ang < 360; ang += 30) {
+        const rad = ang * Math.PI / 180;
+        g.appendChild(makeTextPath(sideColor, Math.cos(rad) * r, Math.sin(rad) * r));
+      }
+    }
+    g.appendChild(makeTextPath(color, 0, 0));
+  } else if (style === 'neon') {
+    const filter = document.createElementNS(svgNS, 'filter');
+    filter.setAttribute('id', 'neon_' + textPathId);
+    filter.innerHTML = `
+      <feGaussianBlur stdDeviation="${depth}" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>`;
+    defs.appendChild(filter);
+    const t = makeTextPath(color, 0, 0);
+    t.setAttribute('filter', `url(#neon_${textPathId})`);
+    g.appendChild(t);
+  } else if (style === 'glow') {
+    const filter = document.createElementNS(svgNS, 'filter');
+    filter.setAttribute('id', 'glow_' + textPathId);
+    filter.innerHTML = `
+      <feGaussianBlur stdDeviation="${depth}" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>`;
+    defs.appendChild(filter);
+    const t = makeTextPath(color, 0, 0);
+    t.setAttribute('filter', `url(#glow_${textPathId})`);
+    g.appendChild(t);
+  } else if (style === 'shadow') {
+    const filter = document.createElementNS(svgNS, 'filter');
+    filter.setAttribute('id', 'shadow_' + textPathId);
+    filter.innerHTML = `
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+      <feOffset dx="4" dy="5" result="offsetblur"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>`;
+    defs.appendChild(filter);
+    const t = makeTextPath(color, 0, 0);
+    t.setAttribute('filter', `url(#shadow_${textPathId})`);
+    g.appendChild(t);
+  } else {
+    g.appendChild(makeTextPath(color, 0, 0));
+  }
+
+  svg.appendChild(g);
+
+  const del = el.querySelector('.del');
+  const h1 = el.querySelector('.handle.tl');
+  const h2 = el.querySelector('.handle.br');
+  el.innerHTML = '';
+  if (del) el.appendChild(del);
+  if (h1) el.appendChild(h1);
+  if (h2) el.appendChild(h2);
+  el.appendChild(svg);
+}
+
+function shadeColor(hex, percent) {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const R = Math.max(0, Math.min(255, (num >> 16) + percent));
+  const G = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + percent));
+  const B = Math.max(0, Math.min(255, (num & 0x0000FF) + percent));
+  return '#' + ((R << 16) | (G << 8) | B).toString(16).padStart(6, '0');
+}
+
+// Ресайз текста через уголки — меняем размер шрифта
+function makeTextResizable(el) {
+  const handles = el.querySelectorAll('.handle');
+  handles.forEach(h => {
+    let resizing = false, startX, startY, startSize, dir;
+    const start = (cx, cy) => {
+      resizing = true;
+      startX = cx; startY = cy;
+      startSize = parseFloat(el.dataset.size) || 60;
+      dir = h.classList.contains('tl') ? -1 : 1;
+    };
+    const move = (cx, cy) => {
+      if (!resizing) return;
+      const dx = cx - startX;
+      const dy = cy - startY;
+      const delta = (dx + dy) * 0.3 * dir;
+      const newSize = Math.max(10, Math.min(300, startSize + delta));
+      el.dataset.size = Math.round(newSize);
+      txtSizeRange.value = Math.round(newSize);
+      txtSizeLabel.textContent = Math.round(newSize);
+      renderText(el);
+    };
+    const end = () => { resizing = false; };
+
+    h.addEventListener('mousedown', e => {
+      start(e.clientX, e.clientY);
+      e.preventDefault(); e.stopPropagation();
+    });
+    document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+    document.addEventListener('mouseup', end);
+
+    h.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      start(t.clientX, t.clientY);
+      e.stopPropagation();
+    }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      if (!resizing) return;
+      const t = e.touches[0];
+      move(t.clientX, t.clientY);
+    }, { passive: true });
+    document.addEventListener('touchend', end);
+  });
+}
+
+function selectText(el) {
+  activeText = el;
+  deselectBlock(); deselectSticker();
+  activeCutout = null;
+  document.querySelectorAll('.cutout, .sticker, .color-block, .text-block').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  hideAllControls();
+  textControls.classList.add('show');
+
+  txtContent.value = el.dataset.text || '';
+  txtSizeRange.value = parseInt(el.dataset.size) || 60;
+  txtSizeLabel.textContent = el.dataset.size || 60;
+  txtColor.value = el.dataset.color || '#ffffff';
+  txtSideColor.value = el.dataset.sideColor || '#1e40af';
+  txtWeight.value = el.dataset.weight || '800';
+  txtFont.value = el.dataset.font || 'Russo One';
+  txtStyle.value = el.dataset.style || 'none';
+  txt3dDepth.value = el.dataset.depth || 6;
+  txt3dLabel.textContent = el.dataset.depth || 6;
+  txtRotate.value = el.dataset.rotate || 0;
+  txtRotateLabel.textContent = (el.dataset.rotate || 0) + '°';
+  txtRotateY.value = el.dataset.rotateY || 0;
+  txtRotateYLabel.textContent = (el.dataset.rotateY || 0) + '°';
+  txtRotateX.value = el.dataset.rotateX || 0;
+  txtRotateXLabel.textContent = (el.dataset.rotateX || 0) + '°';
+  txtCurve.value = el.dataset.curve || 0;
+  txtCurveLabel.textContent = el.dataset.curve || 0;
+  txtCurveAxis.value = el.dataset.curveAxis || 'h';
+  highlightLayer(el);
+}
+function deselectText() {
+  document.querySelectorAll('.text-block').forEach(b => b.classList.remove('active'));
+  activeText = null;
+}
+
+txtContent.addEventListener('input', () => {
+  if (!activeText) return;
+  activeText.dataset.text = txtContent.value;
+  renderText(activeText);
+  rebuildLayers();
+});
+txtSizeRange.addEventListener('input', () => {
+  txtSizeLabel.textContent = txtSizeRange.value;
+  if (activeText) { activeText.dataset.size = txtSizeRange.value; renderText(activeText); }
+});
+txtColor.addEventListener('input', () => { if (activeText) { activeText.dataset.color = txtColor.value; renderText(activeText); } });
+txtSideColor.addEventListener('input', () => { if (activeText) { activeText.dataset.sideColor = txtSideColor.value; renderText(activeText); } });
+txtWeight.addEventListener('change', () => { if (activeText) { activeText.dataset.weight = txtWeight.value; renderText(activeText); } });
+txtFont.addEventListener('change', () => { if (activeText) { activeText.dataset.font = txtFont.value; renderText(activeText); } });
+txtStyle.addEventListener('change', () => { if (activeText) { activeText.dataset.style = txtStyle.value; renderText(activeText); } });
+txt3dDepth.addEventListener('input', () => {
+  txt3dLabel.textContent = txt3dDepth.value;
+  if (activeText) { activeText.dataset.depth = txt3dDepth.value; renderText(activeText); }
+});
+txtRotate.addEventListener('input', () => {
+  txtRotateLabel.textContent = txtRotate.value + '°';
+  if (activeText) { activeText.dataset.rotate = txtRotate.value; renderText(activeText); }
+});
+txtRotateY.addEventListener('input', () => {
+  txtRotateYLabel.textContent = txtRotateY.value + '°';
+  if (activeText) { activeText.dataset.rotateY = txtRotateY.value; renderText(activeText); }
+});
+txtRotateX.addEventListener('input', () => {
+  txtRotateXLabel.textContent = txtRotateX.value + '°';
+  if (activeText) { activeText.dataset.rotateX = txtRotateX.value; renderText(activeText); }
+});
+txtCurve.addEventListener('input', () => {
+  txtCurveLabel.textContent = txtCurve.value;
+  if (activeText) { activeText.dataset.curve = txtCurve.value; renderText(activeText); }
+});
+txtCurveAxis.addEventListener('change', () => {
+  if (activeText) { activeText.dataset.curveAxis = txtCurveAxis.value; renderText(activeText); }
+});
+txtDelete.addEventListener('click', () => { if (activeText) { activeText.remove(); hideAllControls(); activeText = null; rebuildLayers(); } });
+
+// ============ ПЛАШКА ============
+addBlockBtn.addEventListener('click', () => {
+  const el = document.createElement('div');
+  el.className = 'color-block';
+  el.style.left = '80px'; el.style.top = '80px';
+  el.style.width = '200px'; el.style.height = '100px';
+  el.style.background = '#3b82f6';
+  el.style.borderRadius = '12px';
+  el.style.zIndex = ++zCounter;
+
+  const del = document.createElement('button');
+  del.className = 'del'; del.textContent = '×';
+  del.addEventListener('click', e => { e.stopPropagation(); el.remove(); hideAllControls(); rebuildLayers(); });
+  el.appendChild(del);
+  const h1 = document.createElement('div'); h1.className = 'handle tl'; el.appendChild(h1);
+  const h2 = document.createElement('div'); h2.className = 'handle br'; el.appendChild(h2);
+
+  editorStage.appendChild(el);
+  makeDraggable(el, { onStart: () => selectBlock(el) });
+  makeResizable(el, null);
+  selectBlock(el);
+  rebuildLayers();
+});
+
+function selectBlock(el) {
+  activeBlock = el;
+  deselectText(); deselectSticker();
+  activeCutout = null;
+  document.querySelectorAll('.cutout, .sticker, .color-block, .text-block').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  hideAllControls();
+  blockControls.classList.add('show');
+  blkBg.value = rgbToHex(el.style.background || el.style.backgroundColor) || '#3b82f6';
+  blkRadius.value = parseInt(el.style.borderRadius) || 12;
+  const op = Math.round(parseFloat(el.style.opacity || 1) * 100);
+  blkOpacity.value = op; blkOpacityLabel.textContent = op + '%';
+  const rot = parseFloat(el.dataset.rotate || 0);
+  blkRotate.value = rot; blkRotateLabel.textContent = rot + '°';
+  highlightLayer(el);
+}
+function deselectBlock() {
+  document.querySelectorAll('.color-block').forEach(b => b.classList.remove('active'));
+  activeBlock = null;
+}
+blkBg.addEventListener('input', () => { if (activeBlock) activeBlock.style.background = blkBg.value; });
+blkRadius.addEventListener('input', () => { if (activeBlock) activeBlock.style.borderRadius = blkRadius.value + 'px'; });
+blkOpacity.addEventListener('input', () => {
+  if (!activeBlock) return;
+  blkOpacityLabel.textContent = blkOpacity.value + '%';
+  activeBlock.style.opacity = blkOpacity.value / 100;
+});
+blkRotate.addEventListener('input', () => {
+  if (!activeBlock) return;
+  blkRotateLabel.textContent = blkRotate.value + '°';
+  activeBlock.dataset.rotate = blkRotate.value;
+  activeBlock.style.transform = `rotate(${blkRotate.value}deg)`;
+});
+blkDelete.addEventListener('click', () => {
+  if (activeBlock) { activeBlock.remove(); hideAllControls(); activeBlock = null; rebuildLayers(); }
+});
+
+// ============ КЛИКИ ============
+editorStage.addEventListener('click', e => {
+  const cutout = e.target.closest('.cutout');
+  const sticker = e.target.closest('.sticker');
+  const block = e.target.closest('.color-block');
+  const text = e.target.closest('.text-block');
+  if (cutout) { selectCutout(cutout); return; }
+  if (sticker) { selectSticker(sticker); return; }
+  if (block) { selectBlock(block); return; }
+  if (text) { selectText(text); return; }
+  if (e.target === editorStage) {
+    document.querySelectorAll('.cutout, .sticker, .color-block, .text-block').forEach(x => x.classList.remove('active'));
+    hideAllControls();
+    deselectText(); deselectBlock(); deselectSticker();
+    activeCutout = null;
+    rebuildLayers();
+  }
+});
+
+function hideAllControls() {
+  imgControls.classList.remove('show');
+  stickerControls.classList.remove('show');
+  textControls.classList.remove('show');
+  blockControls.classList.remove('show');
+}
+
+function rgbToHex(rgb) {
+  if (!rgb) return null;
+  if (rgb.startsWith('#')) return rgb;
+  if (rgb === 'transparent') return '#ffffff';
+  const m = rgb.match(/\d+/g);
+  if (!m) return null;
+  return '#' + m.slice(0,3).map(x => (+x).toString(16).padStart(2,'0')).join('');
+}
+
+// ============ СКАЧИВАНИЕ ============
+dl.addEventListener('click', async () => {
+  if (!editorStage.children.length) {
+    setStatus('❌ Сначала добавь картинку', 'err');
+    return;
+  }
+  dl.disabled = true;
+  setStatus('<span class="spinner"></span> Готовлю картинку...');
+
+  try {
+    const W = editorWrap.clientWidth;
+    const H = editorWrap.clientHeight;
+    const scale = 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = W * scale;
+    canvas.height = H * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+
+    if (currentBg.type === 'transparent') {
+      // пусто
+    } else if (currentBg.type === 'color') {
+      ctx.fillStyle = currentBg.color; ctx.fillRect(0, 0, W, H);
+    } else if (currentBg.type === 'gradient') {
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      const colors = currentBg.grad.match(/#[a-fA-F0-9]{3,6}/g) || ['#667eea', '#764ba2'];
+      colors.forEach((col, i) => grad.addColorStop(i / (colors.length - 1), col));
+      ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+    } else if (currentBg.type === 'image') {
+      const bgImg = new Image();
+      bgImg.crossOrigin = 'anonymous';
+      bgImg.src = currentBg.src;
+      try {
+        await bgImg.decode();
+        const bgScale = Math.max(W / bgImg.width, H / bgImg.height);
+        const bw = bgImg.width * bgScale;
+        const bh = bgImg.height * bgScale;
+        ctx.drawImage(bgImg, (W - bw) / 2, (H - bh) / 2, bw, bh);
+      } catch (e) {
+        ctx.fillStyle = '#eee'; ctx.fillRect(0, 0, W, H);
+      }
+    }
+
+    const allElements = [...editorStage.children].filter(el =>
+      el.classList.contains('cutout') ||
+      el.classList.contains('sticker') ||
+      el.classList.contains('text-block') ||
+      el.classList.contains('color-block')
+    );
+    allElements.sort((a, b) => (parseInt(a.style.zIndex) || 0) - (parseInt(b.style.zIndex) || 0));
+
+    if (document.fonts) await document.fonts.ready;
+
+    for (const el of allElements) {
+      if (el.style.display === 'none') continue;
+
+      if (el.classList.contains('cutout')) {
+        const img = el.querySelector('img');
+        try {
+          await img.decode();
+          ctx.drawImage(img, el.offsetLeft, el.offsetTop, el.offsetWidth, el.offsetHeight);
+        } catch (e) { console.warn(e); }
+      } else if (el.classList.contains('sticker')) {
+        const x = el.offsetLeft, y = el.offsetTop;
+        const w = el.offsetWidth, h = el.offsetHeight;
+        const rot = parseFloat(el.dataset.rotate || 0);
+        const flip = el.dataset.flip === 'on';
+        const op = parseFloat(el.style.opacity || 1);
+        const img = el.querySelector('img');
+        try {
+          await img.decode();
+          ctx.save();
+          ctx.globalAlpha = op;
+          ctx.translate(x + w/2, y + h/2);
+          ctx.rotate(rot * Math.PI / 180);
+          ctx.scale(flip ? -1 : 1, 1);
+          ctx.drawImage(img, -w/2, -h/2, w, h);
+          ctx.restore();
+        } catch (e) { console.warn(e); }
+      } else if (el.classList.contains('text-block')) {
+        const svg = el.querySelector('svg');
+        if (!svg) continue;
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        const img = new Image();
+        img.src = url;
+        try {
+          await img.decode();
+          ctx.drawImage(img, el.offsetLeft, el.offsetTop, img.naturalWidth, img.naturalHeight);
+        } catch (e) {
+          console.warn('SVG render failed', e);
+        }
+        URL.revokeObjectURL(url);
+      } else if (el.classList.contains('color-block')) {
+        const x = el.offsetLeft, y = el.offsetTop;
+        const w = el.offsetWidth, h = el.offsetHeight;
+        const radius = parseFloat(el.style.borderRadius) || 0;
+        const bg = el.style.background || el.style.backgroundColor || '#3b82f6';
+        const opacity = parseFloat(el.style.opacity || 1);
+        const rot = parseFloat(el.dataset.rotate || 0);
+
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        if (rot) {
+          const cx = x + w / 2; const cy = y + h / 2;
+          ctx.translate(cx, cy);
+          ctx.rotate(rot * Math.PI / 180);
+          ctx.translate(-cx, -cy);
+        }
+        roundRect(ctx, x, y, w, h, radius);
+        ctx.fillStyle = bg;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    if (frameOn.checked) {
+      const w = parseInt(frameWidth.value);
+      const r = parseInt(frameRadius.value);
+      const c = frameColor.value;
+      ctx.save();
+      if (r > 0) {
+        roundRect(ctx, w / 2, w / 2, W - w, H - w, r);
+        ctx.lineWidth = w;
+        ctx.strokeStyle = c;
+        ctx.stroke();
+      } else {
+        ctx.lineWidth = w;
+        ctx.strokeStyle = c;
+        ctx.strokeRect(w / 2, w / 2, W - w, H - w);
+      }
+      ctx.restore();
+    }
+
+    canvas.toBlob(b => {
+      if (!b) {
+        setStatus('❌ Не удалось создать картинку', 'err');
+        dl.disabled = false;
+        return;
+      }
+      if (embeddedEditor) {
+        const reader = new FileReader();
+        reader.onload = () => window.parent.postMessage({ type: 'post-editor:result', dataUrl: reader.result }, window.location.origin);
+        reader.readAsDataURL(b);
+        dl.disabled = false;
+        setStatus('✅ Изображение готово к публикации', 'ok');
+        return;
+      }
+      const url = URL.createObjectURL(b);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'result_' + Date.now() + '.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      dl.disabled = false;
+      setStatus('✅ Картинка скачана!', 'ok');
+    }, 'image/png');
+
+  } catch (err) {
+    console.error(err);
+    setStatus('❌ Ошибка: ' + (err.message || err), 'err');
+    dl.disabled = false;
+  }
+});
+
+function roundRect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// ============ СБРОС ============
+reset.addEventListener('click', () => {
+  panel.classList.remove('show');
+  editorStage.querySelectorAll('.cutout, .text-block, .color-block, .sticker').forEach(b => b.remove());
+  editorStage.style.background = '';
+  file.value = '';
+  bgUpload.value = '';
+  stickerUpload.value = '';
+  currentBg = { type: 'transparent' };
+  editorWrap.style.width = '500px';
+  editorWrap.style.height = '500px';
+  updateSizeLabel();
+  hideAllControls();
+  deselectText(); deselectBlock(); deselectSticker();
+  activeCutout = null;
+  document.querySelectorAll('.bg-item').forEach(el => el.classList.remove('active'));
+  frameOn.checked = false;
+  applyFrame();
+  rebuildLayers();
+  setStatus('');
+});
+
+rebuildLayers();
+applyFrame();
+</script>
+</body>
+</html>
