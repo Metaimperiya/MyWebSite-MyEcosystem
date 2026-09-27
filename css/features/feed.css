@@ -16,6 +16,15 @@
     width: 100%;
 }
 
+.feed-composer-card{padding:8px 12px}
+.feed-composer-toggle{display:flex;align-items:center;gap:9px;min-height:38px;list-style:none;cursor:pointer;color:var(--text-secondary);font-weight:600;user-select:none}
+.feed-composer-toggle::-webkit-details-marker{display:none}
+.feed-composer-toggle::marker{content:""}
+.feed-composer-plus{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--link-color);color:#fff;font-size:22px;line-height:1;transition:transform .18s ease}
+.feed-composer[open] .feed-composer-plus{transform:rotate(45deg)}
+.feed-composer[open] .post-form{padding-top:8px}
+.feed-composer-card #postPublishStatus:empty{display:none}
+
 /* ===== РЕДАКТОР ===== */
 .editor-toolbar {
     display: flex;

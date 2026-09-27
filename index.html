@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
-    <link rel="stylesheet" href="css/features/feed.css?v=4.4">
+    <link rel="stylesheet" href="css/features/feed.css?v=4.5">
     <link rel="stylesheet" href="css/features/profile.css?v=3.3">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
@@ -183,7 +183,9 @@
             </div>
 
             <div class="page active" id="page-feed">
-                <div class="card">
+                <div class="card feed-composer-card">
+                    <details class="feed-composer" id="feedComposer">
+                        <summary class="feed-composer-toggle"><span class="feed-composer-plus" aria-hidden="true">＋</span><span>Создать публикацию</span></summary>
                     <div class="post-form">
                         <div class="editor-toolbar">
                             <button onclick="formatText('bold')"><b>B</b></button>
@@ -208,12 +210,13 @@
                         </div>
                         <input type="file" id="fileInput" accept="image/*" multiple class="hidden">
                         <div class="post-media-list" id="postMediaList"></div>
-                        <div id="postPublishStatus" class="post-publish-status" role="status" aria-live="polite"></div>
                         <div class="preview-box" id="previewBox">
                             <img id="previewImg"><span id="previewName"></span>
                             <button class="remove-pic" onclick="removeImage()">✕</button>
                         </div>
                     </div>
+                    </details>
+                    <div id="postPublishStatus" class="post-publish-status" role="status" aria-live="polite"></div>
                 </div>
                 <div id="feed"></div>
             </div>
@@ -496,7 +499,7 @@
 <script src="js/modules/player.js?v=3.0"></script>
 <script src="js/features/feed/feed-core.js?v=4.3"></script>
 <script src="js/features/feed/feed-actions.js?v=4.0"></script>
-<script src="js/features/feed/feed-edit.js?v=4.5"></script>
+<script src="js/features/feed/feed-edit.js?v=4.6"></script>
 <script src="js/features/profile.js?v=3.3"></script>
 <script src="js/features/reputation.js?v=1.0"></script>
 <script src="js/features/friends.js?v=3.1"></script>

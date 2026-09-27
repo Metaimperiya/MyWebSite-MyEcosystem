@@ -232,6 +232,8 @@
                 withTimeout(db.ref().update(updates), 15000, 'База данных не ответила при сохранении поста').then(function() {
                     clearEditor('postEditor');
                     window.clearPostForm();
+                    var composer = document.getElementById('feedComposer');
+                    if (composer) composer.open = false;
                     setPostPublishBusy(false);
                     setPostPublishStatus('Пост опубликован', 'success');
                     if (typeof loadFeed === 'function') loadFeed();
