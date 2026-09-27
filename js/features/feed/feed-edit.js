@@ -56,6 +56,13 @@
         });
     }
 
+    function withTimeout(promise, milliseconds, message) {
+        return new Promise(function(resolve, reject) {
+            var timer = setTimeout(function() { reject(new Error(message)); }, milliseconds);
+            Promise.resolve(promise).then(function(value) { clearTimeout(timer); resolve(value); }, function(error) { clearTimeout(timer); reject(error); });
+        });
+    }
+
     function compressPostImage(blob) {
         return createImageBitmap(blob).then(function(bitmap) {
             var canvas = document.createElement('canvas');
@@ -92,11 +99,12 @@
             return payloadPromise.then(function(blob) {
                 var name = item.source instanceof File ? item.source.name.replace(/[^\w.-]/g, '_') : 'image.webp';
                 var ref = storage.ref('posts/' + USER_UID + '/' + Date.now() + '_' + index + '_' + name);
-                return ref.put(blob, { contentType: blob.type || source.type || 'image/png' })
-                    .then(function() { return ref.getDownloadURL(); })
+                var upload = ref.put(blob, { contentType: blob.type || source.type || 'image/png' })
+                    .then(function() { return ref.getDownloadURL(); });
+                return withTimeout(upload, 12000, 'Хранилище не ответило за 12 секунд')
                     .then(function(url) { return { type: 'image', url: url }; })
                     .catch(function() {
-                        return compressPostImage(blob).then(function(compact) {
+                        return withTimeout(compressPostImage(blob), 20000, 'Не удалось сжать фото') .then(function(compact) {
                             return blobToDataUrl(compact).then(function(dataUrl) { return { type: 'image', url: dataUrl }; });
                         });
                     });
@@ -171,12 +179,12 @@
             return;
         }
 
-        setPostPublishStatus('Готовлю медиа и публикую пост…');
+        setPostPublishStatus('Проверяю профиль…');
         setPostPublishBusy(true);
 
         var hashtags = extractHashtags(text);
 
-        db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value', function(avatarSnap) {
+        withTimeout(db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value'), 10000, 'База данных не ответила при проверке профиля').then(function(avatarSnap) {
             var avatarUrl = avatarSnap.val() || null;
 
             var postData = {
@@ -204,7 +212,15 @@
             var mediaItems = composeMedia.slice();
             var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
             if (!mediaItems.some(function(item) { return item.type === 'frame'; }) && linkMatch) mediaItems.push({ type: 'frame', url: linkMatch[1], frameSize: 'small' });
-            Promise.all(mediaItems.map(uploadPostImage)).then(function(savedMedia) {
+            var mediaStep = Promise.resolve();
+            var savedMedia = [];
+            mediaItems.forEach(function(item, index) {
+                mediaStep = mediaStep.then(function() {
+                    if (item.type === 'image') setPostPublishStatus('Загружаю фото ' + (index + 1) + ' из ' + mediaItems.filter(function(media) { return media.type === 'image'; }).length + '…');
+                    return uploadPostImage(item, index).then(function(result) { savedMedia.push(result); });
+                });
+            });
+            mediaStep.then(function() {
                 postData.media = savedMedia;
                 postData.img = (savedMedia.find(function(item) { return item.type === 'image'; }) || {}).url || null;
                 postData.link = (savedMedia.find(function(item) { return item.type === 'frame'; }) || {}).url || null;
@@ -212,7 +228,8 @@
                 var updates = {};
                 updates['sites/' + SITE + '/feed_posts/' + postId] = postData;
                 updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + postId] = postData;
-                db.ref().update(updates).then(function() {
+                setPostPublishStatus('Сохраняю пост в ленте…');
+                withTimeout(db.ref().update(updates), 15000, 'База данных не ответила при сохранении поста').then(function() {
                     clearEditor('postEditor');
                     window.clearPostForm();
                     setPostPublishBusy(false);
@@ -228,7 +245,7 @@
                 setPostPublishStatus('Не удалось загрузить фото: ' + (error.message || error), 'error');
                 console.error('Feed media upload failed:', error);
             });
-        }, function(error) {
+        }).catch(function(error) {
             setPostPublishBusy(false);
             setPostPublishStatus('Не удалось подготовить пост: ' + (error.message || error), 'error');
             console.error('Feed post preparation failed:', error);
