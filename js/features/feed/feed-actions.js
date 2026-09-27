@@ -444,6 +444,20 @@ window.shareFeedEntity = function(kind, payload) {
 };
 
 document.addEventListener('click', function(event) {
+    var datingFriendButton = event.target.closest('[data-dating-friend]');
+    if (datingFriendButton) {
+        event.preventDefault(); event.stopPropagation();
+        if (typeof window.sendFriendRequest === 'function') window.sendFriendRequest(datingFriendButton.getAttribute('data-dating-friend'));
+        else alert('Функция добавления в друзья пока загружается. Попробуй ещё раз.');
+        return;
+    }
+    var datingMessageButton = event.target.closest('[data-dating-message]');
+    if (datingMessageButton) {
+        event.preventDefault(); event.stopPropagation();
+        if (typeof window.openPrivateChat === 'function') window.openPrivateChat(datingMessageButton.getAttribute('data-dating-message'));
+        else alert('Сообщения пока загружаются. Попробуй ещё раз.');
+        return;
+    }
     var button = event.target.closest('[data-feed-share]');
     if (button) {
         event.preventDefault();
