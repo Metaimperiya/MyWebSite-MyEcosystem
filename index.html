@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
-    <link rel="stylesheet" href="css/features/feed.css?v=4.3">
+    <link rel="stylesheet" href="css/features/feed.css?v=4.4">
     <link rel="stylesheet" href="css/features/profile.css?v=3.3">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
@@ -193,7 +193,6 @@
                             <button onclick="formatText('h1')">H1</button>
                             <button onclick="formatText('h2')">H2</button>
                             <button onclick="formatText('quote')">"</button>
-                            <button onclick="formatText('code')">&lt;/&gt;</button>
                             <button onclick="insertLink()">🔗</button>
                         </div>
                         <div contenteditable="true" id="postEditor" class="post-editor" placeholder="What's new?"></div>
@@ -260,7 +259,6 @@
                             <button onclick="formatText('h1')">H1</button>
                             <button onclick="formatText('h2')">H2</button>
                             <button onclick="formatText('quote')">"</button>
-                            <button onclick="formatText('code')">&lt;/&gt;</button>
                             <button onclick="insertLink()">🔗</button>
                         </div>
                         <div contenteditable="true" id="postEditorProfile" class="post-editor" placeholder="What's new on your profile?"></div>
@@ -294,7 +292,6 @@
                                 <button onclick="formatText('h1')">H1</button>
                                 <button onclick="formatText('h2')">H2</button>
                                 <button onclick="formatText('quote')">"</button>
-                                <button onclick="formatText('code')">&lt;/&gt;</button>
                                 <button onclick="insertLink()">🔗</button>
                             </div>
                             <div contenteditable="true" id="postEditorFoto" class="post-editor" placeholder="What's new in photos?"></div>
@@ -494,10 +491,10 @@
 
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.1"></script>
-<script src="js/core/app.js?v=4.1"></script>
+<script src="js/core/app.js?v=4.2"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
-<script src="js/features/feed/feed-core.js?v=4.2"></script>
+<script src="js/features/feed/feed-core.js?v=4.3"></script>
 <script src="js/features/feed/feed-actions.js?v=4.0"></script>
 <script src="js/features/feed/feed-edit.js?v=4.5"></script>
 <script src="js/features/profile.js?v=3.3"></script>
@@ -507,7 +504,7 @@
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
 <script src="js/features/admin.js?v=3.2"></script>
-<script src="js/features/page.js?v=3.0"></script>
+<script src="js/features/page.js?v=3.1"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

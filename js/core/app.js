@@ -418,30 +418,6 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'strike') document.execCommand('strikeThrough', false);
         else if (type === 'h1' || type === 'h2') document.execCommand('formatBlock', false, type.toUpperCase());
         else if (type === 'quote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
-        else if (type === 'code') {
-            var range = selection && selection.rangeCount ? selection.getRangeAt(0) : null;
-            var code = document.createElement('code');
-            if (range && !range.collapsed && editor.contains(range.commonAncestorContainer)) {
-                code.appendChild(range.extractContents());
-                range.insertNode(code);
-                range.selectNodeContents(code);
-                selection.removeAllRanges(); selection.addRange(range);
-            } else {
-                var pre = document.createElement('pre');
-                code.textContent = 'вставьте код сюда';
-                pre.appendChild(code);
-                if (range && editor.contains(range.commonAncestorContainer)) {
-                    range.deleteContents();
-                    range.insertNode(pre);
-                } else {
-                    editor.appendChild(pre);
-                }
-                range = document.createRange();
-                range.selectNodeContents(code);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        }
         editor.dispatchEvent(new Event('input', { bubbles: true }));
     };
 

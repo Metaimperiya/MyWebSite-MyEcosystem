@@ -117,7 +117,6 @@ function renderPage(container, pageData) {
                         <button onclick="formatText('h1')">H1</button>
                         <button onclick="formatText('h2')">H2</button>
                         <button onclick="formatText('quote')">"</button>
-                        <button onclick="formatText('code')">&lt;/&gt;</button>
                         <button onclick="insertLink()">🔗</button>
                     </div>
                     <div contenteditable="true" id="postEditorPage" class="post-editor" placeholder="Что нового на странице?"></div>
