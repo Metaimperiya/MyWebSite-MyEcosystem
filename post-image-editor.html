@@ -758,6 +758,8 @@ file.addEventListener('change', e => {
 
 // The same editor can run standalone or inside the post composer iframe.
 const embeddedEditor = window.parent !== window;
+let embeddedImageLoadToken = 0;
+let currentPostEditSession = 0;
 if (embeddedEditor) {
   dl.style.display = 'none';
   useInPost.style.display = 'inline-flex';
@@ -765,10 +767,12 @@ if (embeddedEditor) {
     if (event.source !== window.parent || !event.data || event.data.type !== 'post-editor:load-image') return;
     const dataUrl = event.data.dataUrl;
     if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return;
+    currentPostEditSession = Number(event.data.sessionId) || 0;
+    const loadToken = ++embeddedImageLoadToken;
     const imageBlob = dataUrlToBlob(dataUrl);
     const imageFile = new File([imageBlob], 'post-image.png', { type: imageBlob.type || 'image/png' });
     reset.click();
-    processFile(imageFile);
+    processFile(imageFile, loadToken);
   });
   window.parent.postMessage({ type: 'post-editor:ready' }, '*');
 }
@@ -784,7 +788,7 @@ function dataUrlToBlob(dataUrl) {
 
 useInPost.addEventListener('click', () => dl.click());
 
-async function processFile(f) {
+async function processFile(f, loadToken) {
   if (!f.type.startsWith('image/')) { setStatus('❌ Не картинка', 'err'); return; }
   panel.classList.add('show');
   dl.disabled = true;
@@ -800,15 +804,17 @@ async function processFile(f) {
         setStatus(`<span class="spinner"></span> ${key}: ${pct}%`);
       }
     });
+    if (loadToken != null && loadToken !== embeddedImageLoadToken) return;
     if (!blob || blob.size < 100) throw new Error('Пустой результат');
     const dataUrl = await blobToDataURL(blob);
     addCutout(dataUrl);
     setStatus('✅ Добавлено! Можно ещё', 'ok');
   } catch (err) {
+    if (loadToken != null && loadToken !== embeddedImageLoadToken) return;
     console.error(err);
     setStatus('❌ ' + (err.message || err), 'err');
   }
-  dl.disabled = false;
+  if (loadToken == null || loadToken === embeddedImageLoadToken) dl.disabled = false;
 }
 
 function blobToDataURL(blob) {
@@ -1782,6 +1788,7 @@ function rgbToHex(rgb) {
 
 // ============ СКАЧИВАНИЕ ============
 dl.addEventListener('click', async () => {
+  const exportSessionId = currentPostEditSession;
   if (!editorStage.children.length) {
     setStatus('❌ Сначала добавь картинку', 'err');
     return;
@@ -1923,7 +1930,7 @@ dl.addEventListener('click', async () => {
       }
       if (embeddedEditor) {
         const reader = new FileReader();
-        reader.onload = () => window.parent.postMessage({ type: 'post-editor:result', dataUrl: reader.result }, '*');
+        reader.onload = () => window.parent.postMessage({ type: 'post-editor:result', dataUrl: reader.result, sessionId: exportSessionId }, '*');
         reader.readAsDataURL(b);
         dl.disabled = false;
         setStatus('✅ Изображение готово к публикации', 'ok');

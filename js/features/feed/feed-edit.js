@@ -12,6 +12,9 @@
     var composeMedia = [];
     var editMedia = [];
     var editorSlideIndex = -1;
+    var editorSessionId = 0;
+    var editorSessionTarget = null;
+    var editorSessionItem = null;
     var postEditorReady = false;
     var editorHtmlLoading = null;
     var editorEmbedStarted = false;
@@ -311,7 +314,10 @@
     window.editPostMedia = function(index) {
         var target = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
         if (!target[index] || target[index].type !== 'image') return;
+        editorSessionId++;
+        editorSessionTarget = target;
         editorSlideIndex = index;
+        editorSessionItem = target[index];
         var modal = document.getElementById('postImageEditorModal');
         var frame = document.getElementById('postImageEditorFrame');
         var loading = document.getElementById('postImageEditorLoading');
@@ -322,10 +328,10 @@
         if (loadingText) loadingText.textContent = 'Загружаю редактор…';
         if (retryButton) retryButton.hidden = true;
         if (postEditorReady) {
-            loadEditorImage(target[index]);
+            loadEditorImage(target[index], editorSessionId);
         } else if (!editorEmbedStarted) {
             editorEmbedStarted = true;
-            frame.src = 'post-image-editor.html';
+            frame.src = 'post-image-editor.html?v=1.1';
             setTimeout(function() {
                 if (postEditorReady || editorHtmlLoading) return;
                 editorHtmlLoading = fetch('post-image-editor.html', { cache: 'no-cache' }).then(function(response) {
@@ -351,15 +357,20 @@
         }
     };
 
-    function loadEditorImage(item) {
+    function loadEditorImage(item, sessionId) {
+        if (sessionId == null) sessionId = editorSessionId;
         toDataUrl(item).then(function(dataUrl) {
+            if (sessionId !== editorSessionId || !editorSessionTarget || editorSessionTarget[editorSlideIndex] !== editorSessionItem) return;
             var frame = document.getElementById('postImageEditorFrame');
-            if (frame && frame.contentWindow) frame.contentWindow.postMessage({ type: 'post-editor:load-image', dataUrl: dataUrl }, '*');
+            if (frame && frame.contentWindow) frame.contentWindow.postMessage({ type: 'post-editor:load-image', dataUrl: dataUrl, sessionId: sessionId }, '*');
         }).catch(function(error) { alert('Не получилось открыть фото в редакторе: ' + (error.message || error)); });
     }
 
     window.closePostImageEditor = function() {
         var modal = document.getElementById('postImageEditorModal'); if (modal) modal.classList.remove('open');
+        editorSessionId++;
+        editorSessionTarget = null;
+        editorSessionItem = null;
         editorSlideIndex = -1;
     };
 
@@ -978,14 +989,14 @@
                 var loading = document.getElementById('postImageEditorLoading'); if (loading) loading.hidden = true;
                 var retryButton = document.getElementById('postImageEditorRetry'); if (retryButton) retryButton.hidden = true;
                 var editing = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
-                if (editorSlideIndex >= 0 && editing[editorSlideIndex]) loadEditorImage(editing[editorSlideIndex]);
+                if (editorSlideIndex >= 0 && editing === editorSessionTarget && editing[editorSlideIndex] === editorSessionItem) loadEditorImage(editorSessionItem, editorSessionId);
             }
-            if (event.data.type === 'post-editor:result' && typeof event.data.dataUrl === 'string' && editorSlideIndex >= 0) {
-                var target = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
-                if (target[editorSlideIndex]) {
-                    target[editorSlideIndex].source = event.data.dataUrl;
-                    target[editorSlideIndex].preview = event.data.dataUrl;
-                    target[editorSlideIndex].edited = true;
+            if (event.data.type === 'post-editor:result' && typeof event.data.dataUrl === 'string' && Number(event.data.sessionId) === editorSessionId && editorSlideIndex >= 0) {
+                var target = editorSessionTarget;
+                if (target && target[editorSlideIndex] === editorSessionItem) {
+                    editorSessionItem.source = event.data.dataUrl;
+                    editorSessionItem.preview = event.data.dataUrl;
+                    editorSessionItem.edited = true;
                     renderMediaList(target === editMedia ? 'editMediaList' : 'postMediaList', target, true);
                     window.closePostImageEditor();
                 }
