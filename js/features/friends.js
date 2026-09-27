@@ -314,6 +314,7 @@ function sendFriendRequest(targetUid) {
     });
     });
 }
+window.sendFriendRequest = sendFriendRequest;
 
 // ================================================================ */
 // 4. ОТМЕНА ЗАЯВКИ

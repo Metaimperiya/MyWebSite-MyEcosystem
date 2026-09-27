@@ -375,6 +375,7 @@ function openDatingDetail(uid) {
         blockDatingProfile(uid);
     };
 }
+window.openDatingDetail = openDatingDetail;
 
 function blockDatingProfile(uid) {
     if (!USER_UID || !uid || uid === USER_UID || !confirm('Заблокировать пользователя? Он исчезнет из списка знакомств.')) return;
