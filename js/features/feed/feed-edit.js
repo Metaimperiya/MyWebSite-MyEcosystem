@@ -93,7 +93,7 @@
         });
     }
 
-    function uploadPostImage(item, index) {
+    function uploadPostImage(item, index, ownerUid) {
         if (item.type === 'frame') return Promise.resolve({ type: 'frame', url: item.url, frameSize: item.frameSize || 'small' });
         if (item.source && /^https?:\/\//.test(item.source) && !item.edited) return Promise.resolve({ type: 'image', url: item.source });
         var sourcePromise = item.source instanceof File ? Promise.resolve(item.source) : Promise.resolve(dataUrlToBlob(item.source || item.url));
@@ -101,7 +101,8 @@
             var payloadPromise = source.size < 5 * 1024 * 1024 ? Promise.resolve(source) : compressPostImage(source);
             return payloadPromise.then(function(blob) {
                 var name = item.source instanceof File ? item.source.name.replace(/[^\w.-]/g, '_') : 'image.webp';
-                var ref = storage.ref('posts/' + USER_UID + '/' + Date.now() + '_' + index + '_' + name);
+                var uploadId = Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+                var ref = storage.ref('posts/' + (ownerUid || USER_UID) + '/' + uploadId + '_' + index + '_' + name);
                 var upload = ref.put(blob, { contentType: blob.type || source.type || 'image/png' })
                     .then(function() { return ref.getDownloadURL(); });
                 return withTimeout(upload, 12000, 'Хранилище не ответило за 12 секунд')
@@ -142,11 +143,17 @@
     }
 
     function setPostPublishBusy(busy) {
-        var button = document.querySelector('#page-feed .post-form .btn-submit');
-        if (!button) return;
-        if (!button.dataset.readyLabel) button.dataset.readyLabel = button.textContent;
-        button.disabled = !!busy;
-        button.textContent = busy ? '⏳ Публикую…' : button.dataset.readyLabel;
+        var form = document.querySelector('#page-feed .post-form');
+        if (!form) return;
+        var button = form.querySelector('.btn-submit');
+        if (button) {
+            if (!button.dataset.readyLabel) button.dataset.readyLabel = button.textContent;
+            button.disabled = !!busy;
+            button.textContent = busy ? '⏳ Публикую…' : button.dataset.readyLabel;
+        }
+        form.querySelectorAll('button, input').forEach(function(control) { control.disabled = !!busy; });
+        var editor = form.querySelector('[contenteditable="true"], [contenteditable="false"]');
+        if (editor) editor.contentEditable = busy ? 'false' : 'true';
     }
 
     function clearEditor(id) {
@@ -182,17 +189,24 @@
             return;
         }
 
+        // Фиксируем точный набор вложений на момент нажатия «Опубликовать».
+        // Дальнейшие асинхронные проверки не должны подменить его новыми файлами.
+        var ownerUid = USER_UID;
+        var authorName = USER;
+        var mediaItems = composeMedia.map(function(item) { return Object.assign({}, item); });
+        var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
+        if (!mediaItems.some(function(item) { return item.type === 'frame'; }) && linkMatch) mediaItems.push({ type: 'frame', url: linkMatch[1], frameSize: 'small' });
         setPostPublishStatus('Проверяю профиль…');
         setPostPublishBusy(true);
 
         var hashtags = extractHashtags(text);
 
-        withTimeout(db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value'), 10000, 'База данных не ответила при проверке профиля').then(function(avatarSnap) {
+        withTimeout(db.ref('sites/' + SITE + '/users/' + ownerUid + '/avatarUrl').once('value'), 10000, 'База данных не ответила при проверке профиля').then(function(avatarSnap) {
             var avatarUrl = avatarSnap.val() || null;
 
             var postData = {
-                author: USER,
-                authorUid: USER_UID,
+                author: authorName,
+                authorUid: ownerUid,
                 authorAvatar: avatarUrl,
                 text: text || '📷',
                 marquee: null,
@@ -212,15 +226,12 @@
                 deletedAt: null
             };
 
-            var mediaItems = composeMedia.slice();
-            var linkMatch = (text || '').match(/(https?:\/\/[^\s]+)/);
-            if (!mediaItems.some(function(item) { return item.type === 'frame'; }) && linkMatch) mediaItems.push({ type: 'frame', url: linkMatch[1], frameSize: 'small' });
             var mediaStep = Promise.resolve();
             var savedMedia = [];
             mediaItems.forEach(function(item, index) {
                 mediaStep = mediaStep.then(function() {
                     if (item.type === 'image') setPostPublishStatus('Загружаю фото ' + (index + 1) + ' из ' + mediaItems.filter(function(media) { return media.type === 'image'; }).length + '…');
-                    return uploadPostImage(item, index).then(function(result) { savedMedia.push(result); });
+                    return uploadPostImage(item, index, ownerUid).then(function(result) { savedMedia.push(result); });
                 });
             });
             mediaStep.then(function() {
@@ -230,7 +241,7 @@
                 var postId = db.ref('sites/' + SITE + '/feed_posts').push().key;
                 var updates = {};
                 updates['sites/' + SITE + '/feed_posts/' + postId] = postData;
-                updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + postId] = postData;
+                updates['sites/' + SITE + '/user_posts/' + ownerUid + '/' + postId] = postData;
                 setPostPublishStatus('Сохраняю пост в ленте…');
                 withTimeout(db.ref().update(updates), 15000, 'База данных не ответила при сохранении поста').then(function() {
                     clearEditor('postEditor');
