@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof updateUI === 'function') updateUI();
             if (typeof loadFeed === 'function') loadFeed();
             if (typeof loadGroups === 'function') loadGroups();
+            if (typeof loadWork === 'function') loadWork();
             if (typeof loadPeople === 'function') loadPeople();
             if (typeof loadProfile === 'function') loadProfile();
             if (typeof loadNotifications === 'function') loadNotifications();

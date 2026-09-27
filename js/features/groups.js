@@ -10,6 +10,10 @@ var groupsCache = {};
 var groupMembershipsCache = {};
 var selectedCommunityId = null;
 var selectedGroupIsMember = false;
+var groupCoverPreviewUrl = null;
+var groupAvatarPreviewUrl = null;
+var groupCoverRemoved = false;
+var groupAvatarRemoved = false;
 
 function groupEscape(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
@@ -71,11 +75,27 @@ function renderGroupDetailHeader() {
     var members = groupMembershipsCache[selectedCommunityId] || {};
     var created = group.createdAt ? new Date(group.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     var initial = Array.from((group.name || 'Группа').trim())[0] || '👥';
-    header.innerHTML = '<div class="group-profile-cover"><span>СООБЩЕСТВО</span></div><div class="group-profile-main">' +
-        '<div class="group-profile-avatar">' + groupEscape(initial) + '</div><div class="group-profile-identity"><h2>' + groupEscape(group.name || 'Группа') +
+    header.innerHTML = '<div class="group-profile-cover' + (group.coverUrl ? ' has-cover' : '') + '"><span>СООБЩЕСТВО</span></div><div class="group-profile-main">' +
+        '<div class="group-profile-avatar">' + (group.avatarUrl ? '' : groupEscape(initial)) + '</div><div class="group-profile-identity"><h2>' + groupEscape(group.name || 'Группа') +
         '</h2><span>Группа · ' + Object.keys(members).length + ' участников' + (created ? ' · создана ' + groupEscape(created) : '') + '</span></div>' +
         (group.ownerUid === USER_UID ? '<button type="button" class="group-settings-button" onclick="openEditGroup()">⚙ Настроить</button>' : '') + '</div>' +
         '<p class="group-profile-description">' + groupEscape(group.description || 'У этой группы пока нет описания.') + '</p>';
+    if (group.coverUrl) {
+        var cover = header.querySelector('.group-profile-cover');
+        var coverImage = document.createElement('img');
+        coverImage.src = group.coverUrl;
+        coverImage.alt = 'Обложка группы';
+        coverImage.loading = 'lazy';
+        cover.insertBefore(coverImage, cover.firstChild);
+    }
+    if (group.avatarUrl) {
+        var avatar = header.querySelector('.group-profile-avatar');
+        var avatarImage = document.createElement('img');
+        avatarImage.src = group.avatarUrl;
+        avatarImage.alt = 'Аватар группы';
+        avatarImage.loading = 'lazy';
+        avatar.appendChild(avatarImage);
+    }
     var about = document.getElementById('groupAboutPanel');
     if (about) about.innerHTML = '<h3>Информация о группе</h3><p>' + groupEscape(group.description || 'Описание пока не добавлено.') + '</p><dl>' +
         '<div><dt>Создатель</dt><dd>' + groupEscape(group.ownerName || 'Участник METAIMPERIYA') + '</dd></div>' +
@@ -219,31 +239,146 @@ window.openEditGroup = function() {
     document.getElementById('editGroupName').value = group.name || '';
     document.getElementById('editGroupDescription').value = group.description || '';
     document.getElementById('editGroupError').textContent = '';
+    document.getElementById('editGroupAvatarInput').value = '';
+    document.getElementById('editGroupAvatarUrl').value = group.avatarUrl && /^https?:\/\//i.test(group.avatarUrl) ? group.avatarUrl : '';
+    groupAvatarRemoved = false;
+    renderGroupAvatarPreview(group.avatarUrl || '');
+    document.getElementById('editGroupCoverInput').value = '';
+    document.getElementById('editGroupCoverUrl').value = group.coverUrl && /^https?:\/\//i.test(group.coverUrl) ? group.coverUrl : '';
+    groupCoverRemoved = false;
+    renderGroupCoverPreview(group.coverUrl || '');
     document.getElementById('editCommunityModal').classList.add('open');
 };
 
+function renderGroupCoverPreview(url) {
+    var preview = document.getElementById('editGroupCoverPreview');
+    if (!preview) return;
+    preview.replaceChildren();
+    if (url) {
+        var image = document.createElement('img');
+        image.src = url;
+        image.alt = 'Предпросмотр обложки';
+        preview.appendChild(image);
+    } else {
+        var label = document.createElement('span');
+        label.textContent = 'Пока без обложки';
+        preview.appendChild(label);
+    }
+}
+
+function renderGroupAvatarPreview(url) {
+    var preview = document.getElementById('editGroupAvatarPreview');
+    if (!preview) return;
+    preview.replaceChildren();
+    if (url) {
+        var image = document.createElement('img');
+        image.src = url;
+        image.alt = 'Предпросмотр аватарки';
+        preview.appendChild(image);
+    } else {
+        var label = document.createElement('span');
+        label.textContent = 'Пока без аватарки';
+        preview.appendChild(label);
+    }
+}
+
 window.closeEditGroup = function() {
     document.getElementById('editCommunityModal').classList.remove('open');
+    if (groupCoverPreviewUrl) URL.revokeObjectURL(groupCoverPreviewUrl);
+    if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);
+    groupCoverPreviewUrl = null;
+    groupAvatarPreviewUrl = null;
+};
+
+window.clearGroupCover = function() {
+    var fileInput = document.getElementById('editGroupCoverInput');
+    var urlInput = document.getElementById('editGroupCoverUrl');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = '';
+    if (groupCoverPreviewUrl) URL.revokeObjectURL(groupCoverPreviewUrl);
+    groupCoverPreviewUrl = null;
+    groupCoverRemoved = true;
+    renderGroupCoverPreview('');
+};
+
+window.clearGroupAvatar = function() {
+    var fileInput = document.getElementById('editGroupAvatarInput');
+    var urlInput = document.getElementById('editGroupAvatarUrl');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = '';
+    if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);
+    groupAvatarPreviewUrl = null;
+    groupAvatarRemoved = true;
+    renderGroupAvatarPreview('');
 };
 
 window.saveGroupDetails = function() {
     var group = groupsCache[selectedCommunityId];
     var error = document.getElementById('editGroupError');
     var button = document.getElementById('saveGroupButton');
+    var coverInput = document.getElementById('editGroupCoverInput');
+    var coverUrlInput = document.getElementById('editGroupCoverUrl');
+    var avatarInput = document.getElementById('editGroupAvatarInput');
+    var avatarUrlInput = document.getElementById('editGroupAvatarUrl');
     if (!group || group.ownerUid !== USER_UID) return;
     var name = document.getElementById('editGroupName').value.trim();
     var description = document.getElementById('editGroupDescription').value.trim().slice(0, 300);
+    var coverFile = coverInput && coverInput.files ? coverInput.files[0] : null;
+    var enteredCoverUrl = coverUrlInput ? coverUrlInput.value.trim() : '';
+    var avatarFile = avatarInput && avatarInput.files ? avatarInput.files[0] : null;
+    var enteredAvatarUrl = avatarUrlInput ? avatarUrlInput.value.trim() : '';
     if (name.length < 2) { error.textContent = 'Название должно содержать хотя бы 2 символа.'; return; }
+    if (coverFile && !coverFile.type.match(/^image\//i)) { error.textContent = 'Выбери файл изображения.'; return; }
+    if (coverFile && coverFile.size >= 5 * 1024 * 1024) { error.textContent = 'Размер обложки должен быть меньше 5 МБ.'; return; }
+    if (avatarFile && !avatarFile.type.match(/^image\//i)) { error.textContent = 'Выбери файл изображения для аватарки.'; return; }
+    if (avatarFile && avatarFile.size >= 5 * 1024 * 1024) { error.textContent = 'Размер аватарки должен быть меньше 5 МБ.'; return; }
+    if (enteredCoverUrl) {
+        try {
+            var parsedCoverUrl = new URL(enteredCoverUrl);
+            if (parsedCoverUrl.protocol !== 'http:' && parsedCoverUrl.protocol !== 'https:') throw new Error('Unsupported protocol');
+        } catch (invalidCoverUrl) {
+            error.textContent = 'Вставь полную ссылку на изображение, начинающуюся с https:// или http://.';
+            return;
+        }
+    }
+    if (enteredAvatarUrl) {
+        try {
+            var parsedAvatarUrl = new URL(enteredAvatarUrl);
+            if (parsedAvatarUrl.protocol !== 'http:' && parsedAvatarUrl.protocol !== 'https:') throw new Error('Unsupported protocol');
+        } catch (invalidAvatarUrl) {
+            error.textContent = 'Вставь прямую ссылку на аватарку, начинающуюся с https:// или http://.';
+            return;
+        }
+    }
     button.disabled = true;
-    button.textContent = 'Сохраняю…';
-    db.ref('sites/' + SITE + '/groups/' + selectedCommunityId).update({ name: name, description: description }).then(function() {
+    button.textContent = coverFile || avatarFile ? 'Загружаю изображения…' : 'Сохраняю…';
+    var savedCoverUrl = group.coverUrl || null;
+    var savedAvatarUrl = group.avatarUrl || null;
+    var coverPromise = coverFile
+        ? storage.ref('group-covers/' + USER_UID + '/' + selectedCommunityId + '/cover').put(coverFile, { contentType: coverFile.type }).then(function(snapshot) { return snapshot.ref.getDownloadURL(); })
+        : Promise.resolve(enteredCoverUrl || (groupCoverRemoved ? null : group.coverUrl || null));
+    var avatarPromise = avatarFile
+        ? storage.ref('group-avatars/' + USER_UID + '/' + selectedCommunityId + '/avatar').put(avatarFile, { contentType: avatarFile.type }).then(function(snapshot) { return snapshot.ref.getDownloadURL(); })
+        : Promise.resolve(enteredAvatarUrl || (groupAvatarRemoved ? null : group.avatarUrl || null));
+    Promise.all([coverPromise, avatarPromise]).then(function(imageUrls) {
+        savedCoverUrl = imageUrls[0];
+        savedAvatarUrl = imageUrls[1];
+        return db.ref('sites/' + SITE + '/groups/' + selectedCommunityId).update({ name: name, description: description, coverUrl: savedCoverUrl, avatarUrl: savedAvatarUrl });
+    }).then(function() {
         groupsCache[selectedCommunityId].name = name;
         groupsCache[selectedCommunityId].description = description;
+        groupsCache[selectedCommunityId].coverUrl = savedCoverUrl;
+        groupsCache[selectedCommunityId].avatarUrl = savedAvatarUrl;
+        groupCoverRemoved = false;
+        groupAvatarRemoved = false;
         renderGroupDetailHeader();
         renderGroupDirectory();
         window.closeEditGroup();
     }).catch(function(saveError) {
-        error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Нет прав на изменение группы.' : 'Не удалось сохранить изменения.';
+        console.error('Не удалось сохранить профиль группы:', saveError);
+        error.textContent = saveError.code === 'storage/unauthorized' || saveError.code === 'storage/unauthenticated' || saveError.code === 'storage/bucket-not-found'
+            ? 'Хранилище Firebase Storage ещё не настроено. Добавь обложку по ссылке или включи Storage в Firebase Console.'
+            : saveError.code === 'PERMISSION_DENIED' ? 'Нет прав на изменение группы.' : 'Не удалось сохранить изменения.';
     }).finally(function() { button.disabled = false; button.textContent = 'Сохранить'; });
 };
 
@@ -343,6 +478,60 @@ window.publishGroupPost = function() {
 
 var groupsSearchInput = document.getElementById('groupsSearch');
 if (groupsSearchInput) groupsSearchInput.addEventListener('input', renderGroupDirectory);
+var editGroupCoverInput = document.getElementById('editGroupCoverInput');
+if (editGroupCoverInput) editGroupCoverInput.addEventListener('change', function() {
+    var file = editGroupCoverInput.files && editGroupCoverInput.files[0];
+    var error = document.getElementById('editGroupError');
+    if (!file) return;
+    if (!file.type.match(/^image\//i) || file.size >= 5 * 1024 * 1024) {
+        if (error) error.textContent = !file.type.match(/^image\//i) ? 'Выбери файл изображения.' : 'Размер обложки должен быть меньше 5 МБ.';
+        editGroupCoverInput.value = '';
+        return;
+    }
+    if (error) error.textContent = '';
+    var urlInput = document.getElementById('editGroupCoverUrl');
+    if (urlInput) urlInput.value = '';
+    groupCoverRemoved = false;
+    if (groupCoverPreviewUrl) URL.revokeObjectURL(groupCoverPreviewUrl);
+    groupCoverPreviewUrl = URL.createObjectURL(file);
+    renderGroupCoverPreview(groupCoverPreviewUrl);
+});
+var editGroupCoverUrl = document.getElementById('editGroupCoverUrl');
+if (editGroupCoverUrl) editGroupCoverUrl.addEventListener('input', function() {
+    var fileInput = document.getElementById('editGroupCoverInput');
+    if (fileInput) fileInput.value = '';
+    if (groupCoverPreviewUrl) URL.revokeObjectURL(groupCoverPreviewUrl);
+    groupCoverPreviewUrl = null;
+    groupCoverRemoved = !editGroupCoverUrl.value.trim();
+    renderGroupCoverPreview(editGroupCoverUrl.value.trim());
+});
+var editGroupAvatarInput = document.getElementById('editGroupAvatarInput');
+if (editGroupAvatarInput) editGroupAvatarInput.addEventListener('change', function() {
+    var file = editGroupAvatarInput.files && editGroupAvatarInput.files[0];
+    var error = document.getElementById('editGroupError');
+    if (!file) return;
+    if (!file.type.match(/^image\//i) || file.size >= 5 * 1024 * 1024) {
+        if (error) error.textContent = !file.type.match(/^image\//i) ? 'Выбери файл изображения для аватарки.' : 'Размер аватарки должен быть меньше 5 МБ.';
+        editGroupAvatarInput.value = '';
+        return;
+    }
+    if (error) error.textContent = '';
+    var urlInput = document.getElementById('editGroupAvatarUrl');
+    if (urlInput) urlInput.value = '';
+    groupAvatarRemoved = false;
+    if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);
+    groupAvatarPreviewUrl = URL.createObjectURL(file);
+    renderGroupAvatarPreview(groupAvatarPreviewUrl);
+});
+var editGroupAvatarUrl = document.getElementById('editGroupAvatarUrl');
+if (editGroupAvatarUrl) editGroupAvatarUrl.addEventListener('input', function() {
+    var fileInput = document.getElementById('editGroupAvatarInput');
+    if (fileInput) fileInput.value = '';
+    if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);
+    groupAvatarPreviewUrl = null;
+    groupAvatarRemoved = !editGroupAvatarUrl.value.trim();
+    renderGroupAvatarPreview(editGroupAvatarUrl.value.trim());
+});
 
 window.addEventListener('beforeunload', function() {
     if (groupsDirectoryRef) groupsDirectoryRef.off();

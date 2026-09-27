@@ -40,6 +40,37 @@
             }
           }
         },
+        "work_companies": {
+          ".read": "auth != null",
+          "$companyId": {
+            ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || (data.exists() && data.child('ownerUid').val() === auth.uid))",
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'description', 'ownerUid', 'ownerName', 'createdAt']) && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 80 && newData.child('description').isString() && newData.child('description').val().length <= 500 && newData.child('ownerUid').val() === auth.uid && newData.child('ownerName').isString() && newData.child('createdAt').isNumber())"
+          }
+        },
+        "work_vacancies": {
+          "$companyId": {
+            ".read": "auth != null && root.child('sites').child($site).child('work_companies').child($companyId).exists()",
+            ".indexOn": ["createdAt"],
+            "$vacancyId": {
+              ".write": "auth != null && root.child('sites').child($site).child('work_companies').child($companyId).child('ownerUid').val() === auth.uid && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || (data.exists() && data.child('ownerUid').val() === auth.uid))",
+              ".validate": "!newData.exists() || (newData.hasChildren(['title', 'description', 'city', 'salary', 'companyId', 'companyName', 'ownerUid', 'createdAt']) && newData.child('title').isString() && newData.child('title').val().length >= 2 && newData.child('title').val().length <= 100 && newData.child('description').isString() && newData.child('description').val().length >= 1 && newData.child('description').val().length <= 3000 && newData.child('city').isString() && newData.child('city').val().length <= 80 && newData.child('salary').isString() && newData.child('salary').val().length <= 80 && newData.child('companyId').val() === $companyId && newData.child('companyName').isString() && newData.child('ownerUid').val() === auth.uid && newData.child('createdAt').isNumber())"
+            }
+          }
+        },
+        "work_resumes": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'title', 'city', 'experience', 'about', 'ownerUid', 'contactsPublic', 'updatedAt']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 80 && newData.child('title').isString() && newData.child('title').val().length >= 2 && newData.child('title').val().length <= 100 && newData.child('city').isString() && newData.child('city').val().length <= 80 && newData.child('experience').isString() && newData.child('experience').val().length <= 80 && newData.child('about').isString() && newData.child('about').val().length <= 2000 && newData.child('ownerUid').val() === auth.uid && newData.child('contactsPublic').isBoolean() && newData.child('updatedAt').isNumber())"
+          }
+        },
+        "work_resume_contacts": {
+          "$uid": {
+            ".read": "auth != null && ($uid === auth.uid || root.child('sites').child($site).child('work_resumes').child($uid).child('contactsPublic').val() === true)",
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "!newData.exists() || (newData.hasChildren(['email', 'phone']) && newData.child('email').isString() && newData.child('email').val().length <= 160 && newData.child('phone').isString() && newData.child('phone').val().length <= 40)"
+          }
+        },
         "profile_status": {
           ".read": true,
           "$uid": {

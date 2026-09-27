@@ -43,7 +43,8 @@
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=4.6">
     <link rel="stylesheet" href="css/features/profile.css?v=3.6">
-    <link rel="stylesheet" href="css/features/groups.css?v=1.1">
+    <link rel="stylesheet" href="css/features/groups.css?v=1.4">
+    <link rel="stylesheet" href="css/features/work.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -117,6 +118,7 @@
         <div class="menu-item" onclick="goToProfile();closeSidebar();"><span class="icon">👤</span> Profile</div>
         <div class="menu-item" onclick="goToPeople();closeSidebar();"><span class="icon">👥</span> People</div>
         <div class="menu-item" onclick="goToGroups();closeSidebar();"><span class="icon">📁</span> Groups</div>
+        <div class="menu-item" onclick="goToWork();closeSidebar();"><span class="icon">💼</span> Работа</div>
 
         <a class="menu-item" href="/doss/" onclick="closeSidebar();"><span class="icon">🧠</span> DOSS OS</a>
 
@@ -258,6 +260,20 @@
 
             <div class="page" id="page-people">
                 <div class="card"><h3>👤 All users</h3><div class="people-list" id="peopleList"></div></div>
+            </div>
+
+            <div class="page" id="page-work">
+                <section class="work-page">
+                    <header class="work-heading"><div><span class="work-kicker">METAIMPERIYA · КАРЬЕРА</span><h1>Работа</h1><p>Компании, вакансии и резюме в одном месте.</p></div><button type="button" class="work-primary" id="workCreateButton" onclick="openWorkCreate()">＋ Вакансия</button></header>
+                    <nav class="work-tabs" aria-label="Разделы работы">
+                        <button type="button" class="active" data-work-tab="vacancies" onclick="showWorkTab('vacancies')">Вакансии</button>
+                        <button type="button" data-work-tab="companies" onclick="showWorkTab('companies')">Компании</button>
+                        <button type="button" data-work-tab="resumes" onclick="showWorkTab('resumes')">Резюме</button>
+                    </nav>
+                    <div class="work-tools"><label class="work-search"><span>⌕</span><input id="workSearch" type="search" placeholder="Поиск вакансий" autocomplete="off"></label><span class="work-count" id="workCount"></span></div>
+                    <div class="work-list" id="workList" aria-live="polite"></div>
+                    <section id="workCompanyDetail" class="work-company-detail" hidden></section>
+                </section>
             </div>
 
             <div class="page" id="page-profile">
@@ -504,10 +520,58 @@
             <input id="editGroupName" maxlength="60">
             <label for="editGroupDescription">Описание</label>
             <textarea id="editGroupDescription" maxlength="300"></textarea>
+            <label>Аватар группы</label>
+            <div class="group-avatar-editor-preview" id="editGroupAvatarPreview"><span>Пока без аватарки</span></div>
+            <label class="group-cover-picker" for="editGroupAvatarInput">👤 Выбрать аватарку</label>
+            <input class="hidden" id="editGroupAvatarInput" type="file" accept="image/*">
+            <label for="editGroupAvatarUrl">Или вставь прямую ссылку на изображение</label>
+            <input id="editGroupAvatarUrl" type="url" placeholder="https://example.com/avatar.jpg" autocomplete="off">
+            <button type="button" class="group-cover-remove" onclick="clearGroupAvatar()">Убрать аватарку</button>
+            <label>Обложка группы</label>
+            <div class="group-cover-editor-preview" id="editGroupCoverPreview"><span>Пока без обложки</span></div>
+            <label class="group-cover-picker" for="editGroupCoverInput">🖼️ Выбрать изображение</label>
+            <input class="hidden" id="editGroupCoverInput" type="file" accept="image/*">
+            <label for="editGroupCoverUrl">Или вставь прямую ссылку на изображение</label>
+            <input id="editGroupCoverUrl" type="url" placeholder="https://example.com/cover.jpg" autocomplete="off">
+            <button type="button" class="group-cover-remove" id="removeGroupCoverButton" onclick="clearGroupCover()">Убрать обложку</button>
+            <small class="group-cover-help">Файл — до 5 МБ. Можно использовать прямую HTTPS-ссылку.</small>
             <div class="group-create-error" id="editGroupError" role="alert"></div>
             <button class="btn-primary" id="saveGroupButton" type="button" onclick="saveGroupDetails()">Сохранить</button>
         </div>
     </div>
+
+    <div class="modal-overlay" id="workCompanyModal">
+        <div class="modal-box work-modal"><button class="close-btn" type="button" onclick="closeWorkModal('workCompanyModal')">✕</button><h3 id="workCompanyModalTitle">Компания</h3>
+            <label for="workCompanyName">Название</label><input id="workCompanyName" maxlength="80" placeholder="Например, METAIMPERIYA">
+            <label for="workCompanyDescription">Описание</label><textarea id="workCompanyDescription" maxlength="500" placeholder="Чем занимается компания и кого ищет"></textarea>
+            <label for="workCompanyAvatar">Ссылка на логотип</label><input id="workCompanyAvatar" type="url" placeholder="https://…">
+            <label for="workCompanyCover">Ссылка на обложку</label><input id="workCompanyCover" type="url" placeholder="https://…">
+            <div class="work-error" id="workCompanyError" role="alert"></div><button class="work-primary work-submit" type="button" onclick="saveWorkCompany()">Сохранить компанию</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="workVacancyModal">
+        <div class="modal-box work-modal"><button class="close-btn" type="button" onclick="closeWorkModal('workVacancyModal')">✕</button><h3>Новая вакансия</h3>
+            <label for="workVacancyCompany">Компания</label><select id="workVacancyCompany"></select>
+            <label for="workVacancyTitle">Должность</label><input id="workVacancyTitle" maxlength="100" placeholder="Например, дизайнер">
+            <div class="work-form-row"><div><label for="workVacancyCity">Город / формат</label><input id="workVacancyCity" maxlength="80" placeholder="Киев · удалённо"></div><div><label for="workVacancySalary">Зарплата</label><input id="workVacancySalary" maxlength="80" placeholder="По договорённости"></div></div>
+            <label for="workVacancyDescription">Описание вакансии</label><textarea id="workVacancyDescription" maxlength="3000" placeholder="Задачи, требования и условия"></textarea>
+            <div class="work-error" id="workVacancyError" role="alert"></div><button class="work-primary work-submit" type="button" onclick="saveWorkVacancy()">Опубликовать вакансию</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="workResumeModal">
+        <div class="modal-box work-modal"><button class="close-btn" type="button" onclick="closeWorkModal('workResumeModal')">✕</button><h3>Моё резюме</h3>
+            <label for="workResumeName">Как к тебе обращаться</label><input id="workResumeName" maxlength="80">
+            <label for="workResumeTitle">Желаемая должность / профессия</label><input id="workResumeTitle" maxlength="100" placeholder="Например, фронтенд-разработчик">
+            <div class="work-form-row"><div><label for="workResumeCity">Город / формат</label><input id="workResumeCity" maxlength="80" placeholder="Львов · удалённо"></div><div><label for="workResumeExperience">Опыт</label><input id="workResumeExperience" maxlength="80" placeholder="3 года"></div></div>
+            <label for="workResumePhoto">Ссылка на фото (необязательно)</label><input id="workResumePhoto" type="url" placeholder="https://…">
+            <label for="workResumeAbout">О себе и навыки</label><textarea id="workResumeAbout" maxlength="2000" placeholder="Расскажи о своём опыте и навыках"></textarea>
+            <label for="workResumeEmail">Email для связи (необязательно)</label><input id="workResumeEmail" type="email" maxlength="160" placeholder="name@example.com">
+            <label for="workResumePhone">Телефон (необязательно)</label><input id="workResumePhone" type="tel" maxlength="40" placeholder="+380…">
+            <label class="work-privacy"><input id="workResumeContactsPublic" type="checkbox"> Показывать контакты в резюме</label>
+            <div class="work-error" id="workResumeError" role="alert"></div><button class="work-primary work-submit" type="button" onclick="saveWorkResume()">Сохранить резюме</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="workInfoModal"><div class="modal-box work-modal"><button class="close-btn" type="button" onclick="closeWorkModal('workInfoModal')">✕</button><div id="workInfoContent"></div></div></div>
 
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
@@ -619,7 +683,7 @@
 
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.1"></script>
-<script src="js/core/app.js?v=4.2"></script>
+<script src="js/core/app.js?v=4.3"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
 <script src="js/features/feed/feed-core.js?v=4.5"></script>
@@ -628,7 +692,8 @@
 <script src="js/features/profile.js?v=3.8"></script>
 <script src="js/features/reputation.js?v=1.1"></script>
 <script src="js/features/friends.js?v=3.1"></script>
-<script src="js/features/groups.js?v=4.1"></script>
+<script src="js/features/groups.js?v=4.4"></script>
+<script src="js/features/work.js?v=1.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
 <script src="js/features/admin.js?v=3.2"></script>
@@ -641,11 +706,12 @@ document.addEventListener('DOMContentLoaded', function() {
             el.classList.remove('active');
             el.style.display = 'none';
         });
-        var feed = document.getElementById('page-feed');
-        if (feed) {
-            feed.classList.add('active');
-            feed.style.display = 'block';
-            console.log('✅ Feed opened');
+        var initialPage = new URLSearchParams(window.location.search).get('page') === 'work' ? 'work' : 'feed';
+        var initialPageElement = document.getElementById('page-' + initialPage);
+        if (initialPageElement) {
+            initialPageElement.classList.add('active');
+            initialPageElement.style.display = 'block';
+            console.log('✅ Initial page opened:', initialPage);
         }
         if (typeof updateUI === 'function') updateUI();
         if (typeof updatePcTopbar === 'function') updatePcTopbar();

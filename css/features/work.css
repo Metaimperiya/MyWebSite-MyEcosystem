@@ -1,0 +1,94 @@
+.work-page { padding:4px 0 28px; color:var(--text-color); }
+.work-page [hidden] { display:none !important; }
+.work-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; padding:19px; border:1px solid var(--border-color); border-radius:16px; background:var(--card-bg); box-shadow:var(--shadow); }
+.work-kicker,.work-detail-kicker { color:var(--link-color); font-size:.65rem; font-weight:800; letter-spacing:.11em; }
+.work-heading h1 { margin:4px 0; font-size:1.45rem; }
+.work-heading p { margin:0; color:var(--text-secondary); font-size:.8rem; }
+.work-primary { min-height:38px; padding:8px 14px; border:0; border-radius:10px; background:var(--link-color); color:#fff; font:inherit; font-size:.77rem; font-weight:750; cursor:pointer; white-space:nowrap; }
+.work-primary:disabled { opacity:.6; cursor:wait; }
+.work-tabs { display:flex; gap:5px; margin-bottom:12px; padding:4px; border:1px solid var(--border-color); border-radius:12px; background:var(--card-bg); }
+.work-tabs button { flex:1; min-height:36px; padding:7px 12px; border:0; border-radius:9px; background:transparent; color:var(--text-secondary); font:inherit; font-size:.78rem; cursor:pointer; }
+.work-tabs button.active { background:color-mix(in srgb,var(--link-color) 13%,var(--card-bg)); color:var(--link-color); font-weight:750; }
+.work-tools { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+.work-search { display:flex; align-items:center; gap:8px; width:min(100%,520px); height:40px; padding:0 12px; border:1px solid var(--border-color); border-radius:11px; background:var(--card-bg); color:var(--muted-text); }
+.work-search input { width:100%; border:0; outline:0; background:transparent; color:var(--text-color); font:inherit; font-size:.78rem; }
+.work-count { color:var(--muted-text); font-size:.68rem; white-space:nowrap; }
+.work-list { display:grid; gap:10px; }
+.work-company-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.work-resume-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.work-company-card { overflow:hidden; min-width:0; border:1px solid var(--border-color); border-radius:15px; background:var(--card-bg); box-shadow:var(--shadow); }
+.work-company-cover { display:block; width:100%; height:82px; border:0; background:radial-gradient(circle at 85% 10%,color-mix(in srgb,var(--link-color) 40%,transparent),transparent 32%),linear-gradient(125deg,color-mix(in srgb,var(--link-color) 18%,var(--card-bg)),var(--input-bg)); background-position:center; background-size:cover; cursor:pointer; }
+.work-company-card-main { display:flex; align-items:center; gap:10px; width:100%; padding:0 12px; border:0; background:none; color:inherit; text-align:left; cursor:pointer; }
+.work-company-logo,.work-vacancy-logo { display:grid; place-items:center; width:45px; height:45px; flex:0 0 45px; margin-top:-19px; overflow:hidden; border:3px solid var(--card-bg); border-radius:14px; background:var(--link-color); color:#fff; font-size:1.1rem; font-weight:800; }
+.work-company-logo img,.work-vacancy-logo img { width:100%; height:100%; object-fit:cover; }
+.work-company-copy { display:grid; min-width:0; gap:4px; padding-top:8px; }
+.work-company-copy strong { overflow:hidden; font-size:.85rem; text-overflow:ellipsis; white-space:nowrap; }
+.work-company-copy>span { display:-webkit-box; overflow:hidden; color:var(--text-secondary); font-size:.7rem; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+.work-card-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:10px 12px 0; padding:9px 0; border-top:1px solid var(--border-color); color:var(--muted-text); font-size:.68rem; }
+.work-card-foot button,.work-company-actions>button:not(.work-primary) { padding:5px 9px; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.68rem; cursor:pointer; }
+.work-vacancy-list { display:grid; gap:9px; }
+.work-vacancy-card { display:flex; align-items:flex-start; gap:11px; width:100%; padding:13px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); color:var(--text-color); text-align:left; box-shadow:var(--shadow); cursor:pointer; }
+.work-vacancy-card:hover,.work-resume-card:hover,.work-company-card:hover { border-color:color-mix(in srgb,var(--link-color) 45%,var(--border-color)); }
+.work-vacancy-logo { margin:0; border-radius:12px; background:color-mix(in srgb,var(--link-color) 75%,#8954da); }
+.work-vacancy-body { display:grid; min-width:0; flex:1; gap:4px; }
+.work-vacancy-body>strong { font-size:.88rem; }
+.work-vacancy-company { color:var(--link-color); font-size:.72rem; font-weight:700; }
+.work-vacancy-meta,.work-vacancy-snippet { color:var(--text-secondary); font-size:.7rem; line-height:1.45; }
+.work-vacancy-snippet { display:-webkit-box; overflow:hidden; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+.work-vacancy-date { color:var(--muted-text); font-size:.62rem; white-space:nowrap; }
+.work-resume-card { display:grid; justify-items:start; min-width:0; padding:10px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); color:var(--text-color); text-align:left; box-shadow:var(--shadow); cursor:pointer; }
+.work-resume-photo { display:grid; place-items:center; width:100%; aspect-ratio:1.1/1; margin-bottom:9px; overflow:hidden; border-radius:10px; background:linear-gradient(135deg,color-mix(in srgb,var(--link-color) 20%,var(--card-bg)),var(--input-bg)); color:var(--link-color); font-size:2rem; font-weight:800; }
+.work-resume-photo img { width:100%; height:100%; object-fit:cover; }
+.work-resume-card>strong { overflow:hidden; max-width:100%; font-size:.82rem; text-overflow:ellipsis; white-space:nowrap; }
+.work-resume-title { display:-webkit-box; overflow:hidden; min-height:2.6em; margin-top:4px; color:var(--link-color); font-size:.7rem; line-height:1.35; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
+.work-resume-meta { overflow:hidden; max-width:100%; margin-top:4px; color:var(--text-secondary); font-size:.65rem; text-overflow:ellipsis; white-space:nowrap; }
+.work-empty { display:grid; justify-items:center; gap:9px; grid-column:1/-1; padding:28px 16px; border:1px dashed var(--border-color); border-radius:14px; color:var(--text-secondary); text-align:center; font-size:.78rem; }
+.work-empty>span { font-size:1.6rem; }
+.work-empty p { max-width:390px; margin:0; line-height:1.5; }
+.work-company-detail { margin-top:4px; }
+.work-company-profile { overflow:hidden; margin:10px 0 14px; border:1px solid var(--border-color); border-radius:15px; background:var(--card-bg); box-shadow:var(--shadow); }
+.work-company-profile-cover { height:120px; background:radial-gradient(circle at 85% 10%,color-mix(in srgb,var(--link-color) 35%,transparent),transparent 35%),linear-gradient(125deg,color-mix(in srgb,var(--link-color) 20%,var(--card-bg)),var(--input-bg)); background-position:center; background-size:cover; }
+.work-company-profile-info { display:flex; align-items:center; gap:12px; padding:0 15px 15px; }
+.work-company-profile-logo { display:grid; place-items:center; width:66px; height:66px; flex:0 0 66px; margin-top:-27px; overflow:hidden; border:4px solid var(--card-bg); border-radius:19px; background:var(--link-color); color:#fff; font-size:1.4rem; font-weight:800; }
+.work-company-profile-logo img { width:100%; height:100%; object-fit:cover; }
+.work-company-profile-info>div:not(.work-company-actions) { min-width:0; flex:1; }
+.work-company-profile-info h2 { margin:5px 0; font-size:1rem; }
+.work-company-profile-info p { margin:0; color:var(--text-secondary); font-size:.74rem; line-height:1.45; }
+.work-company-actions { display:flex; gap:6px; }
+.work-section-title { margin:15px 0 9px; font-size:.9rem; }
+.work-modal { max-height:min(88vh,760px); overflow-y:auto; }
+.work-modal label { display:block; margin:10px 0 5px; color:var(--text-secondary); font-size:.76rem; }
+.work-modal input:not([type=checkbox]),.work-modal textarea,.work-modal select { box-sizing:border-box; width:100%; min-height:38px; padding:9px 10px; border:1px solid var(--border-color); border-radius:9px; outline:0; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.78rem; }
+.work-modal textarea { min-height:88px; resize:vertical; }
+.work-modal input:focus,.work-modal textarea:focus,.work-modal select:focus { border-color:var(--link-color); }
+.work-form-row { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.work-form-row>div { min-width:0; }
+.work-submit { width:100%; margin-top:4px; }
+.work-error { min-height:18px; margin:5px 0; color:var(--danger); font-size:.72rem; }
+.work-privacy { display:flex !important; align-items:center; gap:8px; }
+.work-resume-detail { display:flex; align-items:center; gap:13px; }
+.work-resume-detail-photo { display:grid; place-items:center; width:78px; height:78px; flex:0 0 78px; margin:0; overflow:hidden; border-radius:14px; object-fit:cover; background:var(--input-bg); }
+.work-resume-detail-initial { color:var(--link-color); font-size:1.8rem; font-weight:800; }
+.work-resume-detail h2 { margin:5px 0; font-size:1rem; }
+.work-resume-detail strong { color:var(--link-color); font-size:.78rem; }
+.work-detail-meta { color:var(--text-secondary); font-size:.72rem; }
+.work-detail-description { margin:15px 0; color:var(--text-color); font-size:.82rem; line-height:1.6; overflow-wrap:anywhere; }
+.work-resume-contacts { display:grid; gap:7px; margin:12px 0; }
+.work-resume-contacts a { color:var(--link-color); font-size:.78rem; text-decoration:none; }
+.work-private-note { color:var(--muted-text); font-size:.72rem; }
+@media(max-width:620px) {
+    .work-heading { align-items:flex-start; padding:14px; }
+    .work-heading h1 { font-size:1.2rem; }
+    .work-heading p { max-width:210px; line-height:1.4; }
+    .work-primary { padding:7px 10px; font-size:.7rem; }
+    .work-company-grid { grid-template-columns:1fr; }
+    .work-resume-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .work-tabs button { padding:7px 5px; font-size:.7rem; }
+    .work-vacancy-card { padding:10px; }
+    .work-vacancy-date { display:none; }
+    .work-company-profile-info { align-items:flex-start; flex-wrap:wrap; padding:0 11px 12px; }
+    .work-company-profile-info>div:not(.work-company-actions) { padding-top:4px; }
+    .work-company-actions { width:100%; }
+    .work-company-actions>* { flex:1; }
+    .work-form-row { grid-template-columns:1fr; gap:0; }
+}

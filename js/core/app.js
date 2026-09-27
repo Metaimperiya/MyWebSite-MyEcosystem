@@ -345,6 +345,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof loadGroups === 'function') loadGroups();
     };
 
+    window.goToWork = function() {
+        if (!window.checkAccess()) return;
+        if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
+            window.location.href = '/?page=work';
+            return;
+        }
+        window.setActivePage('work');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) {
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null;
+        }
+        CURRENT_ROOM = null;
+        if (typeof loadWork === 'function') loadWork();
+    };
+
     // ===== САЙДБАР =====
     window.toggleSidebar = function() {
         if (!window.checkAccess()) return;
