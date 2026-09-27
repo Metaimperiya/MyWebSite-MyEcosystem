@@ -25,8 +25,12 @@ function datingCountries() {
 }
 
 function datingCountryCode(name) {
-    var value = String(name || '').trim().toLocaleLowerCase('ru');
-    var found = datingCountries().find(function(country) { return country.name.toLocaleLowerCase('ru') === value || country.code.toLocaleLowerCase('ru') === value; });
+    var value = String(name || '').trim().normalize('NFC').replace(/\s+/g, ' ').toLocaleLowerCase('ru');
+    var aliases = { 'україна': 'UA', ukraine: 'UA', usa: 'US', 'united states': 'US', 'united kingdom': 'GB', britain: 'GB' };
+    if (aliases[value]) value = aliases[value].toLocaleLowerCase('ru');
+    var found = datingCountries().find(function(country) {
+        return country.name.trim().normalize('NFC').replace(/\s+/g, ' ').toLocaleLowerCase('ru') === value || country.code.toLocaleLowerCase('ru') === value;
+    });
     return found || null;
 }
 
@@ -215,7 +219,24 @@ window.saveDatingProfile = function(shareAfterSave) {
     var bio = document.getElementById('datingBio').value.trim();
     var ageConfirmed = document.getElementById('datingAdultConfirmed').checked;
     var isActive = document.getElementById('datingActive').checked;
-    if (!name || !gender || !seeking || !country || !city || !goal) { error.textContent = 'Заполни имя, кто ты, кого ищешь, страну, город и цель знакомства.'; return; }
+    error.textContent = '';
+    var missingFields = [];
+    if (!name) missingFields.push({ label: 'имя', id: 'datingName' });
+    if (!gender) missingFields.push({ label: 'кто ты', id: 'datingGender' });
+    if (!seeking) missingFields.push({ label: 'кого ищешь', id: 'datingSeeking' });
+    if (!document.getElementById('datingCountry').value.trim()) missingFields.push({ label: 'страна', id: 'datingCountry' });
+    if (!city) missingFields.push({ label: 'город', id: 'datingCity' });
+    if (!goal) missingFields.push({ label: 'цель знакомства', id: 'datingGoal' });
+    if (missingFields.length) {
+        error.textContent = 'Заполни: ' + missingFields.map(function(field) { return field.label; }).join(', ') + '.';
+        document.getElementById(missingFields[0].id).focus();
+        return;
+    }
+    if (!country) {
+        error.textContent = 'Не удалось распознать страну «' + document.getElementById('datingCountry').value.trim() + '». Выбери её из подсказок или введи название страны.';
+        document.getElementById('datingCountry').focus();
+        return;
+    }
     if (!ageConfirmed) { error.textContent = 'Для раздела знакомств нужно подтвердить, что тебе исполнилось 18 лет.'; return; }
     if (shareAfterSave && !isActive) { error.textContent = 'Включи показ анкеты в поиске, чтобы поделиться ею.'; return; }
     if (photoUrl && !datingSafeImage(photoUrl) && !photoFile) { error.textContent = 'Укажи прямую ссылку на фото с https:// или http://.'; return; }
