@@ -762,14 +762,14 @@ if (embeddedEditor) {
   dl.style.display = 'none';
   useInPost.style.display = 'inline-flex';
   window.addEventListener('message', event => {
-    if (event.origin !== window.location.origin || !event.data || event.data.type !== 'post-editor:load-image') return;
+    if (event.source !== window.parent || !event.data || event.data.type !== 'post-editor:load-image') return;
     const dataUrl = event.data.dataUrl;
     if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) return;
     const imageBlob = dataUrlToBlob(dataUrl);
     const imageFile = new File([imageBlob], 'post-image.png', { type: imageBlob.type || 'image/png' });
     processFile(imageFile);
   });
-  window.parent.postMessage({ type: 'post-editor:ready' }, window.location.origin);
+  window.parent.postMessage({ type: 'post-editor:ready' }, '*');
 }
 
 function dataUrlToBlob(dataUrl) {
@@ -1922,7 +1922,7 @@ dl.addEventListener('click', async () => {
       }
       if (embeddedEditor) {
         const reader = new FileReader();
-        reader.onload = () => window.parent.postMessage({ type: 'post-editor:result', dataUrl: reader.result }, window.location.origin);
+        reader.onload = () => window.parent.postMessage({ type: 'post-editor:result', dataUrl: reader.result }, '*');
         reader.readAsDataURL(b);
         dl.disabled = false;
         setStatus('✅ Изображение готово к публикации', 'ok');

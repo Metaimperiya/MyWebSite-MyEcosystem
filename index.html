@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
-    <link rel="stylesheet" href="css/features/feed.css?v=4.0">
+    <link rel="stylesheet" href="css/features/feed.css?v=4.1">
     <link rel="stylesheet" href="css/features/profile.css?v=3.3">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
@@ -419,6 +419,7 @@
         <div class="modal-box image-editor-modal">
             <button class="close-btn" onclick="closePostImageEditor()">✕</button>
             <h3>🎨 Редактор изображения</h3>
+            <div class="image-editor-loading" id="postImageEditorLoading"><span id="postImageEditorLoadingText">Загружаю редактор…</span><button type="button" id="postImageEditorRetry" onclick="retryPostImageEditor()" hidden>Повторить</button></div>
             <iframe id="postImageEditorFrame" title="Редактор изображения" src="about:blank"></iframe>
         </div>
     </div>
@@ -497,7 +498,7 @@
 <script src="js/modules/player.js?v=3.0"></script>
 <script src="js/features/feed/feed-core.js?v=4.0"></script>
 <script src="js/features/feed/feed-actions.js?v=4.0"></script>
-<script src="js/features/feed/feed-edit.js?v=4.0"></script>
+<script src="js/features/feed/feed-edit.js?v=4.2"></script>
 <script src="js/features/profile.js?v=3.3"></script>
 <script src="js/features/reputation.js?v=1.0"></script>
 <script src="js/features/friends.js?v=3.1"></script>

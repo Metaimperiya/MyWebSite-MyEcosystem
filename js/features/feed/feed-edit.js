@@ -13,7 +13,8 @@
     var editMedia = [];
     var editorSlideIndex = -1;
     var postEditorReady = false;
-    var postEditorLoaded = false;
+    var editorHtmlLoading = null;
+    var editorEmbedStarted = false;
 
     function mediaUrl(item) { return item.type === 'frame' ? item.url : (item.url || item.preview); }
 
@@ -49,19 +50,58 @@
         });
     }
 
+    function blobToDataUrl(blob) {
+        return new Promise(function(resolve, reject) {
+            var reader = new FileReader(); reader.onload = function() { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(blob);
+        });
+    }
+
+    function compressPostImage(blob) {
+        return createImageBitmap(blob).then(function(bitmap) {
+            var canvas = document.createElement('canvas');
+            var scale = Math.min(1, 1440 / Math.max(bitmap.width, bitmap.height));
+            var width = Math.max(1, Math.round(bitmap.width * scale));
+            var height = Math.max(1, Math.round(bitmap.height * scale));
+            var quality = 0.78;
+            function encode() {
+                canvas.width = width; canvas.height = height;
+                var ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, width, height);
+                ctx.drawImage(bitmap, 0, 0, width, height);
+                return new Promise(function(resolve, reject) {
+                    canvas.toBlob(function(result) {
+                        if (!result) { reject(new Error('Не удалось подготовить изображение')); return; }
+                        if (result.size <= 450 * 1024 || width <= 360) { bitmap.close(); resolve(result); return; }
+                        width = Math.max(360, Math.round(width * 0.78));
+                        height = Math.max(1, Math.round(height * 0.78));
+                        quality = Math.max(0.58, quality - 0.04);
+                        encode().then(resolve, reject);
+                    }, 'image/webp', quality);
+                });
+            }
+            return encode();
+        });
+    }
+
     function uploadPostImage(item, index) {
         if (item.type === 'frame') return Promise.resolve({ type: 'frame', url: item.url, frameSize: item.frameSize || 'small' });
-        if (item.source instanceof File && !item.edited) {
-            var rawFile = item.source;
-            if (rawFile.size >= 5 * 1024 * 1024) return Promise.reject(new Error('Фото должно быть меньше 5 МБ'));
-            var rawRef = storage.ref('posts/' + USER_UID + '/' + Date.now() + '_' + index + '_' + rawFile.name.replace(/[^\w.-]/g, '_'));
-            return rawRef.put(rawFile).then(function() { return rawRef.getDownloadURL(); }).then(function(url) { return { type: 'image', url: url }; });
-        }
         if (item.source && /^https?:\/\//.test(item.source) && !item.edited) return Promise.resolve({ type: 'image', url: item.source });
-        var blob = dataUrlToBlob(item.source || item.url);
-        if (blob.size >= 5 * 1024 * 1024) return Promise.reject(new Error('Изображение после обработки больше 5 МБ. Уменьшите его в редакторе.'));
-        var ref = storage.ref('posts/' + USER_UID + '/' + Date.now() + '_' + index + '.png');
-        return ref.put(blob, { contentType: blob.type || 'image/png' }).then(function() { return ref.getDownloadURL(); }).then(function(url) { return { type: 'image', url: url }; });
+        var sourcePromise = item.source instanceof File ? Promise.resolve(item.source) : Promise.resolve(dataUrlToBlob(item.source || item.url));
+        return sourcePromise.then(function(source) {
+            var payloadPromise = source.size < 5 * 1024 * 1024 ? Promise.resolve(source) : compressPostImage(source);
+            return payloadPromise.then(function(blob) {
+                var name = item.source instanceof File ? item.source.name.replace(/[^\w.-]/g, '_') : 'image.webp';
+                var ref = storage.ref('posts/' + USER_UID + '/' + Date.now() + '_' + index + '_' + name);
+                return ref.put(blob, { contentType: blob.type || source.type || 'image/png' })
+                    .then(function() { return ref.getDownloadURL(); })
+                    .then(function(url) { return { type: 'image', url: url }; })
+                    .catch(function() {
+                        return compressPostImage(blob).then(function(compact) {
+                            return blobToDataUrl(compact).then(function(dataUrl) { return { type: 'image', url: dataUrl }; });
+                        });
+                    });
+            });
+        });
     }
 
     function esc(str) {
@@ -225,21 +265,65 @@
         editorSlideIndex = index;
         var modal = document.getElementById('postImageEditorModal');
         var frame = document.getElementById('postImageEditorFrame');
+        var loading = document.getElementById('postImageEditorLoading');
+        var loadingText = document.getElementById('postImageEditorLoadingText');
+        var retryButton = document.getElementById('postImageEditorRetry');
         modal.classList.add('open');
-        if (!postEditorLoaded) frame.src = 'post-image-editor.html';
-        else if (postEditorReady) loadEditorImage(target[index]);
+        if (loading) loading.hidden = postEditorReady;
+        if (loadingText) loadingText.textContent = 'Загружаю редактор…';
+        if (retryButton) retryButton.hidden = true;
+        if (postEditorReady) {
+            loadEditorImage(target[index]);
+        } else if (!editorEmbedStarted) {
+            editorEmbedStarted = true;
+            frame.src = 'post-image-editor.html';
+            setTimeout(function() {
+                if (postEditorReady || editorHtmlLoading) return;
+                editorHtmlLoading = fetch('post-image-editor.html', { cache: 'no-cache' }).then(function(response) {
+                    if (!response.ok) throw new Error('Файл редактора не найден на сайте');
+                    return response.text();
+                }).then(function(html) {
+                    if (!postEditorReady) {
+                        frame.srcdoc = html;
+                        setTimeout(function() {
+                            if (!postEditorReady && modal.classList.contains('open')) {
+                                if (loadingText) loadingText.textContent = 'Редактор не ответил. Проверьте соединение.';
+                                if (retryButton) retryButton.hidden = false;
+                            }
+                        }, 15000);
+                    }
+                    editorHtmlLoading = null;
+                }).catch(function(error) {
+                    editorHtmlLoading = null;
+                    if (loadingText) loadingText.textContent = 'Не удалось загрузить редактор: ' + (error.message || error);
+                    if (retryButton) retryButton.hidden = false;
+                });
+            }, 6000);
+        }
     };
 
     function loadEditorImage(item) {
         toDataUrl(item).then(function(dataUrl) {
             var frame = document.getElementById('postImageEditorFrame');
-            if (frame && frame.contentWindow) frame.contentWindow.postMessage({ type: 'post-editor:load-image', dataUrl: dataUrl }, window.location.origin);
+            if (frame && frame.contentWindow) frame.contentWindow.postMessage({ type: 'post-editor:load-image', dataUrl: dataUrl }, '*');
         }).catch(function(error) { alert('Не получилось открыть фото в редакторе: ' + (error.message || error)); });
     }
 
     window.closePostImageEditor = function() {
         var modal = document.getElementById('postImageEditorModal'); if (modal) modal.classList.remove('open');
         editorSlideIndex = -1;
+    };
+
+    window.retryPostImageEditor = function() {
+        var frame = document.getElementById('postImageEditorFrame');
+        var target = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
+        var index = editorSlideIndex;
+        postEditorReady = false;
+        editorEmbedStarted = false;
+        editorHtmlLoading = null;
+        frame.removeAttribute('srcdoc');
+        frame.src = 'about:blank';
+        if (index >= 0 && target[index]) window.editPostMedia(index);
     };
 
     // ================================================================
@@ -838,11 +922,12 @@
             renderMediaList('editMediaList', editMedia, true);
         });
         var editorFrame = document.getElementById('postImageEditorFrame');
-        if (editorFrame) editorFrame.addEventListener('load', function() { postEditorLoaded = editorFrame.src !== 'about:blank'; });
         window.addEventListener('message', function(event) {
-            if (!editorFrame || event.source !== editorFrame.contentWindow || event.origin !== window.location.origin || !event.data) return;
+            if (!editorFrame || event.source !== editorFrame.contentWindow || !event.data) return;
             if (event.data.type === 'post-editor:ready') {
                 postEditorReady = true;
+                var loading = document.getElementById('postImageEditorLoading'); if (loading) loading.hidden = true;
+                var retryButton = document.getElementById('postImageEditorRetry'); if (retryButton) retryButton.hidden = true;
                 var editing = document.getElementById('editModal').classList.contains('open') ? editMedia : composeMedia;
                 if (editorSlideIndex >= 0 && editing[editorSlideIndex]) loadEditorImage(editing[editorSlideIndex]);
             }
