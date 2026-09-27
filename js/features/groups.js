@@ -239,7 +239,11 @@ window.createGroup = function() {
         window.openGroup(id);
     }).catch(function(saveError) {
         console.error('Не удалось создать группу:', saveError);
-        if (error) error.textContent = 'Не удалось создать группу. Проверь подключение и попробуй ещё раз.';
+        if (error) {
+            error.textContent = saveError.code === 'PERMISSION_DENIED' || /permission_denied|permission denied/i.test(saveError.message || '')
+                ? 'Firebase отклонил создание: опубликуй Database Rules из проекта (firebase deploy --only database --project myecosystem-e6414). Деплой сайта правила не обновляет.'
+                : 'Не удалось создать группу. Проверь подключение и попробуй ещё раз.';
+        }
     }).finally(function() {
         if (button) { button.disabled = false; button.textContent = 'Создать'; }
     });
@@ -261,7 +265,9 @@ window.publishGroupPost = function() {
         if (status) status.textContent = 'Запись опубликована.';
     }).catch(function(error) {
         console.error('Не удалось опубликовать запись в группе:', error);
-        if (status) status.textContent = 'Не удалось опубликовать запись. Вступи в группу и попробуй ещё раз.';
+        if (status) status.textContent = error.code === 'PERMISSION_DENIED' || /permission_denied|permission denied/i.test(error.message || '')
+            ? 'Firebase отклонил запись. Опубликуй Database Rules для групп; деплой сайта их не обновляет.'
+            : 'Не удалось опубликовать запись. Вступи в группу и попробуй ещё раз.';
     }).finally(function() {
         if (button) { button.disabled = false; button.textContent = 'Опубликовать'; }
     });
