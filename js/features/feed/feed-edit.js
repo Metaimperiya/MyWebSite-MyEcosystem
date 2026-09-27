@@ -43,6 +43,15 @@
         return new Blob([bytes], { type: mime });
     }
 
+    // Detach the selected bytes from the file input before resetting it. Keep
+    // the immutable snapshot as the upload source for this media item.
+    function snapshotImageFile(file) {
+        return new File([file], file.name, {
+            type: file.type || 'application/octet-stream',
+            lastModified: file.lastModified
+        });
+    }
+
     function toDataUrl(item) {
         if (item.source instanceof File) return new Promise(function(resolve, reject) {
             var reader = new FileReader(); reader.onload = function() { resolve(reader.result); }; reader.onerror = reject; reader.readAsDataURL(item.source);
@@ -973,7 +982,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         var feedInput = document.getElementById('fileInput');
         if (feedInput) feedInput.addEventListener('change', function(event) {
-            var files = Array.from(event.target.files || []);
+            var files = Array.from(event.target.files || []).map(snapshotImageFile);
             event.target.value = '';
             files.forEach(function(file) {
                 if (!file.type.startsWith('image/')) { alert('Можно добавить только изображения'); return; }
