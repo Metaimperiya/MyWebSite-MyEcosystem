@@ -138,7 +138,8 @@
                 ".write": "auth != null && ((!data.exists() && newData.child('authorUid').val() === auth.uid) || (data.exists() && data.child('authorUid').val() === auth.uid) || auth.token.admin === true)"
               }
             },
-            ".write": "( !data.exists() && newData.child('authorUid').val() === auth.uid ) || ( data.exists() && data.child('authorUid').val() === auth.uid ) || auth.token.admin === true"
+            ".write": "( !data.exists() && newData.child('authorUid').val() === auth.uid ) || ( data.exists() && data.child('authorUid').val() === auth.uid ) || auth.token.admin === true",
+            ".validate": "!newData.exists() || !newData.child('ad').exists() || (auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42') && newData.child('authorUid').val() === auth.uid && newData.child('ad').child('enabled').val() === true && newData.child('ad').child('title').isString() && newData.child('ad').child('title').val().length >= 2 && newData.child('ad').child('title').val().length <= 100 && newData.child('ad').child('url').isString() && newData.child('ad').child('url').val().length <= 2048 && newData.child('ad').child('button').isString() && newData.child('ad').child('button').val().length <= 40)"
           }
         },
         "articles": {

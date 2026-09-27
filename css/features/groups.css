@@ -88,3 +88,7 @@
     .group-settings-button { padding:6px 8px; font-size:.64rem; }
     .group-profile-description { margin:9px 13px 13px 79px; }
 }
+.community-share-button { margin:0 0 0 auto; }
+.group-post>.community-share-button { margin-top:9px; }
+.group-post.shared-post-highlight { outline:2px solid var(--link-color); box-shadow:0 0 0 5px color-mix(in srgb,var(--link-color) 16%,transparent); transition:box-shadow .25s ease; }
+@media(max-width:600px) { .community-share-button { min-height:30px; font-size:.62rem; } }

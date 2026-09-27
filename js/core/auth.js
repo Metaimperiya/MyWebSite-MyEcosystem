@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 0);
 
             isAdmin = ADMIN_UIDS.includes(USER_UID);
+            if (typeof window.updateFeedAdControls === 'function') window.updateFeedAdControls();
             if (isAdmin) {
                 localStorage.setItem('dc_admin_' + SITE, 'true');
                 var dot = document.getElementById('adminDot');

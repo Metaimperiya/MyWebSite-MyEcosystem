@@ -92,3 +92,7 @@
     .work-company-actions>* { flex:1; }
     .work-form-row { grid-template-columns:1fr; gap:0; }
 }
+.work-shareable-card { min-width:0; }
+.work-share-button,.community-share-button { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:32px; margin:5px 0 8px; padding:6px 11px; border:1px solid var(--border-color); border-radius:999px; background:var(--card-bg); color:var(--link-color); font-size:.68rem; font-weight:700; cursor:pointer; }
+.work-shareable-card .work-vacancy-card { width:100%; }
+.work-shareable-card .work-resume-card { width:100%; }

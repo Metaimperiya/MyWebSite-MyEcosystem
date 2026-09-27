@@ -417,6 +417,94 @@ window.closeRepost = function() {
     document.getElementById('repostModal').classList.remove('open');
 };
 
+// Публикует компактную карточку сущности в общей ленте.
+window.shareFeedEntity = function(kind, payload) {
+    if (!USER_UID || !payload) { alert('Войди, чтобы поделиться.'); return; }
+    var comment = prompt('Добавить комментарий к публикации (необязательно):', '');
+    if (comment === null) return;
+    db.ref('sites/' + SITE + '/users/' + USER_UID + '/avatarUrl').once('value').then(function(snapshot) {
+        var post = {
+            author: USER || 'Пользователь', authorUid: USER_UID, authorAvatar: snapshot.val() || null,
+            text: comment.trim(), timestamp: Date.now(), likes: 0, commentCount: 0, reposts: 0,
+            hashtags: [], media: [], repost: null, sharedEntity: Object.assign({ kind: kind }, payload),
+            deleted: null, deletedAt: null
+        };
+        var id = db.ref('sites/' + SITE + '/feed_posts').push().key;
+        var updates = {};
+        updates['sites/' + SITE + '/feed_posts/' + id] = post;
+        updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + id] = post;
+        return db.ref().update(updates);
+    }).then(function() {
+        if (typeof loadFeed === 'function') loadFeed();
+        alert('Карточка опубликована в общей ленте.');
+    }).catch(function(error) {
+        console.error('Не удалось поделиться в ленте:', error);
+        alert('Не удалось опубликовать карточку. Проверь подключение и правила Firebase.');
+    });
+};
+
+document.addEventListener('click', function(event) {
+    var button = event.target.closest('[data-feed-share]');
+    if (button) {
+        event.preventDefault();
+        event.stopPropagation();
+        try { window.shareFeedEntity(button.getAttribute('data-share-kind'), JSON.parse(decodeURIComponent(button.getAttribute('data-feed-share')))); }
+        catch (error) { console.error('Некорректные данные карточки:', error); }
+        return;
+    }
+    var openButton = event.target.closest('[data-open-shared]');
+    if (!openButton) return;
+    event.preventDefault(); event.stopPropagation();
+    try {
+        var destination = JSON.parse(decodeURIComponent(openButton.getAttribute('data-open-shared')));
+        window.openSharedEntity(destination);
+    } catch (error) { console.error('Некорректная ссылка на карточку:', error); }
+});
+
+window.openSharedEntity = function(item) {
+    if (!item) return;
+    var go = window.setActivePage;
+    if (item.kind === 'group' || item.kind === 'group_post') {
+        if (go) go('groups');
+        var groupId = item.kind === 'group_post' ? item.parentId : item.id;
+        db.ref('sites/' + SITE + '/groups/' + groupId).once('value').then(function(snapshot) {
+            if (!snapshot.exists()) { alert('Эта группа уже удалена.'); return; }
+            if (window.groupsCache) window.groupsCache[groupId] = snapshot.val();
+            if (item.kind === 'group_post' && typeof pendingSharedGroupPostId !== 'undefined') pendingSharedGroupPostId = item.id;
+            if (typeof window.openGroup === 'function') window.openGroup(groupId);
+        });
+    } else if (item.kind === 'vacancy' || item.kind === 'resume') {
+        if (go) go('work');
+        if (typeof window.loadWork === 'function') window.loadWork();
+        if (item.kind === 'vacancy') {
+            Promise.all([
+                db.ref('sites/' + SITE + '/work_companies/' + item.parentId).once('value'),
+                db.ref('sites/' + SITE + '/work_vacancies/' + item.parentId + '/' + item.id).once('value')
+            ]).then(function(snapshots) {
+                if (!snapshots[1].exists()) { alert('Эта вакансия уже закрыта или удалена.'); return; }
+                if (typeof workCompanies !== 'undefined') workCompanies[item.parentId] = snapshots[0].val() || {};
+                if (typeof workVacancies !== 'undefined') { workVacancies[item.parentId] = workVacancies[item.parentId] || {}; workVacancies[item.parentId][item.id] = snapshots[1].val(); }
+                if (typeof window.showWorkTab === 'function') window.showWorkTab('vacancies');
+                if (typeof window.showWorkVacancy === 'function') window.showWorkVacancy(item.parentId + '/' + item.id);
+            });
+        } else {
+            db.ref('sites/' + SITE + '/work_resumes/' + item.id).once('value').then(function(snapshot) {
+                if (!snapshot.exists()) { alert('Это резюме уже удалено.'); return; }
+                if (typeof workResumes !== 'undefined') workResumes[item.id] = snapshot.val();
+                if (typeof window.showWorkTab === 'function') window.showWorkTab('resumes');
+                if (typeof window.showWorkResume === 'function') window.showWorkResume(item.id);
+            });
+        }
+    } else if (item.kind === 'dating') {
+        if (go) go('dating');
+        db.ref('sites/' + SITE + '/dating_profiles/' + item.id).once('value').then(function(snapshot) {
+            if (!snapshot.exists()) { alert('Эта анкета больше не активна.'); return; }
+            if (typeof datingProfiles !== 'undefined') datingProfiles[item.id] = snapshot.val();
+            if (typeof window.openDatingDetail === 'function') window.openDatingDetail(item.id);
+        });
+    }
+};
+
 window.submitRepost = function() {
     var postId = document.getElementById('repostPostId').value;
     var type = document.getElementById('repostType').value;

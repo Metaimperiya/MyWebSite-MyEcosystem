@@ -218,7 +218,9 @@
         }
 
         var text = getEditorText('postEditor').trim();
-        if (!text && !composeMedia.length) {
+        var requestedAdMode = document.getElementById('feedAdMode');
+        var canPublishAd = !!(requestedAdMode && requestedAdMode.checked && ADMIN_UIDS.includes(USER_UID));
+        if (!text && !composeMedia.length && !canPublishAd) {
             alert('Введите текст или добавьте фото');
             return;
         }
@@ -259,6 +261,15 @@
                 deleted: null,
                 deletedAt: null
             };
+            var adMode = document.getElementById('feedAdMode');
+            if (adMode && adMode.checked && ADMIN_UIDS.includes(ownerUid)) {
+                var adTitle = (document.getElementById('feedAdTitle').value || '').trim();
+                var adUrl = (document.getElementById('feedAdUrl').value || '').trim();
+                var adButton = (document.getElementById('feedAdButton').value || '').trim();
+                if (!adTitle) { setPostPublishBusy(false); setPostPublishStatus('Добавь заголовок объявления.', 'error'); return; }
+                if (adUrl && !/^https?:\/\//i.test(adUrl)) { setPostPublishBusy(false); setPostPublishStatus('Ссылка объявления должна начинаться с http:// или https://.', 'error'); return; }
+                postData.ad = { enabled: true, title: adTitle.slice(0, 100), url: adUrl.slice(0, 2048), button: (adButton || 'Подробнее').slice(0, 40) };
+            }
 
             var mediaStep = Promise.resolve();
             var savedMedia = [];
@@ -315,6 +326,16 @@
         if (box) box.classList.remove('visible');
         var input = document.getElementById('fileInput');
         if (input) input.value = '';
+        var adMode = document.getElementById('feedAdMode'); if (adMode) adMode.checked = false;
+        ['feedAdTitle', 'feedAdUrl', 'feedAdButton'].forEach(function(id) { var field = document.getElementById(id); if (field) field.value = ''; });
+        var adFields = document.getElementById('feedAdFields'); if (adFields) adFields.hidden = true;
+    };
+
+    window.updateFeedAdControls = function() {
+        var tools = document.getElementById('feedAdTools');
+        var mode = document.getElementById('feedAdMode');
+        if (tools) tools.hidden = !USER_UID || !ADMIN_UIDS.includes(USER_UID);
+        if (tools && tools.hidden && mode) mode.checked = false;
     };
 
     window.removeImage = function() {
@@ -1065,6 +1086,12 @@
                 el.classList.remove('open');
             });
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var mode = document.getElementById('feedAdMode');
+        if (mode) mode.addEventListener('change', function() { var fields = document.getElementById('feedAdFields'); if (fields) fields.hidden = !mode.checked; });
+        if (typeof window.updateFeedAdControls === 'function') window.updateFeedAdControls();
     });
 
     console.log('✅ feed-edit.js загружен (бегущая строка работает)');

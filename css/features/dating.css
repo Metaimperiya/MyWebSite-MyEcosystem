@@ -64,3 +64,5 @@
     .dating-form-row { grid-template-columns:1fr; gap:0; }
     .dating-detail-head>img,.dating-detail-initial { width:78px; height:96px; flex-basis:78px; }
 }
+.dating-heading-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+@media(max-width:600px) { .dating-heading-actions { width:100%; } .dating-heading-actions>button { flex:1; } }

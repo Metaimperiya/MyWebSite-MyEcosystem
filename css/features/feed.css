@@ -939,3 +939,21 @@
     background: var(--input-bg);
     border-color: var(--border-color);
 }
+
+.feed-ad-tools { display:grid; gap:8px; padding:10px 12px; margin:8px 0; border:1px solid var(--border-color); border-radius:12px; background:var(--input-bg); color:var(--text-color); font-size:.78rem; }
+.feed-ad-tools[hidden],#feedAdFields[hidden] { display:none !important; }
+.feed-ad-tools>label { display:flex; align-items:center; gap:8px; cursor:pointer; }
+.feed-ad-tools>div { display:grid; grid-template-columns:1fr; gap:7px; }
+.feed-ad-tools input:not([type="checkbox"]) { width:100%; padding:9px 11px; border:1px solid var(--border-color); border-radius:9px; background:var(--card-bg); color:var(--text-color); }
+.feed-ad-label { display:inline-flex; padding:3px 8px; margin-bottom:5px; border-radius:999px; background:rgba(37,99,235,.1); color:var(--link-color); font-size:.58rem; font-weight:800; letter-spacing:.08em; }
+.feed-ad-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; margin:2px 0 8px; border:1px solid var(--border-color); border-radius:12px; background:linear-gradient(110deg,rgba(37,99,235,.09),var(--input-bg)); }
+.feed-ad-card strong { font-size:.86rem; }
+.feed-ad-card a,.shared-entity-copy em { color:var(--link-color); font-size:.72rem; font-style:normal; font-weight:700; text-decoration:none; white-space:nowrap; }
+.shared-entity-card { display:flex; width:100%; align-items:stretch; gap:12px; margin:8px 0; padding:9px; border:1px solid var(--border-color); border-radius:13px; background:var(--input-bg); color:var(--text-color); text-align:left; cursor:pointer; }
+.shared-entity-image { width:82px; min-height:76px; object-fit:cover; border-radius:9px; background:var(--card-bg); }
+.shared-entity-copy { display:flex; min-width:0; flex:1; flex-direction:column; align-items:flex-start; gap:4px; }
+.shared-entity-copy small { color:var(--muted-text); font-size:.56rem; font-weight:800; letter-spacing:.08em; }
+.shared-entity-copy strong { font-size:.84rem; }
+.shared-entity-copy>span { color:var(--muted-text); font-size:.68rem; line-height:1.4; }
+.shared-entity-copy em { margin-top:2px; }
+@media(max-width:520px) { .shared-entity-image { width:64px; min-height:64px; } .feed-ad-card { align-items:flex-start; flex-direction:column; gap:6px; } }

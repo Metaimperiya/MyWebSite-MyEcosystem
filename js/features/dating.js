@@ -111,7 +111,20 @@ function renderDatingProfiles() {
     });
     var create = document.getElementById('datingCreateButton');
     if (create) create.textContent = datingProfiles[USER_UID] ? '✎ Моя анкета' : '＋ Создать анкету';
+    var share = document.getElementById('datingShareButton');
+    if (share) share.hidden = !(datingProfiles[USER_UID] && datingProfiles[USER_UID].isActive === true);
 }
+
+window.shareMyDatingProfile = function() {
+    var profile = datingProfiles[USER_UID];
+    if (!USER_UID || !profile || profile.isActive !== true) { alert('Сначала создай и активируй свою анкету.'); return; }
+    window.shareFeedEntity('dating', {
+        id: USER_UID,
+        title: profile.name + ' · ' + profile.goal,
+        description: profile.gender + ' · ищет: ' + profile.seeking + ' · ' + profile.city + ', ' + profile.country + (profile.bio ? ' · ' + profile.bio : ''),
+        image: datingSafeImage(profile.photoUrl) || ''
+    });
+};
 
 window.openDatingProfileModal = function() {
     var profile = datingProfiles[USER_UID] || {};

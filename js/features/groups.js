@@ -14,11 +14,16 @@ var groupCoverPreviewUrl = null;
 var groupAvatarPreviewUrl = null;
 var groupCoverRemoved = false;
 var groupAvatarRemoved = false;
+var pendingSharedGroupPostId = null;
 
 function groupEscape(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
         return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
     });
+}
+
+function groupShareButton(kind, payload) {
+    return '<button type="button" class="community-share-button" data-share-kind="' + groupEscape(kind) + '" data-feed-share="' + encodeURIComponent(JSON.stringify(payload)) + '">↗ Поделиться</button>';
 }
 
 function stopGroupDetailListeners() {
@@ -78,6 +83,7 @@ function renderGroupDetailHeader() {
     header.innerHTML = '<div class="group-profile-cover' + (group.coverUrl ? ' has-cover' : '') + '"><span>СООБЩЕСТВО</span></div><div class="group-profile-main">' +
         '<div class="group-profile-avatar">' + (group.avatarUrl ? '' : groupEscape(initial)) + '</div><div class="group-profile-identity"><h2>' + groupEscape(group.name || 'Группа') +
         '</h2><span>Группа · ' + Object.keys(members).length + ' участников' + (created ? ' · создана ' + groupEscape(created) : '') + '</span></div>' +
+        groupShareButton('group', { id: selectedCommunityId, title: group.name || 'Группа', description: group.description || 'Сообщество METAIMPERIYA', image: group.avatarUrl || group.coverUrl || '' }) +
         (group.ownerUid === USER_UID ? '<button type="button" class="group-settings-button" onclick="openEditGroup()">⚙ Настроить</button>' : '') + '</div>' +
         '<p class="group-profile-description">' + groupEscape(group.description || 'У этой группы пока нет описания.') + '</p>';
     if (group.coverUrl) {
@@ -130,6 +136,7 @@ function renderGroupPosts(posts) {
     entries.forEach(function(post) {
         var card = document.createElement('article');
         card.className = 'group-post';
+        card.dataset.groupPostId = post.id;
         var author = document.createElement('button');
         author.type = 'button';
         author.className = 'group-post-author';
@@ -147,8 +154,20 @@ function renderGroupPosts(posts) {
         card.appendChild(author);
         card.appendChild(date);
         card.appendChild(text);
+        var shareHolder = document.createElement('div');
+        shareHolder.innerHTML = groupShareButton('group_post', { id: post.id, parentId: selectedCommunityId, title: 'Запись в группе «' + ((groupsCache[selectedCommunityId] || {}).name || 'Группа') + '»', description: post.text || '', image: (groupsCache[selectedCommunityId] || {}).avatarUrl || '' });
+        card.appendChild(shareHolder.firstChild);
         feed.appendChild(card);
     });
+    if (pendingSharedGroupPostId) {
+        var target = Array.from(feed.querySelectorAll('[data-group-post-id]')).find(function(card) { return card.dataset.groupPostId === pendingSharedGroupPostId; });
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('shared-post-highlight');
+            setTimeout(function() { target.classList.remove('shared-post-highlight'); }, 2200);
+            pendingSharedGroupPostId = null;
+        }
+    }
 }
 
 function loadSelectedGroupFeed() {
@@ -431,6 +450,15 @@ window.createGroup = function() {
     var updates = {};
     updates['sites/' + SITE + '/groups/' + id] = group;
     updates['sites/' + SITE + '/group_members/' + id + '/' + USER_UID] = true;
+    var announcementId = db.ref('sites/' + SITE + '/feed_posts').push().key;
+    var announcement = {
+        author: USER || 'Пользователь', authorUid: USER_UID, authorAvatar: null,
+        text: 'Создал новую группу', timestamp: group.createdAt, likes: 0, commentCount: 0, reposts: 0,
+        hashtags: [], media: [], sharedEntity: { kind: 'group', id: id, title: group.name, description: group.description || 'Новая группа METAIMPERIYA', image: '' },
+        deleted: null, deletedAt: null
+    };
+    updates['sites/' + SITE + '/feed_posts/' + announcementId] = announcement;
+    updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + announcementId] = announcement;
     if (error) error.textContent = '';
     if (button) { button.disabled = true; button.textContent = 'Создаю…'; }
     db.ref().update(updates).then(function() {
@@ -439,6 +467,7 @@ window.createGroup = function() {
         groupMembershipsCache[id][USER_UID] = true;
         window.closeCreateGroup();
         loadGroups();
+        if (typeof loadFeed === 'function') loadFeed();
         window.openGroup(id);
     }).catch(function(saveError) {
         console.error('Не удалось создать группу:', saveError);

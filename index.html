@@ -41,11 +41,11 @@
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
-    <link rel="stylesheet" href="css/features/feed.css?v=4.6">
+    <link rel="stylesheet" href="css/features/feed.css?v=4.7">
     <link rel="stylesheet" href="css/features/profile.css?v=3.6">
-    <link rel="stylesheet" href="css/features/groups.css?v=1.4">
-    <link rel="stylesheet" href="css/features/work.css?v=1.1">
-    <link rel="stylesheet" href="css/features/dating.css?v=1.1">
+    <link rel="stylesheet" href="css/features/groups.css?v=1.5">
+    <link rel="stylesheet" href="css/features/work.css?v=1.2">
+    <link rel="stylesheet" href="css/features/dating.css?v=1.2">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
@@ -205,6 +205,14 @@
                             <button onclick="insertLink()">🔗</button>
                         </div>
                         <div contenteditable="true" id="postEditor" class="post-editor" placeholder="What's new?"></div>
+                        <div class="feed-ad-tools" id="feedAdTools" hidden>
+                            <label><input type="checkbox" id="feedAdMode"> Опубликовать как рекламу / объявление</label>
+                            <div id="feedAdFields" hidden>
+                                <input type="text" id="feedAdTitle" maxlength="100" placeholder="Заголовок объявления">
+                                <input type="url" id="feedAdUrl" maxlength="2048" placeholder="Ссылка для кнопки (необязательно)">
+                                <input type="text" id="feedAdButton" maxlength="40" placeholder="Текст кнопки, например «Подробнее»">
+                            </div>
+                        </div>
                         <div class="post-actions">
                             <label class="file-label" for="fileInput">📎 Фото для карусели</label>
                             <button class="btn-submit" onclick="submitPost()">📤 Publish</button>
@@ -282,7 +290,7 @@
 
             <div class="page" id="page-dating">
                 <section class="dating-page">
-                    <header class="dating-heading"><div><span class="dating-kicker">METAIMPERIYA · ЗНАКОМСТВА</span><h1>Новые знакомства</h1><p>Ищи людей по стране и городу. Контакты остаются под твоим контролем.</p></div><button type="button" class="dating-primary" id="datingCreateButton" onclick="openDatingProfileModal()">＋ Создать анкету</button></header>
+                    <header class="dating-heading"><div><span class="dating-kicker">METAIMPERIYA · ЗНАКОМСТВА</span><h1>Новые знакомства</h1><p>Ищи людей по стране и городу. Контакты остаются под твоим контролем.</p></div><div class="dating-heading-actions"><button type="button" class="dating-secondary" id="datingShareButton" onclick="shareMyDatingProfile()" hidden>↗ Поделиться анкетой</button><button type="button" class="dating-primary" id="datingCreateButton" onclick="openDatingProfileModal()">＋ Создать анкету</button></div></header>
                     <div class="dating-filters">
                         <label class="dating-filter"><span>Страна</span><input id="datingCountryFilter" list="datingCountryOptions" placeholder="Любая страна" autocomplete="off"></label>
                         <label class="dating-filter"><span>Город</span><input id="datingCityFilter" placeholder="Любой город" autocomplete="off"></label>
@@ -755,19 +763,19 @@
 </div>
 
 <script src="js/core/firebase.js?v=3.0"></script>
-<script src="js/core/auth.js?v=3.1"></script>
-<script src="js/core/app.js?v=4.6"></script>
+<script src="js/core/auth.js?v=3.2"></script>
+<script src="js/core/app.js?v=4.7"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
-<script src="js/features/feed/feed-core.js?v=4.5"></script>
-<script src="js/features/feed/feed-actions.js?v=4.0"></script>
-<script src="js/features/feed/feed-edit.js?v=5.1"></script>
+<script src="js/features/feed/feed-core.js?v=4.6"></script>
+<script src="js/features/feed/feed-actions.js?v=4.1"></script>
+<script src="js/features/feed/feed-edit.js?v=5.2"></script>
 <script src="js/features/profile.js?v=3.8"></script>
 <script src="js/features/reputation.js?v=1.1"></script>
 <script src="js/features/friends.js?v=3.1"></script>
-<script src="js/features/groups.js?v=4.4"></script>
-<script src="js/features/work.js?v=1.1"></script>
-<script src="js/features/dating.js?v=1.1"></script>
+<script src="js/features/groups.js?v=4.5"></script>
+<script src="js/features/work.js?v=1.2"></script>
+<script src="js/features/dating.js?v=1.2"></script>
 <script src="js/features/marketplace.js?v=1.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>

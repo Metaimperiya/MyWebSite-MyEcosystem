@@ -250,6 +250,19 @@ function renderPost(p, type) {
     }
     var mediaHtml = renderPostMedia(mediaSlides, p.id);
     var repostHtml = p.repost ? renderNestedRepost(p.repost, 1) : '';
+    var sharedHtml = '';
+    if (p.sharedEntity) {
+        var entity = p.sharedEntity;
+        var labels = { group: 'ГРУППА', group_post: 'ЗАПИСЬ В ГРУППЕ', vacancy: 'ВАКАНСИЯ', resume: 'РЕЗЮМЕ', dating: 'АНКЕТА' };
+        var openData = encodeURIComponent(JSON.stringify({ kind: entity.kind, id: entity.id || '', parentId: entity.parentId || '' }));
+        var image = entity.image && /^https?:\/\//i.test(entity.image) ? '<img class="shared-entity-image" src="' + esc(entity.image) + '" alt="" loading="lazy">' : '';
+        sharedHtml = '<button type="button" class="shared-entity-card" data-open-shared="' + openData + '" onclick="event.stopPropagation();">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind] || 'ПУБЛИКАЦИЯ') + '</small><strong>' + esc(entity.title || 'Открыть публикацию') + '</strong><span>' + esc(entity.description || '') + '</span><em>Открыть →</em></span></button>';
+    }
+    var adHtml = '';
+    if (p.ad && p.ad.enabled) {
+        var adUrl = p.ad.url && /^https?:\/\//i.test(p.ad.url) ? p.ad.url : '';
+        adHtml = '<div class="feed-ad-label">РЕКЛАМА</div><div class="feed-ad-card"><strong>' + esc(p.ad.title || 'Объявление') + '</strong>' + (adUrl ? '<a href="' + esc(adUrl) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">' + esc(p.ad.button || 'Подробнее') + ' →</a>' : '') + '</div>';
+    }
     
     var buttonsHtml = '';
     if (p.buttons && p.buttons.length > 0) {
@@ -321,7 +334,7 @@ function renderPost(p, type) {
         </div>
     `;
     
-    var contentHtml = textHtml + repostHtml + mediaHtml + buttonsHtml + previewHtml + hashtagsHtml;
+    var contentHtml = adHtml + textHtml + repostHtml + sharedHtml + mediaHtml + buttonsHtml + previewHtml + hashtagsHtml;
     
     var authorHtml = `
         <div class="author">

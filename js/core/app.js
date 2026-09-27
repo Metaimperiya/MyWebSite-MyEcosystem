@@ -205,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
             window.renderAvatar(USER_UID, sAvatar, USER ? USER.charAt(0).toUpperCase() : '?');
 
             isAdmin = ADMIN_UIDS.includes(USER_UID);
+            if (typeof window.updateFeedAdControls === 'function') window.updateFeedAdControls();
             if (isAdmin) {
                 if (dot) dot.classList.add('active');
                 localStorage.setItem('dc_admin_' + SITE, 'true');
