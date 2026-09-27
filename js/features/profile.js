@@ -11,13 +11,15 @@ var PROFILE_SOCIAL_SERVICES = [
     { key: 'threads', label: 'Threads', glyph: '@', className: 'threads' },
     { key: 'x', label: 'X', glyph: '𝕏', className: 'x-social' },
     { key: 'youtube', label: 'YouTube', glyph: '▶', className: 'youtube' },
+    { key: 'tiktok', label: 'TikTok', glyph: '♪', className: 'tiktok' },
+    { key: 'likee', label: 'Likee', glyph: '♥', className: 'likee' },
     { key: 'google', label: 'Google', glyph: 'G', className: 'google-social' }
 ];
 
 function profileSocialHref(key, value) {
     var input = String(value || '').trim();
     if (!input) return '';
-    if (/^(?:https?:\/\/|www\.|(?:instagram\.com|t\.me|telegram\.me|facebook\.com|threads\.net|x\.com|twitter\.com|youtube\.com|youtu\.be|wa\.me|viber\.com)(?:\/|$))/i.test(input)) {
+    if (/^(?:https?:\/\/|www\.|(?:instagram\.com|t\.me|telegram\.me|facebook\.com|threads\.net|x\.com|twitter\.com|youtube\.com|youtu\.be|tiktok\.com|likee\.video|wa\.me|viber\.com)(?:\/|$))/i.test(input)) {
         try {
             var parsed = new URL(/^https?:\/\//i.test(input) ? input : 'https://' + input);
             return (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.href : '';
@@ -34,6 +36,8 @@ function profileSocialHref(key, value) {
     if (key === 'threads') return 'https://www.threads.net/@' + encoded;
     if (key === 'x') return 'https://x.com/' + encoded;
     if (key === 'youtube') return 'https://www.youtube.com/@' + encoded;
+    if (key === 'tiktok') return 'https://www.tiktok.com/@' + encoded;
+    if (key === 'likee') return 'https://likee.video/@' + encoded;
     if (key === 'whatsapp' || key === 'viber') {
         var digits = input.replace(/[^\d+]/g, '').replace(/^\+/, '');
         if (!digits) return '';
@@ -45,6 +49,7 @@ function profileSocialHref(key, value) {
 function renderProfileContacts(user) {
     var row = document.getElementById('profileContactRow');
     var emailLink = document.getElementById('profileEmail');
+    var phoneNumber = document.getElementById('profilePhoneNumber');
     var callLink = document.getElementById('profileCallButton');
     var socialContainer = document.getElementById('profileSocialLinks');
     var email = String(user.email || '').trim();
@@ -58,6 +63,10 @@ function renderProfileContacts(user) {
     if (callLink) {
         callLink.hidden = !phone;
         callLink.href = phone ? 'tel:' + phone.replace(/[^+\d,;*#]/g, '') : '';
+    }
+    if (phoneNumber) {
+        phoneNumber.hidden = !phone;
+        phoneNumber.textContent = phone;
     }
     if (row) row.hidden = !email && !phone;
     if (!socialContainer) return;

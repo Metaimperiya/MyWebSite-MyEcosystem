@@ -54,6 +54,7 @@
 .profile-contact-row[hidden], .profile-social-links[hidden] { display:none; }
 .profile-email { color:var(--text-secondary); font-size:.78rem; text-decoration:none; overflow-wrap:anywhere; }
 .profile-email:hover { color:var(--link-color); text-decoration:underline; }
+.profile-phone-number { color:var(--text-color); font-size:.8rem; font-weight:650; text-decoration:none; font-variant-numeric:tabular-nums; }
 .profile-call-btn { display:inline-flex; align-items:center; justify-content:center; min-height:32px; padding:6px 13px; border-radius:18px; background:var(--link-color); color:#fff; font-size:.76rem; font-weight:700; text-decoration:none; box-shadow:0 4px 12px rgba(35,105,210,.2); transition:var(--transition); }
 .profile-call-btn:hover,.profile-call-btn:focus-visible { filter:brightness(.93); outline:2px solid color-mix(in srgb,var(--link-color) 35%,transparent); outline-offset:2px; }
 .profile-social-links { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:7px; width:min(100% - 24px,600px); margin:8px auto 5px; }
@@ -67,6 +68,8 @@
 .profile-social-link.facebook { color:#1877f2; }
 .profile-social-link.threads,.profile-social-link.x-social { color:var(--text-color); }
 .profile-social-link.youtube { color:#e62117; }
+.profile-social-link.tiktok { color:#111; }
+.profile-social-link.likee { color:#ed3d79; }
 .profile-social-link.google-social { color:#4285f4; }
 
 @media (max-width:420px) {

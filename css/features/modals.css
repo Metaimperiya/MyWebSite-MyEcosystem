@@ -165,6 +165,8 @@
 .social-service-icon.facebook { color:#1877f2; background:#eef5ff; }
 .social-service-icon.threads,.social-service-icon.x-social { color:#172033; background:#f0f1f4; }
 .social-service-icon.youtube { color:#e62117; background:#fff0ef; }
+.social-service-icon.tiktok { color:#111; background:#f0f1f4; }
+.social-service-icon.likee { color:#ed3d79; background:#fff0f6; }
 .social-service-icon.google-social { color:#4285f4; background:#eef5ff; }
 .social-editor-field { display:block; min-width:0; flex:1; }
 .social-editor-field strong { display:block; margin:0 0 4px; color:#344054; font-size:.75rem; }
