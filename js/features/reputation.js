@@ -65,6 +65,13 @@ function loadProfileStatus(uid) {
     db.ref(reputationPath('profile_status/' + uid)).once('value', function(snap) {
         var status = snap.val() || {};
         renderProfileBadges(status);
+        var spotlightButton = document.getElementById('proSpotlightButton');
+        if (spotlightButton) {
+            var activePro = !!status.pro && (!status.proExpiresAt || status.proExpiresAt > Date.now());
+            spotlightButton.hidden = !activePro;
+            spotlightButton.textContent = status.spotlight ? '★ Убрать из закреплённых PRO' : '☆ Закрепить в авторах PRO';
+            spotlightButton.onclick = function() { window.setProfileSpotlight(uid, !status.spotlight); };
+        }
         refreshInlineStatuses(uid, status);
     });
 }
@@ -248,6 +255,24 @@ window.setProfileStatus = function(uid, field, value) {
         .catch(function(error) { alert('Не удалось изменить статус: ' + error.message); });
 };
 
+window.setProfileSpotlight = function(uid, enabled) {
+    if (!isProfileAdmin()) return alert('Только администратор может закреплять авторов.');
+    var ref = db.ref(reputationPath('profile_status/' + uid));
+    ref.once('value').then(function(snap) {
+        var current = snap.val() || {};
+        if (!current.pro || (current.proExpiresAt && current.proExpiresAt <= Date.now())) throw new Error('Закреплять можно только аккаунты с действующим PRO.');
+        current.verified = !!current.verified;
+        current.pro = true;
+        current.spotlight = !!enabled;
+        current.updatedAt = Date.now();
+        current.updatedBy = USER_UID;
+        return ref.set(current);
+    }).then(function() {
+        loadProfileStatus(uid);
+        if (typeof window.loadProShowcase === 'function') window.loadProShowcase();
+    }).catch(function(error) { alert('Не удалось изменить закрепление: ' + (error.message || error)); });
+};
+
 window.setProfilePro = function(uid) {
     if (!isProfileAdmin()) return alert('Только администратор может выдавать PRO.');
     var rawDays = prompt('Срок PRO в днях. Оставьте 0 для бессрочного статуса.', '30');
@@ -319,7 +344,7 @@ function renderReputationPanel(uid) {
     if (isProfileAdmin()) {
         var controls = document.createElement('section');
         controls.className = 'profile-status-admin';
-        controls.innerHTML = '<h4>Управление статусами</h4><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',true)">Выдать галочку</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',false)">Снять галочку</button><button type="button" onclick="setProfilePro(\'' + uid + '\')">Выдать PRO</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'pro\',false)">Снять PRO</button><button type="button" onclick="setProfileLevel(\'' + uid + '\')">Установить уровень</button><button type="button" onclick="adjustProfileExperience(\'' + uid + '\')">Изменить опыт</button><button type="button" onclick="rebuildProfileExperience(\'' + uid + '\')">Пересчитать уровень</button>';
+        controls.innerHTML = '<h4>Управление статусами</h4><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',true)">Выдать галочку</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'verified\',false)">Снять галочку</button><button type="button" onclick="setProfilePro(\'' + uid + '\')">Выдать PRO</button><button type="button" onclick="setProfileStatus(\'' + uid + '\',\'pro\',false)">Снять PRO</button><button type="button" id="proSpotlightButton" hidden></button><button type="button" onclick="setProfileLevel(\'' + uid + '\')">Установить уровень</button><button type="button" onclick="adjustProfileExperience(\'' + uid + '\')">Изменить опыт</button><button type="button" onclick="rebuildProfileExperience(\'' + uid + '\')">Пересчитать уровень</button>';
         panel.appendChild(controls);
     }
     loadProfileReviews(uid);

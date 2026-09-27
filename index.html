@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
-    <link rel="stylesheet" href="css/features/feed.css?v=4.5">
+    <link rel="stylesheet" href="css/features/feed.css?v=4.6">
     <link rel="stylesheet" href="css/features/profile.css?v=3.3">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
@@ -218,6 +218,15 @@
                     </details>
                     <div id="postPublishStatus" class="post-publish-status" role="status" aria-live="polite"></div>
                 </div>
+                <section class="pro-showcase" id="proShowcase" aria-label="Авторы PRO" hidden>
+                    <div class="pro-showcase-heading"><div><span class="pro-showcase-kicker">METAIMPERIYA</span><h2>Авторы PRO</h2></div><span class="pro-showcase-mark">PRO</span></div>
+                    <div class="pro-showcase-grid" id="proShowcaseGrid"></div>
+                    <div class="pro-showcase-controls" id="proShowcaseControls" hidden>
+                        <button type="button" id="proShowcasePrev" aria-label="Предыдущие авторы">‹</button>
+                        <div class="pro-showcase-dots" id="proShowcaseDots"></div>
+                        <button type="button" id="proShowcaseNext" aria-label="Следующие авторы">›</button>
+                    </div>
+                </section>
                 <div id="feed"></div>
             </div>
 
@@ -497,11 +506,11 @@
 <script src="js/core/app.js?v=4.2"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
-<script src="js/features/feed/feed-core.js?v=4.3"></script>
+<script src="js/features/feed/feed-core.js?v=4.4"></script>
 <script src="js/features/feed/feed-actions.js?v=4.0"></script>
 <script src="js/features/feed/feed-edit.js?v=4.6"></script>
 <script src="js/features/profile.js?v=3.3"></script>
-<script src="js/features/reputation.js?v=1.0"></script>
+<script src="js/features/reputation.js?v=1.1"></script>
 <script src="js/features/friends.js?v=3.1"></script>
 <script src="js/features/groups.js?v=3.0"></script>
 <script src="js/features/chat.js?v=3.2"></script>

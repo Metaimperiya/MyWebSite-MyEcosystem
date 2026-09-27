@@ -14,6 +14,87 @@ var FEED_CONFIG = {
     avatarCacheTTL: 300000
 };
 
+var proShowcaseTimer = null;
+var proShowcasePage = 0;
+var proShowcaseUsers = [];
+
+function renderProShowcase() {
+    var section = document.getElementById('proShowcase');
+    var grid = document.getElementById('proShowcaseGrid');
+    var controls = document.getElementById('proShowcaseControls');
+    var dots = document.getElementById('proShowcaseDots');
+    if (!section || !grid || !controls || !dots) return;
+    if (!proShowcaseUsers.length) {
+        section.hidden = true;
+        clearInterval(proShowcaseTimer);
+        return;
+    }
+    section.hidden = false;
+    var pageCount = Math.ceil(proShowcaseUsers.length / 3);
+    proShowcasePage = ((proShowcasePage % pageCount) + pageCount) % pageCount;
+    var start = proShowcasePage * 3;
+    grid.innerHTML = proShowcaseUsers.slice(start, start + 3).map(function(user) {
+        var name = user.name || 'Пользователь';
+        var avatar = user.avatarUrl
+            ? '<img src="' + esc(user.avatarUrl).replace(/"/g, '&quot;') + '" alt="" loading="lazy">'
+            : '<span class="pro-showcase-initial">' + esc(name.charAt(0).toUpperCase()) + '</span>';
+        return '<button type="button" class="pro-showcase-card" data-profile-uid="' + esc(user.uid).replace(/"/g, '&quot;') + '" aria-label="Открыть профиль ' + esc(name).replace(/"/g, '&quot;') + '">' +
+            '<span class="pro-showcase-avatar">' + avatar + '<span class="pro-showcase-pro">PRO</span></span>' +
+            '<span class="pro-showcase-name">' + esc(name) + '</span></button>';
+    }).join('');
+    grid.querySelectorAll('[data-profile-uid]').forEach(function(card) {
+        card.addEventListener('click', function() { viewUser(card.dataset.profileUid); });
+    });
+    controls.hidden = pageCount < 2;
+    dots.innerHTML = pageCount > 1 ? Array.from({ length: pageCount }, function(_, index) {
+        return '<button type="button" class="pro-showcase-dot' + (index === proShowcasePage ? ' active' : '') + '" data-pro-page="' + index + '" aria-label="Группа ' + (index + 1) + '"></button>';
+    }).join('') : '';
+    dots.querySelectorAll('[data-pro-page]').forEach(function(dot) {
+        dot.addEventListener('click', function() { proShowcasePage = Number(dot.dataset.proPage); renderProShowcase(); restartProShowcaseTimer(); });
+    });
+}
+
+function restartProShowcaseTimer() {
+    clearInterval(proShowcaseTimer);
+    if (proShowcaseUsers.length > 3) proShowcaseTimer = setInterval(function() {
+        var section = document.getElementById('proShowcase');
+        if (!section || section.hidden || document.hidden || section.matches(':hover') || section.contains(document.activeElement)) return;
+        proShowcasePage++;
+        renderProShowcase();
+    }, 7000);
+}
+
+window.loadProShowcase = function() {
+    var section = document.getElementById('proShowcase');
+    if (!section || !USER_UID) { if (section) section.hidden = true; return; }
+    Promise.all([
+        db.ref('sites/' + SITE + '/all_users').once('value'),
+        db.ref('sites/' + SITE + '/profile_status').once('value')
+    ]).then(function(snaps) {
+        var users = snaps[0].val() || {};
+        var statuses = snaps[1].val() || {};
+        var now = Date.now();
+        proShowcaseUsers = Object.keys(statuses).filter(function(uid) {
+            var status = statuses[uid] || {};
+            return !!status.pro && (!status.proExpiresAt || status.proExpiresAt > now) && !!users[uid] && users[uid].name;
+        }).map(function(uid) {
+            return { uid: uid, name: users[uid].name, avatarUrl: users[uid].avatarUrl || '', spotlight: !!(statuses[uid] && statuses[uid].spotlight) };
+        }).sort(function(a, b) {
+            return Number(b.spotlight) - Number(a.spotlight) || a.name.localeCompare(b.name, 'ru');
+        });
+        proShowcasePage = 0;
+        renderProShowcase();
+        restartProShowcaseTimer();
+    }).catch(function(error) { console.warn('Не удалось загрузить авторов PRO:', error); });
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    var previous = document.getElementById('proShowcasePrev');
+    var next = document.getElementById('proShowcaseNext');
+    if (previous) previous.addEventListener('click', function() { proShowcasePage--; renderProShowcase(); restartProShowcaseTimer(); });
+    if (next) next.addEventListener('click', function() { proShowcasePage++; renderProShowcase(); restartProShowcaseTimer(); });
+});
+
 // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 function esc(str) {
     if (!str) return '';
@@ -394,6 +475,7 @@ var scrollListenerAdded = false;
 function loadFeed() {
     var el = document.getElementById('feed');
     if (!el) return;
+    if (typeof window.loadProShowcase === 'function') window.loadProShowcase();
     if (!USER_UID) {
         el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
         return;

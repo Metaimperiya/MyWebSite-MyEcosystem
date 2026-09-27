@@ -18,7 +18,7 @@
           ".read": true,
           "$uid": {
             ".write": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')",
-            ".validate": "!newData.exists() || (newData.child('verified').isBoolean() && newData.child('pro').isBoolean() && (!newData.child('proExpiresAt').exists() || newData.child('proExpiresAt').isNumber() || newData.child('proExpiresAt').val() === null) && newData.child('updatedAt').isNumber() && newData.child('updatedBy').val() === auth.uid)"
+            ".validate": "!newData.exists() || (newData.child('verified').isBoolean() && newData.child('pro').isBoolean() && (!newData.child('proExpiresAt').exists() || newData.child('proExpiresAt').isNumber() || newData.child('proExpiresAt').val() === null) && (!newData.child('spotlight').exists() || newData.child('spotlight').isBoolean()) && newData.child('updatedAt').isNumber() && newData.child('updatedBy').val() === auth.uid)"
           }
         },
         "profile_reviews": {
