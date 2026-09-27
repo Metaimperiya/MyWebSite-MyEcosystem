@@ -201,31 +201,22 @@ function renderDatingProfiles() {
             if (goal && profile.goal !== goal) return false;
             return true;
         }).sort(function(a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
-    grid.innerHTML = profiles.length ? profiles.map(function(profile) {
+    var ownProfile = datingProfiles[USER_UID];
+    var ownCard = ownProfile ? '<button type="button" class="dating-card dating-own-card" data-dating-own><span class="dating-own-badge">МОЯ АНКЕТА</span><span class="dating-card-photo">' + (datingPhotoSource(ownProfile.photoUrl) ? '<img src="' + datingEscape(datingPhotoSource(ownProfile.photoUrl)) + '" alt="">' : '<span>' + datingEscape(Array.from(ownProfile.name || '?')[0]) + '</span>') + '</span><span class="dating-card-name">' + datingEscape(ownProfile.name || 'Моя анкета') + '</span><span class="dating-card-meta">' + datingEscape(ownProfile.city || '') + (ownProfile.country ? ', ' + datingEscape(ownProfile.country) : '') + '</span><span class="dating-card-goal">' + datingEscape(ownProfile.goal || '') + '</span><span class="dating-own-edit">Редактировать анкету →</span></button>' : '';
+    grid.innerHTML = ownCard + (profiles.length ? profiles.map(function(profile) {
         var image = datingPhotoSource(profile.photoUrl);
         return '<button type="button" class="dating-card" data-dating-profile="' + datingEscape(profile.uid) + '"><span class="dating-card-photo">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<span>' + datingEscape(Array.from(profile.name || '?')[0]) + '</span>') + '</span><span class="dating-card-name">' + datingEscape(profile.name) + '</span><span class="dating-card-meta">' + datingEscape(profile.gender) + ' · ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</span><span class="dating-card-goal">' + datingEscape(profile.goal) + '</span>' + (profile.bio ? '<span class="dating-card-bio">' + datingEscape(profile.bio) + '</span>' : '') + '</button>';
-    }).join('') : '<div class="dating-empty"><span>💗</span><strong>Пока нет подходящих анкет</strong><p>Попробуй изменить фильтры или загляни позже.</p></div>';
+    }).join('') : '<div class="dating-empty"><span>💗</span><strong>Пока нет подходящих анкет</strong><p>Попробуй изменить фильтры или загляни позже.</p></div>');
     var label = document.getElementById('datingResultsLabel');
     if (label) label.textContent = profiles.length + (profiles.length === 1 ? ' анкета' : profiles.length > 1 && profiles.length < 5 ? ' анкеты' : ' анкет');
     grid.querySelectorAll('[data-dating-profile]').forEach(function(card) {
         card.addEventListener('click', function() { openDatingDetail(card.getAttribute('data-dating-profile')); });
     });
+    var ownCardButton = grid.querySelector('[data-dating-own]');
+    if (ownCardButton) ownCardButton.addEventListener('click', openDatingProfileModal);
     var create = document.getElementById('datingCreateButton');
-    if (create) create.textContent = datingProfiles[USER_UID] ? '✎ Моя анкета' : '＋ Создать анкету';
-    var share = document.getElementById('datingShareButton');
-    if (share) share.hidden = !(datingProfiles[USER_UID] && datingProfiles[USER_UID].isActive === true);
+    if (create) create.textContent = ownProfile ? '✎ Редактировать анкету' : '＋ Создать анкету';
 }
-
-window.shareMyDatingProfile = function() {
-    var profile = datingProfiles[USER_UID];
-    if (!USER_UID || !profile || profile.isActive !== true) { alert('Сначала создай и активируй свою анкету.'); return; }
-    window.shareFeedEntity('dating', {
-        id: USER_UID,
-        title: profile.name + ' · ' + profile.goal,
-        description: profile.gender + ' · ищет: ' + profile.seeking + ' · ' + profile.city + ', ' + profile.country + (profile.bio ? ' · ' + profile.bio : ''),
-        image: datingPhotoSource(profile.photoUrl) || ''
-    });
-};
 
 window.openDatingProfileModal = function() {
     var profile = datingProfiles[USER_UID] || {};
@@ -268,10 +259,9 @@ window.closeDatingProfileModal = function() {
     datingPhotoPreviewUrl = null;
 };
 
-window.saveDatingProfile = function(shareAfterSave) {
+window.saveDatingProfile = function() {
     var error = document.getElementById('datingError');
     var saveButton = document.getElementById('datingSaveButton');
-    var shareSaveButton = document.getElementById('datingSaveAndShareButton');
     var uploadStatus = document.getElementById('datingUploadStatus');
     var name = document.getElementById('datingName').value.trim();
     var gender = document.getElementById('datingGender').value;
@@ -286,6 +276,7 @@ window.saveDatingProfile = function(shareAfterSave) {
     var ageConfirmed = document.getElementById('datingAdultConfirmed').checked;
     var isActive = document.getElementById('datingActive').checked;
     error.textContent = '';
+    if (!USER_UID) { error.textContent = 'Войди в аккаунт, чтобы сохранить анкету.'; return; }
     var missingFields = [];
     if (!name) missingFields.push({ label: 'имя', id: 'datingName' });
     if (!gender) missingFields.push({ label: 'кто ты', id: 'datingGender' });
@@ -304,17 +295,15 @@ window.saveDatingProfile = function(shareAfterSave) {
         return;
     }
     if (!ageConfirmed) { error.textContent = 'Для раздела знакомств нужно подтвердить, что тебе исполнилось 18 лет.'; return; }
-    if (shareAfterSave && !isActive) { error.textContent = 'Включи показ анкеты в поиске, чтобы поделиться ею.'; return; }
     if (!photoFile && !datingPhotoSource(photoUrl)) { error.textContent = 'Добавь фотографию по ссылке или выбери файл с устройства. Без фото анкету сохранить и опубликовать нельзя.'; document.getElementById('datingPhotoUrl').focus(); return; }
     if (photoUrlInput && !datingSafeImage(photoUrlInput) && !photoFile) { error.textContent = 'Укажи прямую ссылку на фото с https:// или http://.'; return; }
     if (photoFile && (!photoFile.type.match(/^image\//i) || photoFile.size >= 5 * 1024 * 1024)) { error.textContent = 'Выбери изображение размером меньше 5 МБ.'; return; }
     var profile = {
         name: name, gender: gender, seeking: seeking, countryCode: country.code, country: country.name,
         city: city, goal: goal, bio: bio, photoUrl: photoFile ? '' : (datingPhotoSource(photoUrl) || ''),
-        ageConfirmed: true, isActive: isActive, updatedAt: Date.now()
+        ageConfirmed: true, isActive: isActive, feedPublished: isActive, updatedAt: Date.now()
     };
     saveButton.disabled = true;
-    if (shareSaveButton) shareSaveButton.disabled = true;
     if (uploadStatus) uploadStatus.textContent = photoFile ? 'Подготавливаю фото для сохранения…' : 'Сохраняю анкету…';
     saveButton.textContent = photoFile ? 'Подготавливаю фото…' : 'Сохраняю…';
     var photoPromise = Promise.resolve(profile.photoUrl);
@@ -325,16 +314,43 @@ window.saveDatingProfile = function(shareAfterSave) {
         profile.photoUrl = url;
         if (uploadStatus) uploadStatus.textContent = photoFile ? 'Фото сжато. Сохраняю его вместе с анкетой…' : 'Сохраняю анкету…';
         saveButton.textContent = 'Сохраняю анкету…';
+        var previousProfile = datingProfiles[USER_UID] || {};
+        var feedPostId = profile.isActive ? (previousProfile.feedPostId || db.ref('sites/' + SITE + '/feed_posts').push().key) : previousProfile.feedPostId;
+        if (feedPostId) profile.feedPostId = feedPostId;
         var updates = {};
         updates['sites/' + SITE + '/dating_private_profiles/' + USER_UID] = profile;
         updates['sites/' + SITE + '/dating_profiles/' + USER_UID] = profile.isActive ? profile : null;
-        return db.ref().update(updates);
+        if (!profile.isActive && feedPostId) {
+            updates['sites/' + SITE + '/feed_posts/' + feedPostId] = null;
+            updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + feedPostId] = null;
+            return db.ref().update(updates);
+        }
+        if (!profile.isActive || !feedPostId) return db.ref().update(updates);
+        return db.ref('sites/' + SITE + '/feed_posts/' + feedPostId).once('value').then(function(snapshot) {
+            var oldPost = snapshot.val() || {};
+            var now = Date.now();
+            var feedPost = Object.assign({}, oldPost, {
+                author: USER || 'Пользователь', authorUid: USER_UID,
+                text: oldPost.text || '', timestamp: oldPost.timestamp || now,
+                likes: oldPost.likes || 0, commentCount: oldPost.commentCount || 0, reposts: oldPost.reposts || 0,
+                hashtags: oldPost.hashtags || [], media: oldPost.media || [], repost: oldPost.repost || null,
+                sharedEntity: {
+                    kind: 'dating', id: USER_UID, title: profile.name + ' · ' + profile.goal,
+                    description: profile.gender + ' · ищет: ' + profile.seeking + ' · ' + profile.city + ', ' + profile.country + (profile.bio ? ' · ' + profile.bio : ''),
+                    image: datingPhotoSource(profile.photoUrl) || ''
+                },
+                deleted: null, deletedAt: null
+            });
+            updates['sites/' + SITE + '/feed_posts/' + feedPostId] = feedPost;
+            updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + feedPostId] = feedPost;
+            return db.ref().update(updates);
+        });
     }).then(function() {
         datingProfiles[USER_UID] = profile;
         datingCurrentPhotoUrl = profile.photoUrl;
         window.closeDatingProfileModal();
         renderDatingProfiles();
-        if (shareAfterSave) window.shareMyDatingProfile();
+        if (typeof window.loadFeed === 'function') window.loadFeed();
     }).catch(function(saveError) {
         console.error('Не удалось сохранить анкету знакомств:', saveError);
         error.textContent = saveError.code === 'PERMISSION_DENIED' || saveError.code === 'permission_denied'
@@ -343,7 +359,6 @@ window.saveDatingProfile = function(shareAfterSave) {
     }).finally(function() {
         saveButton.disabled = false;
         saveButton.textContent = 'Сохранить анкету';
-        if (shareSaveButton) shareSaveButton.disabled = false;
     });
 };
 

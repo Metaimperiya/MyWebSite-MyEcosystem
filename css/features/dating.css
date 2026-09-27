@@ -20,6 +20,9 @@
 .dating-card-meta { display:-webkit-box; overflow:hidden; margin-top:4px; color:var(--text-secondary); font-size:.66rem; line-height:1.4; -webkit-box-orient:vertical; -webkit-line-clamp:2; }
 .dating-card-goal { justify-self:start; margin-top:7px; padding:4px 7px; border-radius:999px; background:color-mix(in srgb,#e54491 12%,var(--card-bg)); color:#d6418b; font-size:.61rem; font-weight:700; }
 .dating-card-bio { display:-webkit-box; overflow:hidden; margin-top:7px; color:var(--text-secondary); font-size:.67rem; line-height:1.45; -webkit-box-orient:vertical; -webkit-line-clamp:3; }
+.dating-own-card { border-color:color-mix(in srgb,#e54491 60%,var(--border-color)); }
+.dating-own-badge { justify-self:start; margin:0 0 7px; padding:4px 7px; border-radius:999px; background:color-mix(in srgb,#e54491 13%,var(--card-bg)); color:#d6418b; font-size:.58rem; font-weight:800; letter-spacing:.04em; }
+.dating-own-edit { margin-top:8px; color:#d6418b; font-size:.67rem; font-weight:750; }
 .dating-empty { display:grid; justify-items:center; gap:7px; grid-column:1/-1; padding:30px 16px; border:1px dashed var(--border-color); border-radius:14px; color:var(--text-secondary); text-align:center; font-size:.78rem; }
 .dating-empty>span { font-size:1.6rem; }
 .dating-empty strong { color:var(--text-color); }

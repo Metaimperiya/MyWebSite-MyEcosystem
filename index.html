@@ -315,7 +315,7 @@
 
             <div class="page" id="page-dating">
                 <section class="dating-page">
-                    <header class="dating-heading"><div><span class="dating-kicker">METAIMPERIYA · ЗНАКОМСТВА</span><h1>Новые знакомства</h1><p>Ищи людей по стране и городу. Контакты остаются под твоим контролем.</p></div><div class="dating-heading-actions"><button type="button" class="dating-secondary" id="datingShareButton" onclick="shareMyDatingProfile()" hidden>↗ Поделиться анкетой</button><button type="button" class="dating-primary" id="datingCreateButton" onclick="openDatingProfileModal()">＋ Создать анкету</button></div></header>
+                    <header class="dating-heading"><div><span class="dating-kicker">METAIMPERIYA · ЗНАКОМСТВА</span><h1>Новые знакомства</h1><p>Ищи людей по стране и городу. Контакты остаются под твоим контролем.</p></div><div class="dating-heading-actions"><button type="button" class="dating-primary" id="datingCreateButton" onclick="openDatingProfileModal()">＋ Создать анкету</button></div></header>
                     <div class="dating-filters">
                         <label class="dating-filter"><span>Страна</span><input id="datingCountryFilter" list="datingCountryOptions" placeholder="Любая страна" autocomplete="off"></label>
                         <label class="dating-filter"><span>Город</span><input id="datingCityFilter" placeholder="Любой город" autocomplete="off"></label>
@@ -669,9 +669,9 @@
             <div id="datingPhotoPreview" class="dating-photo-preview" hidden></div>
             <div id="datingUploadStatus" class="dating-upload-status" role="status" aria-live="polite"></div>
             <label for="datingBio">Немного о себе</label><textarea id="datingBio" maxlength="1200" placeholder="Что тебе нравится и кого ты хотел(а) бы встретить?"></textarea>
-            <label class="dating-check"><input id="datingActive" type="checkbox" checked> Показывать мою анкету в поиске</label>
+            <label class="dating-check"><input id="datingActive" type="checkbox" checked> Показывать анкету в поиске знакомств и общей ленте</label>
             <label class="dating-check dating-age-check"><input id="datingAdultConfirmed" type="checkbox"> Подтверждаю, что мне уже исполнилось 18 лет</label>
-            <div class="dating-error" id="datingError" role="alert"></div><div class="dating-submit-row"><button type="button" class="dating-primary dating-submit" id="datingSaveButton" onclick="saveDatingProfile()">Сохранить анкету</button><button type="button" class="dating-secondary dating-share-submit" id="datingSaveAndShareButton" onclick="saveDatingProfile(true)">Сохранить и поделиться</button></div>
+            <div class="dating-error" id="datingError" role="alert"></div><div class="dating-submit-row"><button type="button" class="dating-primary dating-submit" id="datingSaveButton" onclick="saveDatingProfile()">Сохранить анкету</button></div>
         </div>
     </div>
     <div class="modal-overlay" id="datingDetailModal"><div class="modal-box dating-modal dating-detail-modal"><button class="close-btn" type="button" onclick="closeDatingDetail()">✕</button><div id="datingDetailContent"></div></div></div>
@@ -814,7 +814,7 @@
 <script src="js/features/friends.js?v=3.2"></script>
 <script src="js/features/groups.js?v=4.5"></script>
 <script src="js/features/work.js?v=1.2"></script>
-<script src="js/features/dating.js?v=1.7"></script>
+<script src="js/features/dating.js?v=1.8"></script>
 <script src="js/features/marketplace.js?v=1.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
