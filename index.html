@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=4.6">
     <link rel="stylesheet" href="css/features/profile.css?v=3.6">
-    <link rel="stylesheet" href="css/features/groups.css?v=1.0">
+    <link rel="stylesheet" href="css/features/groups.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -234,11 +234,19 @@
             <div class="page" id="page-groups">
                 <section class="groups-page">
                     <div class="groups-heading"><div><span class="groups-kicker">СООБЩЕСТВА</span><h2>Группы</h2><p>Создавай сообщества и общайся в отдельной ленте каждой группы.</p></div><button type="button" class="groups-create-button" onclick="openCreateGroup()">＋ Создать группу</button></div>
-                    <div class="groups-directory" id="groupsDirectory"><div class="group-list" id="groupList"></div></div>
+                    <div class="groups-directory" id="groupsDirectory">
+                        <label class="groups-search"><span aria-hidden="true">⌕</span><input id="groupsSearch" type="search" placeholder="Поиск групп" autocomplete="off"></label>
+                        <div class="group-list" id="groupList"></div>
+                    </div>
                     <section class="group-detail" id="groupDetail" hidden>
                         <button type="button" class="group-back-button" onclick="closeGroup()">← Все группы</button>
-                        <div class="group-detail-header" id="groupDetailHeader"></div>
+                        <div class="group-profile" id="groupDetailHeader"></div>
                         <div class="group-membership" id="groupMembership"></div>
+                        <div class="group-profile-tabs" role="tablist" aria-label="Разделы группы">
+                            <button type="button" class="active" data-group-tab="feed" onclick="showGroupTab('feed')">Лента</button>
+                            <button type="button" data-group-tab="about" onclick="showGroupTab('about')">Информация</button>
+                        </div>
+                        <div class="group-about-panel" id="groupAboutPanel" hidden></div>
                         <div class="group-post-composer" id="groupPostComposer" hidden>
                             <textarea id="groupPostText" maxlength="3000" placeholder="Напиши что-нибудь в группу…"></textarea>
                             <div class="group-composer-footer"><span id="groupPostStatus" role="status" aria-live="polite"></span><button type="button" onclick="publishGroupPost()">Опубликовать</button></div>
@@ -488,6 +496,19 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="editCommunityModal">
+        <div class="modal-box group-create-modal">
+            <button class="close-btn" type="button" onclick="closeEditGroup()">✕</button>
+            <h3>Настройки группы</h3>
+            <label for="editGroupName">Название</label>
+            <input id="editGroupName" maxlength="60">
+            <label for="editGroupDescription">Описание</label>
+            <textarea id="editGroupDescription" maxlength="300"></textarea>
+            <div class="group-create-error" id="editGroupError" role="alert"></div>
+            <button class="btn-primary" id="saveGroupButton" type="button" onclick="saveGroupDetails()">Сохранить</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeEdit()">✕</button>
@@ -607,7 +628,7 @@
 <script src="js/features/profile.js?v=3.8"></script>
 <script src="js/features/reputation.js?v=1.1"></script>
 <script src="js/features/friends.js?v=3.1"></script>
-<script src="js/features/groups.js?v=4.0"></script>
+<script src="js/features/groups.js?v=4.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
 <script src="js/features/admin.js?v=3.2"></script>

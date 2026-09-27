@@ -9,6 +9,7 @@ var groupDetailPostsRef = null;
 var groupsCache = {};
 var groupMembershipsCache = {};
 var selectedCommunityId = null;
+var selectedGroupIsMember = false;
 
 function groupEscape(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
@@ -29,9 +30,16 @@ function renderGroupDirectory() {
     var groups = Object.keys(groupsCache).map(function(id) {
         return Object.assign({ id: id }, groupsCache[id] || {});
     }).sort(function(a, b) { return (b.createdAt || 0) - (a.createdAt || 0); });
+    var search = (document.getElementById('groupsSearch') || {}).value || '';
+    var query = search.trim().toLocaleLowerCase('ru');
+    if (query) groups = groups.filter(function(group) {
+        return ((group.name || '') + ' ' + (group.description || '')).toLocaleLowerCase('ru').indexOf(query) !== -1;
+    });
 
     if (!groups.length) {
-        list.innerHTML = '<div class="groups-empty"><span>👥</span><strong>Пока нет групп</strong><p>Создай первую группу — и у неё появится собственная лента.</p><button type="button" onclick="openCreateGroup()">＋ Создать группу</button></div>';
+        list.innerHTML = query
+            ? '<div class="groups-empty"><span>⌕</span><strong>Ничего не найдено</strong><p>Попробуй изменить запрос.</p></div>'
+            : '<div class="groups-empty"><span>👥</span><strong>Пока нет групп</strong><p>Создай первую группу — и у неё появится собственная лента.</p><button type="button" onclick="openCreateGroup()">＋ Создать группу</button></div>';
         return;
     }
 
@@ -41,7 +49,7 @@ function renderGroupDirectory() {
         var memberCount = Object.keys(members).length;
         return '<article class="community-card">' +
             '<button type="button" class="community-card-main" data-open-group="' + groupEscape(group.id) + '">' +
-                '<span class="community-card-icon">👥</span><span class="community-card-copy"><strong>' + groupEscape(group.name || 'Группа') + '</strong>' +
+            '<span class="community-card-icon">' + groupEscape(Array.from((group.name || 'Группа').trim())[0] || '👥') + '</span><span class="community-card-copy"><strong>' + groupEscape(group.name || 'Группа') + '</strong>' +
                 '<span>' + groupEscape(group.description || 'Группа сообщества') + '</span></span></button>' +
             '<div class="community-card-footer"><span>👤 ' + memberCount + ' участников</span>' +
             (isMember ? '<span class="community-member-label">Вы участник</span>' : '<button type="button" class="community-join-button" data-join-group="' + groupEscape(group.id) + '">Вступить</button>') + '</div></article>';
@@ -61,8 +69,18 @@ function renderGroupDetailHeader() {
     var header = document.getElementById('groupDetailHeader');
     if (!group || !header) return;
     var members = groupMembershipsCache[selectedCommunityId] || {};
-    header.innerHTML = '<div class="group-detail-icon">👥</div><div class="group-detail-copy"><h2>' + groupEscape(group.name || 'Группа') +
-        '</h2><p>' + groupEscape(group.description || 'Публичная группа сообщества.') + '</p><span>👤 ' + Object.keys(members).length + ' участников</span></div>';
+    var created = group.createdAt ? new Date(group.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    var initial = Array.from((group.name || 'Группа').trim())[0] || '👥';
+    header.innerHTML = '<div class="group-profile-cover"><span>СООБЩЕСТВО</span></div><div class="group-profile-main">' +
+        '<div class="group-profile-avatar">' + groupEscape(initial) + '</div><div class="group-profile-identity"><h2>' + groupEscape(group.name || 'Группа') +
+        '</h2><span>Группа · ' + Object.keys(members).length + ' участников' + (created ? ' · создана ' + groupEscape(created) : '') + '</span></div>' +
+        (group.ownerUid === USER_UID ? '<button type="button" class="group-settings-button" onclick="openEditGroup()">⚙ Настроить</button>' : '') + '</div>' +
+        '<p class="group-profile-description">' + groupEscape(group.description || 'У этой группы пока нет описания.') + '</p>';
+    var about = document.getElementById('groupAboutPanel');
+    if (about) about.innerHTML = '<h3>Информация о группе</h3><p>' + groupEscape(group.description || 'Описание пока не добавлено.') + '</p><dl>' +
+        '<div><dt>Создатель</dt><dd>' + groupEscape(group.ownerName || 'Участник METAIMPERIYA') + '</dd></div>' +
+        '<div><dt>Участников</dt><dd>' + Object.keys(members).length + '</dd></div>' +
+        (created ? '<div><dt>Создана</dt><dd>' + groupEscape(created) + '</dd></div>' : '') + '</dl>';
 }
 
 function renderGroupMembership(isMember) {
@@ -71,10 +89,11 @@ function renderGroupMembership(isMember) {
     if (!controls || !selectedCommunityId) return;
     var group = groupsCache[selectedCommunityId] || {};
     var isOwner = group.ownerUid === USER_UID;
+    selectedGroupIsMember = isMember;
     controls.innerHTML = isMember
         ? '<div class="group-member-state">' + (isOwner ? 'Ты создатель этой группы' : 'Ты участник этой группы') + '</div>' + (!isOwner ? '<button type="button" class="group-leave-button" onclick="leaveGroup()">Покинуть группу</button>' : '')
         : '<button type="button" class="community-join-button" onclick="joinGroup(\'' + groupEscape(selectedCommunityId) + '\')">Вступить в группу</button><span>Вступи, чтобы публиковать записи</span>';
-    if (composer) composer.hidden = !isMember;
+    if (composer) composer.hidden = !isMember || document.querySelector('[data-group-tab="about"].active') !== null;
 }
 
 function renderGroupPosts(posts) {
@@ -167,16 +186,65 @@ window.openGroup = function(id) {
     if (directory) directory.hidden = true;
     if (detail) detail.hidden = false;
     renderGroupDetailHeader();
+    window.showGroupTab('feed');
     loadSelectedGroupFeed();
 };
 
 window.closeGroup = function() {
     stopGroupDetailListeners();
     selectedCommunityId = null;
+    selectedGroupIsMember = false;
     var directory = document.getElementById('groupsDirectory');
     var detail = document.getElementById('groupDetail');
     if (directory) directory.hidden = false;
     if (detail) detail.hidden = true;
+};
+
+window.showGroupTab = function(tab) {
+    var feed = document.getElementById('groupFeed');
+    var about = document.getElementById('groupAboutPanel');
+    var composer = document.getElementById('groupPostComposer');
+    document.querySelectorAll('[data-group-tab]').forEach(function(button) {
+        button.classList.toggle('active', button.getAttribute('data-group-tab') === tab);
+    });
+    if (feed) feed.hidden = tab !== 'feed';
+    if (about) about.hidden = tab !== 'about';
+    if (composer) composer.hidden = tab !== 'feed' || !selectedGroupIsMember;
+};
+
+window.openEditGroup = function() {
+    if (!selectedCommunityId) return;
+    var group = groupsCache[selectedCommunityId];
+    if (!group || group.ownerUid !== USER_UID) return;
+    document.getElementById('editGroupName').value = group.name || '';
+    document.getElementById('editGroupDescription').value = group.description || '';
+    document.getElementById('editGroupError').textContent = '';
+    document.getElementById('editCommunityModal').classList.add('open');
+};
+
+window.closeEditGroup = function() {
+    document.getElementById('editCommunityModal').classList.remove('open');
+};
+
+window.saveGroupDetails = function() {
+    var group = groupsCache[selectedCommunityId];
+    var error = document.getElementById('editGroupError');
+    var button = document.getElementById('saveGroupButton');
+    if (!group || group.ownerUid !== USER_UID) return;
+    var name = document.getElementById('editGroupName').value.trim();
+    var description = document.getElementById('editGroupDescription').value.trim().slice(0, 300);
+    if (name.length < 2) { error.textContent = 'Название должно содержать хотя бы 2 символа.'; return; }
+    button.disabled = true;
+    button.textContent = 'Сохраняю…';
+    db.ref('sites/' + SITE + '/groups/' + selectedCommunityId).update({ name: name, description: description }).then(function() {
+        groupsCache[selectedCommunityId].name = name;
+        groupsCache[selectedCommunityId].description = description;
+        renderGroupDetailHeader();
+        renderGroupDirectory();
+        window.closeEditGroup();
+    }).catch(function(saveError) {
+        error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Нет прав на изменение группы.' : 'Не удалось сохранить изменения.';
+    }).finally(function() { button.disabled = false; button.textContent = 'Сохранить'; });
 };
 
 window.joinGroup = function(id) {
@@ -272,6 +340,9 @@ window.publishGroupPost = function() {
         if (button) { button.disabled = false; button.textContent = 'Опубликовать'; }
     });
 };
+
+var groupsSearchInput = document.getElementById('groupsSearch');
+if (groupsSearchInput) groupsSearchInput.addEventListener('input', renderGroupDirectory);
 
 window.addEventListener('beforeunload', function() {
     if (groupsDirectoryRef) groupsDirectoryRef.off();
