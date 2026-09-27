@@ -427,7 +427,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 range.selectNodeContents(code);
                 selection.removeAllRanges(); selection.addRange(range);
             } else {
-                document.execCommand('insertHTML', false, '<pre><code>код</code></pre><p><br></p>');
+                var pre = document.createElement('pre');
+                code.textContent = 'вставьте код сюда';
+                pre.appendChild(code);
+                if (range && editor.contains(range.commonAncestorContainer)) {
+                    range.deleteContents();
+                    range.insertNode(pre);
+                } else {
+                    editor.appendChild(pre);
+                }
+                range = document.createRange();
+                range.selectNodeContents(code);
+                selection.removeAllRanges();
+                selection.addRange(range);
             }
         }
         editor.dispatchEvent(new Event('input', { bubbles: true }));
