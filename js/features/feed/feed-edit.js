@@ -123,6 +123,21 @@
         return editor.innerHTML;
     }
 
+    function setPostPublishStatus(message, type) {
+        var status = document.getElementById('postPublishStatus');
+        if (!status) return;
+        status.textContent = message || '';
+        status.className = 'post-publish-status' + (type ? ' ' + type : '');
+    }
+
+    function setPostPublishBusy(busy) {
+        var button = document.querySelector('#page-feed .post-form .btn-submit');
+        if (!button) return;
+        if (!button.dataset.readyLabel) button.dataset.readyLabel = button.textContent;
+        button.disabled = !!busy;
+        button.textContent = busy ? '⏳ Публикую…' : button.dataset.readyLabel;
+    }
+
     function clearEditor(id) {
         var editor = document.getElementById(id);
         if (!editor) return;
@@ -155,6 +170,9 @@
             alert('Введите текст или добавьте фото');
             return;
         }
+
+        setPostPublishStatus('Готовлю медиа и публикую пост…');
+        setPostPublishBusy(true);
 
         var hashtags = extractHashtags(text);
 
@@ -194,20 +212,32 @@
                 var updates = {};
                 updates['sites/' + SITE + '/feed_posts/' + postId] = postData;
                 updates['sites/' + SITE + '/user_posts/' + USER_UID + '/' + postId] = postData;
-                db.ref().update(updates);
-                clearEditor('postEditor');
-                window.clearPostForm();
-
-                // ОБНОВЛЯЕМ ЛЕНТУ БЕЗ ПЕРЕЗАГРУЗКИ
-                setTimeout(function() {
+                db.ref().update(updates).then(function() {
+                    clearEditor('postEditor');
+                    window.clearPostForm();
+                    setPostPublishBusy(false);
+                    setPostPublishStatus('Пост опубликован', 'success');
                     if (typeof loadFeed === 'function') loadFeed();
-                }, 300);
-            }).catch(function(error) { alert('Не удалось загрузить медиа: ' + (error.message || error)); });
+                }).catch(function(error) {
+                    setPostPublishBusy(false);
+                    setPostPublishStatus('Пост не отправлен: ' + (error.message || 'ошибка базы данных'), 'error');
+                    console.error('Feed post write failed:', error);
+                });
+            }).catch(function(error) {
+                setPostPublishBusy(false);
+                setPostPublishStatus('Не удалось загрузить фото: ' + (error.message || error), 'error');
+                console.error('Feed media upload failed:', error);
+            });
+        }, function(error) {
+            setPostPublishBusy(false);
+            setPostPublishStatus('Не удалось подготовить пост: ' + (error.message || error), 'error');
+            console.error('Feed post preparation failed:', error);
         });
     };
 
     window.clearPostForm = function() {
         clearEditor('postEditor');
+        setPostPublishStatus('', '');
         pendingImageFile_Feed = null;
         pendingImageData_Feed = null;
         composeMedia.forEach(function(item) { if (item.preview && item.preview.startsWith('blob:')) URL.revokeObjectURL(item.preview); });
