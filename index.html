@@ -42,7 +42,7 @@
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=4.7">
-    <link rel="stylesheet" href="css/features/profile.css?v=3.7">
+    <link rel="stylesheet" href="css/features/profile.css?v=3.8">
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
     <link rel="stylesheet" href="css/features/work.css?v=1.2">
     <link rel="stylesheet" href="css/features/dating.css?v=1.2">
@@ -348,7 +348,12 @@
             </div>
 
             <div class="page" id="page-profile">
-                <div class="profile-header">
+                <div class="profile-header is-collapsed">
+                    <div class="profile-stats" aria-label="Статистика профиля">
+                        <button type="button" class="profile-stat" id="friendsStat">🤝 <span>Друзья</span><strong id="friendsCount">0</strong></button>
+                        <button type="button" class="profile-stat" id="subscribersStat">👀 <span>Подписчики</span><strong id="subscribersCount">0</strong></button>
+                        <button type="button" class="profile-stat" id="subscriptionsStat">📌 <span>Подписки</span><strong id="subscriptionsCount">0</strong></button>
+                    </div>
                     <div class="profile-identity" id="profileIdentity">
                         <div class="avatar-wrap" id="profileAvatar" onclick="uploadAvatar()"><span class="letter">?</span></div>
                         <div class="profile-identity-copy">
@@ -358,24 +363,25 @@
                             <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
                         </div>
                     </div>
-                    <div class="profile-header-details" id="profileHeaderDetails">
-                        <div class="profile-contact-row" id="profileContactRow" hidden>
-                            <a class="profile-email" id="profileEmail" hidden></a>
-                            <div class="profile-phone-actions" id="profilePhoneActions" hidden>
-                                <a class="profile-phone-number" id="profilePhoneNumber" hidden></a>
-                                <a class="profile-call-btn" id="profileCallButton" aria-label="Позвонить" title="Позвонить" hidden><span aria-hidden="true">📞</span>&nbsp;Позвонить</a>
-                            </div>
+                    <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
+                    <div class="profile-reputation-accordion">
+                        <button type="button" class="profile-reputation-toggle" id="profileReputationToggle" aria-expanded="false" aria-controls="profileReputation">Отзывы и рейтинг <span aria-hidden="true">⌄</span></button>
+                        <div class="profile-reputation" id="profileReputation" hidden></div>
+                    </div>
+                    <div class="profile-contact-row profile-phone-row" id="profilePhoneRow" hidden>
+                        <div class="profile-phone-actions" id="profilePhoneActions" hidden>
+                            <a class="profile-phone-number" id="profilePhoneNumber" hidden></a>
+                            <a class="profile-call-btn" id="profileCallButton" aria-label="Позвонить" title="Позвонить" hidden><span aria-hidden="true">📞</span>&nbsp;Позвонить</a>
                         </div>
-                        <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
+                    </div>
+                    <div class="profile-header-details" id="profileHeaderDetails">
                         <div class="bio" id="profileBio"></div>
-                        <div class="profile-stats" aria-label="Статистика профиля">
-                            <button type="button" class="profile-stat" id="friendsStat">🤝 <span>Друзья</span><strong id="friendsCount">0</strong></button>
-                            <button type="button" class="profile-stat" id="subscribersStat">👀 <span>Подписчики</span><strong id="subscribersCount">0</strong></button>
-                            <button type="button" class="profile-stat" id="subscriptionsStat">📌 <span>Подписки</span><strong id="subscriptionsCount">0</strong></button>
+                        <div class="profile-contact-row profile-email-row" id="profileEmailRow" hidden>
+                            <a class="profile-email" id="profileEmail" hidden></a>
                         </div>
                         <div class="profile-actions" id="profileActions"></div>
                     </div>
-                    <button type="button" class="profile-header-toggle" id="profileHeaderToggle" aria-expanded="true" aria-controls="profileHeaderDetails" aria-label="Свернуть шапку профиля"><span class="profile-header-grip" aria-hidden="true"></span><span class="profile-header-toggle-label">Свернуть шапку</span><span class="profile-header-chevron" aria-hidden="true">⌃</span></button>
+                    <button type="button" class="profile-header-toggle" id="profileHeaderToggle" aria-expanded="false" aria-controls="profileHeaderDetails" aria-label="Развернуть описание и дополнительные действия"><span class="profile-header-grip" aria-hidden="true"></span><span class="profile-header-toggle-label">Показать описание</span><span class="profile-header-chevron" aria-hidden="true">⌄</span></button>
                 </div>
                 <section class="profile-list-section" id="profileListSection" hidden aria-live="polite">
                     <div class="profile-list-heading">
@@ -384,7 +390,6 @@
                     </div>
                     <div class="profile-user-list" id="profileUserList"></div>
                 </section>
-                <div class="profile-reputation" id="profileReputation" hidden></div>
                 <div class="card" style="margin-top:8px;">
                     <div class="post-form">
                         <div class="editor-toolbar">
@@ -803,8 +808,8 @@
 <script src="js/features/feed/feed-actions.js?v=4.1"></script>
 <script src="js/features/feed/feed-edit.js?v=5.2"></script>
 <script src="js/features/referrals.js?v=1.0"></script>
-<script src="js/features/profile.js?v=3.9"></script>
-<script src="js/features/reputation.js?v=1.1"></script>
+<script src="js/features/profile.js?v=4.0"></script>
+<script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.2"></script>
 <script src="js/features/groups.js?v=4.5"></script>
 <script src="js/features/work.js?v=1.2"></script>

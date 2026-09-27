@@ -23,15 +23,18 @@
 .profile-header-grip { width:28px; height:4px; border-radius:99px; background:color-mix(in srgb,var(--text-secondary) 40%,transparent); }
 .profile-header-chevron { color:var(--link-color); font-size:1rem; font-weight:800; line-height:1; transition:transform .22s ease; }
 .profile-header.is-collapsed { padding:8px 12px 6px; box-shadow:0 4px 16px rgba(15,23,42,.08); }
-.profile-header.is-collapsed .profile-identity { flex-direction:row; justify-content:flex-start; gap:10px; text-align:left; }
-.profile-header.is-collapsed .avatar-wrap { width:42px; height:42px; flex:0 0 42px; margin:0; }
-.profile-header.is-collapsed .profile-identity-copy { align-items:flex-start; gap:1px; }
-.profile-header.is-collapsed .profile-avatar-rating { display:none; }
 .profile-header.is-collapsed .profile-header-details { max-height:0; margin:0; opacity:0; pointer-events:none; }
 .profile-header.is-collapsed .profile-header-toggle { width:54px; min-height:20px; margin:4px auto 0; padding:2px 8px; border:0; background:transparent; }
 .profile-header.is-collapsed .profile-header-toggle-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
 .profile-header.is-collapsed .profile-header-chevron { transform:rotate(180deg); }
 .profile-header.is-collapsed .profile-header-grip { width:34px; height:4px; }
+.profile-reputation-accordion { width:min(100% - 28px,600px); margin:7px auto 2px; }
+.profile-reputation-toggle { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:35px; padding:7px 11px; border:1px solid var(--border-color); border-radius:10px; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.72rem; font-weight:700; text-align:left; cursor:pointer; }
+.profile-reputation-toggle span { color:var(--link-color); font-size:1rem; }
+.profile-reputation[hidden] { display:none; }
+.profile-reputation-accordion .profile-reputation { margin:8px 0 0; text-align:left; }
+.profile-phone-row { margin-top:7px; }
+.profile-email-row { margin-top:10px; }
 
 .profile-header .avatar-wrap {
     width: 80px;

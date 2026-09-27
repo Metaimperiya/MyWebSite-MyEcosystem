@@ -47,7 +47,8 @@ function profileSocialHref(key, value) {
 }
 
 function renderProfileContacts(user) {
-    var row = document.getElementById('profileContactRow');
+    var emailRow = document.getElementById('profileEmailRow');
+    var phoneRow = document.getElementById('profilePhoneRow');
     var emailLink = document.getElementById('profileEmail');
     var phoneActions = document.getElementById('profilePhoneActions');
     var phoneNumber = document.getElementById('profilePhoneNumber');
@@ -70,7 +71,8 @@ function renderProfileContacts(user) {
         phoneNumber.textContent = phone;
     }
     if (phoneActions) phoneActions.hidden = !phone;
-    if (row) row.hidden = !email && !phone;
+    if (emailRow) emailRow.hidden = !email;
+    if (phoneRow) phoneRow.hidden = !phone;
     if (!socialContainer) return;
     socialContainer.replaceChildren();
     var links = user.social_links || {};
@@ -99,16 +101,18 @@ function renderProfileContacts(user) {
     socialContainer.hidden = !socialCount;
 }
 
-function setProfileHeaderCollapsed(collapsed) {
+function setProfileHeaderCollapsed(collapsed, persist) {
     var header = document.querySelector('.profile-header');
     var toggle = document.getElementById('profileHeaderToggle');
     if (!header || !toggle) return;
     header.classList.toggle('is-collapsed', collapsed);
     toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    toggle.setAttribute('aria-label', collapsed ? 'Развернуть шапку профиля' : 'Свернуть шапку профиля');
+    toggle.setAttribute('aria-label', collapsed ? 'Показать описание и дополнительные действия' : 'Скрыть описание и дополнительные действия');
     var label = toggle.querySelector('.profile-header-toggle-label');
-    if (label) label.textContent = collapsed ? 'Развернуть шапку' : 'Свернуть шапку';
-    try { localStorage.setItem('profileHeaderCollapsed', collapsed ? '1' : '0'); } catch (ignore) {}
+    if (label) label.textContent = collapsed ? 'Показать описание' : 'Скрыть описание';
+    if (persist !== false) {
+        try { localStorage.setItem('profileHeaderCollapsedV2', collapsed ? '1' : '0'); } catch (ignore) {}
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -132,8 +136,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (Date.now() - swipeFinishedAt < 350) return;
         setProfileHeaderCollapsed(!document.querySelector('.profile-header').classList.contains('is-collapsed'));
     });
-    try { setProfileHeaderCollapsed(localStorage.getItem('profileHeaderCollapsed') === '1'); }
+    try { setProfileHeaderCollapsed(localStorage.getItem('profileHeaderCollapsedV2') !== '0', false); }
     catch (ignore) { setProfileHeaderCollapsed(false); }
+
+    var reputationToggle = document.getElementById('profileReputationToggle');
+    var reputationPanel = document.getElementById('profileReputation');
+    if (reputationToggle && reputationPanel) {
+        reputationToggle.addEventListener('click', function() {
+            var expanded = reputationToggle.getAttribute('aria-expanded') === 'true';
+            reputationToggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            reputationPanel.hidden = expanded;
+            var chevron = reputationToggle.querySelector('span');
+            if (chevron) chevron.textContent = expanded ? '⌄' : '⌃';
+        });
+    }
 });
 
 function validateSocialLinksWithoutBlockingSave() {

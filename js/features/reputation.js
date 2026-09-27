@@ -332,9 +332,15 @@ window.rebuildProfileExperience = function(uid) {
 function renderReputationPanel(uid) {
     var panel = document.getElementById('profileReputation');
     if (!panel) return;
+    var reputationToggle = document.getElementById('profileReputationToggle');
+    panel.hidden = true;
+    if (reputationToggle) {
+        reputationToggle.setAttribute('aria-expanded', 'false');
+        var chevron = reputationToggle.querySelector('span');
+        if (chevron) chevron.textContent = '⌄';
+    }
     var viewingOwn = uid === USER_UID;
     var canReview = !!USER_UID && !viewingOwn;
-    panel.hidden = false;
     panel.innerHTML =
         '<section class="profile-rating"><h4>Отзывы и рейтинг</h4><div id="profileRatingSummary" class="profile-rating-summary">Загрузка…</div></section>' +
         (canReview ? '<section class="profile-review-form"><h4>Оставить отзыв</h4><div class="profile-rating-choice" aria-label="Ваша оценка">' +
