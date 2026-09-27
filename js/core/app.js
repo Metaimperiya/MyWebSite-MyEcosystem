@@ -361,6 +361,38 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof loadWork === 'function') loadWork();
     };
 
+    window.goToDating = function() {
+        if (!window.checkAccess()) return;
+        if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
+            window.location.href = '/?page=dating';
+            return;
+        }
+        window.setActivePage('dating');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) {
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null;
+        }
+        CURRENT_ROOM = null;
+        if (typeof loadDating === 'function') loadDating();
+    };
+
+    window.goToMarketplace = function() {
+        if (!window.checkAccess()) return;
+        if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
+            window.location.href = '/?page=marketplace';
+            return;
+        }
+        window.setActivePage('marketplace');
+        document.getElementById('chatView').classList.remove('active');
+        if (chatUnsub) {
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null;
+        }
+        CURRENT_ROOM = null;
+        if (typeof loadMarketplace === 'function') loadMarketplace();
+    };
+
     // ===== САЙДБАР =====
     window.toggleSidebar = function() {
         if (!window.checkAccess()) return;

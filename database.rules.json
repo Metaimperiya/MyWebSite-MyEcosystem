@@ -71,6 +71,35 @@
             ".validate": "!newData.exists() || (newData.hasChildren(['email', 'phone']) && newData.child('email').isString() && newData.child('email').val().length <= 160 && newData.child('phone').isString() && newData.child('phone').val().length <= 40)"
           }
         },
+        "dating_profiles": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'gender', 'seeking', 'countryCode', 'country', 'city', 'goal', 'bio', 'photoUrl', 'ageConfirmed', 'isActive', 'updatedAt']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 80 && newData.child('gender').isString() && newData.child('gender').val().length >= 1 && newData.child('gender').val().length <= 30 && newData.child('seeking').isString() && newData.child('seeking').val().length >= 1 && newData.child('seeking').val().length <= 30 && newData.child('countryCode').isString() && newData.child('countryCode').val().length === 2 && newData.child('country').isString() && newData.child('country').val().length <= 80 && newData.child('city').isString() && newData.child('city').val().length >= 1 && newData.child('city').val().length <= 80 && newData.child('goal').isString() && newData.child('goal').val().length >= 1 && newData.child('goal').val().length <= 60 && newData.child('bio').isString() && newData.child('bio').val().length <= 1200 && newData.child('photoUrl').isString() && newData.child('photoUrl').val().length <= 2048 && newData.child('ageConfirmed').val() === true && newData.child('isActive').val() === true && newData.child('updatedAt').isNumber())"
+          }
+        },
+        "dating_private_profiles": {
+          "$uid": {
+            ".read": "auth != null && $uid === auth.uid",
+            ".write": "auth != null && $uid === auth.uid",
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'gender', 'seeking', 'countryCode', 'country', 'city', 'goal', 'bio', 'photoUrl', 'ageConfirmed', 'isActive', 'updatedAt']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 80 && newData.child('gender').isString() && newData.child('gender').val().length >= 1 && newData.child('gender').val().length <= 30 && newData.child('seeking').isString() && newData.child('seeking').val().length >= 1 && newData.child('seeking').val().length <= 30 && newData.child('countryCode').isString() && newData.child('countryCode').val().length === 2 && newData.child('country').isString() && newData.child('country').val().length <= 80 && newData.child('city').isString() && newData.child('city').val().length >= 1 && newData.child('city').val().length <= 80 && newData.child('goal').isString() && newData.child('goal').val().length >= 1 && newData.child('goal').val().length <= 60 && newData.child('bio').isString() && newData.child('bio').val().length <= 1200 && newData.child('photoUrl').isString() && newData.child('photoUrl').val().length <= 2048 && newData.child('ageConfirmed').val() === true && newData.child('isActive').isBoolean() && newData.child('updatedAt').isNumber())"
+          }
+        },
+        "dating_reports": {
+          ".read": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')",
+          "$reportId": {
+            ".write": "auth != null && !data.exists() && newData.child('reporterUid').val() === auth.uid && newData.child('status').val() === 'new'",
+            ".validate": "!newData.exists() || (newData.hasChildren(['reporterUid', 'reportedUid', 'reason', 'createdAt', 'status']) && newData.child('reporterUid').val() === auth.uid && newData.child('reportedUid').isString() && newData.child('reportedUid').val() !== auth.uid && newData.child('reason').isString() && newData.child('reason').val().length >= 3 && newData.child('reason').val().length <= 500 && newData.child('createdAt').isNumber() && newData.child('status').val() === 'new')"
+          }
+        },
+        "marketplace_listings": {
+          ".read": "auth != null",
+          ".indexOn": ["createdAt", "kind", "countryCode", "city"],
+          "$listingId": {
+            ".write": "auth != null && ((!data.exists() && newData.child('sellerUid').val() === auth.uid) || (data.exists() && data.child('sellerUid').val() === auth.uid))",
+            ".validate": "!newData.exists() || (newData.hasChildren(['kind', 'category', 'title', 'description', 'price', 'currency', 'country', 'countryCode', 'city', 'imageUrl', 'sellerUid', 'createdAt', 'isActive']) && newData.child('kind').isString() && newData.child('kind').val().matches(/^(goods|services|realestate)$/) && newData.child('category').isString() && newData.child('category').val().length <= 80 && newData.child('title').isString() && newData.child('title').val().length >= 2 && newData.child('title').val().length <= 100 && newData.child('description').isString() && newData.child('description').val().length >= 1 && newData.child('description').val().length <= 3000 && newData.child('price').isString() && newData.child('price').val().length <= 50 && newData.child('currency').isString() && newData.child('currency').val().matches(/^(UAH|USD|EUR|RUB)$/) && newData.child('country').isString() && newData.child('country').val().length <= 80 && newData.child('countryCode').isString() && newData.child('countryCode').val().length <= 2 && newData.child('city').isString() && newData.child('city').val().length <= 80 && newData.child('imageUrl').isString() && newData.child('imageUrl').val().length <= 2048 && newData.child('sellerUid').val() === auth.uid && newData.child('createdAt').isNumber() && newData.child('isActive').isBoolean())"
+          }
+        },
         "profile_status": {
           ".read": true,
           "$uid": {

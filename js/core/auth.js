@@ -121,6 +121,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof loadFeed === 'function') loadFeed();
             if (typeof loadGroups === 'function') loadGroups();
             if (typeof loadWork === 'function') loadWork();
+            if (typeof loadDating === 'function') loadDating();
+            if (typeof loadMarketplace === 'function') loadMarketplace();
             if (typeof loadPeople === 'function') loadPeople();
             if (typeof loadProfile === 'function') loadProfile();
             if (typeof loadNotifications === 'function') loadNotifications();

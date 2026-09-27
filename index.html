@@ -45,6 +45,8 @@
     <link rel="stylesheet" href="css/features/profile.css?v=3.6">
     <link rel="stylesheet" href="css/features/groups.css?v=1.4">
     <link rel="stylesheet" href="css/features/work.css?v=1.1">
+    <link rel="stylesheet" href="css/features/dating.css?v=1.1">
+    <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -119,6 +121,8 @@
         <div class="menu-item" onclick="goToPeople();closeSidebar();"><span class="icon">👥</span> People</div>
         <div class="menu-item" onclick="goToGroups();closeSidebar();"><span class="icon">📁</span> Groups</div>
         <div class="menu-item" onclick="goToWork();closeSidebar();"><span class="icon">💼</span> Работа</div>
+        <div class="menu-item" onclick="goToDating();closeSidebar();"><span class="icon">💗</span> Знакомства</div>
+        <div class="menu-item" onclick="goToMarketplace();closeSidebar();"><span class="icon">🛍️</span> Маркетплейс</div>
 
         <a class="menu-item" href="/doss/" onclick="closeSidebar();"><span class="icon">🧠</span> DOSS OS</a>
 
@@ -136,7 +140,7 @@
         <a class="menu-item" href="/cinema/"><span class="icon">🎥</span> Cinema</a>
         <a class="menu-item" href="/programming/"><span class="icon">💻</span> Programming</a>
         <a class="menu-item" href="/business/"><span class="icon">💼</span> Business</a>
-        <a class="menu-item" href="/dating/"><span class="icon">❤️</span> Dating</a>
+        <a class="menu-item" href="/dating/"><span class="icon">❤️</span> Статьи о знакомствах</a>
         </div>
         <div class="menu-divider"></div>
         <div class="menu-item" onclick="openNotifications();closeSidebar();"><span class="icon">🔔</span> Notifications</div>
@@ -273,6 +277,40 @@
                     <div class="work-tools"><label class="work-search"><span>⌕</span><input id="workSearch" type="search" placeholder="Поиск вакансий" autocomplete="off"></label><span class="work-count" id="workCount"></span></div>
                     <div class="work-list" id="workList" aria-live="polite"></div>
                     <section id="workCompanyDetail" class="work-company-detail" hidden></section>
+                </section>
+            </div>
+
+            <div class="page" id="page-dating">
+                <section class="dating-page">
+                    <header class="dating-heading"><div><span class="dating-kicker">METAIMPERIYA · ЗНАКОМСТВА</span><h1>Новые знакомства</h1><p>Ищи людей по стране и городу. Контакты остаются под твоим контролем.</p></div><button type="button" class="dating-primary" id="datingCreateButton" onclick="openDatingProfileModal()">＋ Создать анкету</button></header>
+                    <div class="dating-filters">
+                        <label class="dating-filter"><span>Страна</span><input id="datingCountryFilter" list="datingCountryOptions" placeholder="Любая страна" autocomplete="off"></label>
+                        <label class="dating-filter"><span>Город</span><input id="datingCityFilter" placeholder="Любой город" autocomplete="off"></label>
+                        <label class="dating-filter dating-goal-filter"><span>Цель</span><select id="datingGoalFilter"><option value="">Любая</option><option>Серьёзные отношения</option><option>Дружба</option><option>Общение</option><option>Свидания</option></select></label>
+                    </div>
+                    <datalist id="datingCountryOptions"></datalist>
+                    <div class="dating-results-label" id="datingResultsLabel"></div>
+                    <div class="dating-grid" id="datingGrid" aria-live="polite"></div>
+                </section>
+            </div>
+
+            <div class="page" id="page-marketplace">
+                <section class="marketplace-page">
+                    <header class="marketplace-heading"><div><span class="marketplace-kicker">METAIMPERIYA · ПОКУПКИ И ПРЕДЛОЖЕНИЯ</span><h1>Маркетплейс</h1><p>Товары, услуги и недвижимость — каждый раздел со своими объявлениями.</p></div><button type="button" class="marketplace-primary" id="marketplaceCreateButton" onclick="openMarketplaceListing()">＋ Объявление</button></header>
+                    <nav class="marketplace-tabs" aria-label="Категории маркетплейса">
+                        <button type="button" class="active" data-market-tab="goods" onclick="showMarketplaceTab('goods')">📦 Товары</button>
+                        <button type="button" data-market-tab="services" onclick="showMarketplaceTab('services')">🧰 Услуги</button>
+                        <button type="button" data-market-tab="realestate" onclick="showMarketplaceTab('realestate')">🏠 Недвижимость</button>
+                        <button type="button" data-market-tab="library" onclick="showMarketplaceTab('library')">📚 Книги и курсы</button>
+                    </nav>
+                    <div class="marketplace-filters" id="marketplaceFilters">
+                        <input id="marketplaceSearch" type="search" placeholder="Что ищешь?" autocomplete="off">
+                        <input id="marketplaceCountry" list="datingCountryOptions" placeholder="Страна" autocomplete="off">
+                        <input id="marketplaceCity" placeholder="Город" autocomplete="off">
+                    </div>
+                    <div class="marketplace-summary" id="marketplaceSummary"></div>
+                    <div class="marketplace-grid" id="marketplaceGrid" aria-live="polite"></div>
+                    <section class="marketplace-library" id="marketplaceLibrary" hidden></section>
                 </section>
             </div>
 
@@ -573,6 +611,41 @@
     </div>
     <div class="modal-overlay" id="workInfoModal"><div class="modal-box work-modal"><button class="close-btn" type="button" onclick="closeWorkModal('workInfoModal')">✕</button><div id="workInfoContent"></div></div></div>
 
+    <div class="modal-overlay" id="datingProfileModal">
+        <div class="modal-box dating-modal"><button class="close-btn" type="button" onclick="closeDatingProfileModal()">✕</button><h3>Твоя анкета</h3>
+            <p class="dating-modal-intro">Заполни главное — анкету можно будет обновить в любой момент.</p>
+            <label for="datingName">Как тебя зовут</label><input id="datingName" maxlength="80" autocomplete="name" placeholder="Имя">
+            <div class="dating-form-row"><div><label for="datingGender">Ты кто?</label><select id="datingGender"><option value="">Выбери</option><option>Парень</option><option>Девушка</option><option>Другой вариант</option><option>Не указывать</option></select></div><div><label for="datingSeeking">Кого ищешь?</label><select id="datingSeeking"><option value="">Выбери</option><option>Парней</option><option>Девушек</option><option>Всех</option></select></div></div>
+            <label for="datingCountry">Страна</label><input id="datingCountry" list="datingCountryOptions" maxlength="80" autocomplete="country-name" placeholder="Начни вводить страну">
+            <label for="datingCity">Город</label><input id="datingCity" maxlength="80" autocomplete="address-level2" placeholder="Например, Киев">
+            <label for="datingGoal">Цель знакомства</label><select id="datingGoal"><option value="">Выбери</option><option>Серьёзные отношения</option><option>Дружба</option><option>Общение</option><option>Свидания</option></select>
+            <label for="datingPhotoUrl">Фотография по ссылке (необязательно)</label><input id="datingPhotoUrl" type="url" placeholder="https://…">
+            <label class="dating-photo-picker" for="datingPhotoInput">📷 Или выбери фото с устройства</label><input class="hidden" id="datingPhotoInput" type="file" accept="image/*">
+            <div id="datingPhotoPreview" class="dating-photo-preview" hidden></div>
+            <label for="datingBio">Немного о себе</label><textarea id="datingBio" maxlength="1200" placeholder="Что тебе нравится и кого ты хотел(а) бы встретить?"></textarea>
+            <label class="dating-check"><input id="datingActive" type="checkbox" checked> Показывать мою анкету в поиске</label>
+            <label class="dating-check dating-age-check"><input id="datingAdultConfirmed" type="checkbox"> Подтверждаю, что мне уже исполнилось 18 лет</label>
+            <div class="dating-error" id="datingError" role="alert"></div><button type="button" class="dating-primary dating-submit" id="datingSaveButton" onclick="saveDatingProfile()">Сохранить анкету</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="datingDetailModal"><div class="modal-box dating-modal dating-detail-modal"><button class="close-btn" type="button" onclick="closeDatingDetail()">✕</button><div id="datingDetailContent"></div></div></div>
+
+    <div class="modal-overlay" id="marketplaceListingModal">
+        <div class="modal-box marketplace-modal"><button class="close-btn" type="button" onclick="closeMarketplaceModal()">✕</button><h3 id="marketplaceModalTitle">Новое объявление</h3>
+            <label for="marketplaceKind">Раздел</label><select id="marketplaceKind"><option value="goods">Товары</option><option value="services">Услуги</option><option value="realestate">Недвижимость</option></select>
+            <label for="marketplaceCategory">Категория</label><select id="marketplaceCategory"></select>
+            <div id="marketplacePropertyFields" hidden><div class="marketplace-form-row"><div><label for="marketplaceDealType">Тип объявления</label><select id="marketplaceDealType"><option>Продажа</option><option>Долгосрочная аренда</option><option>Посуточно</option><option>Хостел</option></select></div><div><label for="marketplacePropertyType">Объект</label><select id="marketplacePropertyType"><option>Квартира</option><option>Дом</option><option>Комната</option><option>Хостел</option><option>Коммерческая недвижимость</option><option>Земельный участок</option></select></div></div><div class="marketplace-form-row"><div><label for="marketplaceRooms">Комнаты (необязательно)</label><input id="marketplaceRooms" maxlength="20" placeholder="2"></div><div><label for="marketplaceArea">Площадь (необязательно)</label><input id="marketplaceArea" maxlength="30" placeholder="65 м²"></div></div></div>
+            <label for="marketplaceTitle">Название</label><input id="marketplaceTitle" maxlength="100" placeholder="Что предлагаешь?"><div class="marketplace-form-row"><div><label for="marketplacePrice">Цена</label><input id="marketplacePrice" maxlength="50" placeholder="По договорённости"></div><div><label for="marketplaceCurrency">Валюта</label><select id="marketplaceCurrency"><option>UAH</option><option>USD</option><option>EUR</option><option>RUB</option></select></div></div>
+            <div class="marketplace-form-row"><div><label for="marketplaceCountryInput">Страна</label><input id="marketplaceCountryInput" list="datingCountryOptions" placeholder="Начни вводить"></div><div><label for="marketplaceCityInput">Город</label><input id="marketplaceCityInput" maxlength="80" placeholder="Город"></div></div>
+            <label for="marketplaceImageUrl">Ссылка на фото (необязательно)</label><input id="marketplaceImageUrl" type="url" placeholder="https://…">
+            <label class="marketplace-file-label" for="marketplaceImageFile">📷 Или выбери фото с устройства</label><input id="marketplaceImageFile" class="hidden" type="file" accept="image/*">
+            <div class="marketplace-image-preview" id="marketplaceImagePreview" hidden></div>
+            <label for="marketplaceDescription">Описание</label><textarea id="marketplaceDescription" maxlength="3000" placeholder="Расскажи подробнее"></textarea>
+            <div class="marketplace-error" id="marketplaceError" role="alert"></div><button type="button" class="marketplace-primary marketplace-submit" id="marketplaceSaveButton" onclick="saveMarketplaceListing()">Опубликовать</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="marketplaceDetailModal"><div class="modal-box marketplace-modal marketplace-detail-modal"><button class="close-btn" type="button" onclick="closeMarketplaceDetail()">✕</button><div id="marketplaceDetailContent"></div></div></div>
+
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
             <button class="close-btn" onclick="closeEdit()">✕</button>
@@ -683,7 +756,7 @@
 
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.1"></script>
-<script src="js/core/app.js?v=4.3"></script>
+<script src="js/core/app.js?v=4.6"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
 <script src="js/features/feed/feed-core.js?v=4.5"></script>
@@ -694,6 +767,8 @@
 <script src="js/features/friends.js?v=3.1"></script>
 <script src="js/features/groups.js?v=4.4"></script>
 <script src="js/features/work.js?v=1.1"></script>
+<script src="js/features/dating.js?v=1.1"></script>
+<script src="js/features/marketplace.js?v=1.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.1"></script>
 <script src="js/features/admin.js?v=3.2"></script>
@@ -706,7 +781,8 @@ document.addEventListener('DOMContentLoaded', function() {
             el.classList.remove('active');
             el.style.display = 'none';
         });
-        var initialPage = new URLSearchParams(window.location.search).get('page') === 'work' ? 'work' : 'feed';
+        var requestedPage = new URLSearchParams(window.location.search).get('page');
+        var initialPage = requestedPage === 'work' || requestedPage === 'dating' || requestedPage === 'marketplace' ? requestedPage : 'feed';
         var initialPageElement = document.getElementById('page-' + initialPage);
         if (initialPageElement) {
             initialPageElement.classList.add('active');
