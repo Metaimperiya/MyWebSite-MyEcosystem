@@ -255,6 +255,7 @@ function renderPost(p, type) {
     div.innerHTML = marqueeHtml + authorHtml +
         '<div class="post-content" onclick="window.openPostPage(\'' + p.id + '\', \'' + type + '\')" style="cursor:pointer;">' + contentHtml + '</div>' +
         actionsHtml + commentsHtml + inputHtml;
+    initPostCodeBlocks(div);
     initPostCarousel(div);
     
     if (p.authorUid) {
@@ -279,6 +280,38 @@ function renderPost(p, type) {
     }
     
     return div;
+}
+
+function initPostCodeBlocks(root) {
+    root.querySelectorAll('.post-content pre code').forEach(function(code) {
+        var pre = code.parentElement;
+        if (!pre || pre.parentElement.classList.contains('post-code-demo')) return;
+        var wrapper = document.createElement('div');
+        wrapper.className = 'post-code-demo';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        var run = document.createElement('button');
+        run.type = 'button';
+        run.className = 'post-code-run';
+        run.textContent = '▶ Запустить JS';
+        run.setAttribute('aria-label', 'Запустить JavaScript в изолированном окне');
+        wrapper.appendChild(run);
+
+        run.addEventListener('click', function(event) {
+            event.stopPropagation();
+            var previous = wrapper.querySelector('.post-code-output');
+            if (previous) previous.remove();
+            var output = document.createElement('iframe');
+            output.className = 'post-code-output';
+            output.title = 'Результат выполнения JavaScript';
+            output.setAttribute('sandbox', 'allow-scripts');
+            output.setAttribute('referrerpolicy', 'no-referrer');
+            var source = code.textContent.replace(/</g, '\\u003c');
+            output.srcdoc = '<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; style-src \'unsafe-inline\'; connect-src \'none\'; img-src data: blob:; form-action \'none\'; base-uri \'none\'"><style>body{margin:0;padding:10px;font:13px/1.5 ui-monospace,monospace;color:#1b2633;background:#f7f9fc}pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}.error{color:#b42318}</style><pre id="out"></pre><script>const out=document.getElementById("out");function show(kind,args){const line=document.createElement("div");if(kind==="error")line.className="error";line.textContent=Array.from(args).map(v=>{try{return typeof v==="string"?v:JSON.stringify(v)}catch(_){return String(v)}}).join(" ");out.appendChild(line)}console.log=(...a)=>show("log",a);console.info=(...a)=>show("log",a);console.warn=(...a)=>show("log",a);console.error=(...a)=>show("error",a);window.onerror=m=>{show("error",[m]);return true};window.onunhandledrejection=e=>show("error",[e.reason]);(async()=>{try{\n' + source + '\n}catch(error){console.error(error.name+": "+error.message)}})();</script>';
+            wrapper.appendChild(output);
+        });
+    });
 }
 
 function renderPostMedia(slides, postId) {
