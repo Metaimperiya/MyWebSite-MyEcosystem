@@ -259,7 +259,7 @@ function renderPost(p, type) {
         var image = entityImage ? '<img class="shared-entity-image" src="' + esc(entityImage) + '" alt="" loading="lazy">' : '';
         if (entity.kind === 'group') {
             var groupOpenData = encodeURIComponent(JSON.stringify({ kind: 'group', id: entity.id || '' }));
-            sharedHtml = '<div class="shared-entity-wrap shared-group-wrap"><button type="button" class="shared-entity-card" data-preview-group="' + esc(entity.id || '') + '" aria-expanded="false">' + image + '<span class="shared-entity-copy"><small>' + esc(labels.group) + '</small><strong>' + esc(entity.title || 'Группа') + '</strong><span>' + esc(entity.description || 'Посмотри обложку, описание и последние записи группы.') + '</span><em>Показать группу <span aria-hidden="true">⌄</span></em></span></button><div class="shared-group-preview" hidden></div><button type="button" class="shared-group-open" data-open-shared="' + groupOpenData + '">Перейти в группу <span aria-hidden="true">→</span></button></div>';
+            sharedHtml = '<div class="shared-entity-wrap shared-group-wrap"><button type="button" class="shared-entity-card" data-open-shared="' + groupOpenData + '">' + image + '<span class="shared-entity-copy"><small>' + esc(labels.group) + '</small><strong>' + esc(entity.title || 'Группа') + '</strong><span>' + esc(entity.description || 'Посмотри обложку и описание группы.') + '</span><em>Перейти в группу <span aria-hidden="true">→</span></em></span></button></div>';
         } else {
             if (entity.kind === 'dating') {
                 var datingActions = entity.id === USER_UID
