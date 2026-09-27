@@ -467,10 +467,13 @@ function removeLoading(el) {
 // ================================================================
 
 var feedPageSize = 10;
-var feedLastKey = null;
+var feedLastTimestamp = null;
+var feedLastPostKey = null;
 var feedLoading = false;
 var feedHasMore = true;
 var scrollListenerAdded = false;
+var feedRequestId = 0;
+var renderedFeedPostIds = Object.create(null);
 
 function loadFeed() {
     var el = document.getElementById('feed');
@@ -481,7 +484,11 @@ function loadFeed() {
         return;
     }
 
-    feedLastKey = null;
+    feedRequestId++;
+    feedLoading = false;
+    feedLastTimestamp = null;
+    feedLastPostKey = null;
+    renderedFeedPostIds = Object.create(null);
     feedHasMore = true;
     el.innerHTML = '';
     
@@ -492,7 +499,7 @@ function loadFeed() {
     spinner.textContent = '⏳ Загрузка...';
     el.appendChild(spinner);
     
-    loadMorePosts();
+    loadMorePosts(feedRequestId);
 
     // Добавляем слушатель скролла только один раз
     if (!scrollListenerAdded) {
@@ -512,45 +519,58 @@ function loadFeed() {
     }
 }
 
-function loadMorePosts() {
+function loadMorePosts(requestId) {
     var el = document.getElementById('feed');
     if (!el) return;
     if (feedLoading || !feedHasMore) return;
+    requestId = requestId == null ? feedRequestId : requestId;
     feedLoading = true;
 
     var spinner = document.getElementById('feedSpinner');
     if (spinner) spinner.style.display = 'block';
 
-    var query = db.ref('sites/' + SITE + '/feed_posts')
-        .orderByChild('timestamp')
-        .limitToLast(feedPageSize + 1);
-
-    if (feedLastKey) {
-        query = query.endAt(feedLastKey);
+    var query = db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp');
+    if (feedLastPostKey) {
+        // Include the exact cursor row, then remove it below. Using both the
+        // timestamp and key gives deterministic pagination when timestamps tie.
+        query = query.endAt(feedLastTimestamp, feedLastPostKey).limitToLast(feedPageSize + 2);
+    } else {
+        query = query.limitToLast(feedPageSize + 1);
     }
 
     query.once('value', function(snap) {
-        var data = snap.val() || {};
-        var keys = Object.keys(data).sort(function(a, b) {
-            return (data[a].timestamp || 0) - (data[b].timestamp || 0);
+        if (requestId !== feedRequestId) return;
+
+        var entries = [];
+        snap.forEach(function(child) {
+            entries.push({ key: child.key, post: child.val() });
         });
 
-        if (keys.length > feedPageSize) {
-            keys = keys.slice(0, feedPageSize);
+        if (feedLastPostKey) {
+            entries = entries.filter(function(entry) { return entry.key !== feedLastPostKey; });
+        }
+
+        if (entries.length > feedPageSize) {
+            entries = entries.slice(-feedPageSize);
             feedHasMore = true;
         } else {
             feedHasMore = false;
         }
 
-        if (keys.length > 0) {
-            feedLastKey = data[keys[keys.length - 1]].timestamp;
+        if (entries.length > 0) {
+            var oldestEntry = entries[0];
+            feedLastTimestamp = oldestEntry.post.timestamp || 0;
+            feedLastPostKey = oldestEntry.key;
         }
 
         if (spinner) spinner.style.display = 'none';
 
         var fragment = document.createDocumentFragment();
-        keys.reverse().forEach(function(k) {
-            var p = data[k];
+        entries.reverse().forEach(function(entry) {
+            var k = entry.key;
+            if (renderedFeedPostIds[k]) return;
+            renderedFeedPostIds[k] = true;
+            var p = entry.post;
             p.id = k;
             var postEl = renderPost(p, 'feed');
             fragment.appendChild(postEl);
@@ -576,6 +596,7 @@ function loadMorePosts() {
 
         feedLoading = false;
     }).catch(function(err) {
+        if (requestId !== feedRequestId) return;
         console.error('❌ Ошибка загрузки постов:', err);
         feedLoading = false;
         if (spinner) spinner.style.display = 'none';
