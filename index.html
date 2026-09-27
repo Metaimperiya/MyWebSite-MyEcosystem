@@ -42,11 +42,11 @@
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=4.6">
-    <link rel="stylesheet" href="css/features/profile.css?v=3.3">
+    <link rel="stylesheet" href="css/features/profile.css?v=3.4">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.1">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
-    <link rel="stylesheet" href="css/features/modals.css?v=3.0">
+    <link rel="stylesheet" href="css/features/modals.css?v=3.1">
     <link rel="stylesheet" href="css/features/notifications.css?v=3.0">
     <link rel="stylesheet" href="css/layout/grid.css?v=3.0">
     <link rel="stylesheet" href="css/layout/panels.css?v=3.0">
@@ -245,6 +245,11 @@
                     <div class="name" id="profileName"></div>
                     <div class="profile-badges" id="profileBadges" aria-label="Статусы профиля"></div>
                     <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
+                    <div class="profile-contact-row" id="profileContactRow" hidden>
+                        <a class="profile-email" id="profileEmail" hidden></a>
+                        <a class="profile-call-btn" id="profileCallButton" hidden>Позвонить</a>
+                    </div>
+                    <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
                     <div class="bio" id="profileBio"></div>
                     <div class="profile-stats" aria-label="Статистика профиля">
                         <button type="button" class="profile-stat" id="friendsStat">🤝 <span>Друзья</span><strong id="friendsCount">0</strong></button>
@@ -383,13 +388,71 @@
     </div>
 
     <div class="modal-overlay" id="editProfileModal">
-        <div class="modal-box">
-            <button class="close-btn" onclick="closeEditProfile()">✕</button>
-            <h3>✏️ Edit profile</h3>
-            <input type="text" id="editName" placeholder="Name...">
-            <textarea id="editBio" placeholder="About you..."></textarea>
-            <button class="btn-primary" onclick="saveProfile()">💾 Save</button>
-            <button class="btn-secondary" onclick="closeEditProfile()">Cancel</button>
+        <div class="modal-box profile-editor-box">
+            <div class="profile-editor-head">
+                <div><span class="profile-editor-kicker">ВАША СТРАНИЦА</span><h3>Редактировать профиль</h3></div>
+                <button class="profile-editor-close" onclick="closeEditProfile()" aria-label="Закрыть">✕</button>
+            </div>
+            <div class="profile-editor-content">
+                <div class="profile-editor-section">Основное</div>
+                <label class="profile-editor-label" for="editName">Имя</label>
+                <input type="text" id="editName" maxlength="60" placeholder="Как вас называть">
+                <label class="profile-editor-label" for="editBio">О себе</label>
+                <textarea id="editBio" maxlength="500" placeholder="Расскажите немного о себе"></textarea>
+
+                <div class="profile-editor-section">Профиль</div>
+                <label class="profile-editor-label" for="editGender">Пол</label>
+                <select id="editGender"><option value="">Не указывать</option><option value="male">Мужской</option><option value="female">Женский</option></select>
+
+                <div class="profile-editor-section">Местоположение</div>
+                <div class="profile-editor-grid">
+                    <label>Страна<input id="editCountry" maxlength="80" placeholder="Страна"></label>
+                    <label>Регион<input id="editRegion" maxlength="100" placeholder="Регион / область"></label>
+                </div>
+                <label class="profile-editor-label" for="editCity">Город</label>
+                <input id="editCity" maxlength="100" placeholder="Город">
+
+                <div class="profile-editor-section">Профессия и интересы</div>
+                <label class="profile-editor-label" for="editProfession">Профессиональная сфера или профессия</label>
+                <input id="editProfession" maxlength="120" placeholder="Например, дизайн или разработка">
+                <label class="profile-editor-label" for="editSpecialization">Специализация</label>
+                <input id="editSpecialization" maxlength="120" placeholder="Направление / специализация">
+                <label class="profile-editor-label" for="editInterests">Интересы</label>
+                <input id="editInterests" maxlength="300" placeholder="Через запятую">
+
+                <div class="profile-editor-section">Работа</div>
+                <label class="profile-editor-label" for="editWorkStatus">Статус</label>
+                <select id="editWorkStatus"><option value="">Не указывать</option><option>Ищу работу</option><option>Ищу подработку</option><option>Открыт к предложениям</option><option>Ищу сотрудников</option><option>Предлагаю услуги</option><option>Не ищу работу</option></select>
+                <label class="profile-editor-label" for="editWorkFormat">Формат работы</label>
+                <select id="editWorkFormat"><option value="">Не указывать</option><option>Удалённо</option><option>Офис</option><option>Гибрид</option><option>Фриланс</option><option>Проектная работа</option><option>Полная занятость</option><option>Частичная занятость</option></select>
+
+                <div class="profile-editor-section">Контакты</div>
+                <label class="profile-editor-label" for="editEmail">Email</label>
+                <input id="editEmail" type="email" maxlength="160" placeholder="example@email.com" autocomplete="email">
+                <label class="profile-editor-label" for="editPhone">Телефон</label>
+                <input id="editPhone" type="tel" maxlength="32" placeholder="Номер телефона">
+                <label class="profile-editor-toggle" for="editPhonePublic"><span><strong>Показывать телефон в профиле</strong><small>В профиле появится кнопка «Позвонить»</small></span><input id="editPhonePublic" type="checkbox"><span class="profile-editor-toggle-track" aria-hidden="true"></span></label>
+
+                <div class="profile-editor-section">Социальные сети и мессенджеры</div>
+                <div class="social-editor-grid">
+                    <label class="social-editor-card" for="editSocialInstagram"><span class="social-service-icon instagram">◎</span><span class="social-editor-field"><strong>Instagram</strong><input id="editSocialInstagram" placeholder="username или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialTelegram"><span class="social-service-icon telegram">➤</span><span class="social-editor-field"><strong>Telegram</strong><input id="editSocialTelegram" placeholder="username или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialViber"><span class="social-service-icon viber">☎</span><span class="social-editor-field"><strong>Viber</strong><input id="editSocialViber" placeholder="номер или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialWhatsapp"><span class="social-service-icon whatsapp">◔</span><span class="social-editor-field"><strong>WhatsApp</strong><input id="editSocialWhatsapp" placeholder="номер или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialFacebook"><span class="social-service-icon facebook">f</span><span class="social-editor-field"><strong>Facebook</strong><input id="editSocialFacebook" placeholder="username или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialThreads"><span class="social-service-icon threads">@</span><span class="social-editor-field"><strong>Threads</strong><input id="editSocialThreads" placeholder="username или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialX"><span class="social-service-icon x-social">𝕏</span><span class="social-editor-field"><strong>X (Twitter)</strong><input id="editSocialX" placeholder="username или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialYoutube"><span class="social-service-icon youtube">▶</span><span class="social-editor-field"><strong>YouTube</strong><input id="editSocialYoutube" placeholder="username или ссылка" autocomplete="off"></span></label>
+                    <label class="social-editor-card" for="editSocialGoogle"><span class="social-service-icon google-social">G</span><span class="social-editor-field"><strong>Google профиль</strong><input id="editSocialGoogle" placeholder="ссылка на профиль или страницу" autocomplete="off"></span></label>
+                </div>
+                <div class="profile-editor-hint">Можно указать имя пользователя или ссылку. Для мессенджеров подойдут номер телефона и ссылка. Google здесь — ссылка на профиль/страницу, не вход в аккаунт.</div>
+                <div class="profile-editor-hint profile-social-validation" id="socialLinkValidation" aria-live="polite"></div>
+                <div class="profile-editor-error" id="editProfileError" role="alert"></div>
+            </div>
+            <div class="profile-editor-footer">
+                <button class="btn-secondary" onclick="closeEditProfile()">Отмена</button>
+                <button class="btn-primary" id="saveProfileButton" onclick="saveProfile()">Сохранить</button>
+            </div>
         </div>
     </div>
 
@@ -509,7 +572,7 @@
 <script src="js/features/feed/feed-core.js?v=4.5"></script>
 <script src="js/features/feed/feed-actions.js?v=4.0"></script>
 <script src="js/features/feed/feed-edit.js?v=5.1"></script>
-<script src="js/features/profile.js?v=3.3"></script>
+<script src="js/features/profile.js?v=3.5"></script>
 <script src="js/features/reputation.js?v=1.1"></script>
 <script src="js/features/friends.js?v=3.1"></script>
 <script src="js/features/groups.js?v=3.0"></script>

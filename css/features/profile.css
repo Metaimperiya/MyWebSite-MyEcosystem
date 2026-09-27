@@ -50,6 +50,31 @@
     margin: 4px 0;
 }
 
+.profile-contact-row { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px 12px; margin:5px 0 3px; }
+.profile-contact-row[hidden], .profile-social-links[hidden] { display:none; }
+.profile-email { color:var(--text-secondary); font-size:.78rem; text-decoration:none; overflow-wrap:anywhere; }
+.profile-email:hover { color:var(--link-color); text-decoration:underline; }
+.profile-call-btn { display:inline-flex; align-items:center; justify-content:center; min-height:32px; padding:6px 13px; border-radius:18px; background:var(--link-color); color:#fff; font-size:.76rem; font-weight:700; text-decoration:none; box-shadow:0 4px 12px rgba(35,105,210,.2); transition:var(--transition); }
+.profile-call-btn:hover,.profile-call-btn:focus-visible { filter:brightness(.93); outline:2px solid color-mix(in srgb,var(--link-color) 35%,transparent); outline-offset:2px; }
+.profile-social-links { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:7px; width:min(100% - 24px,600px); margin:8px auto 5px; }
+.profile-social-heading { flex-basis:100%; color:var(--text-secondary); font-size:.66rem; font-weight:700; text-align:center; }
+.profile-social-link { display:inline-grid; place-items:center; width:32px; height:32px; flex:0 0 32px; border:1px solid var(--border-color); border-radius:11px; background:var(--input-bg); color:var(--text-color); font-size:1rem; font-weight:800; text-decoration:none; transition:transform .16s ease,box-shadow .16s ease,filter .16s ease; }
+.profile-social-link:hover,.profile-social-link:focus-visible { transform:translateY(-2px); box-shadow:0 5px 12px rgba(20,28,50,.15); outline:2px solid color-mix(in srgb,var(--link-color) 35%,transparent); outline-offset:2px; }
+.profile-social-link.instagram { color:#c13584; }
+.profile-social-link.telegram { color:#229ed9; }
+.profile-social-link.viber { color:#7360f2; }
+.profile-social-link.whatsapp { color:#1da851; }
+.profile-social-link.facebook { color:#1877f2; }
+.profile-social-link.threads,.profile-social-link.x-social { color:var(--text-color); }
+.profile-social-link.youtube { color:#e62117; }
+.profile-social-link.google-social { color:#4285f4; }
+
+@media (max-width:420px) {
+    .profile-social-links { gap:6px; width:calc(100% - 20px); }
+    .profile-social-link { width:30px; height:30px; flex-basis:30px; }
+    .profile-email { max-width:100%; }
+}
+
 .profile-stats {
     display: flex;
     gap: 20px;

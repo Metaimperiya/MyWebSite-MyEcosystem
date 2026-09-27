@@ -2,6 +2,115 @@
 // ПРОФИЛЬ — ПОЛНАЯ ВЕРСИЯ
 // ================================================================ */
 
+var PROFILE_SOCIAL_SERVICES = [
+    { key: 'instagram', label: 'Instagram', glyph: '◎', className: 'instagram' },
+    { key: 'telegram', label: 'Telegram', glyph: '➤', className: 'telegram' },
+    { key: 'viber', label: 'Viber', glyph: '☎', className: 'viber' },
+    { key: 'whatsapp', label: 'WhatsApp', glyph: '◔', className: 'whatsapp' },
+    { key: 'facebook', label: 'Facebook', glyph: 'f', className: 'facebook' },
+    { key: 'threads', label: 'Threads', glyph: '@', className: 'threads' },
+    { key: 'x', label: 'X', glyph: '𝕏', className: 'x-social' },
+    { key: 'youtube', label: 'YouTube', glyph: '▶', className: 'youtube' },
+    { key: 'google', label: 'Google', glyph: 'G', className: 'google-social' }
+];
+
+function profileSocialHref(key, value) {
+    var input = String(value || '').trim();
+    if (!input) return '';
+    if (/^(?:https?:\/\/|www\.|(?:instagram\.com|t\.me|telegram\.me|facebook\.com|threads\.net|x\.com|twitter\.com|youtube\.com|youtu\.be|wa\.me|viber\.com)(?:\/|$))/i.test(input)) {
+        try {
+            var parsed = new URL(/^https?:\/\//i.test(input) ? input : 'https://' + input);
+            return (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.href : '';
+        } catch (ignore) { return ''; }
+    }
+    if (key === 'viber' && /^viber:\/\//i.test(input)) return input;
+    if (key === 'whatsapp' && /^whatsapp:\/\//i.test(input)) return input;
+    if (/^[a-z][a-z0-9+.-]*:/i.test(input)) return '';
+    var username = input.replace(/^@/, '').replace(/^\/+|\/+$/g, '');
+    var encoded = encodeURIComponent(username);
+    if (key === 'instagram') return 'https://www.instagram.com/' + encoded + '/';
+    if (key === 'telegram') return 'https://t.me/' + encoded;
+    if (key === 'facebook') return 'https://www.facebook.com/' + encoded;
+    if (key === 'threads') return 'https://www.threads.net/@' + encoded;
+    if (key === 'x') return 'https://x.com/' + encoded;
+    if (key === 'youtube') return 'https://www.youtube.com/@' + encoded;
+    if (key === 'whatsapp' || key === 'viber') {
+        var digits = input.replace(/[^\d+]/g, '').replace(/^\+/, '');
+        if (!digits) return '';
+        return key === 'whatsapp' ? 'https://wa.me/' + digits : 'viber://chat?number=%2B' + digits;
+    }
+    return '';
+}
+
+function renderProfileContacts(user) {
+    var row = document.getElementById('profileContactRow');
+    var emailLink = document.getElementById('profileEmail');
+    var callLink = document.getElementById('profileCallButton');
+    var socialContainer = document.getElementById('profileSocialLinks');
+    var email = String(user.email || '').trim();
+    var phone = user.phone_public ? String(user.phone || '').trim() : '';
+
+    if (emailLink) {
+        emailLink.hidden = !email;
+        emailLink.textContent = email ? '✉ ' + email : '';
+        emailLink.href = email ? 'mailto:' + encodeURIComponent(email) : '';
+    }
+    if (callLink) {
+        callLink.hidden = !phone;
+        callLink.href = phone ? 'tel:' + phone.replace(/[^+\d,;*#]/g, '') : '';
+    }
+    if (row) row.hidden = !email && !phone;
+    if (!socialContainer) return;
+    socialContainer.replaceChildren();
+    var links = user.social_links || {};
+    var socialCount = 0;
+    PROFILE_SOCIAL_SERVICES.forEach(function(service) {
+        var value = String(links[service.key] || '').trim();
+        var href = profileSocialHref(service.key, value);
+        if (!value || !href) return;
+        var link = document.createElement('a');
+        link.className = 'profile-social-link ' + service.className;
+        link.href = href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.title = service.label;
+        link.setAttribute('aria-label', service.label);
+        link.textContent = service.glyph;
+        socialContainer.appendChild(link);
+        socialCount++;
+    });
+    if (socialCount) {
+        var heading = document.createElement('span');
+        heading.className = 'profile-social-heading';
+        heading.textContent = 'Социальные сети';
+        socialContainer.insertBefore(heading, socialContainer.firstChild);
+    }
+    socialContainer.hidden = !socialCount;
+}
+
+function validateSocialLinksWithoutBlockingSave() {
+    var invalidCount = 0;
+    PROFILE_SOCIAL_SERVICES.forEach(function(service) {
+        var id = 'editSocial' + service.key.charAt(0).toUpperCase() + service.key.slice(1);
+        if (service.key === 'x') id = 'editSocialX';
+        if (service.key === 'youtube') id = 'editSocialYoutube';
+        var field = document.getElementById(id);
+        if (!field) return;
+        var value = field.value.trim();
+        var looksLikeLink = /^(?:https?:\/\/|www\.|(?:[\w-]+\.)+[a-z]{2,}(?:\/|$))/i.test(value);
+        var validLink = true;
+        if (looksLikeLink) {
+            try { validLink = /^(https?:\/\/|www\.|[\w-]+\.)/i.test(value) && !!new URL(/^https?:\/\//i.test(value) ? value : 'https://' + value).hostname; }
+            catch (ignore) { validLink = false; }
+        }
+        field.setAttribute('aria-invalid', !validLink ? 'true' : 'false');
+        field.title = !validLink ? 'Похоже, ссылка указана с ошибкой. Её можно сохранить и исправить позже.' : '';
+        if (!validLink) invalidCount++;
+    });
+    var note = document.getElementById('socialLinkValidation');
+    if (note) note.textContent = invalidCount ? 'Некоторые ссылки выглядят необычно. Они всё равно будут сохранены, их можно поправить позже.' : '';
+}
+
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
     console.log('🔵 loadProfile вызвана с uid:', uid, 'VIEWING_USER:', VIEWING_USER);
@@ -22,6 +131,7 @@ function loadProfile() {
         if (avatarEl) {
             avatarEl.innerHTML = '<span class="letter" style="cursor:pointer;font-size:24px;" onclick="document.getElementById(\'loginModal\').classList.add(\'open\')">🔑</span>';
         }
+        renderProfileContacts({});
 
         var postsContainer = document.getElementById('profilePosts');
         if (postsContainer) postsContainer.innerHTML = '';
@@ -49,6 +159,7 @@ function loadProfile() {
             }
             var badgesEl = document.getElementById('profileBadges');
             if (badgesEl) badgesEl.innerHTML = '';
+            renderProfileContacts({});
             return;
         }
 
@@ -60,6 +171,7 @@ function loadProfile() {
             bioEl.textContent = u.bio || 'Привет!';
             bioEl.style.display = 'block';
         }
+        renderProfileContacts(u);
         renderAvatar(uid, avatarEl, (u.name || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
         makeStatsClickable(uid);
@@ -476,12 +588,43 @@ window.viewUser = function(uid) {
 };
 
 window.openEditProfile = function() {
-    var editName = document.getElementById('editName');
-    var editBio = document.getElementById('editBio');
     var modal = document.getElementById('editProfileModal');
-    if (editName) editName.value = USER || '';
-    if (editBio) editBio.value = '';
-    if (modal) modal.classList.add('open');
+    var error = document.getElementById('editProfileError');
+    if (error) error.textContent = '';
+    if (!USER_UID) return;
+    db.ref('sites/' + SITE + '/users/' + USER_UID).once('value').then(function(snapshot) {
+        var user = snapshot.val() || {};
+        var details = user.profileDetails || {};
+        var values = {
+            editName: user.name || USER || '', editBio: user.bio || '',
+            editEmail: user.email || '',
+            editGender: details.gender || '', editCountry: details.country || '',
+            editRegion: details.region || '', editCity: details.city || '',
+            editProfession: details.profession || '', editSpecialization: details.specialization || '',
+            editInterests: Array.isArray(details.interests) ? details.interests.join(', ') : '',
+            editWorkStatus: details.workStatus || '', editWorkFormat: details.workFormat || '',
+            editPhone: user.phone || details.phone || ''
+        };
+        Object.keys(values).forEach(function(id) {
+            var input = document.getElementById(id);
+            if (input) input.value = values[id];
+        });
+        var phonePublic = document.getElementById('editPhonePublic');
+        if (phonePublic) phonePublic.checked = user.phone_public === true || (!Object.prototype.hasOwnProperty.call(user, 'phone_public') && details.phoneVisibility === 'public');
+        var socialLinks = user.social_links || {};
+        PROFILE_SOCIAL_SERVICES.forEach(function(service) {
+            var input = document.getElementById('editSocial' + service.key.charAt(0).toUpperCase() + service.key.slice(1));
+            if (service.key === 'x') input = document.getElementById('editSocialX');
+            if (service.key === 'youtube') input = document.getElementById('editSocialYoutube');
+            if (input) input.value = socialLinks[service.key] || '';
+        });
+        validateSocialLinksWithoutBlockingSave();
+        if (modal) modal.classList.add('open');
+    }).catch(function(err) {
+        console.error('Не удалось загрузить профиль для редактирования:', err);
+        if (error) error.textContent = 'Не удалось загрузить профиль. Попробуйте ещё раз.';
+        if (modal) modal.classList.add('open');
+    });
 };
 
 window.closeEditProfile = function() {
@@ -495,16 +638,59 @@ window.saveProfile = function() {
     if (!editName) return;
     var name = editName.value.trim();
     var bio = editBio ? editBio.value.trim() : '';
-    if (!name) { alert('Введите имя'); return; }
+    var error = document.getElementById('editProfileError');
+    var saveButton = document.getElementById('saveProfileButton');
+    if (!name) { if (error) error.textContent = 'Введите имя.'; editName.focus(); return; }
+    if (!USER_UID) { if (error) error.textContent = 'Войдите в аккаунт, чтобы сохранить профиль.'; return; }
 
-    USER = name;
-    localStorage.setItem('dc_u_' + SITE, USER);
-    db.ref('sites/' + SITE + '/users/' + USER_UID).update({ name: USER, bio: bio });
-    db.ref('sites/' + SITE + '/all_users/' + USER_UID).update({ name: USER, bio: bio });
-    updateUI();
-    closeEditProfile();
-    loadProfile();
-    loadFeed();
+    var interests = (document.getElementById('editInterests').value || '').split(',').map(function(value) { return value.trim(); }).filter(Boolean).slice(0, 20);
+    var socialLinks = {};
+    PROFILE_SOCIAL_SERVICES.forEach(function(service) {
+        var inputId = 'editSocial' + service.key.charAt(0).toUpperCase() + service.key.slice(1);
+        if (service.key === 'x') inputId = 'editSocialX';
+        if (service.key === 'youtube') inputId = 'editSocialYoutube';
+        var input = document.getElementById(inputId);
+        socialLinks[service.key] = input ? input.value.trim() : '';
+    });
+    var phonePublic = document.getElementById('editPhonePublic').checked;
+    var email = document.getElementById('editEmail').value.trim();
+    var phone = document.getElementById('editPhone').value.trim();
+    validateSocialLinksWithoutBlockingSave();
+    var details = {
+        gender: document.getElementById('editGender').value,
+        country: document.getElementById('editCountry').value.trim(),
+        region: document.getElementById('editRegion').value.trim(),
+        city: document.getElementById('editCity').value.trim(),
+        profession: document.getElementById('editProfession').value.trim(),
+        specialization: document.getElementById('editSpecialization').value.trim(),
+        interests: interests,
+        workStatus: document.getElementById('editWorkStatus').value,
+        workFormat: document.getElementById('editWorkFormat').value,
+        phone: phone,
+        phoneVisibility: phonePublic ? 'public' : 'private'
+    };
+    var publicDetails = Object.assign({}, details);
+    publicDetails.phone = phonePublic ? phone : '';
+    var update = { name: name, bio: bio, email: email, phone: phone, phone_public: phonePublic, social_links: socialLinks, profileDetails: details };
+    var publicUpdate = { name: name, bio: bio, email: email, phone: phonePublic ? phone : null, phone_public: phonePublic, social_links: socialLinks, profileDetails: publicDetails };
+    if (error) error.textContent = '';
+    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Сохраняю…'; }
+    Promise.all([
+        db.ref('sites/' + SITE + '/users/' + USER_UID).update(update),
+        db.ref('sites/' + SITE + '/all_users/' + USER_UID).update(publicUpdate)
+    ]).then(function() {
+        USER = name;
+        localStorage.setItem('dc_u_' + SITE, USER);
+        updateUI();
+        closeEditProfile();
+        loadProfile();
+        loadFeed();
+    }).catch(function(err) {
+        console.error('Не удалось сохранить профиль:', err);
+        if (error) error.textContent = 'Не удалось сохранить изменения. Проверьте соединение и попробуйте ещё раз.';
+    }).finally(function() {
+        if (saveButton) { saveButton.disabled = false; saveButton.textContent = 'Сохранить'; }
+    });
 };
 
 window.uploadAvatar = function() {
