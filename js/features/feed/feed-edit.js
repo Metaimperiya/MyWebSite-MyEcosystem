@@ -107,7 +107,9 @@
                     .then(function() { return ref.getDownloadURL(); });
                 return withTimeout(upload, 12000, 'Хранилище не ответило за 12 секунд')
                     .then(function(url) { return { type: 'image', url: url }; })
-                    .catch(function() {
+                    .catch(function(storageError) {
+                        console.warn('Firebase Storage upload failed; using compressed image data in post:', storageError);
+                        setPostPublishStatus('Хранилище фото недоступно — добавляю сжатую копию прямо в пост…');
                         return withTimeout(compressPostImage(blob), 20000, 'Не удалось сжать фото') .then(function(compact) {
                             return blobToDataUrl(compact).then(function(dataUrl) { return { type: 'image', url: dataUrl }; });
                         });
