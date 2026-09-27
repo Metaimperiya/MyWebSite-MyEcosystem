@@ -5,7 +5,7 @@ var datingProfiles = {};
 var datingBlocked = {};
 var datingCountryItems = [];
 var datingPhotoPreviewUrl = null;
-var datingPhotoUploadTask = null;
+var datingCurrentPhotoUrl = '';
 
 var DATING_COUNTRY_CODES = ('AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW').split(' ');
 
@@ -46,6 +46,79 @@ function datingSafeImage(url) {
         var parsed = new URL(url);
         return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : '';
     } catch (error) { return ''; }
+}
+
+function datingPhotoSource(value) {
+    var safeUrl = datingSafeImage(value);
+    if (safeUrl) return safeUrl;
+    value = String(value || '');
+    return value.length <= 400000 && /^data:image\/(?:webp|jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(value) ? value : '';
+}
+
+function datingBlobToDataUrl(blob) {
+    return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() { resolve(String(reader.result || '')); };
+        reader.onerror = function() { reject(new Error('Не удалось прочитать подготовленное фото.')); };
+        reader.readAsDataURL(blob);
+    });
+}
+
+function datingLoadImage(file) {
+    if (typeof createImageBitmap === 'function') {
+        return createImageBitmap(file).catch(function() { return datingLoadImageElement(file); });
+    }
+    return datingLoadImageElement(file);
+}
+
+function datingLoadImageElement(file) {
+    return new Promise(function(resolve, reject) {
+        var image = new Image();
+        var objectUrl = URL.createObjectURL(file);
+        image.onload = function() {
+            URL.revokeObjectURL(objectUrl);
+            resolve({ width: image.naturalWidth, height: image.naturalHeight, close: function() {} });
+        };
+        image.onerror = function() {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error('Не удалось открыть выбранное изображение.'));
+        };
+        image.src = objectUrl;
+    });
+}
+
+function datingCompressPhoto(file) {
+    return datingLoadImage(file).then(function(bitmap) {
+        var canvas = document.createElement('canvas');
+        var scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));
+        var width = Math.max(1, Math.round(bitmap.width * scale));
+        var height = Math.max(1, Math.round(bitmap.height * scale));
+        var quality = 0.82;
+        var attempts = 0;
+        function encode() {
+            canvas.width = width;
+            canvas.height = height;
+            var context = canvas.getContext('2d');
+            context.drawImage(bitmap, 0, 0, width, height);
+            return new Promise(function(resolve, reject) {
+                canvas.toBlob(function(blob) {
+                    if (!blob) { reject(new Error('Не удалось сжать фотографию. Попробуй другое изображение.')); return; }
+                    if (blob.size <= 220 * 1024) { bitmap.close(); resolve(blob); return; }
+                    attempts++;
+                    if (attempts >= 8 || width <= 360) {
+                        bitmap.close();
+                        reject(new Error('Фото слишком большое даже после сжатия. Выбери другое изображение.'));
+                        return;
+                    }
+                    width = Math.max(360, Math.round(width * 0.8));
+                    height = Math.max(1, Math.round(height * 0.8));
+                    quality = Math.max(0.56, quality - 0.04);
+                    encode().then(resolve, reject);
+                }, 'image/webp', quality);
+            });
+        }
+        return encode();
+    });
 }
 
 function setupDatingCountries() {
@@ -129,7 +202,7 @@ function renderDatingProfiles() {
             return true;
         }).sort(function(a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
     grid.innerHTML = profiles.length ? profiles.map(function(profile) {
-        var image = datingSafeImage(profile.photoUrl);
+        var image = datingPhotoSource(profile.photoUrl);
         return '<button type="button" class="dating-card" data-dating-profile="' + datingEscape(profile.uid) + '"><span class="dating-card-photo">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<span>' + datingEscape(Array.from(profile.name || '?')[0]) + '</span>') + '</span><span class="dating-card-name">' + datingEscape(profile.name) + '</span><span class="dating-card-meta">' + datingEscape(profile.gender) + ' · ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</span><span class="dating-card-goal">' + datingEscape(profile.goal) + '</span>' + (profile.bio ? '<span class="dating-card-bio">' + datingEscape(profile.bio) + '</span>' : '') + '</button>';
     }).join('') : '<div class="dating-empty"><span>💗</span><strong>Пока нет подходящих анкет</strong><p>Попробуй изменить фильтры или загляни позже.</p></div>';
     var label = document.getElementById('datingResultsLabel');
@@ -150,7 +223,7 @@ window.shareMyDatingProfile = function() {
         id: USER_UID,
         title: profile.name + ' · ' + profile.goal,
         description: profile.gender + ' · ищет: ' + profile.seeking + ' · ' + profile.city + ', ' + profile.country + (profile.bio ? ' · ' + profile.bio : ''),
-        image: datingSafeImage(profile.photoUrl) || ''
+        image: datingPhotoSource(profile.photoUrl) || ''
     });
 };
 
@@ -162,14 +235,16 @@ window.openDatingProfileModal = function() {
     document.getElementById('datingCountry').value = profile.country || '';
     document.getElementById('datingCity').value = profile.city || '';
     document.getElementById('datingGoal').value = profile.goal || '';
-    document.getElementById('datingPhotoUrl').value = profile.photoUrl || '';
+    var savedPhoto = datingPhotoSource(profile.photoUrl);
+    datingCurrentPhotoUrl = savedPhoto;
+    document.getElementById('datingPhotoUrl').value = datingSafeImage(savedPhoto) || '';
     document.getElementById('datingBio').value = profile.bio || '';
     document.getElementById('datingActive').checked = profile.isActive !== false;
     document.getElementById('datingAdultConfirmed').checked = profile.ageConfirmed === true;
     document.getElementById('datingError').textContent = '';
     document.getElementById('datingUploadStatus').textContent = '';
     document.getElementById('datingPhotoInput').value = '';
-    renderDatingPhotoPreview(profile.photoUrl || '');
+    renderDatingPhotoPreview(savedPhoto);
     updateDatingCityOptions();
     document.getElementById('datingProfileModal').classList.add('open');
 };
@@ -178,6 +253,7 @@ function renderDatingPhotoPreview(url) {
     var container = document.getElementById('datingPhotoPreview');
     if (!container) return;
     container.replaceChildren();
+    url = datingPhotoSource(url);
     if (!url) { container.hidden = true; return; }
     var image = document.createElement('img');
     image.src = url;
@@ -192,34 +268,19 @@ window.closeDatingProfileModal = function() {
     datingPhotoPreviewUrl = null;
 };
 
-function datingStorageErrorMessage(error) {
-    var messages = {
-        'dating/upload-stalled': 'Firebase Storage не начал передачу фото за 30 секунд. Проверь, что Storage включён в Firebase Console и опубликованы Storage Rules для dating-photos.',
-        'dating/url-timeout': 'Фото передалось, но Firebase не вернул ссылку за 20 секунд. Проверь доступ к Firebase Storage и подключение.',
-        'dating/profile-save-timeout': 'Фото загружено, но Firebase Database не подтвердил сохранение анкеты за 20 секунд. Проверь Database Rules и подключение.',
-        'storage/bucket-not-found': 'Хранилище Firebase не настроено.',
-        'storage/unauthorized': 'Firebase Storage отклонил загрузку. Проверь опубликованные Storage Rules.',
-        'storage/unauthenticated': 'Сессия входа истекла. Войди в аккаунт и попробуй снова.',
-        'storage/quota-exceeded': 'В хранилище Firebase закончилась квота.',
-        'storage/retry-limit-exceeded': 'Загрузка прервалась из-за соединения. Попробуй ещё раз.',
-        'storage/canceled': 'Загрузка фотографии отменена.'
-    };
-    return messages[error && error.code] || 'Загрузка фото не завершилась (' + ((error && error.code) || 'ошибка сети') + ').';
-}
-
 window.saveDatingProfile = function(shareAfterSave) {
     var error = document.getElementById('datingError');
     var saveButton = document.getElementById('datingSaveButton');
     var shareSaveButton = document.getElementById('datingSaveAndShareButton');
     var uploadStatus = document.getElementById('datingUploadStatus');
-    var uploadCancel = document.getElementById('datingUploadCancel');
     var name = document.getElementById('datingName').value.trim();
     var gender = document.getElementById('datingGender').value;
     var seeking = document.getElementById('datingSeeking').value;
     var country = datingCountryCode(document.getElementById('datingCountry').value);
     var city = document.getElementById('datingCity').value.trim();
     var goal = document.getElementById('datingGoal').value;
-    var photoUrl = document.getElementById('datingPhotoUrl').value.trim();
+    var photoUrlInput = document.getElementById('datingPhotoUrl').value.trim();
+    var photoUrl = datingSafeImage(photoUrlInput) || datingCurrentPhotoUrl;
     var photoFile = document.getElementById('datingPhotoInput').files[0];
     var bio = document.getElementById('datingBio').value.trim();
     var ageConfirmed = document.getElementById('datingAdultConfirmed').checked;
@@ -244,110 +305,52 @@ window.saveDatingProfile = function(shareAfterSave) {
     }
     if (!ageConfirmed) { error.textContent = 'Для раздела знакомств нужно подтвердить, что тебе исполнилось 18 лет.'; return; }
     if (shareAfterSave && !isActive) { error.textContent = 'Включи показ анкеты в поиске, чтобы поделиться ею.'; return; }
-    if (!photoFile && !datingSafeImage(photoUrl)) { error.textContent = 'Добавь фотографию по ссылке или выбери файл с устройства. Без фото анкету сохранить и опубликовать нельзя.'; document.getElementById('datingPhotoUrl').focus(); return; }
-    if (photoUrl && !datingSafeImage(photoUrl) && !photoFile) { error.textContent = 'Укажи прямую ссылку на фото с https:// или http://.'; return; }
+    if (!photoFile && !datingPhotoSource(photoUrl)) { error.textContent = 'Добавь фотографию по ссылке или выбери файл с устройства. Без фото анкету сохранить и опубликовать нельзя.'; document.getElementById('datingPhotoUrl').focus(); return; }
+    if (photoUrlInput && !datingSafeImage(photoUrlInput) && !photoFile) { error.textContent = 'Укажи прямую ссылку на фото с https:// или http://.'; return; }
     if (photoFile && (!photoFile.type.match(/^image\//i) || photoFile.size >= 5 * 1024 * 1024)) { error.textContent = 'Выбери изображение размером меньше 5 МБ.'; return; }
     var profile = {
         name: name, gender: gender, seeking: seeking, countryCode: country.code, country: country.name,
-        city: city, goal: goal, bio: bio, photoUrl: photoFile ? '' : (datingSafeImage(photoUrl) || ''),
+        city: city, goal: goal, bio: bio, photoUrl: photoFile ? '' : (datingPhotoSource(photoUrl) || ''),
         ageConfirmed: true, isActive: isActive, updatedAt: Date.now()
     };
     saveButton.disabled = true;
     if (shareSaveButton) shareSaveButton.disabled = true;
-    if (uploadCancel) uploadCancel.hidden = !photoFile;
-    if (uploadStatus) uploadStatus.textContent = photoFile ? 'Подключаюсь к Firebase Storage…' : '';
-    saveButton.textContent = photoFile ? 'Подготовка фото…' : 'Сохраняю…';
+    if (uploadStatus) uploadStatus.textContent = photoFile ? 'Подготавливаю фото для сохранения…' : 'Сохраняю анкету…';
+    saveButton.textContent = photoFile ? 'Подготавливаю фото…' : 'Сохраняю…';
     var photoPromise = Promise.resolve(profile.photoUrl);
     if (photoFile) {
-        photoPromise = new Promise(function(resolve, reject) {
-            var uploadTask = storage.ref('dating-photos/' + USER_UID + '/main').put(photoFile, { contentType: photoFile.type });
-            datingPhotoUploadTask = uploadTask;
-            var lastBytesTransferred = 0;
-            var stalled = false;
-            var stallTimer = setTimeout(function() {
-                stalled = true;
-                if (uploadStatus) uploadStatus.textContent = 'Передача не началась за 30 секунд. Останавливаю, чтобы показать причину.';
-                uploadTask.cancel();
-            }, 30000);
-            uploadTask.on('state_changed', function(snapshot) {
-                var percent = snapshot.totalBytes ? Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100) : 0;
-                saveButton.textContent = 'Фото · ' + percent + '%';
-                if (uploadStatus) uploadStatus.textContent = 'Загружаю фотографию: ' + percent + '%';
-                if (snapshot.bytesTransferred > lastBytesTransferred) {
-                    lastBytesTransferred = snapshot.bytesTransferred;
-                    clearTimeout(stallTimer);
-                    stallTimer = setTimeout(function() {
-                        stalled = true;
-                        if (uploadStatus) uploadStatus.textContent = 'Передача остановилась. Останавливаю загрузку, чтобы показать причину.';
-                        uploadTask.cancel();
-                    }, 30000);
-                }
-            }, function(uploadError) {
-                clearTimeout(stallTimer);
-                datingPhotoUploadTask = null;
-                if (stalled) reject({ code: 'dating/upload-stalled' });
-                else reject(uploadError);
-            }, function() {
-                clearTimeout(stallTimer);
-                datingPhotoUploadTask = null;
-                if (uploadStatus) uploadStatus.textContent = 'Фото передано. Получаю ссылку…';
-                var urlTimer = setTimeout(function() { reject({ code: 'dating/url-timeout' }); }, 20000);
-                uploadTask.snapshot.ref.getDownloadURL().then(function(url) {
-                    clearTimeout(urlTimer);
-                    resolve(url);
-                }, function(urlError) {
-                    clearTimeout(urlTimer);
-                    reject(urlError);
-                });
-            });
-        });
+        photoPromise = datingCompressPhoto(photoFile).then(datingBlobToDataUrl);
     }
     photoPromise.then(function(url) {
         profile.photoUrl = url;
-        if (uploadStatus) uploadStatus.textContent = 'Фотография загружена. Сохраняю анкету…';
+        if (uploadStatus) uploadStatus.textContent = photoFile ? 'Фото сжато. Сохраняю его вместе с анкетой…' : 'Сохраняю анкету…';
         saveButton.textContent = 'Сохраняю анкету…';
         var updates = {};
         updates['sites/' + SITE + '/dating_private_profiles/' + USER_UID] = profile;
         updates['sites/' + SITE + '/dating_profiles/' + USER_UID] = profile.isActive ? profile : null;
-        return Promise.race([
-            db.ref().update(updates),
-            new Promise(function(_, reject) {
-                setTimeout(function() { reject({ code: 'dating/profile-save-timeout' }); }, 20000);
-            })
-        ]);
+        return db.ref().update(updates);
     }).then(function() {
         datingProfiles[USER_UID] = profile;
+        datingCurrentPhotoUrl = profile.photoUrl;
         window.closeDatingProfileModal();
         renderDatingProfiles();
         if (shareAfterSave) window.shareMyDatingProfile();
     }).catch(function(saveError) {
         console.error('Не удалось сохранить анкету знакомств:', saveError);
-        if (saveError.code === 'dating/profile-save-timeout') {
-            error.textContent = datingStorageErrorMessage(saveError) + ' Код: ' + saveError.code;
-            if (uploadStatus) uploadStatus.textContent = 'Фото загружено, но подтверждение сохранения анкеты не получено.';
-        } else if (saveError.code && (saveError.code.indexOf('storage/') === 0 || saveError.code.indexOf('dating/') === 0)) {
-            error.textContent = 'Фотография не загрузилась: ' + datingStorageErrorMessage(saveError) + ' Код: ' + saveError.code;
-            if (uploadStatus) uploadStatus.textContent = 'Анкета не сохранена — сначала нужна успешно загруженная фотография.';
-        } else {
-            error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Firebase запретил запись анкеты. Опубликуй Database Rules для знакомств.' : 'Не удалось сохранить анкету. ' + (saveError.message || 'Проверь подключение и попробуй ещё раз.');
-        }
+        error.textContent = saveError.code === 'PERMISSION_DENIED' || saveError.code === 'permission_denied'
+            ? 'Firebase запретил запись фото или анкеты. Проверь опубликованные Database Rules.'
+            : 'Не удалось сохранить анкету. ' + (saveError.message || 'Проверь подключение и попробуй ещё раз.');
     }).finally(function() {
-        datingPhotoUploadTask = null;
         saveButton.disabled = false;
         saveButton.textContent = 'Сохранить анкету';
         if (shareSaveButton) shareSaveButton.disabled = false;
-        if (uploadCancel) uploadCancel.hidden = true;
     });
-};
-
-window.cancelDatingPhotoUpload = function() {
-    if (datingPhotoUploadTask) datingPhotoUploadTask.cancel();
 };
 
 function openDatingDetail(uid) {
     var profile = datingProfiles[uid];
     if (!profile) return;
-    var image = datingSafeImage(profile.photoUrl);
+    var image = datingPhotoSource(profile.photoUrl);
     var detail = document.getElementById('datingDetailContent');
     detail.innerHTML = '<div class="dating-detail-head">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<div class="dating-detail-initial">' + datingEscape(Array.from(profile.name || '?')[0]) + '</div>') + '<div><span class="dating-kicker">АНКЕТА · 18+</span><h2>' + datingEscape(profile.name) + '</h2><p>' + datingEscape(profile.gender) + ' · ищет: ' + datingEscape(profile.seeking) + '</p><p>📍 ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</p></div></div><div class="dating-detail-goal">' + datingEscape(profile.goal) + '</div><p class="dating-detail-bio">' + datingEscape(profile.bio || 'Описание пока не добавлено.').replace(/\n/g, '<br>') + '</p><div class="dating-detail-actions"><button type="button" class="dating-primary" data-message-profile="' + datingEscape(uid) + '">Открыть профиль</button><button type="button" class="dating-secondary" data-report-profile="' + datingEscape(uid) + '">Пожаловаться</button><button type="button" class="dating-secondary dating-block" data-block-profile="' + datingEscape(uid) + '">Заблокировать</button></div>';
     document.getElementById('datingDetailModal').classList.add('open');
@@ -399,6 +402,7 @@ var datingPhotoUrlInput = document.getElementById('datingPhotoUrl');
 if (datingPhotoUrlInput) datingPhotoUrlInput.addEventListener('input', function() {
     var fileInput = document.getElementById('datingPhotoInput');
     if (fileInput) fileInput.value = '';
+    datingCurrentPhotoUrl = datingSafeImage(datingPhotoUrlInput.value.trim());
     if (datingPhotoPreviewUrl) URL.revokeObjectURL(datingPhotoPreviewUrl);
     datingPhotoPreviewUrl = null;
     renderDatingPhotoPreview(datingPhotoUrlInput.value.trim());
@@ -418,8 +422,9 @@ if (datingPhotoInput) datingPhotoInput.addEventListener('change', function() {
         return;
     }
     error.textContent = '';
+    datingCurrentPhotoUrl = '';
     var uploadStatus = document.getElementById('datingUploadStatus');
-    if (uploadStatus) uploadStatus.textContent = 'Фото выбрано. Загрузка начнётся при сохранении анкеты.';
+    if (uploadStatus) uploadStatus.textContent = 'Фото выбрано. Сжатие начнётся при сохранении анкеты.';
     document.getElementById('datingPhotoUrl').value = '';
     if (datingPhotoPreviewUrl) URL.revokeObjectURL(datingPhotoPreviewUrl);
     datingPhotoPreviewUrl = URL.createObjectURL(file);

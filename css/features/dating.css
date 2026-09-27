@@ -46,8 +46,6 @@
 .dating-share-submit { border-color:color-mix(in srgb,#e54491 35%,var(--border-color)); color:#d6418b; font-weight:750; }
 .dating-upload-status { min-height:16px; margin-top:5px; color:var(--text-secondary); font-size:.66rem; }
 .dating-upload-status:empty { display:none; }
-.dating-upload-cancel { margin:4px 0; padding:5px 8px; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg); color:var(--text-secondary); font:inherit; font-size:.65rem; cursor:pointer; }
-.dating-upload-cancel[hidden] { display:none; }
 .dating-detail-head { display:flex; align-items:center; gap:13px; }
 .dating-detail-head>img,.dating-detail-initial { display:grid; place-items:center; width:92px; height:112px; flex:0 0 92px; overflow:hidden; border-radius:12px; object-fit:cover; background:linear-gradient(145deg,color-mix(in srgb,#e54491 18%,var(--card-bg)),var(--input-bg)); color:#d6418b; font-size:2rem; font-weight:800; }
 .dating-detail-head h2 { margin:5px 0; font-size:1.05rem; }
