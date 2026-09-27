@@ -195,6 +195,8 @@ window.closeDatingProfileModal = function() {
 function datingStorageErrorMessage(error) {
     var messages = {
         'dating/upload-stalled': 'Firebase Storage не начал передачу фото за 30 секунд. Проверь, что Storage включён в Firebase Console и опубликованы Storage Rules для dating-photos.',
+        'dating/url-timeout': 'Фото передалось, но Firebase не вернул ссылку за 20 секунд. Проверь доступ к Firebase Storage и подключение.',
+        'dating/profile-save-timeout': 'Фото загружено, но Firebase Database не подтвердил сохранение анкеты за 20 секунд. Проверь Database Rules и подключение.',
         'storage/bucket-not-found': 'Хранилище Firebase не настроено.',
         'storage/unauthorized': 'Firebase Storage отклонил загрузку. Проверь опубликованные Storage Rules.',
         'storage/unauthenticated': 'Сессия входа истекла. Войди в аккаунт и попробуй снова.',
@@ -288,16 +290,31 @@ window.saveDatingProfile = function(shareAfterSave) {
             }, function() {
                 clearTimeout(stallTimer);
                 datingPhotoUploadTask = null;
-                uploadTask.snapshot.ref.getDownloadURL().then(resolve, reject);
+                if (uploadStatus) uploadStatus.textContent = 'Фото передано. Получаю ссылку…';
+                var urlTimer = setTimeout(function() { reject({ code: 'dating/url-timeout' }); }, 20000);
+                uploadTask.snapshot.ref.getDownloadURL().then(function(url) {
+                    clearTimeout(urlTimer);
+                    resolve(url);
+                }, function(urlError) {
+                    clearTimeout(urlTimer);
+                    reject(urlError);
+                });
             });
         });
     }
     photoPromise.then(function(url) {
         profile.photoUrl = url;
+        if (uploadStatus) uploadStatus.textContent = 'Фотография загружена. Сохраняю анкету…';
+        saveButton.textContent = 'Сохраняю анкету…';
         var updates = {};
         updates['sites/' + SITE + '/dating_private_profiles/' + USER_UID] = profile;
         updates['sites/' + SITE + '/dating_profiles/' + USER_UID] = profile.isActive ? profile : null;
-        return db.ref().update(updates);
+        return Promise.race([
+            db.ref().update(updates),
+            new Promise(function(_, reject) {
+                setTimeout(function() { reject({ code: 'dating/profile-save-timeout' }); }, 20000);
+            })
+        ]);
     }).then(function() {
         datingProfiles[USER_UID] = profile;
         window.closeDatingProfileModal();
@@ -305,7 +322,10 @@ window.saveDatingProfile = function(shareAfterSave) {
         if (shareAfterSave) window.shareMyDatingProfile();
     }).catch(function(saveError) {
         console.error('Не удалось сохранить анкету знакомств:', saveError);
-        if (saveError.code && (saveError.code.indexOf('storage/') === 0 || saveError.code.indexOf('dating/') === 0)) {
+        if (saveError.code === 'dating/profile-save-timeout') {
+            error.textContent = datingStorageErrorMessage(saveError) + ' Код: ' + saveError.code;
+            if (uploadStatus) uploadStatus.textContent = 'Фото загружено, но подтверждение сохранения анкеты не получено.';
+        } else if (saveError.code && (saveError.code.indexOf('storage/') === 0 || saveError.code.indexOf('dating/') === 0)) {
             error.textContent = 'Фотография не загрузилась: ' + datingStorageErrorMessage(saveError) + ' Код: ' + saveError.code;
             if (uploadStatus) uploadStatus.textContent = 'Анкета не сохранена — сначала нужна успешно загруженная фотография.';
         } else {
