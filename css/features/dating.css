@@ -12,8 +12,9 @@
 .dating-filter input:focus,.dating-filter select:focus { border-color:#dc478e; }
 .dating-results-label { margin:0 2px 8px; color:var(--muted-text); font-size:.68rem; }
 .dating-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:11px; }
-.dating-card { display:grid; align-content:start; min-width:0; overflow:hidden; padding:9px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); color:var(--text-color); text-align:left; box-shadow:var(--shadow); cursor:pointer; transition:transform .15s,border-color .15s; }
+.dating-card { display:grid; align-content:start; min-width:0; overflow:hidden; padding:9px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); color:var(--text-color); text-align:left; box-shadow:var(--shadow); transition:transform .15s,border-color .15s; }
 .dating-card:hover { transform:translateY(-2px); border-color:color-mix(in srgb,#e54491 55%,var(--border-color)); }
+.dating-card-main { display:grid; align-content:start; min-width:0; width:100%; padding:0; border:0; background:transparent; color:inherit; font:inherit; text-align:left; cursor:pointer; }
 .dating-card-photo { display:grid; place-items:center; width:100%; aspect-ratio:1/1.08; overflow:hidden; border-radius:10px; background:linear-gradient(145deg,color-mix(in srgb,#e54491 18%,var(--card-bg)),var(--input-bg)); color:#d6418b; font-size:2.4rem; font-weight:800; }
 .dating-card-photo img { width:100%; height:100%; object-fit:cover; }
 .dating-card-name { overflow:hidden; margin-top:9px; font-size:.86rem; font-weight:780; text-overflow:ellipsis; white-space:nowrap; }

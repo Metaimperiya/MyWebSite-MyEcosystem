@@ -262,10 +262,10 @@ function renderPost(p, type) {
             sharedHtml = '<div class="shared-entity-wrap shared-group-wrap"><button type="button" class="shared-entity-card" data-open-shared="' + groupOpenData + '">' + image + '<span class="shared-entity-copy"><small>' + esc(labels.group) + '</small><strong>' + esc(entity.title || 'Группа') + '</strong><span>' + esc(entity.description || 'Посмотри обложку и описание группы.') + '</span><em>Перейти в группу <span aria-hidden="true">→</span></em></span></button></div>';
         } else {
             if (entity.kind === 'dating') {
-                var datingActions = entity.id === USER_UID
-                    ? '<button type="button" class="shared-dating-action" data-open-shared="' + openData + '">Открыть анкету</button><button type="button" class="shared-dating-action" onclick="event.stopPropagation();openDatingProfileModal();">Редактировать</button>'
-                    : '<button type="button" class="shared-dating-action" data-dating-friend="' + esc(entity.id || '') + '">＋ Добавить в друзья</button><button type="button" class="shared-dating-action shared-dating-action--primary" data-dating-message="' + esc(entity.id || '') + '">✉ Отправить сообщение</button>';
-                sharedHtml = '<div class="shared-entity-wrap shared-dating-wrap"><button type="button" class="shared-entity-card" data-open-shared="' + openData + '">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind]) + '</small><strong>' + esc(entity.title || 'Анкета') + '</strong><span>' + esc(entity.description || '') + '</span><em>Открыть анкету →</em></span></button><div class="shared-dating-actions">' + datingActions + '</div></div>';
+                var datingActions = typeof window.renderDatingActionPanel === 'function'
+                    ? window.renderDatingActionPanel(entity.id || '', entity.id === USER_UID)
+                    : '<div class="shared-dating-actions"><button type="button" class="shared-dating-action" data-dating-open-profile="' + esc(entity.id || '') + '">Открыть профиль</button></div>';
+                sharedHtml = '<div class="shared-entity-wrap shared-dating-wrap"><div class="shared-entity-card">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind]) + '</small><strong>' + esc(entity.title || 'Анкета') + '</strong><span>' + esc(entity.description || '') + '</span></span></div>' + datingActions + '</div>';
             } else {
                 sharedHtml = '<button type="button" class="shared-entity-card" data-open-shared="' + openData + '" onclick="event.stopPropagation();">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind] || 'ПУБЛИКАЦИЯ') + '</small><strong>' + esc(entity.title || 'Открыть публикацию') + '</strong><span>' + esc(entity.description || '') + '</span><em>Открыть →</em></span></button>';
             }
@@ -607,6 +607,10 @@ function loadMorePosts(requestId) {
             el.insertBefore(fragment, spinner);
         } else {
             el.appendChild(fragment);
+        }
+        if (typeof window.loadDatingLikeSummaries === 'function') {
+            var datingLikeUids = Array.from(el.querySelectorAll('[data-dating-like]')).map(function(button) { return button.getAttribute('data-dating-like'); });
+            window.loadDatingLikeSummaries(datingLikeUids);
         }
 
         if (!feedHasMore) {

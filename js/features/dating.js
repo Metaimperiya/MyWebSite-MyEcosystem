@@ -6,6 +6,7 @@ var datingBlocked = {};
 var datingCountryItems = [];
 var datingPhotoPreviewUrl = null;
 var datingCurrentPhotoUrl = '';
+var datingLikeSummaries = Object.create(null);
 
 var DATING_COUNTRY_CODES = ('AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW').split(' ');
 
@@ -14,6 +15,57 @@ function datingEscape(value) {
         return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
     });
 }
+
+function datingActionPanel(uid, isOwn) {
+    if (isOwn) return '<div class="shared-dating-actions"><button type="button" class="shared-dating-action" data-dating-open-profile="' + datingEscape(uid) + '">Открыть профиль</button><button type="button" class="shared-dating-action" data-dating-edit>Редактировать</button></div>';
+    var summary = datingLikeSummaries[uid] || { count: 0, liked: false };
+    return '<div class="shared-dating-actions"><button type="button" class="shared-dating-action" data-dating-open-profile="' + datingEscape(uid) + '">Открыть профиль</button><button type="button" class="shared-dating-action" data-dating-friend="' + datingEscape(uid) + '">Добавить в друзья</button><button type="button" class="shared-dating-action shared-dating-action--primary" data-dating-message="' + datingEscape(uid) + '">Написать</button><button type="button" class="shared-dating-action shared-dating-action--like' + (summary.liked ? ' is-liked' : '') + '" data-dating-like="' + datingEscape(uid) + '" aria-pressed="' + (summary.liked ? 'true' : 'false') + '">' + (summary.liked ? '♥' : '♡') + ' Нравится · ' + summary.count + '</button></div>';
+}
+window.renderDatingActionPanel = datingActionPanel;
+
+function loadDatingLikeSummaries(uids) {
+    if (!USER_UID || !uids || !uids.length) return;
+    uids = Array.from(new Set(uids));
+    Promise.all(uids.map(function(uid) {
+        if (datingLikeSummaries[uid]) return Promise.resolve();
+        return db.ref('sites/' + SITE + '/dating_profile_likes/' + uid).once('value').then(function(snapshot) {
+            var likes = snapshot.val() || {};
+            datingLikeSummaries[uid] = { count: Object.keys(likes).length, liked: likes[USER_UID] === true };
+        }).catch(function(error) { console.warn('Не удалось загрузить отметки анкеты:', uid, error); });
+    })).then(function() {
+        uids.forEach(function(uid) {
+            var summary = datingLikeSummaries[uid] || { count: 0, liked: false };
+            document.querySelectorAll('[data-dating-like="' + uid + '"]').forEach(function(button) {
+                button.classList.toggle('is-liked', summary.liked);
+                button.setAttribute('aria-pressed', summary.liked ? 'true' : 'false');
+                button.innerHTML = (summary.liked ? '♥' : '♡') + ' Нравится · ' + summary.count;
+            });
+        });
+    });
+}
+window.loadDatingLikeSummaries = loadDatingLikeSummaries;
+
+window.toggleDatingProfileLike = function(uid) {
+    if (!USER_UID) { alert('Войди, чтобы отметить анкету.'); return; }
+    if (!uid || uid === USER_UID) return;
+    var path = 'sites/' + SITE + '/dating_profile_likes/' + uid + '/' + USER_UID;
+    db.ref(path).transaction(function(current) { return current === true ? null : true; }).then(function(result) {
+        if (!result.committed) return;
+        return db.ref('sites/' + SITE + '/dating_profile_likes/' + uid).once('value').then(function(snapshot) {
+            var likes = snapshot.val() || {};
+            datingLikeSummaries[uid] = { count: Object.keys(likes).length, liked: likes[USER_UID] === true };
+            document.querySelectorAll('[data-dating-like="' + uid + '"]').forEach(function(button) {
+                var summary = datingLikeSummaries[uid];
+                button.classList.toggle('is-liked', summary.liked);
+                button.setAttribute('aria-pressed', summary.liked ? 'true' : 'false');
+                button.innerHTML = (summary.liked ? '♥' : '♡') + ' Нравится · ' + summary.count;
+            });
+        });
+    }).catch(function(error) {
+        console.error('Не удалось поставить отметку анкете:', error);
+        alert('Не удалось поставить лайк. Проверь подключение и правила базы данных.');
+    });
+};
 
 function datingCountries() {
     if (datingCountryItems.length) return datingCountryItems;
@@ -202,10 +254,10 @@ function renderDatingProfiles() {
             return true;
         }).sort(function(a, b) { return (b.updatedAt || 0) - (a.updatedAt || 0); });
     var ownProfile = datingProfiles[USER_UID];
-    var ownCard = ownProfile ? '<button type="button" class="dating-card dating-own-card" data-dating-own><span class="dating-own-badge">МОЯ АНКЕТА</span><span class="dating-card-photo">' + (datingPhotoSource(ownProfile.photoUrl) ? '<img src="' + datingEscape(datingPhotoSource(ownProfile.photoUrl)) + '" alt="">' : '<span>' + datingEscape(Array.from(ownProfile.name || '?')[0]) + '</span>') + '</span><span class="dating-card-name">' + datingEscape(ownProfile.name || 'Моя анкета') + '</span><span class="dating-card-meta">' + datingEscape(ownProfile.city || '') + (ownProfile.country ? ', ' + datingEscape(ownProfile.country) : '') + '</span><span class="dating-card-goal">' + datingEscape(ownProfile.goal || '') + '</span><span class="dating-own-edit">Редактировать анкету →</span></button>' : '';
+    var ownCard = ownProfile ? '<article class="dating-card dating-own-card"><span class="dating-own-badge">МОЯ АНКЕТА</span><button type="button" class="dating-card-main" data-dating-own><span class="dating-card-photo">' + (datingPhotoSource(ownProfile.photoUrl) ? '<img src="' + datingEscape(datingPhotoSource(ownProfile.photoUrl)) + '" alt="">' : '<span>' + datingEscape(Array.from(ownProfile.name || '?')[0]) + '</span>') + '</span><span class="dating-card-name">' + datingEscape(ownProfile.name || 'Моя анкета') + '</span><span class="dating-card-meta">' + datingEscape(ownProfile.city || '') + (ownProfile.country ? ', ' + datingEscape(ownProfile.country) : '') + '</span><span class="dating-card-goal">' + datingEscape(ownProfile.goal || '') + '</span></button>' + datingActionPanel(USER_UID, true) + '</article>' : '';
     grid.innerHTML = ownCard + (profiles.length ? profiles.map(function(profile) {
         var image = datingPhotoSource(profile.photoUrl);
-        return '<button type="button" class="dating-card" data-dating-profile="' + datingEscape(profile.uid) + '"><span class="dating-card-photo">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<span>' + datingEscape(Array.from(profile.name || '?')[0]) + '</span>') + '</span><span class="dating-card-name">' + datingEscape(profile.name) + '</span><span class="dating-card-meta">' + datingEscape(profile.gender) + ' · ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</span><span class="dating-card-goal">' + datingEscape(profile.goal) + '</span>' + (profile.bio ? '<span class="dating-card-bio">' + datingEscape(profile.bio) + '</span>' : '') + '</button>';
+        return '<article class="dating-card"><button type="button" class="dating-card-main" data-dating-profile="' + datingEscape(profile.uid) + '"><span class="dating-card-photo">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<span>' + datingEscape(Array.from(profile.name || '?')[0]) + '</span>') + '</span><span class="dating-card-name">' + datingEscape(profile.name) + '</span><span class="dating-card-meta">' + datingEscape(profile.gender) + ' · ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</span><span class="dating-card-goal">' + datingEscape(profile.goal) + '</span>' + (profile.bio ? '<span class="dating-card-bio">' + datingEscape(profile.bio) + '</span>' : '') + '</button>' + datingActionPanel(profile.uid, false) + '</article>';
     }).join('') : '<div class="dating-empty"><span>💗</span><strong>Пока нет подходящих анкет</strong><p>Попробуй изменить фильтры или загляни позже.</p></div>');
     var label = document.getElementById('datingResultsLabel');
     if (label) label.textContent = profiles.length + (profiles.length === 1 ? ' анкета' : profiles.length > 1 && profiles.length < 5 ? ' анкеты' : ' анкет');
@@ -214,6 +266,7 @@ function renderDatingProfiles() {
     });
     var ownCardButton = grid.querySelector('[data-dating-own]');
     if (ownCardButton) ownCardButton.addEventListener('click', openDatingProfileModal);
+    loadDatingLikeSummaries(profiles.map(function(profile) { return profile.uid; }));
     var create = document.getElementById('datingCreateButton');
     if (create) create.textContent = ownProfile ? '✎ Редактировать анкету' : '＋ Создать анкету';
 }
@@ -367,9 +420,8 @@ function openDatingDetail(uid) {
     if (!profile) return;
     var image = datingPhotoSource(profile.photoUrl);
     var detail = document.getElementById('datingDetailContent');
-    detail.innerHTML = '<div class="dating-detail-head">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<div class="dating-detail-initial">' + datingEscape(Array.from(profile.name || '?')[0]) + '</div>') + '<div><span class="dating-kicker">АНКЕТА · 18+</span><h2>' + datingEscape(profile.name) + '</h2><p>' + datingEscape(profile.gender) + ' · ищет: ' + datingEscape(profile.seeking) + '</p><p>📍 ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</p></div></div><div class="dating-detail-goal">' + datingEscape(profile.goal) + '</div><p class="dating-detail-bio">' + datingEscape(profile.bio || 'Описание пока не добавлено.').replace(/\n/g, '<br>') + '</p><div class="dating-detail-actions"><button type="button" class="dating-primary" data-message-profile="' + datingEscape(uid) + '">Открыть профиль</button><button type="button" class="dating-secondary" data-report-profile="' + datingEscape(uid) + '">Пожаловаться</button><button type="button" class="dating-secondary dating-block" data-block-profile="' + datingEscape(uid) + '">Заблокировать</button></div>';
+    detail.innerHTML = '<div class="dating-detail-head">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<div class="dating-detail-initial">' + datingEscape(Array.from(profile.name || '?')[0]) + '</div>') + '<div><span class="dating-kicker">АНКЕТА · 18+</span><h2>' + datingEscape(profile.name) + '</h2><p>' + datingEscape(profile.gender) + ' · ищет: ' + datingEscape(profile.seeking) + '</p><p>📍 ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</p></div></div><div class="dating-detail-goal">' + datingEscape(profile.goal) + '</div><p class="dating-detail-bio">' + datingEscape(profile.bio || 'Описание пока не добавлено.').replace(/\n/g, '<br>') + '</p>' + datingActionPanel(uid, uid === USER_UID) + '<div class="dating-detail-actions"><button type="button" class="dating-secondary" data-report-profile="' + datingEscape(uid) + '">Пожаловаться</button><button type="button" class="dating-secondary dating-block" data-block-profile="' + datingEscape(uid) + '">Заблокировать</button></div>';
     document.getElementById('datingDetailModal').classList.add('open');
-    detail.querySelector('[data-message-profile]').onclick = function() { closeDatingDetail(); if (typeof viewUserProfile === 'function') viewUserProfile(uid); };
     detail.querySelector('[data-report-profile]').onclick = function() { reportDatingProfile(uid); };
     detail.querySelector('[data-block-profile]').onclick = function() {
         blockDatingProfile(uid);

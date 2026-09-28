@@ -444,6 +444,27 @@ window.shareFeedEntity = function(kind, payload) {
 };
 
 document.addEventListener('click', function(event) {
+    var datingProfileButton = event.target.closest('[data-dating-open-profile]');
+    if (datingProfileButton) {
+        event.preventDefault(); event.stopPropagation();
+        var profileUid = datingProfileButton.getAttribute('data-dating-open-profile');
+        if (typeof window.closeDatingDetail === 'function') window.closeDatingDetail();
+        if (typeof window.navigateToProfile === 'function') window.navigateToProfile(profileUid);
+        else alert('Профиль пока загружается. Попробуй ещё раз.');
+        return;
+    }
+    var datingEditButton = event.target.closest('[data-dating-edit]');
+    if (datingEditButton) {
+        event.preventDefault(); event.stopPropagation();
+        if (typeof window.openDatingProfileModal === 'function') window.openDatingProfileModal();
+        return;
+    }
+    var datingLikeButton = event.target.closest('[data-dating-like]');
+    if (datingLikeButton) {
+        event.preventDefault(); event.stopPropagation();
+        if (typeof window.toggleDatingProfileLike === 'function') window.toggleDatingProfileLike(datingLikeButton.getAttribute('data-dating-like'));
+        return;
+    }
     var datingFriendButton = event.target.closest('[data-dating-friend]');
     if (datingFriendButton) {
         event.preventDefault(); event.stopPropagation();
