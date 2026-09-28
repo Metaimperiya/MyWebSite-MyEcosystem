@@ -33,8 +33,8 @@
 .pro-showcase-mark{padding:4px 8px;border:1px solid color-mix(in srgb,var(--link-color) 28%,transparent);border-radius:999px;color:var(--link-color);font-size:.63rem;font-weight:800;letter-spacing:.06em}
 .pro-showcase-grid{overflow:hidden;width:100%;mask-image:linear-gradient(90deg,transparent,#000 2%,#000 98%,transparent)}
 .pro-showcase-track{display:flex;width:max-content;will-change:transform}
-.pro-showcase-track.is-looping{animation:pro-showcase-drum 52s linear infinite}
-.pro-showcase-grid:hover .pro-showcase-track,.pro-showcase-grid:focus-within .pro-showcase-track{animation-play-state:paused}
+.pro-showcase-track.is-intro{animation:pro-showcase-intro 1.4s ease-out both}
+.pro-showcase-track.is-looping-ready{animation:pro-showcase-drum 42s linear infinite}
 .pro-showcase-set{display:flex;flex:0 0 auto;gap:9px;padding-right:9px}
 .pro-showcase-card{flex:0 0 96px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 7px 9px;border:1px solid var(--border-color);border-radius:12px;background:var(--card-bg);color:var(--text-color);cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
 .pro-showcase-card:hover,.pro-showcase-card:focus-visible{transform:translateY(-2px);border-color:var(--link-color);box-shadow:0 5px 16px #0002;outline:none}
@@ -43,8 +43,8 @@
 .pro-showcase-initial{font-size:1.25rem;font-weight:750;color:var(--link-color)}
 .pro-showcase-pro{position:absolute;right:-8px;bottom:-3px;padding:2px 5px;border:2px solid var(--card-bg);border-radius:999px;background:var(--link-color);color:#fff;font-size:.48rem;font-weight:850;line-height:1.1}
 .pro-showcase-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.76rem;font-weight:650}
-@keyframes pro-showcase-drum{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(prefers-reduced-motion:reduce){.pro-showcase-track.is-looping{animation:none}}
+@keyframes pro-showcase-intro{from{transform:translateX(0)}to{transform:translateX(var(--pro-showcase-first-shift,-105px))}}
+@keyframes pro-showcase-drum{from{transform:translateX(var(--pro-showcase-offset,0px))}to{transform:translateX(calc(-50% + var(--pro-showcase-offset,0px)))}}
 
 /* ===== РЕДАКТОР ===== */
 .editor-toolbar {

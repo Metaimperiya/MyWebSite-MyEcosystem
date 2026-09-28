@@ -15,6 +15,7 @@ var FEED_CONFIG = {
 };
 
 var proShowcaseUsers = [];
+var proShowcaseStartTimer = null;
 
 function renderProShowcase() {
     var section = document.getElementById('proShowcase');
@@ -25,7 +26,10 @@ function renderProShowcase() {
         return;
     }
     section.hidden = false;
-    var cardsHtml = proShowcaseUsers.map(function(user) {
+    clearTimeout(proShowcaseStartTimer);
+    // Даже одного автора повторяем в ленте, чтобы движение оставалось непрерывным.
+    var displayUsers = proShowcaseUsers.length === 1 ? Array(8).fill(proShowcaseUsers[0]) : proShowcaseUsers;
+    var cardsHtml = displayUsers.map(function(user) {
         var name = user.name || 'Пользователь';
         var avatar = user.avatarUrl
             ? '<img src="' + esc(user.avatarUrl).replace(/"/g, '&quot;') + '" alt="" loading="lazy">'
@@ -34,8 +38,8 @@ function renderProShowcase() {
             '<span class="pro-showcase-avatar">' + avatar + '<span class="pro-showcase-pro">PRO</span></span>' +
             '<span class="pro-showcase-name">' + esc(name) + '</span></button>';
     }).join('');
-    var duplicateHtml = proShowcaseUsers.length > 1
-        ? proShowcaseUsers.map(function(user) {
+    var duplicateHtml = displayUsers.length
+        ? displayUsers.map(function(user) {
             var name = user.name || 'Пользователь';
             var avatar = user.avatarUrl
                 ? '<img src="' + esc(user.avatarUrl).replace(/"/g, '&quot;') + '" alt="" loading="lazy">'
@@ -50,6 +54,29 @@ function renderProShowcase() {
     grid.querySelectorAll('[data-profile-uid]').forEach(function(card) {
         card.addEventListener('click', function() { viewUser(card.dataset.profileUid); });
     });
+    var track = grid.querySelector('.pro-showcase-track.is-looping');
+    if (track) {
+        proShowcaseStartTimer = setTimeout(function() {
+            if (!track.isConnected) return;
+            var firstCard = track.querySelector('.pro-showcase-set .pro-showcase-card');
+            var set = track.querySelector('.pro-showcase-set');
+            var gap = set ? parseFloat(getComputedStyle(set).gap) || 0 : 0;
+            var offset = firstCard ? firstCard.getBoundingClientRect().width + gap : 105;
+            track.style.setProperty('--pro-showcase-first-shift', '-' + offset + 'px');
+            track.classList.add('is-intro');
+            var introFallback = setTimeout(finishIntro, 1800);
+            function finishIntro(event) {
+                if (event && event.animationName !== 'pro-showcase-intro') return;
+                clearTimeout(introFallback);
+                track.removeEventListener('animationend', onIntroEnd);
+                track.style.setProperty('--pro-showcase-offset', '-' + offset + 'px');
+                track.classList.remove('is-intro');
+                track.classList.add('is-looping-ready');
+            }
+            function onIntroEnd(event) { finishIntro(event); }
+            track.addEventListener('animationend', onIntroEnd);
+        }, 5000);
+    }
 }
 
 window.loadProShowcase = function() {
