@@ -5,8 +5,9 @@
 .amb-kicker { color:#367453; font-size:.59rem; font-weight:850; letter-spacing:.13em; }
 .amb-demo-pill { padding:7px 10px; border:1px solid #e1c56d; border-radius:999px; background:#fff4cf; color:#805e10; font-size:.6rem; font-weight:850; letter-spacing:.06em; white-space:nowrap; }
 .amb-demo-note { margin:0 0 15px; padding:9px 11px; border:1px solid #e7d18b; border-radius:10px; background:#fff8df; color:#755d20; font-size:.66rem; line-height:1.5; }
-.amb-game-grid { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(245px,.85fr); align-items:start; gap:14px; }
-.amb-game-main,.amb-game-aside { display:grid; gap:13px; min-width:0; }
+.amb-game-grid { display:block; }
+.amb-game-main,.amb-game-aside { display:contents; }
+.amb-game-main > *, .amb-game-aside > * { margin-bottom:13px; }
 .amb-bank-card { position:relative; display:grid; justify-items:center; overflow:hidden; padding:16px; border:1px solid #d5bd72; border-radius:17px; background:radial-gradient(ellipse at 50% -35%,#37936a 0,transparent 65%),linear-gradient(135deg,#14583f,#0d382b); color:#fff; text-align:center; box-shadow:0 7px 20px #0a422626; }
 .amb-bank-card:after { position:absolute; inset:7px; border:1px solid #ffffff20; border-radius:12px; content:""; pointer-events:none; }
 .amb-bank-title { display:flex; width:100%; justify-content:space-between; color:#e8d49a; font-size:.61rem; font-weight:800; letter-spacing:.08em; }
@@ -89,5 +90,18 @@
 .amb-real-referrals { margin-top:12px; padding:10px 12px; border:1px solid #dce5dc; border-radius:12px; background:#fff; }
 .amb-real-referrals>summary { color:#50715d; font-size:.68rem; font-weight:750; cursor:pointer; }
 .amb-real-referrals>.referrals-heading { margin-top:13px; }
+.amb-promo-panel,.amb-ai-panel { padding:13px; border:1px solid #d9e4d9; border-radius:15px; background:#fff; }
+.amb-promo-copy { margin:4px 0 10px; color:#718277; font-size:.61rem; line-height:1.5; }
+.amb-platform-list { display:flex; flex-wrap:wrap; gap:7px; }
+.amb-platform-list a { display:inline-flex; align-items:center; gap:5px; min-height:32px; padding:5px 9px; border:1px solid #dce7dc; border-radius:999px; background:#f8fbf7; color:#2c5d43; font-size:.62rem; font-weight:750; text-decoration:none; transition:background .15s,transform .15s; }
+.amb-platform-list a:hover { transform:translateY(-1px); background:#eaf4e9; }
+.amb-ai-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.amb-ai-card { display:grid; justify-items:start; gap:5px; min-width:0; padding:10px; border:1px solid #dfe7df; border-radius:11px; background:linear-gradient(145deg,#fff,#f5f8f5); color:#284838; text-decoration:none; }
+.amb-ai-card>span { font-size:1.1rem; }
+.amb-ai-card strong { font-size:.66rem; }
+.amb-ai-card small { color:#75847a; font-size:.53rem; line-height:1.4; }
+.amb-ai-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:9px; }
+.amb-ai-footer small { color:#78877d; font-size:.55rem; }
+.amb-ai-footer button { min-height:31px; padding:5px 9px; border:1px solid #d4e1d5; border-radius:8px; background:#eff6ef; color:#286344; font:inherit; font-size:.58rem; font-weight:750; cursor:pointer; }
 @media(max-width:780px) { .amb-game-grid { grid-template-columns:1fr; } .amb-game-aside { grid-template-columns:1fr 1fr; } .amb-player-panel { grid-row:span 2; } }
-@media(max-width:520px) { .ambassador-game { padding:12px; border-radius:16px; } .amb-game-heading { align-items:flex-start; } .amb-demo-pill { font-size:.5rem; } .amb-game-heading p { max-width:245px; font-size:.69rem; } .amb-game-aside { grid-template-columns:1fr; } .amb-player-panel { grid-row:auto; } .amb-board { grid-template-columns:repeat(2,minmax(0,1fr)); } .amb-board button { min-height:70px; } .amb-form-grid { grid-template-columns:1fr 1fr; } .amb-form-grid label:first-child { grid-column:1/-1; } .amb-section-heading h2 { font-size:.83rem; } .amb-primary { padding:6px 8px; font-size:.59rem; } }
+@media(max-width:520px) { .ambassador-game { padding:12px; border-radius:16px; } .amb-game-heading { align-items:flex-start; } .amb-demo-pill { font-size:.5rem; } .amb-game-heading p { max-width:245px; font-size:.69rem; } .amb-game-aside { grid-template-columns:1fr; } .amb-player-panel { grid-row:auto; } .amb-board { grid-template-columns:repeat(2,minmax(0,1fr)); } .amb-board button { min-height:70px; } .amb-form-grid { grid-template-columns:1fr 1fr; } .amb-form-grid label:first-child { grid-column:1/-1; } .amb-section-heading h2 { font-size:.83rem; } .amb-primary { padding:6px 8px; font-size:.59rem; } .amb-ai-grid { grid-template-columns:1fr; } }

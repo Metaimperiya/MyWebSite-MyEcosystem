@@ -162,6 +162,9 @@
     function initialize() {
         if (!document.getElementById('ambassadorGame')) return;
         state = readState();
+        var playerSlot = document.getElementById('ambPlayerSlot');
+        var playerPanel = document.getElementById('ambPlayers');
+        if (playerSlot && playerPanel) playerSlot.appendChild(playerPanel);
         document.getElementById('ambBankInput').value = state.bank;
         document.getElementById('ambBankSave').addEventListener('click', function() {
             var amount = Number(document.getElementById('ambBankInput').value);
@@ -209,6 +212,10 @@
             var lookup = { bank: '.amb-bank-card', referrals: '.amb-real-referrals', exchange: '#ambExchange', target: '#ambExchange', bonus: '#ambLedger', team: '#ambPlayers' };
             if (target === 'referrals') { var details = document.querySelector('.amb-real-referrals'); if (details) details.open = true; }
             var section = document.querySelector(lookup[target]); if (section) section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        document.getElementById('ambCopyAiBrief').addEventListener('click', function() {
+            var brief = 'METAIMPERIYA: социальная платформа с реферальной программой и биржей амбассадорских заявок. Концепция в стиле настольной игры: администратор пополняет банк демо-очков, участники получают баланс, переводят очки и размещают заявки с наградой за подтверждённые регистрации. Оцени идею, предложи улучшения интерфейса и простые этапы реализации. Это пока визуальный прототип; начисления и регистрации не подключены к серверу.';
+            navigator.clipboard.writeText(brief).then(function() { setFeedback('Вводные скопированы. Вставь их в ChatGPT, Gemini или DeepSeek.'); }).catch(function() { window.prompt('Скопируй вводные для ИИ:', brief); });
         });
         refresh();
     }
