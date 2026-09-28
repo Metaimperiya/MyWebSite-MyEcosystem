@@ -102,7 +102,7 @@ function renderPost(p, type) {
     var menuHtml = '';
     if (canDelete) {
         menuHtml = '<div class="post-menu">' +
-            '<button class="dots" onclick="event.stopPropagation();window.togglePostMenu(\'' + p.id + '\')">⋮</button>' +
+            '<button class="dots" onclick="event.stopPropagation();window.togglePostMenu(this)">⋮</button>' +
             '<div class="dropdown" id="menu_' + p.id + '">' +
             '<button class="edit-btn" onclick="event.stopPropagation();window.openEdit(\'' + p.id + '\', \'' + type + '\')">✏️ Edit</button>' +
             '<button class="del-btn" onclick="event.stopPropagation();window.deletePost(\'' + p.id + '\', \'' + type + '\')">🗑 Delete</button>' +

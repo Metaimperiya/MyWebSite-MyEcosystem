@@ -42,9 +42,10 @@ exports.getReferralDashboard = onCall(async (request) => {
     if (!code) throw new HttpsError('unavailable', 'Не удалось создать ссылку. Попробуй ещё раз.');
   }
   await db.ref(`sites/${site}/referral_codes/${code}`).transaction((current) => current || { uid, createdAt: Date.now() });
-  const [directSnap, teamSnap] = await Promise.all([
+  const [directSnap, teamSnap, walletSnap] = await Promise.all([
     db.ref(`sites/${site}/referrals/${uid}`).once('value'),
-    db.ref(`sites/${site}/referral_team/${uid}`).once('value')
+    db.ref(`sites/${site}/referral_team/${uid}`).once('value'),
+    db.ref(`sites/${site}/referral_wallets/${uid}`).once('value')
   ]);
   const direct = directSnap.val() || {};
   const team = teamSnap.val() || {};
@@ -59,6 +60,7 @@ exports.getReferralDashboard = onCall(async (request) => {
     link: `https://metaimperiya.com/?ref=${encodeURIComponent(code)}`,
     directCount: Object.keys(direct).length,
     teamCount: Object.keys(team).length,
+    balance: Number(walletSnap.child('balance').val() || 0),
     members
   };
 });
@@ -137,8 +139,9 @@ exports.claimReferral = onCall(async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Сначала войди в аккаунт.');
   const site = referralSite(request.data && request.data.site);
   const uid = request.auth.uid;
-  const code = String(request.data && request.data.code || '').trim().toUpperCase();
-  if (!/^[A-F0-9]{12}$/.test(code)) return { claimed: false, reason: 'invalid_code' };
+  let code = String(request.data && request.data.code || '').trim();
+  if (/^[a-f0-9]{12}$/i.test(code)) code = code.toUpperCase();
+  if (!/^[A-Za-z0-9_-]{10,128}$/.test(code)) return { claimed: false, reason: 'invalid_code' };
   const authUser = await admin.auth().getUser(uid);
   const createdAt = Date.parse(authUser.metadata.creationTime || '');
   if (!createdAt || Date.now() - createdAt > 7 * 24 * 60 * 60 * 1000) return { claimed: false, reason: 'account_not_new' };

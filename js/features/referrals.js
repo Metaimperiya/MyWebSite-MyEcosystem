@@ -75,45 +75,8 @@
     }
 
     function claimDemoReferral(user, code) {
-        var createdAt = Date.parse(user.metadata && user.metadata.creationTime || '');
-        if (!createdAt || Date.now() - createdAt > 7 * 24 * 60 * 60 * 1000) return Promise.resolve({ claimed: false, reason: 'account_not_new' });
-        var referrerPromise = db.ref('sites/' + SITE + '/referral_codes/' + code).once('value').then(function(snapshot) {
-            if (snapshot.exists()) return snapshot.child('uid').val();
-            return code;
-        });
-        return referrerPromise.then(function(referrerUid) {
-            if (!referrerUid || referrerUid === user.uid) return { claimed: false, reason: 'invalid_code' };
-            return db.ref('sites/' + SITE + '/all_users/' + referrerUid).once('value').then(function(ownerSnapshot) {
-                if (!ownerSnapshot.exists()) return { claimed: false, reason: 'invalid_code' };
-                var attributionRef = db.ref('sites/' + SITE + '/referred_by/' + user.uid);
-                return attributionRef.transaction(function(current) {
-                    return current || { referrerUid: referrerUid, code: code, joinedAt: createdAt };
-                }).then(function(result) {
-                    var attribution = result.snapshot.val();
-                    if (!result.committed || !attribution || attribution.referrerUid !== referrerUid) return { claimed: false, reason: 'already_attributed' };
-                    return db.ref('sites/' + SITE + '/referral_ancestors/' + referrerUid).once('value').then(function(ancestorSnapshot) {
-                        var ancestors = ancestorSnapshot.val() || {};
-                        var ancestorUids = Object.keys(ancestors).sort(function(a, b) { return Number(ancestors[a]) - Number(ancestors[b]); }).slice(0, 100);
-                        var updates = {};
-                        var newAncestors = {};
-                        newAncestors[referrerUid] = 1;
-                        updates['sites/' + SITE + '/referrals/' + referrerUid + '/' + user.uid] = { joinedAt: createdAt };
-                        updates['sites/' + SITE + '/referral_team/' + referrerUid + '/' + user.uid] = { depth: 1, joinedAt: createdAt, directReferrerUid: referrerUid };
-                        ancestorUids.forEach(function(ancestorUid) {
-                            var depth = Number(ancestors[ancestorUid] || 1) + 1;
-                            newAncestors[ancestorUid] = depth;
-                            updates['sites/' + SITE + '/referral_team/' + ancestorUid + '/' + user.uid] = { depth: depth, joinedAt: createdAt, directReferrerUid: referrerUid };
-                        });
-                        updates['sites/' + SITE + '/referral_ancestors/' + user.uid] = newAncestors;
-                        return db.ref().update(updates).then(function() {
-                            return Promise.all([referrerUid].concat(ancestorUids).map(function(ancestorUid) {
-                                return addDemoPoints(ancestorUid, DEMO_REFERRAL_POINTS, { type: 'referral', referredUid: user.uid, directReferrerUid: referrerUid });
-                            }));
-                        }).then(function() { return { claimed: true, referrerUid: referrerUid }; });
-                    });
-                });
-            });
-        });
+        if (!user || !code) return Promise.resolve({ claimed: false, reason: 'invalid_code' });
+        return functionsApi().httpsCallable('claimReferral')({ site: SITE, code: code }).then(function(result) { return result.data || {}; });
     }
 
     function displayName(member, userData) {
@@ -188,21 +151,9 @@
         }
         referralBusy = true;
         referralStatus('Готовим ссылку…');
-        var code = USER_UID;
-        var link = 'https://metaimperiya.com/?ref=' + encodeURIComponent(code);
-        db.ref('sites/' + SITE + '/referral_codes/' + code).transaction(function(current) { return current || { uid: USER_UID, createdAt: Date.now() }; })
-        .then(function() {
-            return Promise.all([
-                db.ref('sites/' + SITE + '/referrals/' + USER_UID).once('value'),
-                db.ref('sites/' + SITE + '/referral_team/' + USER_UID).once('value'),
-                db.ref(walletPath(USER_UID)).once('value')
-            ]);
-        }).then(function(snapshots) {
-            var direct = snapshots[0].val() || {};
-            var team = snapshots[1].val() || {};
-            var members = Object.keys(team).map(function(uid) { return Object.assign({ uid: uid }, team[uid] || {}); }).sort(function(a, b) { return Number(b.joinedAt || 0) - Number(a.joinedAt || 0); });
-            var wallet = snapshots[2].val() || {};
-            referralDashboard = { code: code, link: link, directCount: Object.keys(direct).length, teamCount: Object.keys(team).length, members: members, balance: Number(wallet.balance || 0) };
+        functionsApi().httpsCallable('getReferralDashboard')({ site: SITE }).then(function(result) {
+            referralDashboard = result.data || {};
+            referralDashboard.balance = Number(referralDashboard.balance || 0);
             referralStatus(referralDashboard.link || 'Не удалось подготовить ссылку.');
             var direct = document.getElementById('referralDirectCount');
             var total = document.getElementById('referralTeamCount');

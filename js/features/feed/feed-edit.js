@@ -668,11 +668,13 @@
     // ================================================================
 
     window.togglePostMenu = function(postId) {
-        var menu = document.getElementById('menu_' + postId);
+        var menu = postId && postId.nodeType === 1
+            ? postId.closest('.post-menu')?.querySelector('.dropdown')
+            : document.getElementById('menu_' + postId);
         if (!menu) return;
 
         document.querySelectorAll('.post-menu .dropdown.open').forEach(function(el) {
-            if (el.id !== 'menu_' + postId) el.classList.remove('open');
+            if (el !== menu) el.classList.remove('open');
         });
 
         menu.classList.toggle('open');
