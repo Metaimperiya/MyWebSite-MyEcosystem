@@ -370,14 +370,25 @@ window.saveGroupDetails = function() {
         }
     }
     button.disabled = true;
-    button.textContent = coverFile || avatarFile ? 'Загружаю изображения…' : 'Сохраняю…';
+    button.textContent = coverFile || avatarFile ? 'Подготавливаю изображения…' : 'Сохраняю…';
     var savedCoverUrl = group.coverUrl || null;
     var savedAvatarUrl = group.avatarUrl || null;
+    function prepareGroupImage(file) {
+        if (typeof datingCompressPhoto !== 'function' || typeof datingBlobToDataUrl !== 'function') {
+            return Promise.reject(new Error('Не удалось подготовить изображение. Обнови страницу и попробуй ещё раз.'));
+        }
+        return datingCompressPhoto(file).then(datingBlobToDataUrl).then(function(dataUrl) {
+            if (!/^data:image\/webp;base64,/.test(dataUrl) || dataUrl.length > 400000) {
+                throw new Error('Изображение не поместилось после сжатия. Выбери фото поменьше.');
+            }
+            return dataUrl;
+        });
+    }
     var coverPromise = coverFile
-        ? storage.ref('group-covers/' + USER_UID + '/' + selectedCommunityId + '/cover').put(coverFile, { contentType: coverFile.type }).then(function(snapshot) { return snapshot.ref.getDownloadURL(); })
+        ? prepareGroupImage(coverFile)
         : Promise.resolve(enteredCoverUrl || (groupCoverRemoved ? null : group.coverUrl || null));
     var avatarPromise = avatarFile
-        ? storage.ref('group-avatars/' + USER_UID + '/' + selectedCommunityId + '/avatar').put(avatarFile, { contentType: avatarFile.type }).then(function(snapshot) { return snapshot.ref.getDownloadURL(); })
+        ? prepareGroupImage(avatarFile)
         : Promise.resolve(enteredAvatarUrl || (groupAvatarRemoved ? null : group.avatarUrl || null));
     Promise.all([coverPromise, avatarPromise]).then(function(imageUrls) {
         savedCoverUrl = imageUrls[0];
@@ -395,9 +406,9 @@ window.saveGroupDetails = function() {
         window.closeEditGroup();
     }).catch(function(saveError) {
         console.error('Не удалось сохранить профиль группы:', saveError);
-        error.textContent = saveError.code === 'storage/unauthorized' || saveError.code === 'storage/unauthenticated' || saveError.code === 'storage/bucket-not-found'
-            ? 'Хранилище Firebase Storage ещё не настроено. Добавь обложку по ссылке или включи Storage в Firebase Console.'
-            : saveError.code === 'PERMISSION_DENIED' ? 'Нет прав на изменение группы.' : 'Не удалось сохранить изменения.';
+        error.textContent = saveError.code === 'PERMISSION_DENIED'
+            ? 'Нет прав на изменение группы. Проверь, что ты владелец этой группы.'
+            : saveError.message || 'Не удалось сохранить изменения. Проверь подключение и попробуй ещё раз.';
     }).finally(function() { button.disabled = false; button.textContent = 'Сохранить'; });
 };
 

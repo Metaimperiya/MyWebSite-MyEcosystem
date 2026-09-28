@@ -19,7 +19,7 @@
           ".read": "auth != null",
           "$groupId": {
             ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || (data.exists() && data.child('ownerUid').val() === auth.uid))",
-            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'description', 'ownerUid', 'ownerName', 'createdAt']) && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 60 && newData.child('description').isString() && newData.child('description').val().length <= 300 && newData.child('ownerUid').val() === auth.uid && newData.child('ownerName').isString() && newData.child('createdAt').isNumber())"
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'description', 'ownerUid', 'ownerName', 'createdAt']) && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 60 && newData.child('description').isString() && newData.child('description').val().length <= 300 && newData.child('ownerUid').val() === auth.uid && newData.child('ownerName').isString() && newData.child('createdAt').isNumber() && (!newData.child('coverUrl').exists() || (newData.child('coverUrl').isString() && newData.child('coverUrl').val().length <= 400000)) && (!newData.child('avatarUrl').exists() || (newData.child('avatarUrl').isString() && newData.child('avatarUrl').val().length <= 400000)))"
           }
         },
         "group_members": {
