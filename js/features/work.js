@@ -8,6 +8,9 @@ var workVacancies = {};
 var workActiveTab = 'vacancies';
 var workActiveCompany = null;
 var workEditingCompany = null;
+var workCompanyAvatarData = '';
+var workCompanyCoverData = '';
+var workResumePhotoData = '';
 
 function workEscape(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
@@ -21,6 +24,21 @@ function workUrl(value) {
         var url = new URL(value);
         return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : '';
     } catch (error) { return ''; }
+}
+
+function workImageSource(value) {
+    value = String(value || '');
+    return /^data:image\/webp;base64,[A-Za-z0-9+/]+={0,2}$/.test(value) && value.length <= 400000 ? value : workUrl(value);
+}
+
+function prepareWorkImage(file) {
+    if (!file) return Promise.resolve('');
+    if (!file.type.match(/^image\//i) || file.size >= 5 * 1024 * 1024) return Promise.reject(new Error('Выбери изображение размером меньше 5 МБ.'));
+    if (typeof datingCompressPhoto !== 'function' || typeof datingBlobToDataUrl !== 'function') return Promise.reject(new Error('Не удалось подготовить фото. Обнови страницу и попробуй ещё раз.'));
+    return datingCompressPhoto(file).then(datingBlobToDataUrl).then(function(dataUrl) {
+        if (!/^data:image\/webp;base64,/.test(dataUrl) || dataUrl.length > 400000) throw new Error('Фото слишком большое после сжатия. Выбери другое изображение.');
+        return dataUrl;
+    });
 }
 
 function workDate(value) {
@@ -113,20 +131,20 @@ function workEmpty(message, button, action) {
 }
 
 function renderCompanyCard(company) {
-    var logo = workUrl(company.avatarUrl);
-    var cover = workUrl(company.coverUrl);
+    var logo = workImageSource(company.avatarUrl);
+    var cover = workImageSource(company.coverUrl);
     var jobs = Object.keys(workVacancies[company.id] || {}).length;
     return '<article class="work-company-card"><button type="button" class="work-company-cover" data-work-company="' + workEscape(company.id) + '"' + (cover ? ' style="background-image:linear-gradient(0deg,#0005,transparent),url(&quot;' + workEscape(cover) + '&quot;)"' : '') + ' aria-label="Открыть ' + workEscape(company.name) + '"></button><button type="button" class="work-company-card-main" data-work-company="' + workEscape(company.id) + '"><span class="work-company-logo">' + (logo ? '<img src="' + workEscape(logo) + '" alt="">' : workEscape(Array.from(company.name || 'К')[0])) + '</span><span class="work-company-copy"><strong>' + workEscape(company.name) + '</strong><span>' + workEscape(company.description || 'Страница компании') + '</span></span></button><div class="work-card-foot"><span>' + jobs + ' вакансий</span>' + (company.ownerUid === USER_UID ? '<button type="button" data-edit-company="' + workEscape(company.id) + '">Настроить</button>' : '') + '</div></article>';
 }
 
 function renderVacancyCard(item) {
-    var logo = workUrl(item.company.avatarUrl);
+    var logo = workImageSource(item.company.avatarUrl);
     var share = encodeURIComponent(JSON.stringify({ id: item.id, parentId: item.companyId, title: item.title, description: (item.company.name || 'Компания') + ' · ' + (item.city || 'Город не указан') + (item.salary ? ' · ' + item.salary : '') + ' — ' + item.description, image: logo }));
     return '<article class="work-shareable-card"><button type="button" class="work-vacancy-card" data-work-vacancy="' + workEscape(item.companyId) + '/' + workEscape(item.id) + '"><span class="work-vacancy-logo">' + (logo ? '<img src="' + workEscape(logo) + '" alt="">' : workEscape(Array.from(item.company.name || 'К')[0])) + '</span><span class="work-vacancy-body"><strong>' + workEscape(item.title) + '</strong><span class="work-vacancy-company">' + workEscape(item.company.name || 'Компания') + '</span><span class="work-vacancy-meta">' + workEscape(item.city || 'Город не указан') + (item.salary ? ' · ' + workEscape(item.salary) : '') + '</span><span class="work-vacancy-snippet">' + workEscape(item.description) + '</span></span><span class="work-vacancy-date">' + workEscape(workDate(item.createdAt)) + '</span></button><button type="button" class="work-share-button" data-share-kind="vacancy" data-feed-share="' + share + '">↗ Поделиться</button></article>';
 }
 
 function renderResumeCard(resume) {
-    var photo = workUrl(resume.photoUrl);
+    var photo = workImageSource(resume.photoUrl);
     var share = encodeURIComponent(JSON.stringify({ id: resume.uid, title: resume.name + ' — ' + resume.title, description: [resume.city, resume.experience, resume.about].filter(Boolean).join(' · ').slice(0, 500), image: photo }));
     return '<article class="work-shareable-card"><button type="button" class="work-resume-card" data-work-resume="' + workEscape(resume.uid) + '"><span class="work-resume-photo">' + (photo ? '<img src="' + workEscape(photo) + '" alt="">' : '<span>' + workEscape(Array.from(resume.name || '?')[0]) + '</span>') + '</span><strong>' + workEscape(resume.name) + '</strong><span class="work-resume-title">' + workEscape(resume.title) + '</span><span class="work-resume-meta">' + workEscape(resume.city || 'Город не указан') + '</span><span class="work-resume-meta">' + workEscape(resume.experience || 'Опыт не указан') + '</span></button><button type="button" class="work-share-button" data-share-kind="resume" data-feed-share="' + share + '">↗ Поделиться</button></article>';
 }
@@ -144,8 +162,8 @@ window.openWorkCompany = function(id) {
     var list = document.getElementById('workList');
     if (!company || !detail || !list) return;
     workActiveCompany = id;
-    var logo = workUrl(company.avatarUrl);
-    var cover = workUrl(company.coverUrl);
+    var logo = workImageSource(company.avatarUrl);
+    var cover = workImageSource(company.coverUrl);
     var vacancyItems = Object.keys(workVacancies[id] || {}).map(function(vacancyId) { return Object.assign({ id: vacancyId, companyId: id, company: company }, workVacancies[id][vacancyId]); }).sort(function(a,b) { return (b.createdAt || 0) - (a.createdAt || 0); });
     detail.innerHTML = '<button type="button" class="group-back-button" onclick="closeWorkCompany()">← К вакансиям</button><header class="work-company-profile">' + (cover ? '<div class="work-company-profile-cover" style="background-image:linear-gradient(0deg,#0004,transparent),url(&quot;' + workEscape(cover) + '&quot;)"></div>' : '<div class="work-company-profile-cover"></div>') + '<div class="work-company-profile-info"><span class="work-company-profile-logo">' + (logo ? '<img src="' + workEscape(logo) + '" alt="">' : workEscape(Array.from(company.name || 'К')[0])) + '</span><div><h2>' + workEscape(company.name) + '</h2><p>' + workEscape(company.description || 'О компании пока нет описания.') + '</p></div>' + (company.ownerUid === USER_UID ? '<div class="work-company-actions"><button type="button" onclick="openWorkCompanyModal(\'' + workEscape(id) + '\')">Настроить</button><button type="button" class="work-primary" onclick="openWorkVacancyModal(\'' + workEscape(id) + '\')">＋ Вакансия</button></div>' : '') + '</div></header><h3 class="work-section-title">Вакансии компании</h3><div class="work-vacancy-list">' + (vacancyItems.length ? vacancyItems.map(renderVacancyCard).join('') : '<div class="work-empty">У компании пока нет открытых вакансий.</div>') + '</div>';
     list.hidden = true;
@@ -188,7 +206,7 @@ function showWorkResume(uid) {
 }
 
 function renderWorkResumeDetail(uid, resume, contactsData) {
-    var photo = workUrl(resume.photoUrl);
+    var photo = workImageSource(resume.photoUrl);
     var contacts = resume.contactsPublic && (contactsData.email || contactsData.phone)
         ? '<div class="work-resume-contacts">' + (contactsData.email ? '<a href="mailto:' + workEscape(contactsData.email) + '">✉ ' + workEscape(contactsData.email) + '</a>' : '') + (contactsData.phone ? '<a href="tel:' + workEscape(contactsData.phone.replace(/[^+\d]/g, '')) + '">📞 ' + workEscape(contactsData.phone) + '</a>' : '') + '</div>'
         : '<p class="work-private-note">Контакты скрыты. Можно связаться через профиль METAIMPERIYA.</p>';
@@ -214,8 +232,13 @@ window.openWorkCompanyModal = function(id) {
     document.getElementById('workCompanyModalTitle').textContent = id ? 'Настройки компании' : 'Новая компания';
     document.getElementById('workCompanyName').value = company.name || '';
     document.getElementById('workCompanyDescription').value = company.description || '';
-    document.getElementById('workCompanyAvatar').value = company.avatarUrl || '';
-    document.getElementById('workCompanyCover').value = company.coverUrl || '';
+    document.getElementById('workCompanyAvatar').value = workUrl(company.avatarUrl);
+    document.getElementById('workCompanyCover').value = workUrl(company.coverUrl);
+    document.getElementById('workCompanyAvatarFile').value = '';
+    document.getElementById('workCompanyCoverFile').value = '';
+    workCompanyAvatarData = /^data:image\/webp;base64,/.test(company.avatarUrl || '') ? company.avatarUrl : '';
+    workCompanyCoverData = /^data:image\/webp;base64,/.test(company.coverUrl || '') ? company.coverUrl : '';
+    document.getElementById('workCompanyImageStatus').textContent = workCompanyAvatarData || workCompanyCoverData ? 'Сохранённые изображения останутся, если не выбрать новые.' : '';
     document.getElementById('workCompanyError').textContent = '';
     document.getElementById('workCompanyModal').classList.add('open');
 };
@@ -225,6 +248,8 @@ window.saveWorkCompany = function() {
     var description = document.getElementById('workCompanyDescription').value.trim();
     var avatarUrl = document.getElementById('workCompanyAvatar').value.trim();
     var coverUrl = document.getElementById('workCompanyCover').value.trim();
+    var avatarFile = document.getElementById('workCompanyAvatarFile').files[0];
+    var coverFile = document.getElementById('workCompanyCoverFile').files[0];
     var error = document.getElementById('workCompanyError');
     if (name.length < 2) { error.textContent = 'Название компании должно содержать хотя бы 2 символа.'; return; }
     if ((avatarUrl && !workUrl(avatarUrl)) || (coverUrl && !workUrl(coverUrl))) { error.textContent = 'Для изображений укажи полную ссылку http:// или https://.'; return; }
@@ -232,8 +257,15 @@ window.saveWorkCompany = function() {
     var createVacancyAfter = creatingCompany && workActiveTab === 'vacancies';
     var id = workEditingCompany || db.ref('sites/' + SITE + '/work_companies').push().key;
     var old = workCompanies[id] || {};
-    var company = { name: name, description: description, avatarUrl: avatarUrl, coverUrl: coverUrl, ownerUid: USER_UID, ownerName: USER || 'Пользователь', createdAt: old.createdAt || Date.now() };
-    db.ref('sites/' + SITE + '/work_companies/' + id).set(company).then(function() {
+    var button = document.querySelector('#workCompanyModal .work-submit');
+    if (button) { button.disabled = true; button.textContent = 'Подготавливаю…'; }
+    Promise.all([
+        avatarFile ? prepareWorkImage(avatarFile) : Promise.resolve(avatarUrl || workCompanyAvatarData || old.avatarUrl || ''),
+        coverFile ? prepareWorkImage(coverFile) : Promise.resolve(coverUrl || workCompanyCoverData || old.coverUrl || '')
+    ]).then(function(images) {
+        var company = { name: name, description: description, avatarUrl: images[0], coverUrl: images[1], ownerUid: USER_UID, ownerName: USER || 'Пользователь', createdAt: old.createdAt || Date.now() };
+        return db.ref('sites/' + SITE + '/work_companies/' + id).set(company).then(function() { return company; });
+    }).then(function(company) {
         workCompanies[id] = company;
         if (!workVacancies[id]) workVacancies[id] = {};
         window.closeWorkModal('workCompanyModal');
@@ -242,7 +274,7 @@ window.saveWorkCompany = function() {
             window.showWorkTab('companies');
             window.openWorkCompany(id);
         } else if (workActiveCompany === id) window.openWorkCompany(id);
-    }).catch(function(saveError) { console.error('Ошибка сохранения компании:', saveError); error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Firebase запретил запись: опубликуй Database Rules для раздела «Работа».' : 'Не удалось сохранить компанию.'; });
+    }).catch(function(saveError) { console.error('Ошибка сохранения компании:', saveError); error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Firebase запретил запись: опубликуй Database Rules для раздела «Работа».' : saveError.message || 'Не удалось сохранить компанию.'; }).finally(function() { if (button) { button.disabled = false; button.textContent = 'Сохранить компанию'; } });
 };
 
 window.openWorkVacancyModal = function(companyId) {
@@ -283,7 +315,10 @@ window.openWorkResumeModal = function() {
     document.getElementById('workResumeTitle').value = resume.title || '';
     document.getElementById('workResumeCity').value = resume.city || '';
     document.getElementById('workResumeExperience').value = resume.experience || '';
-    document.getElementById('workResumePhoto').value = resume.photoUrl || '';
+    document.getElementById('workResumePhoto').value = workUrl(resume.photoUrl);
+    document.getElementById('workResumePhotoFile').value = '';
+    workResumePhotoData = /^data:image\/webp;base64,/.test(resume.photoUrl || '') ? resume.photoUrl : '';
+    document.getElementById('workResumeImageStatus').textContent = workResumePhotoData ? 'Сохранённое фото останется, если не выбрать новое.' : '';
     document.getElementById('workResumeAbout').value = resume.about || '';
     document.getElementById('workResumeEmail').value = workResumeContacts.email || '';
     document.getElementById('workResumePhone').value = workResumeContacts.phone || '';
@@ -305,20 +340,26 @@ window.saveWorkResume = function() {
         updatedAt: Date.now()
     };
     var error = document.getElementById('workResumeError');
+    var photoFile = document.getElementById('workResumePhotoFile').files[0];
     if (!resume.name || resume.title.length < 2) { error.textContent = 'Укажи имя и желаемую должность.'; return; }
     if (resume.photoUrl && !workUrl(resume.photoUrl)) { error.textContent = 'Для фото укажи полную ссылку http:// или https://.'; return; }
     var contacts = { email: document.getElementById('workResumeEmail').value.trim(), phone: document.getElementById('workResumePhone').value.trim() };
     if (contacts.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contacts.email)) { error.textContent = 'Проверь адрес электронной почты.'; return; }
-    var updates = {};
-    updates['sites/' + SITE + '/work_resumes/' + USER_UID] = resume;
-    updates['sites/' + SITE + '/work_resume_contacts/' + USER_UID] = contacts;
-    db.ref().update(updates).then(function() {
+    var button = document.querySelector('#workResumeModal .work-submit');
+    if (button) { button.disabled = true; button.textContent = photoFile ? 'Подготавливаю фото…' : 'Сохраняю…'; }
+    (photoFile ? prepareWorkImage(photoFile) : Promise.resolve(resume.photoUrl || workResumePhotoData || (workResumes[USER_UID] || {}).photoUrl || '')).then(function(photoUrl) {
+        resume.photoUrl = photoUrl;
+        var updates = {};
+        updates['sites/' + SITE + '/work_resumes/' + USER_UID] = resume;
+        updates['sites/' + SITE + '/work_resume_contacts/' + USER_UID] = contacts;
+        return db.ref().update(updates);
+    }).then(function() {
         workResumes[USER_UID] = resume;
         workResumeContacts = contacts;
         window.closeWorkModal('workResumeModal');
         workActiveTab = 'resumes';
         document.querySelector('[data-work-tab="resumes"]').click();
-    }).catch(function(saveError) { console.error('Ошибка сохранения резюме:', saveError); error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Firebase запретил запись: опубликуй Database Rules для раздела «Работа».' : 'Не удалось сохранить резюме.'; });
+    }).catch(function(saveError) { console.error('Ошибка сохранения резюме:', saveError); error.textContent = saveError.code === 'PERMISSION_DENIED' ? 'Firebase запретил запись: опубликуй Database Rules для раздела «Работа».' : saveError.message || 'Не удалось сохранить резюме.'; }).finally(function() { if (button) { button.disabled = false; button.textContent = 'Сохранить резюме'; } });
 };
 
 window.closeWorkModal = function(id) {
@@ -327,4 +368,17 @@ window.closeWorkModal = function(id) {
 };
 
 document.getElementById('workSearch').addEventListener('input', renderWork);
+[
+    ['workCompanyAvatarFile', 'workCompanyImageStatus', 'Логотип'],
+    ['workCompanyCoverFile', 'workCompanyImageStatus', 'Обложка'],
+    ['workResumePhotoFile', 'workResumeImageStatus', 'Фото']
+].forEach(function(entry) {
+    var input = document.getElementById(entry[0]);
+    var status = document.getElementById(entry[1]);
+    if (!input || !status) return;
+    input.addEventListener('change', function() {
+        var file = input.files && input.files[0];
+        status.textContent = file ? entry[2] + ' выбрано: ' + file.name + '. Фото будет сжато перед сохранением.' : '';
+    });
+});
 document.querySelectorAll('[data-work-tab]').forEach(function(button) { button.addEventListener('click', function() { workActiveTab = button.getAttribute('data-work-tab'); }); });

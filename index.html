@@ -44,12 +44,12 @@
     <link rel="stylesheet" href="css/features/feed.css?v=5.2">
     <link rel="stylesheet" href="css/features/profile.css?v=3.9">
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
-    <link rel="stylesheet" href="css/features/work.css?v=1.2">
+    <link rel="stylesheet" href="css/features/work.css?v=1.3">
     <link rel="stylesheet" href="css/features/dating.css?v=1.6">
     <link rel="stylesheet" href="css/features/referrals.css?v=1.1">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
-    <link rel="stylesheet" href="css/features/friends.css?v=3.2">
+    <link rel="stylesheet" href="css/features/friends.css?v=3.3">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
     <link rel="stylesheet" href="css/features/modals.css?v=3.1">
     <link rel="stylesheet" href="css/features/notifications.css?v=3.0">
@@ -637,7 +637,10 @@
             <label for="workCompanyName">Название</label><input id="workCompanyName" maxlength="80" placeholder="Например, METAIMPERIYA">
             <label for="workCompanyDescription">Описание</label><textarea id="workCompanyDescription" maxlength="500" placeholder="Чем занимается компания и кого ищет"></textarea>
             <label for="workCompanyAvatar">Ссылка на логотип</label><input id="workCompanyAvatar" type="url" placeholder="https://…">
+            <label for="workCompanyAvatarFile">Или выбери логотип с устройства</label><input id="workCompanyAvatarFile" type="file" accept="image/*">
             <label for="workCompanyCover">Ссылка на обложку</label><input id="workCompanyCover" type="url" placeholder="https://…">
+            <label for="workCompanyCoverFile">Или выбери обложку с устройства</label><input id="workCompanyCoverFile" type="file" accept="image/*">
+            <div class="work-image-status" id="workCompanyImageStatus" role="status"></div>
             <div class="work-error" id="workCompanyError" role="alert"></div><button class="work-primary work-submit" type="button" onclick="saveWorkCompany()">Сохранить компанию</button>
         </div>
     </div>
@@ -656,6 +659,8 @@
             <label for="workResumeTitle">Желаемая должность / профессия</label><input id="workResumeTitle" maxlength="100" placeholder="Например, фронтенд-разработчик">
             <div class="work-form-row"><div><label for="workResumeCity">Город / формат</label><input id="workResumeCity" maxlength="80" placeholder="Львов · удалённо"></div><div><label for="workResumeExperience">Опыт</label><input id="workResumeExperience" maxlength="80" placeholder="3 года"></div></div>
             <label for="workResumePhoto">Ссылка на фото (необязательно)</label><input id="workResumePhoto" type="url" placeholder="https://…">
+            <label for="workResumePhotoFile">Или выбери фото с устройства</label><input id="workResumePhotoFile" type="file" accept="image/*">
+            <div class="work-image-status" id="workResumeImageStatus" role="status"></div>
             <label for="workResumeAbout">О себе и навыки</label><textarea id="workResumeAbout" maxlength="2000" placeholder="Расскажи о своём опыте и навыках"></textarea>
             <label for="workResumeEmail">Email для связи (необязательно)</label><input id="workResumeEmail" type="email" maxlength="160" placeholder="name@example.com">
             <label for="workResumePhone">Телефон (необязательно)</label><input id="workResumePhone" type="tel" maxlength="40" placeholder="+380…">
@@ -822,7 +827,7 @@
 <script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.4"></script>
 <script src="js/features/groups.js?v=4.6"></script>
-<script src="js/features/work.js?v=1.2"></script>
+<script src="js/features/work.js?v=1.3"></script>
 <script src="js/features/dating.js?v=2.1"></script>
 <script src="js/features/marketplace.js?v=1.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>

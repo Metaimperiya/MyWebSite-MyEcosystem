@@ -65,6 +65,7 @@
 .work-form-row>div { min-width:0; }
 .work-submit { width:100%; margin-top:4px; }
 .work-error { min-height:18px; margin:5px 0; color:var(--danger); font-size:.72rem; }
+.work-image-status { min-height:16px; color:var(--text-secondary); font-size:.68rem; }
 .work-privacy { display:flex !important; align-items:center; gap:8px; }
 .work-resume-detail { display:flex; align-items:center; gap:13px; }
 .work-resume-detail-photo { display:grid; place-items:center; width:78px; height:78px; flex:0 0 78px; margin:0; overflow:hidden; border-radius:14px; object-fit:cover; background:var(--input-bg); }
