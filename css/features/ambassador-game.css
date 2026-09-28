@@ -1,0 +1,93 @@
+.ambassador-game { --ag-green:#135b42; --ag-deep:#0b382b; --ag-gold:#e3bd65; max-width:1120px; margin:0 auto 24px; padding:18px; border:1px solid #b9cdbd; border-radius:22px; background:linear-gradient(145deg,#e9f1e9,#f7f8f4 48%,#e7efe9); color:#163a2d; box-shadow:0 16px 46px #123b2718; }
+.amb-game-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.amb-game-heading h1 { margin:5px 0; color:#123d2f; font-size:clamp(1.25rem,3vw,1.8rem); }
+.amb-game-heading p { margin:0; color:#5c7066; font-size:.78rem; }
+.amb-kicker { color:#367453; font-size:.59rem; font-weight:850; letter-spacing:.13em; }
+.amb-demo-pill { padding:7px 10px; border:1px solid #e1c56d; border-radius:999px; background:#fff4cf; color:#805e10; font-size:.6rem; font-weight:850; letter-spacing:.06em; white-space:nowrap; }
+.amb-demo-note { margin:0 0 15px; padding:9px 11px; border:1px solid #e7d18b; border-radius:10px; background:#fff8df; color:#755d20; font-size:.66rem; line-height:1.5; }
+.amb-game-grid { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(245px,.85fr); align-items:start; gap:14px; }
+.amb-game-main,.amb-game-aside { display:grid; gap:13px; min-width:0; }
+.amb-bank-card { position:relative; display:grid; justify-items:center; overflow:hidden; padding:16px; border:1px solid #d5bd72; border-radius:17px; background:radial-gradient(ellipse at 50% -35%,#37936a 0,transparent 65%),linear-gradient(135deg,#14583f,#0d382b); color:#fff; text-align:center; box-shadow:0 7px 20px #0a422626; }
+.amb-bank-card:after { position:absolute; inset:7px; border:1px solid #ffffff20; border-radius:12px; content:""; pointer-events:none; }
+.amb-bank-title { display:flex; width:100%; justify-content:space-between; color:#e8d49a; font-size:.61rem; font-weight:800; letter-spacing:.08em; }
+.amb-bank-title span+span { padding:3px 6px; border:1px solid #ffffff37; border-radius:20px; font-size:.52rem; }
+.amb-bank-card>strong { margin-top:8px; color:#ffdf82; font-size:clamp(2rem,6vw,3rem); font-variant-numeric:tabular-nums; letter-spacing:.025em; }
+.amb-points-label { margin-top:-2px; color:#d3e7dc; font-size:.68rem; }
+.amb-bank-edit { display:flex; width:min(100%,330px); gap:6px; margin-top:12px; }
+.amb-bank-edit input,.amb-bank-edit button,.amb-primary,.amb-icon-button { min-height:36px; border:1px solid #ffffff35; border-radius:9px; font:inherit; }
+.amb-bank-edit input { width:0; flex:1; padding:0 9px; outline:0; background:#ffffffed; color:#143c2d; font-size:.71rem; }
+.amb-bank-edit button { padding:0 10px; background:#f2d77e; color:#3e3216; font-size:.68rem; font-weight:800; cursor:pointer; white-space:nowrap; }
+.amb-bank-card>small { margin-top:8px; color:#c6dbce; font-size:.56rem; }
+.amb-wallet-row { display:grid; grid-template-columns:1.2fr .8fr; gap:9px; }
+.amb-wallet-row article { display:grid; justify-items:start; gap:4px; padding:12px; border:1px solid #d9e4d9; border-radius:14px; background:#fff; }
+.amb-wallet-row article>span { color:#678073; font-size:.56rem; font-weight:800; letter-spacing:.08em; }
+.amb-wallet-row article>strong { color:#155c41; font-size:1.35rem; font-variant-numeric:tabular-nums; }
+.amb-wallet-row article>small { color:#7a8a80; font-size:.6rem; }
+.amb-wallet-row article>button { min-height:29px; margin-top:3px; padding:5px 9px; border:0; border-radius:8px; background:#e5f2e9; color:#1a6748; font:inherit; font-size:.62rem; font-weight:800; cursor:pointer; }
+.amb-section-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:9px; }
+.amb-section-heading h2 { margin:3px 0 0; color:#193d30; font-size:.98rem; }
+.amb-section-heading>span { font-size:1.3rem; }
+.amb-board-section,.amb-exchange-section,.amb-player-panel,.amb-ledger,.amb-howto,.amb-create-panel { padding:13px; border:1px solid #d9e4d9; border-radius:15px; background:#fff; }
+.amb-board { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; padding:8px; border:1px solid #b5cbbb; border-radius:13px; background:#e8f1e6; }
+.amb-board button { display:grid; min-height:78px; align-content:center; justify-items:center; gap:3px; padding:7px 4px; border:1px solid #dce7d9; border-radius:10px; background:#fff; color:#214b39; cursor:pointer; transition:transform .16s,box-shadow .16s; }
+.amb-board button:hover { transform:translateY(-2px); box-shadow:0 5px 12px #173c2418; }
+.amb-board button>span { font-size:1.2rem; }
+.amb-board button>b { font-size:.64rem; }
+.amb-board button>small { color:#78887c; font-size:.52rem; text-align:center; }
+.amb-primary { padding:7px 11px; border:0; background:#19764f; color:#fff; font-size:.67rem; font-weight:800; cursor:pointer; white-space:nowrap; }
+.amb-request-list { display:grid; gap:8px; }
+.amb-request-card { display:grid; gap:8px; padding:11px; border:1px solid #dbe6dc; border-radius:12px; background:linear-gradient(120deg,#fbfdf9,#f3f8f2); }
+.amb-request-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.amb-request-top strong { color:#1b4433; font-size:.75rem; }
+.amb-request-status { padding:3px 7px; border-radius:999px; background:#fff2cc; color:#785b13; font-size:.52rem; font-weight:800; white-space:nowrap; }
+.amb-request-meta { display:flex; flex-wrap:wrap; gap:6px; color:#60746a; font-size:.59rem; }
+.amb-request-meta b { color:#246647; }
+.amb-request-foot { display:flex; align-items:center; justify-content:space-between; gap:7px; }
+.amb-request-foot small { color:#78887c; font-size:.56rem; }
+.amb-request-foot button { min-height:30px; padding:5px 9px; border:1px solid #c9dacc; border-radius:8px; background:#fff; color:#236544; font:inherit; font-size:.59rem; font-weight:750; cursor:pointer; }
+.amb-request-foot button:disabled { opacity:.55; cursor:default; }
+.amb-create-panel[hidden] { display:none; }
+.amb-icon-button { width:31px; min-height:31px; background:#f0f5ef; color:#466253; font-size:1.2rem; cursor:pointer; }
+.amb-form-grid { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:8px; }
+.amb-form-grid label,.amb-transfer label { display:grid; gap:4px; color:#697c70; font-size:.59rem; }
+.amb-form-grid label:first-child { grid-column:1/-1; }
+.amb-form-grid input,.amb-transfer input,.amb-transfer select { box-sizing:border-box; width:100%; min-width:0; min-height:34px; padding:6px 8px; border:1px solid #d8e3d9; border-radius:8px; outline:0; background:#f8faf7; color:#233e31; font:inherit; font-size:.65rem; }
+.amb-form-grid input:focus,.amb-transfer input:focus,.amb-transfer select:focus { border-color:#488969; }
+.amb-form-grid input[readonly] { background:#edf3ec; color:#2c6d4c; font-weight:800; }
+.amb-form-hint { margin:8px 0; color:#718277; font-size:.59rem; line-height:1.5; }
+.amb-submit { width:100%; }
+.amb-feedback { min-height:15px; margin-top:6px; color:#35704f; font-size:.62rem; }
+.amb-feedback.error { color:#b74242; }
+.amb-demo-link { overflow-wrap:anywhere; color:#567363; font-size:.57rem; }
+.amb-player-panel { padding:12px; }
+.amb-aside-heading { display:flex; align-items:center; gap:8px; padding-bottom:9px; border-bottom:1px solid #e7ede6; }
+.amb-aside-heading>span { font-size:1.15rem; }
+.amb-aside-heading>div { display:grid; flex:1; gap:2px; }
+.amb-aside-heading strong { color:#214433; font-size:.73rem; }
+.amb-aside-heading small { color:#809086; font-size:.56rem; }
+.amb-aside-heading>b { color:#2c704d; font-size:.85rem; }
+.amb-player-list { display:grid; gap:6px; max-height:265px; overflow:auto; padding:8px 0; }
+.amb-player-row { display:flex; align-items:center; gap:7px; min-width:0; }
+.amb-player-avatar { display:grid; width:30px; height:30px; flex:0 0 30px; place-items:center; border-radius:50%; background:#e1efe3; color:#26704b; font-size:.67rem; font-weight:800; }
+.amb-player-copy { display:grid; min-width:0; flex:1; gap:2px; }
+.amb-player-copy strong { overflow:hidden; color:#304c3d; font-size:.61rem; text-overflow:ellipsis; white-space:nowrap; }
+.amb-player-copy small { color:#8a978f; font-size:.51rem; }
+.amb-player-row>b { color:#246647; font-size:.59rem; white-space:nowrap; }
+.amb-mini-grant { padding:4px 6px; border:1px solid #d4e3d4; border-radius:7px; background:#f1f7ef; color:#2a704c; font:inherit; font-size:.54rem; font-weight:800; cursor:pointer; }
+.amb-player-empty { padding:13px 4px; color:#829187; font-size:.6rem; line-height:1.5; text-align:center; }
+.amb-transfer { display:grid; gap:7px; padding-top:9px; border-top:1px solid #e7ede6; }
+.amb-transfer>strong { color:#294c39; font-size:.66rem; }
+.amb-transfer>button { min-height:32px; border:0; border-radius:8px; background:#19764f; color:#fff; font:inherit; font-size:.63rem; font-weight:800; cursor:pointer; }
+.amb-howto { display:flex; align-items:flex-start; gap:9px; background:#f7f5ea; }
+.amb-howto>span { font-size:1.1rem; }
+.amb-howto strong { color:#4f502f; font-size:.65rem; }
+.amb-howto p { margin:5px 0 0; color:#71735d; font-size:.57rem; line-height:1.55; }
+.amb-ledger #ambLedger { display:grid; gap:6px; padding-top:8px; }
+.amb-ledger-row { display:flex; justify-content:space-between; gap:7px; color:#738177; font-size:.56rem; }
+.amb-ledger-row b { color:#32734f; white-space:nowrap; }
+.amb-ledger-empty { padding-top:8px; color:#859188; font-size:.58rem; }
+.amb-real-referrals { margin-top:12px; padding:10px 12px; border:1px solid #dce5dc; border-radius:12px; background:#fff; }
+.amb-real-referrals>summary { color:#50715d; font-size:.68rem; font-weight:750; cursor:pointer; }
+.amb-real-referrals>.referrals-heading { margin-top:13px; }
+@media(max-width:780px) { .amb-game-grid { grid-template-columns:1fr; } .amb-game-aside { grid-template-columns:1fr 1fr; } .amb-player-panel { grid-row:span 2; } }
+@media(max-width:520px) { .ambassador-game { padding:12px; border-radius:16px; } .amb-game-heading { align-items:flex-start; } .amb-demo-pill { font-size:.5rem; } .amb-game-heading p { max-width:245px; font-size:.69rem; } .amb-game-aside { grid-template-columns:1fr; } .amb-player-panel { grid-row:auto; } .amb-board { grid-template-columns:repeat(2,minmax(0,1fr)); } .amb-board button { min-height:70px; } .amb-form-grid { grid-template-columns:1fr 1fr; } .amb-form-grid label:first-child { grid-column:1/-1; } .amb-section-heading h2 { font-size:.83rem; } .amb-primary { padding:6px 8px; font-size:.59rem; } }
