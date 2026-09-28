@@ -57,6 +57,9 @@
 .dating-detail-goal { display:inline-block; margin-top:13px; padding:5px 8px; border-radius:999px; background:color-mix(in srgb,#e54491 12%,var(--card-bg)); color:#d6418b; font-size:.68rem; font-weight:750; }
 .dating-detail-bio { margin:12px 0 15px; color:var(--text-color); font-size:.8rem; line-height:1.6; overflow-wrap:anywhere; }
 .dating-detail-actions { display:flex; flex-wrap:wrap; gap:7px; }
+.dating-detail-feed { margin-top:16px; padding-top:12px; border-top:1px solid var(--border-color); }
+.dating-detail-feed h3 { margin:0 0 9px; font-size:.86rem; }
+.dating-detail-posts-empty { padding:14px; border:1px dashed var(--border-color); border-radius:10px; color:var(--text-secondary); font-size:.72rem; text-align:center; }
 .dating-secondary { min-height:36px; padding:7px 10px; border:1px solid var(--border-color); border-radius:9px; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.69rem; cursor:pointer; }
 .dating-block { color:var(--danger); }
 @media(max-width:620px) {

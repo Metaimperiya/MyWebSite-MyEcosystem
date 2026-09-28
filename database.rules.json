@@ -84,7 +84,7 @@
             ".read": "auth != null",
             "$likerUid": {
               ".write": "auth != null && $likerUid === auth.uid && $profileUid !== auth.uid && (!newData.exists() || root.child('sites').child($site).child('dating_profiles').child($profileUid).child('isActive').val() === true)",
-              ".validate": "!newData.exists() || newData.val() === true"
+              ".validate": "!newData.exists() || newData.val() === true || (newData.isString() && newData.val().matches(/^(heart|like|love|laugh|dislike|poop)$/))"
             }
           }
         },

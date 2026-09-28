@@ -265,9 +265,9 @@ function renderPost(p, type) {
                 var datingActions = typeof window.renderDatingActionPanel === 'function'
                     ? window.renderDatingActionPanel(entity.id || '', entity.id === USER_UID)
                     : '<div class="shared-dating-actions"><button type="button" class="shared-dating-action" data-dating-open-profile="' + esc(entity.id || '') + '">Открыть профиль</button></div>';
-                sharedHtml = '<div class="shared-entity-wrap shared-dating-wrap"><div class="shared-entity-card">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind]) + '</small><strong>' + esc(entity.title || 'Анкета') + '</strong><span>' + esc(entity.description || '') + '</span></span></div>' + datingActions + '</div>';
+                sharedHtml = '<div class="shared-entity-wrap shared-dating-wrap"><div class="shared-entity-card shared-dating-card-content"><div class="shared-dating-card-head">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind]) + '</small><strong>' + esc(entity.title || 'Анкета') + '</strong><span>' + esc(entity.description || '') + '</span></span></div>' + datingActions + '</div></div>';
             } else {
-                sharedHtml = '<button type="button" class="shared-entity-card" data-open-shared="' + openData + '" onclick="event.stopPropagation();">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind] || 'ПУБЛИКАЦИЯ') + '</small><strong>' + esc(entity.title || 'Открыть публикацию') + '</strong><span>' + esc(entity.description || '') + '</span><em>Открыть →</em></span></button>';
+                sharedHtml = '<button type="button" class="shared-entity-card" data-open-shared="' + openData + '">' + image + '<span class="shared-entity-copy"><small>' + esc(labels[entity.kind] || 'ПУБЛИКАЦИЯ') + '</small><strong>' + esc(entity.title || 'Открыть публикацию') + '</strong><span>' + esc(entity.description || '') + '</span><em>Открыть →</em></span></button>';
             }
         }
     }
@@ -360,7 +360,7 @@ function renderPost(p, type) {
     `;
     
     div.innerHTML = marqueeHtml + authorHtml +
-        '<div class="post-content" onclick="window.openPostPage(\'' + p.id + '\', \'' + type + '\')" style="cursor:pointer;">' + contentHtml + '</div>' +
+        '<div class="post-content" data-post-id="' + esc(p.id) + '" data-post-type="' + esc(type) + '" onclick="window.openPostPageFromContent(event, this.dataset.postId, this.dataset.postType)" style="cursor:pointer;">' + contentHtml + '</div>' +
         actionsHtml + commentsHtml + inputHtml;
     initPostCarousel(div);
     
@@ -387,6 +387,11 @@ function renderPost(p, type) {
     
     return div;
 }
+
+window.openPostPageFromContent = function(event, postId, type) {
+    if (event && event.target && event.target.closest('.shared-entity-wrap')) return;
+    if (typeof window.openPostPage === 'function') window.openPostPage(postId, type);
+};
 
 function renderPostMedia(slides, postId) {
     if (!slides || !slides.length) return '';

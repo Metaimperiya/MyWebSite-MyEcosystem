@@ -4,6 +4,7 @@
 
 function getPostPath(type) {
     if (type === 'foto') return 'foto_posts';
+    if (type && type.indexOf('datingprofile:') === 0) return 'user_posts/' + type.slice('datingprofile:'.length);
     if (type === 'profile') {
         var uid = VIEWING_USER || USER_UID;
         return 'user_posts/' + uid;
@@ -444,13 +445,23 @@ window.shareFeedEntity = function(kind, payload) {
 };
 
 document.addEventListener('click', function(event) {
-    var datingProfileButton = event.target.closest('[data-dating-open-profile]');
-    if (datingProfileButton) {
+    var datingOpenButton = event.target.closest('[data-dating-open]');
+    if (datingOpenButton) {
         event.preventDefault(); event.stopPropagation();
-        var profileUid = datingProfileButton.getAttribute('data-dating-open-profile');
-        if (typeof window.closeDatingDetail === 'function') window.closeDatingDetail();
-        if (typeof window.navigateToProfile === 'function') window.navigateToProfile(profileUid);
-        else alert('Профиль пока загружается. Попробуй ещё раз.');
+        var datingUid = datingOpenButton.getAttribute('data-dating-open');
+        var openDatingCard = function(profile) {
+            if (!profile || (datingUid !== USER_UID && profile.isActive !== true)) { alert('Эта анкета больше не активна.'); return; }
+            if (typeof datingProfiles !== 'undefined') datingProfiles[datingUid] = profile;
+            if (typeof window.openDatingDetail === 'function') window.openDatingDetail(datingUid);
+            else alert('Раздел знакомств ещё загружается. Попробуй ещё раз.');
+        };
+        if (typeof datingProfiles !== 'undefined' && datingProfiles[datingUid]) openDatingCard(datingProfiles[datingUid]);
+        else db.ref('sites/' + SITE + '/' + (datingUid === USER_UID ? 'dating_private_profiles/' : 'dating_profiles/') + datingUid).once('value').then(function(snapshot) {
+            openDatingCard(snapshot.val());
+        }).catch(function(error) {
+            console.error('Не удалось открыть анкету из ленты:', error);
+            alert('Не удалось открыть анкету. Проверь подключение и попробуй ещё раз.');
+        });
         return;
     }
     var datingEditButton = event.target.closest('[data-dating-edit]');
@@ -462,7 +473,7 @@ document.addEventListener('click', function(event) {
     var datingLikeButton = event.target.closest('[data-dating-like]');
     if (datingLikeButton) {
         event.preventDefault(); event.stopPropagation();
-        if (typeof window.toggleDatingProfileLike === 'function') window.toggleDatingProfileLike(datingLikeButton.getAttribute('data-dating-like'));
+        if (typeof window.toggleDatingProfileLike === 'function') window.toggleDatingProfileLike(datingLikeButton.getAttribute('data-dating-like'), datingLikeButton.getAttribute('data-dating-reaction'));
         return;
     }
     var datingFriendButton = event.target.closest('[data-dating-friend]');

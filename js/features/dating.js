@@ -7,6 +7,16 @@ var datingCountryItems = [];
 var datingPhotoPreviewUrl = null;
 var datingCurrentPhotoUrl = '';
 var datingLikeSummaries = Object.create(null);
+var datingDetailPostRefs = [];
+var datingDetailPostData = { profile: {}, feed: {} };
+var DATING_REACTIONS = [
+    { id: 'heart', emoji: '❤️', label: 'Сердце' },
+    { id: 'like', emoji: '👍', label: 'Нравится' },
+    { id: 'love', emoji: '🥰', label: 'Восхищён' },
+    { id: 'laugh', emoji: '😂', label: 'Весело' },
+    { id: 'dislike', emoji: '👎', label: 'Не нравится' },
+    { id: 'poop', emoji: '💩', label: 'Не нравится анкета' }
+];
 
 var DATING_COUNTRY_CODES = ('AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW').split(' ');
 
@@ -16,12 +26,40 @@ function datingEscape(value) {
     });
 }
 
-function datingActionPanel(uid, isOwn) {
-    if (isOwn) return '<div class="shared-dating-actions"><button type="button" class="shared-dating-action" data-dating-open-profile="' + datingEscape(uid) + '">Открыть профиль</button><button type="button" class="shared-dating-action" data-dating-edit>Редактировать</button></div>';
-    var summary = datingLikeSummaries[uid] || { count: 0, liked: false };
-    return '<div class="shared-dating-actions"><button type="button" class="shared-dating-action" data-dating-open-profile="' + datingEscape(uid) + '">Открыть профиль</button><button type="button" class="shared-dating-action" data-dating-friend="' + datingEscape(uid) + '">Добавить в друзья</button><button type="button" class="shared-dating-action shared-dating-action--primary" data-dating-message="' + datingEscape(uid) + '">Написать</button><button type="button" class="shared-dating-action shared-dating-action--like' + (summary.liked ? ' is-liked' : '') + '" data-dating-like="' + datingEscape(uid) + '" aria-pressed="' + (summary.liked ? 'true' : 'false') + '">' + (summary.liked ? '♥' : '♡') + ' Нравится · ' + summary.count + '</button></div>';
+function datingReactionChart(uid, isOwn) {
+    var summary = datingLikeSummaries[uid] || { counts: {}, mine: null };
+    var max = Math.max.apply(Math, DATING_REACTIONS.map(function(reaction) { return summary.counts[reaction.id] || 0; }).concat([1]));
+    return '<div class="dating-reaction-chart" data-dating-reactions-for="' + datingEscape(uid) + '" role="group" aria-label="Реакции на анкету">' + DATING_REACTIONS.map(function(reaction) {
+        var count = summary.counts[reaction.id] || 0;
+        var height = count ? Math.max(12, Math.round(count / max * 100)) : 4;
+        return '<button type="button" class="dating-reaction' + (summary.mine === reaction.id ? ' is-active' : '') + '" data-dating-like="' + datingEscape(uid) + '" data-dating-reaction="' + reaction.id + '" aria-label="' + reaction.label + ': ' + count + '" aria-pressed="' + (summary.mine === reaction.id ? 'true' : 'false') + '"' + (isOwn ? ' disabled' : '') + '><span class="dating-reaction-count">' + count + '</span><span class="dating-reaction-bar" style="--reaction-height:' + height + '%"></span><span class="dating-reaction-emoji">' + reaction.emoji + '</span></button>';
+    }).join('') + '</div>';
+}
+
+function datingActionPanel(uid, isOwn, inDetail) {
+    var actions = isOwn
+        ? '<div class="shared-dating-actions"><button type="button" class="shared-dating-action" data-dating-open="' + datingEscape(uid) + '">Открыть анкету</button><button type="button" class="shared-dating-action" data-dating-edit>Редактировать</button></div>'
+        : '<div class="shared-dating-actions">' + (inDetail ? '' : '<button type="button" class="shared-dating-action shared-dating-action--primary" data-dating-open="' + datingEscape(uid) + '">Открыть анкету</button>') + '<button type="button" class="shared-dating-action" data-dating-friend="' + datingEscape(uid) + '">Добавить в друзья</button><button type="button" class="shared-dating-action shared-dating-action--primary" data-dating-message="' + datingEscape(uid) + '">Написать сообщение</button></div>';
+    return actions + datingReactionChart(uid, isOwn);
 }
 window.renderDatingActionPanel = datingActionPanel;
+
+function updateDatingReactionButtons(uid) {
+    var summary = datingLikeSummaries[uid] || { counts: {}, mine: null };
+    var max = Math.max.apply(Math, DATING_REACTIONS.map(function(reaction) { return summary.counts[reaction.id] || 0; }).concat([1]));
+    document.querySelectorAll('[data-dating-reactions-for="' + uid + '"]').forEach(function(chart) {
+        chart.querySelectorAll('[data-dating-reaction]').forEach(function(button) {
+            var id = button.getAttribute('data-dating-reaction');
+            var count = summary.counts[id] || 0;
+            var active = summary.mine === id;
+            button.classList.toggle('is-active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            button.setAttribute('aria-label', (DATING_REACTIONS.find(function(reaction) { return reaction.id === id; }) || {}).label + ': ' + count);
+            button.querySelector('.dating-reaction-count').textContent = count;
+            button.querySelector('.dating-reaction-bar').style.setProperty('--reaction-height', (count ? Math.max(12, Math.round(count / max * 100)) : 4) + '%');
+        });
+    });
+}
 
 function loadDatingLikeSummaries(uids) {
     if (!USER_UID || !uids || !uids.length) return;
@@ -30,36 +68,40 @@ function loadDatingLikeSummaries(uids) {
         if (datingLikeSummaries[uid]) return Promise.resolve();
         return db.ref('sites/' + SITE + '/dating_profile_likes/' + uid).once('value').then(function(snapshot) {
             var likes = snapshot.val() || {};
-            datingLikeSummaries[uid] = { count: Object.keys(likes).length, liked: likes[USER_UID] === true };
+            var counts = {};
+            Object.keys(likes).forEach(function(likerUid) {
+                var reaction = likes[likerUid] === true ? 'heart' : likes[likerUid];
+                if (DATING_REACTIONS.some(function(item) { return item.id === reaction; })) counts[reaction] = (counts[reaction] || 0) + 1;
+            });
+            var mine = likes[USER_UID] === true ? 'heart' : (likes[USER_UID] || null);
+            datingLikeSummaries[uid] = { counts: counts, mine: mine };
         }).catch(function(error) { console.warn('Не удалось загрузить отметки анкеты:', uid, error); });
     })).then(function() {
-        uids.forEach(function(uid) {
-            var summary = datingLikeSummaries[uid] || { count: 0, liked: false };
-            document.querySelectorAll('[data-dating-like="' + uid + '"]').forEach(function(button) {
-                button.classList.toggle('is-liked', summary.liked);
-                button.setAttribute('aria-pressed', summary.liked ? 'true' : 'false');
-                button.innerHTML = (summary.liked ? '♥' : '♡') + ' Нравится · ' + summary.count;
-            });
-        });
+        uids.forEach(updateDatingReactionButtons);
     });
 }
 window.loadDatingLikeSummaries = loadDatingLikeSummaries;
 
-window.toggleDatingProfileLike = function(uid) {
+window.toggleDatingProfileLike = function(uid, reaction) {
     if (!USER_UID) { alert('Войди, чтобы отметить анкету.'); return; }
     if (!uid || uid === USER_UID) return;
+    if (!DATING_REACTIONS.some(function(item) { return item.id === reaction; })) reaction = 'heart';
     var path = 'sites/' + SITE + '/dating_profile_likes/' + uid + '/' + USER_UID;
-    db.ref(path).transaction(function(current) { return current === true ? null : true; }).then(function(result) {
+    db.ref(path).transaction(function(current) {
+        var currentReaction = current === true ? 'heart' : current;
+        return currentReaction === reaction ? null : reaction;
+    }).then(function(result) {
         if (!result.committed) return;
         return db.ref('sites/' + SITE + '/dating_profile_likes/' + uid).once('value').then(function(snapshot) {
             var likes = snapshot.val() || {};
-            datingLikeSummaries[uid] = { count: Object.keys(likes).length, liked: likes[USER_UID] === true };
-            document.querySelectorAll('[data-dating-like="' + uid + '"]').forEach(function(button) {
-                var summary = datingLikeSummaries[uid];
-                button.classList.toggle('is-liked', summary.liked);
-                button.setAttribute('aria-pressed', summary.liked ? 'true' : 'false');
-                button.innerHTML = (summary.liked ? '♥' : '♡') + ' Нравится · ' + summary.count;
+            var counts = {};
+            Object.keys(likes).forEach(function(likerUid) {
+                var value = likes[likerUid] === true ? 'heart' : likes[likerUid];
+                if (DATING_REACTIONS.some(function(item) { return item.id === value; })) counts[value] = (counts[value] || 0) + 1;
             });
+            var mine = likes[USER_UID] === true ? 'heart' : (likes[USER_UID] || null);
+            datingLikeSummaries[uid] = { counts: counts, mine: mine };
+            updateDatingReactionButtons(uid);
         });
     }).catch(function(error) {
         console.error('Не удалось поставить отметку анкете:', error);
@@ -418,16 +460,70 @@ window.saveDatingProfile = function() {
 function openDatingDetail(uid) {
     var profile = datingProfiles[uid];
     if (!profile) return;
+    stopDatingDetailPosts();
     var image = datingPhotoSource(profile.photoUrl);
     var detail = document.getElementById('datingDetailContent');
-    detail.innerHTML = '<div class="dating-detail-head">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<div class="dating-detail-initial">' + datingEscape(Array.from(profile.name || '?')[0]) + '</div>') + '<div><span class="dating-kicker">АНКЕТА · 18+</span><h2>' + datingEscape(profile.name) + '</h2><p>' + datingEscape(profile.gender) + ' · ищет: ' + datingEscape(profile.seeking) + '</p><p>📍 ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</p></div></div><div class="dating-detail-goal">' + datingEscape(profile.goal) + '</div><p class="dating-detail-bio">' + datingEscape(profile.bio || 'Описание пока не добавлено.').replace(/\n/g, '<br>') + '</p>' + datingActionPanel(uid, uid === USER_UID) + '<div class="dating-detail-actions"><button type="button" class="dating-secondary" data-report-profile="' + datingEscape(uid) + '">Пожаловаться</button><button type="button" class="dating-secondary dating-block" data-block-profile="' + datingEscape(uid) + '">Заблокировать</button></div>';
+    detail.innerHTML = '<div class="dating-detail-head">' + (image ? '<img src="' + datingEscape(image) + '" alt="">' : '<div class="dating-detail-initial">' + datingEscape(Array.from(profile.name || '?')[0]) + '</div>') + '<div><span class="dating-kicker">АНКЕТА · 18+</span><h2>' + datingEscape(profile.name) + '</h2><p>' + datingEscape(profile.gender) + ' · ищет: ' + datingEscape(profile.seeking) + '</p><p>📍 ' + datingEscape(profile.city) + ', ' + datingEscape(profile.country) + '</p></div></div><div class="dating-detail-goal">' + datingEscape(profile.goal) + '</div><p class="dating-detail-bio">' + datingEscape(profile.bio || 'Описание пока не добавлено.').replace(/\n/g, '<br>') + '</p>' + datingActionPanel(uid, uid === USER_UID, true) + '<div class="dating-detail-actions"><button type="button" class="dating-secondary" data-report-profile="' + datingEscape(uid) + '">Пожаловаться</button><button type="button" class="dating-secondary dating-block" data-block-profile="' + datingEscape(uid) + '">Заблокировать</button></div><section class="dating-detail-feed"><h3>Публикации</h3><div id="datingDetailPosts"><div class="dating-empty">Загружаем публикации…</div></div></section>';
     document.getElementById('datingDetailModal').classList.add('open');
+    loadDatingLikeSummaries([uid]);
+    loadDatingDetailPosts(uid);
     detail.querySelector('[data-report-profile]').onclick = function() { reportDatingProfile(uid); };
     detail.querySelector('[data-block-profile]').onclick = function() {
         blockDatingProfile(uid);
     };
 }
 window.openDatingDetail = openDatingDetail;
+
+function stopDatingDetailPosts() {
+    datingDetailPostRefs.forEach(function(ref) { ref.off('value'); });
+    datingDetailPostRefs = [];
+    datingDetailPostData = { profile: {}, feed: {} };
+}
+
+function renderDatingDetailPosts(uid) {
+    var container = document.getElementById('datingDetailPosts');
+    if (!container || !document.getElementById('datingDetailModal').classList.contains('open')) return;
+    var seen = Object.create(null);
+    var posts = [];
+    Object.keys(datingDetailPostData.feed || {}).forEach(function(id) {
+        var post = datingDetailPostData.feed[id];
+        if (!post || post.deleted || post.authorUid !== uid || seen[id]) return;
+        seen[id] = true;
+        posts.push({ id: id, post: post, type: 'feed' });
+    });
+    Object.keys(datingDetailPostData.profile || {}).forEach(function(id) {
+        var post = datingDetailPostData.profile[id];
+        if (!post || post.deleted || seen[id]) return;
+        posts.push({ id: id, post: post, type: 'datingprofile:' + uid });
+    });
+    posts.sort(function(a, b) { return Number(b.post.timestamp || 0) - Number(a.post.timestamp || 0); });
+    container.innerHTML = '';
+    if (!posts.length) {
+        container.innerHTML = '<div class="dating-detail-posts-empty">Публикаций пока нет.</div>';
+        return;
+    }
+    posts.slice(0, 30).forEach(function(entry) {
+        var post = Object.assign({}, entry.post, { id: entry.id });
+        container.appendChild(renderPost(post, entry.type));
+    });
+}
+
+function loadDatingDetailPosts(uid) {
+    var container = document.getElementById('datingDetailPosts');
+    if (!container) return;
+    datingDetailPostRefs = [
+        db.ref('sites/' + SITE + '/user_posts/' + uid),
+        db.ref('sites/' + SITE + '/feed_posts').orderByChild('authorUid').equalTo(uid).limitToLast(30)
+    ];
+    datingDetailPostRefs[0].on('value', function(snapshot) {
+        datingDetailPostData.profile = snapshot.val() || {};
+        renderDatingDetailPosts(uid);
+    }, function(error) { console.error('Не удалось загрузить публикации анкеты:', error); });
+    datingDetailPostRefs[1].on('value', function(snapshot) {
+        datingDetailPostData.feed = snapshot.val() || {};
+        renderDatingDetailPosts(uid);
+    }, function(error) { console.error('Не удалось загрузить ленту анкеты:', error); });
+}
 
 function blockDatingProfile(uid) {
     if (!USER_UID || !uid || uid === USER_UID || !confirm('Заблокировать пользователя? Он исчезнет из списка знакомств.')) return;
@@ -459,7 +555,10 @@ function reportDatingProfile(uid) {
     });
 }
 
-window.closeDatingDetail = function() { document.getElementById('datingDetailModal').classList.remove('open'); };
+window.closeDatingDetail = function() {
+    document.getElementById('datingDetailModal').classList.remove('open');
+    stopDatingDetailPosts();
+};
 
 ['datingCountryFilter', 'datingCityFilter', 'datingGoalFilter'].forEach(function(id) {
     var filter = document.getElementById(id);
