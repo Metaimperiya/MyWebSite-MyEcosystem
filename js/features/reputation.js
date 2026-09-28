@@ -4,7 +4,6 @@
 
 var reputationReviewRef = null;
 var profileLevelRef = null;
-var profileFunctions = null;
 var inlineRatingCache = {};
 var inlineStatusCache = {};
 
@@ -90,22 +89,29 @@ function loadProfileLevel(uid) {
     profileLevelRef.on('value', function(snap) { renderProfileLevel(snap.val() || {}); });
 }
 
-function getProfileFunctions() {
-    if (profileFunctions) return profileFunctions;
-    if (!firebase.functions) return null;
-    profileFunctions = firebase.functions();
-    return profileFunctions;
+function levelForExperience(experience) {
+    var level = 1;
+    var required = 0;
+    while (level < 86) {
+        var next = Math.round(20 + level * 12 + level * level * 2);
+        if (experience < required + next) break;
+        required += next;
+        level += 1;
+    }
+    return level;
+}
+
+function experienceForLevel(level) {
+    var experience = 0;
+    for (var current = 1; current < level; current += 1) {
+        experience += Math.round(20 + current * 12 + current * current * 2);
+    }
+    return experience;
 }
 
 function recordDailyProfileVisit() {
-    var functions = getProfileFunctions();
-    if (!functions || !USER_UID) return;
-    functions.httpsCallable('recordDailyVisit')({ site: SITE }).then(function(result) {
-        if (result.data && result.data.added) renderProfileLevel(result.data);
-    }).catch(function(error) {
-        // Пока функция не опубликована, интерфейс сайта должен продолжать работать.
-        console.info('Опыт за посещение пока недоступен:', error.code || error.message);
-    });
+    // Автоматическое начисление опыта требует серверной проверки. На тарифе без
+    // Cloud Functions оставляем уровень защищённым и меняем его только админом.
 }
 
 function stars(value) {
@@ -298,12 +304,18 @@ window.adjustProfileExperience = function(uid) {
     if (raw === null) return;
     var delta = Number(raw);
     if (!Number.isInteger(delta) || !delta || delta < -5000 || delta > 5000) return alert('Введите целое число от -5000 до 5000, кроме 0.');
-    var reason = prompt('Причина изменения опыта (видна только в журнале администратора):', '') || '';
-    var functions = getProfileFunctions();
-    if (!functions) return alert('Модуль Firebase Functions не подключён.');
-    functions.httpsCallable('adjustProfileExperience')({ site: SITE, uid: uid, delta: delta, reason: reason })
-        .then(function(result) { renderProfileLevel(result.data || {}); })
-        .catch(function(error) { alert('Не удалось изменить опыт: ' + (error.message || error.code)); });
+    var ref = db.ref(reputationPath('profile_levels/' + uid));
+    ref.transaction(function(current) {
+        var state = current || {};
+        state.experience = Math.max(0, Number(state.experience) || 0) + delta;
+        state.manualExperience = (Number(state.manualExperience) || 0) + delta;
+        state.level = levelForExperience(state.experience);
+        state.updatedAt = Date.now();
+        return state;
+    }).then(function(result) {
+        if (!result.committed) throw new Error('Изменение не сохранено.');
+        renderProfileLevel(result.snapshot.val() || {});
+    }).catch(function(error) { alert('Не удалось изменить опыт: ' + (error.message || error.code)); });
 };
 
 window.setProfileLevel = function(uid) {
@@ -312,21 +324,56 @@ window.setProfileLevel = function(uid) {
     if (raw === null) return;
     var level = Number(raw);
     if (!Number.isInteger(level) || level < 1 || level > 86) return alert('Введите целое число от 1 до 86.');
-    var functions = getProfileFunctions();
-    if (!functions) return alert('Модуль Firebase Functions не подключён.');
-    functions.httpsCallable('setProfileLevel')({ site: SITE, uid: uid, level: level })
-        .then(function(result) { renderProfileLevel(result.data || {}); })
-        .catch(function(error) { alert('Не удалось установить уровень: ' + (error.message || error.code)); });
+    db.ref(reputationPath('profile_levels/' + uid)).once('value').then(function(snap) {
+        var old = snap.val() || {};
+        var baseExperience = Math.max(0, Number(old.posts) || 0) * 12 +
+            Math.max(0, Number(old.comments) || 0) * 3 +
+            Math.max(0, Number(old.activeDays) || 0) * 2;
+        var experience = experienceForLevel(level);
+        var state = {
+            level: level,
+            experience: experience,
+            manualExperience: experience - baseExperience,
+            posts: Math.max(0, Number(old.posts) || 0),
+            comments: Math.max(0, Number(old.comments) || 0),
+            activeDays: Math.max(0, Number(old.activeDays) || 0),
+            updatedAt: Date.now()
+        };
+        return db.ref(reputationPath('profile_levels/' + uid)).set(state).then(function() { return state; });
+    }).then(function(state) {
+        renderProfileLevel(state);
+    }).catch(function(error) { alert('Не удалось установить уровень: ' + (error.message || error.code)); });
 };
 
 window.rebuildProfileExperience = function(uid) {
     if (!isProfileAdmin()) return alert('Только администратор может пересчитать опыт.');
     if (!confirm('Пересчитать опыт из всех существующих постов и комментариев этого пользователя?')) return;
-    var functions = getProfileFunctions();
-    if (!functions) return alert('Модуль Firebase Functions не подключён.');
-    functions.httpsCallable('rebuildProfileExperience')({ site: SITE, uid: uid })
-        .then(function(result) { renderProfileLevel(result.data || {}); alert('Уровень пересчитан.'); })
-        .catch(function(error) { alert('Не удалось пересчитать опыт: ' + (error.message || error.code)); });
+    Promise.all([
+        db.ref(reputationPath('feed_posts')).once('value'),
+        db.ref(reputationPath('foto_posts')).once('value'),
+        db.ref(reputationPath('profile_levels/' + uid)).once('value')
+    ]).then(function(snaps) {
+        var posts = 0;
+        var comments = 0;
+        [snaps[0].val() || {}, snaps[1].val() || {}].forEach(function(collection) {
+            Object.keys(collection).forEach(function(id) {
+                var post = collection[id] || {};
+                if (post.authorUid === uid && !post.deleted) posts += 1;
+                Object.keys(post.comments || {}).forEach(function(commentId) {
+                    if ((post.comments[commentId] || {}).authorUid === uid) comments += 1;
+                });
+            });
+        });
+        var old = snaps[2].val() || {};
+        var activeDays = Math.max(0, Number(old.activeDays) || 0);
+        var manualExperience = Number(old.manualExperience) || 0;
+        var experience = Math.max(0, posts * 12 + comments * 3 + activeDays * 2 + manualExperience);
+        var state = { experience: experience, level: levelForExperience(experience), posts: posts, comments: comments, activeDays: activeDays, manualExperience: manualExperience, updatedAt: Date.now() };
+        return db.ref(reputationPath('profile_levels/' + uid)).set(state).then(function() { return state; });
+    }).then(function(state) {
+        renderProfileLevel(state);
+        alert('Уровень пересчитан.');
+    }).catch(function(error) { alert('Не удалось пересчитать уровень: ' + (error.message || error.code)); });
 };
 
 function renderReputationPanel(uid) {

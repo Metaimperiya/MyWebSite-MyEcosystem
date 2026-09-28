@@ -129,7 +129,8 @@
         "profile_levels": {
           "$uid": {
             ".read": true,
-            ".write": false
+            ".write": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')",
+            ".validate": "!newData.exists() || (newData.child('level').isNumber() && newData.child('level').val() >= 1 && newData.child('level').val() <= 86 && newData.child('experience').isNumber() && newData.child('experience').val() >= 0 && newData.child('updatedAt').isNumber())"
           }
         },
         "profile_activity": {
