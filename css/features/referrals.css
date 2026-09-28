@@ -28,4 +28,35 @@
 .referral-team-feed { display:grid; gap:10px; }
 .referral-team-feed[hidden],.referral-members-list[hidden] { display:none !important; }
 .referral-post-source { padding:6px 11px 0; color:var(--link-color); font-size:.62rem; font-weight:700; }
+.referrals-demo-banner { margin:0 0 12px; padding:9px 12px; border:1px solid #f0d48a; border-radius:11px; background:#fff8df; color:#755600; font-size:.68rem; line-height:1.45; }
+.referrals-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.referral-transfer-card { display:flex; align-items:end; gap:9px; margin:12px 0; padding:13px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); }
+.referral-transfer-card>div { display:grid; gap:3px; flex:1; }
+.referral-transfer-card>div strong { font-size:.76rem; }
+.referral-transfer-card>div span,.referral-transfer-card label>span { color:var(--text-secondary); font-size:.62rem; }
+.referral-transfer-card label { display:grid; gap:4px; width:150px; }
+.referral-transfer-card input,.referral-admin-tools select { min-width:0; height:35px; padding:0 9px; border:1px solid var(--border-color); border-radius:9px; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.69rem; }
+.referral-transfer-card button,.referral-admin-row button { min-height:35px; padding:7px 11px; border:0; border-radius:9px; background:var(--link-color); color:#fff; font:inherit; font-size:.68rem; font-weight:700; cursor:pointer; white-space:nowrap; }
+.referral-admin-panel { margin-top:22px; padding:14px; border:1px solid var(--border-color); border-radius:16px; background:var(--card-bg); box-shadow:var(--shadow); }
+.referral-admin-panel>header { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.referral-admin-panel h2 { margin:3px 0; font-size:1rem; }
+.referral-admin-panel header p { margin:4px 0 12px; color:var(--text-secondary); font-size:.68rem; }
+.referral-admin-tools { display:grid; grid-template-columns:1fr 170px; gap:8px; margin:10px 0; }
+.referral-admin-tools .people-search { min-width:0; }
+.referral-admin-summary { margin:8px 0; color:var(--text-secondary); font-size:.68rem; }
+.referral-admin-list { display:grid; gap:7px; max-height:660px; overflow:auto; }
+.referral-admin-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 10px; border:1px solid var(--border-color); border-radius:11px; background:var(--input-bg); }
+.referral-admin-person,.referral-admin-stats { display:grid; gap:3px; min-width:0; }
+.referral-admin-person strong { overflow:hidden; font-size:.73rem; text-overflow:ellipsis; white-space:nowrap; }
+.referral-admin-person span,.referral-admin-stats span { overflow-wrap:anywhere; color:var(--text-secondary); font-size:.59rem; }
+.referral-admin-stats { justify-items:end; flex:0 0 auto; }
+.referral-admin-row button { min-height:27px; padding:4px 8px; font-size:.61rem; }
+.referral-admin-ledger { margin-top:4px; color:var(--text-secondary); font-size:.6rem; }
+.referral-admin-ledger summary { width:max-content; cursor:pointer; color:var(--link-color); }
+.referral-admin-ledger>div { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 7px; margin-top:5px; padding:5px 7px; border-left:2px solid var(--border-color); }
+.referral-admin-ledger>div span { overflow-wrap:anywhere; }
+.referral-admin-ledger>div b { color:var(--text-color); }
+.referral-admin-ledger>div time { grid-column:1/-1; font-size:.55rem; }
+.referral-admin-no-ledger { display:block; margin-top:5px; }
+@media(max-width:600px) { .referral-transfer-card { align-items:stretch; flex-wrap:wrap; } .referral-transfer-card>div { flex-basis:100%; } .referral-transfer-card label { flex:1; width:auto; } .referral-transfer-card button { align-self:end; } .referral-admin-panel { padding:10px; } .referral-admin-tools { grid-template-columns:1fr; } .referral-admin-tools select { width:100%; } .referral-admin-row { align-items:flex-start; } .referral-admin-stats { max-width:38%; } }
 @media(max-width:520px) { .referrals-heading { align-items:center; } .referrals-heading h1 { font-size:1.12rem; } .referrals-heading p { font-size:.69rem; } .referrals-link-card { align-items:flex-start; flex-direction:column; } .referrals-link-card button { width:100%; } .referral-member { gap:8px; padding:8px; } }

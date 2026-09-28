@@ -86,7 +86,7 @@ exports.searchPeople = onCall(async (request) => {
   const queryText = String(data.query || '').trim().toLocaleLowerCase('ru').slice(0, 100);
   const countryText = String(data.country || '').trim().toLocaleLowerCase('ru').slice(0, 80);
   const cityText = String(data.city || '').trim().toLocaleLowerCase('ru').slice(0, 80);
-  const pageSize = 30;
+  const pageSize = 50;
   const batchSize = 200;
   const maxBatches = 20;
   let cursor = data.cursor && typeof data.cursor.key === 'string' ? { value: data.cursor.value, key: data.cursor.key } : null;
@@ -95,10 +95,16 @@ exports.searchPeople = onCall(async (request) => {
   const matches = [];
   while (hasMore && batches < maxBatches && matches.length < pageSize) {
     let ref = db.ref(`sites/${site}/all_users`).orderByChild(sort);
-    if (cursor) ref = ref.startAfter(cursor.value, cursor.key);
-    const snapshot = await ref.limitToFirst(batchSize).once('value');
+    if (sort === 'lastLogin' && cursor) ref = ref.endAt(cursor.value, cursor.key);
+    else if (sort === 'name' && cursor) ref = ref.startAfter(cursor.value, cursor.key);
+    const snapshot = await (sort === 'lastLogin' ? ref.limitToLast(batchSize) : ref.limitToFirst(batchSize)).once('value');
+    const batchFull = snapshot.numChildren() === batchSize;
     const rows = [];
     snapshot.forEach((child) => rows.push({ uid: child.key, user: child.val() || {} }));
+    if (sort === 'lastLogin') {
+      rows.reverse();
+      if (cursor && rows.length && rows[0].uid === cursor.key) rows.shift();
+    }
     batches += 1;
     if (!rows.length) { hasMore = false; break; }
     let stoppedInsideBatch = false;
@@ -122,7 +128,7 @@ exports.searchPeople = onCall(async (request) => {
       cursor = { key: row.uid, value: sort === 'name' ? String(user.name || '') : Number(user.lastLogin || 0) };
       if (matches.length >= pageSize) { stoppedInsideBatch = index < rows.length - 1; break; }
     }
-    hasMore = stoppedInsideBatch || rows.length === batchSize;
+    hasMore = stoppedInsideBatch || batchFull;
   }
   return { people: matches.slice(0, pageSize), cursor, hasMore, scanned: batches * batchSize };
 });

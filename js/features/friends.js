@@ -200,6 +200,7 @@ function fetchPeoplePage(reset) {
         city: cityInput ? cityInput.value.trim() : '',
         sort: sortInput ? sortInput.value : 'recent'
     };
+    var useDirectRecentDirectory = !filters.query && !filters.country && !filters.city && filters.sort === 'recent';
     var filterKey = JSON.stringify(filters);
     if (reset || filterKey !== peopleFilterKey) {
         peopleFilterKey = filterKey;
@@ -215,9 +216,36 @@ function fetchPeoplePage(reset) {
     renderPeopleDirectory();
     var button = document.getElementById('peopleLoadMore');
     if (button) { button.hidden = false; button.disabled = true; button.textContent = 'Загружаю…'; }
-    firebase.functions().httpsCallable('searchPeople')({ site: SITE, query: filters.query, country: filters.country, city: filters.city, sort: filters.sort, cursor: peopleCursor }).then(function(result) {
+    var pageRequest;
+    if (useDirectRecentDirectory) {
+        var peopleRef = db.ref('sites/' + SITE + '/all_users').orderByChild('lastLogin');
+        if (peopleCursor) peopleRef = peopleRef.endAt(peopleCursor.value, peopleCursor.key);
+        pageRequest = peopleRef.limitToLast(52).once('value').then(function(snapshot) {
+            var rows = [];
+            snapshot.forEach(function(child) { rows.push({ uid: child.key, user: child.val() || {} }); });
+            rows.reverse();
+            if (peopleCursor && rows.length && rows[0].uid === peopleCursor.key) rows.shift();
+            var hasMore = rows.length > 50;
+            var page = rows.slice(0, 50).filter(function(row) { return row.uid !== USER_UID; }).map(function(row) {
+                var user = row.user;
+                var details = peopleProfileDetails(user);
+                return {
+                    uid: row.uid,
+                    user: {
+                        name: user.name || 'Участник', avatarUrl: user.avatarUrl || '', lastLogin: Number(user.lastLogin || 0),
+                        country: user.country || '', city: user.city || '',
+                        profileDetails: { country: details.country || '', city: details.city || '', profession: details.profession || '', specialization: details.specialization || '', interests: details.interests || [] }
+                    }
+                };
+            });
+            var last = rows[Math.min(49, rows.length - 1)];
+            return { people: page, cursor: last ? { value: Number(last.user.lastLogin || 0), key: last.uid } : null, hasMore: hasMore };
+        });
+    } else {
+        pageRequest = firebase.functions().httpsCallable('searchPeople')({ site: SITE, query: filters.query, country: filters.country, city: filters.city, sort: filters.sort, cursor: peopleCursor }).then(function(result) { return result.data || {}; });
+    }
+    pageRequest.then(function(data) {
         if (requestId !== peopleLoadRequest) return;
-        var data = result.data || {};
         peopleDirectoryUsers = peopleDirectoryUsers.concat(data.people || []);
         peopleCursor = data.cursor || null;
         peopleHasMore = !!data.hasMore;
@@ -232,7 +260,7 @@ function fetchPeoplePage(reset) {
         if (requestId !== peopleLoadRequest) return;
         peoplePageBusy = false;
         var list = document.getElementById('peopleList');
-        if (list) list.innerHTML = '<div class="people-directory-empty"><strong>Не удалось загрузить список</strong><span>Проверь подключение и публикацию Cloud Functions.</span></div>';
+        if (list) list.innerHTML = '<div class="people-directory-empty"><strong>Не удалось загрузить список</strong><span>' + esc(error && error.message ? error.message : 'Проверь подключение и попробуй ещё раз.') + '</span></div>';
         if (button) { button.hidden = true; }
         console.error('Не удалось загрузить каталог участников:', error);
     });

@@ -42,11 +42,11 @@
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=5.2">
-    <link rel="stylesheet" href="css/features/profile.css?v=3.8">
+    <link rel="stylesheet" href="css/features/profile.css?v=3.9">
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
     <link rel="stylesheet" href="css/features/work.css?v=1.2">
     <link rel="stylesheet" href="css/features/dating.css?v=1.6">
-    <link rel="stylesheet" href="css/features/referrals.css?v=1.0">
+    <link rel="stylesheet" href="css/features/referrals.css?v=1.1">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.2">
@@ -123,7 +123,7 @@
         <div class="menu-item" onclick="goToGroups();closeSidebar();"><span class="icon">📁</span> Groups</div>
         <div class="menu-item" onclick="goToWork();closeSidebar();"><span class="icon">💼</span> Работа</div>
         <div class="menu-item" onclick="goToDating();closeSidebar();"><span class="icon">💗</span> Знакомства</div>
-        <div class="menu-item" onclick="goToReferrals();closeSidebar();"><span class="icon">🔗</span> Моя команда</div>
+        <div class="menu-item" onclick="goToReferrals();closeSidebar();"><span class="icon">🌐</span> Амбассадоры и приглашения</div>
         <div class="menu-item" onclick="goToMarketplace();closeSidebar();"><span class="icon">🛍️</span> Маркетплейс</div>
 
         <a class="menu-item" href="/doss/" onclick="closeSidebar();"><span class="icon">🧠</span> DOSS OS</a>
@@ -249,12 +249,20 @@
 
             <div class="page" id="page-referrals">
                 <section class="referrals-page">
-                    <header class="referrals-heading"><div><span class="referrals-kicker">METAIMPERIYA · СООБЩЕСТВО</span><h1>Моя команда</h1><p>Приглашай людей по своей ссылке, смотри прямые приглашения и публикации команды.</p></div><button type="button" class="referrals-refresh" onclick="loadReferralDashboard()">↻ Обновить</button></header>
+                    <header class="referrals-heading"><div><span class="referrals-kicker">METAIMPERIYA · СООБЩЕСТВО</span><h1>Амбассадоры</h1><p>Приглашай людей, смотри свою команду и демо-очки.</p></div><button type="button" class="referrals-refresh" onclick="loadReferralDashboard()">↻ Обновить</button></header>
+                    <div class="referrals-demo-banner">ДЕМО · Очки пока не являются деньгами или платёжным средством. В прототипе данные можно менять.</div>
                     <section class="referrals-link-card"><div><span class="referrals-kicker">ТВОЯ ССЫЛКА-ПРИГЛАШЕНИЕ</span><p id="referralLinkValue">Готовим персональную ссылку…</p></div><button type="button" id="copyReferralLink" onclick="copyReferralLink()">⧉ Скопировать</button></section>
-                    <div class="referrals-stats"><article><strong id="referralDirectCount">—</strong><span>приглашены тобой</span></article><article><strong id="referralTeamCount">—</strong><span>всего в команде</span></article></div>
+                    <div class="referrals-stats"><article><strong id="referralDirectCount">—</strong><span>приглашены тобой</span></article><article><strong id="referralTeamCount">—</strong><span>всего в команде</span></article><article><strong id="referralPointsBalance">0</strong><span>демо-очков</span></article></div>
+                    <section class="referral-transfer-card"><div><strong>Перевести демо-очки</strong><span>Начни вводить имя или UID и выбери участника из подсказок.</span></div><label><span>Получатель</span><input id="referralTransferUid" list="referralRecipientOptions" autocomplete="off" placeholder="Имя или UID" oninput="searchReferralRecipient(this.value)"><datalist id="referralRecipientOptions"></datalist></label><label><span>Количество</span><input id="referralTransferAmount" type="number" min="1" step="1" value="1"></label><button type="button" onclick="transferReferralPoints()">Перевести</button></section>
                     <div class="referrals-tabs"><button type="button" class="active" data-referral-tab="members" onclick="showReferralTab('members')">Участники</button><button type="button" data-referral-tab="feed" onclick="showReferralTab('feed')">Лента команды</button></div>
                     <div class="referral-members-list" id="referralMembersList"><div class="referrals-empty">Загружаем приглашения…</div></div>
                     <div class="referral-team-feed" id="referralTeamFeed" hidden><div class="referrals-empty">Лента команды появится здесь.</div></div>
+                    <section class="referral-admin-panel" id="referralAdminPanel" hidden>
+                        <header><div><span class="referrals-kicker">ТОЛЬКО ДЛЯ АДМИНИСТРАТОРА · ДЕМО</span><h2>Кабинет амбассадоров</h2><p>Ищи участников, проверяй цепочки приглашений и начисляй очки.</p></div><button type="button" class="referrals-refresh" onclick="loadReferralAdminPanel()">↻ Обновить</button></header>
+                        <div class="referral-admin-tools"><label class="people-search"><span aria-hidden="true">⌕</span><input id="referralAdminSearch" type="search" placeholder="Имя, UID или кто пригласил" autocomplete="off"></label><select id="referralAdminFilter"><option value="all">Все участники</option><option value="ambassadors">Есть приглашённые</option><option value="referred">Пришли по ссылке</option></select></div>
+                        <div class="referral-admin-summary" id="referralAdminSummary"></div>
+                        <div class="referral-admin-list" id="referralAdminList"><div class="referrals-empty">Кабинет администратора загружается…</div></div>
+                    </section>
                 </section>
             </div>
 
@@ -361,6 +369,7 @@
                             <div class="name" id="profileName"></div>
                             <div class="profile-badges" id="profileBadges" aria-label="Статусы профиля"></div>
                             <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
+                            <button type="button" class="profile-referral-shortcut" id="profileReferralShortcut" onclick="goToReferrals()">🌐 Пригласить и посмотреть демо-очки</button>
                         </div>
                     </div>
                     <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
@@ -808,10 +817,10 @@
 <script src="js/features/feed/feed-core.js?v=5.3"></script>
 <script src="js/features/feed/feed-actions.js?v=4.7"></script>
 <script src="js/features/feed/feed-edit.js?v=5.2"></script>
-<script src="js/features/referrals.js?v=1.0"></script>
+<script src="js/features/referrals.js?v=1.1"></script>
 <script src="js/features/profile.js?v=4.0"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
-<script src="js/features/friends.js?v=3.3"></script>
+<script src="js/features/friends.js?v=3.4"></script>
 <script src="js/features/groups.js?v=4.6"></script>
 <script src="js/features/work.js?v=1.2"></script>
 <script src="js/features/dating.js?v=2.1"></script>

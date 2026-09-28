@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof loadMarketplace === 'function') loadMarketplace();
             if (typeof loadPeople === 'function') loadPeople();
             if (typeof loadProfile === 'function') loadProfile();
+            if (typeof window.loadReferralDashboard === 'function' && document.getElementById('page-referrals') && document.getElementById('page-referrals').classList.contains('active')) window.loadReferralDashboard();
             if (typeof loadNotifications === 'function') loadNotifications();
             if (typeof loadFriendRequests === 'function') loadFriendRequests();
             if (typeof startDirectMessageUnreadTracking === 'function') startDirectMessageUnreadTracking();

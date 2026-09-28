@@ -139,20 +139,24 @@
             ".write": false
           }
         },
-        "referral_codes": { ".read": false, ".write": false },
+        "referral_codes": { ".read": "auth != null", ".write": "auth != null" },
         "referral_code_by_uid": {
           "$uid": { ".read": "$uid === auth.uid", ".write": false }
         },
         "referred_by": {
-          "$uid": { ".read": "$uid === auth.uid", ".write": false }
+          ".read": "auth != null",
+          "$uid": { ".write": "auth != null" }
         },
         "referrals": {
-          "$uid": { ".read": "$uid === auth.uid", ".write": false }
+          ".read": "auth != null",
+          "$uid": { ".write": "auth != null" }
         },
-        "referral_ancestors": { ".read": false, ".write": false },
+        "referral_ancestors": { ".read": "auth != null", ".write": "auth != null" },
         "referral_team": {
-          "$uid": { ".read": "$uid === auth.uid", ".write": false }
+          ".read": "auth != null",
+          "$uid": { ".write": "auth != null" }
         },
+        "referral_wallets": { ".read": "auth != null", ".write": "auth != null" },
         "feed_posts": {
           ".read": "auth != null",
           ".indexOn": ["authorUid"],
