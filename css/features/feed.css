@@ -31,20 +31,20 @@
 .pro-showcase-kicker{font-size:.58rem;letter-spacing:.14em;font-weight:800;color:var(--link-color);opacity:.8}
 .pro-showcase-heading h2{margin:2px 0 0;font-size:1rem;line-height:1.2}
 .pro-showcase-mark{padding:4px 8px;border:1px solid color-mix(in srgb,var(--link-color) 28%,transparent);border-radius:999px;color:var(--link-color);font-size:.63rem;font-weight:800;letter-spacing:.06em}
-.pro-showcase-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.pro-showcase-card{min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 7px 9px;border:1px solid var(--border-color);border-radius:12px;background:var(--card-bg);color:var(--text-color);cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.pro-showcase-grid{overflow:hidden;width:100%;mask-image:linear-gradient(90deg,transparent,#000 2%,#000 98%,transparent)}
+.pro-showcase-track{display:flex;width:max-content;will-change:transform}
+.pro-showcase-track.is-looping{animation:pro-showcase-drum 52s linear infinite}
+.pro-showcase-grid:hover .pro-showcase-track,.pro-showcase-grid:focus-within .pro-showcase-track{animation-play-state:paused}
+.pro-showcase-set{display:flex;flex:0 0 auto;gap:9px;padding-right:9px}
+.pro-showcase-card{flex:0 0 96px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 7px 9px;border:1px solid var(--border-color);border-radius:12px;background:var(--card-bg);color:var(--text-color);cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
 .pro-showcase-card:hover,.pro-showcase-card:focus-visible{transform:translateY(-2px);border-color:var(--link-color);box-shadow:0 5px 16px #0002;outline:none}
 .pro-showcase-avatar{position:relative;width:54px;height:54px;display:grid;place-items:center;border-radius:50%;background:var(--input-bg);box-shadow:0 0 0 3px color-mix(in srgb,var(--link-color) 18%,transparent)}
 .pro-showcase-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .pro-showcase-initial{font-size:1.25rem;font-weight:750;color:var(--link-color)}
 .pro-showcase-pro{position:absolute;right:-8px;bottom:-3px;padding:2px 5px;border:2px solid var(--card-bg);border-radius:999px;background:var(--link-color);color:#fff;font-size:.48rem;font-weight:850;line-height:1.1}
 .pro-showcase-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.76rem;font-weight:650}
-.pro-showcase-controls{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px}
-.pro-showcase-controls[hidden]{display:none}
-.pro-showcase-controls>button{width:25px;height:25px;border:1px solid var(--border-color);border-radius:50%;background:var(--card-bg);color:var(--text-secondary);font-size:18px;line-height:1;cursor:pointer}
-.pro-showcase-dots{display:flex;align-items:center;gap:5px}
-.pro-showcase-dot{width:6px;height:6px;padding:0;border:0;border-radius:9px;background:var(--text-secondary);opacity:.35;cursor:pointer;transition:width .18s ease,opacity .18s ease}
-.pro-showcase-dot.active{width:17px;background:var(--link-color);opacity:1}
+@keyframes pro-showcase-drum{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.pro-showcase-track.is-looping{animation:none}}
 
 /* ===== РЕДАКТОР ===== */
 .editor-toolbar {
@@ -292,7 +292,7 @@
 .image-editor-loading{padding:6px 4px;color:var(--muted-text);font-size:.8rem}
 .image-editor-modal iframe{width:100%;flex:1;min-height:0;border:0;border-radius:10px;background:#f5f5f7}
 @media(max-width:600px){.post-carousel-arrow{width:30px;height:30px;font-size:24px}.post-carousel-frame,.post-carousel-frame.link-preview--large{height:240px}.post-media-item{flex-basis:76px;height:76px}.image-editor-modal{width:100vw;height:100dvh;max-height:100dvh;border-radius:0;padding:10px}}
-@media(max-width:420px){.pro-showcase{padding:12px}.pro-showcase-grid{gap:6px}.pro-showcase-card{padding:9px 4px 8px}.pro-showcase-avatar{width:46px;height:46px}.pro-showcase-name{font-size:.69rem}}
+@media(max-width:420px){.pro-showcase{padding:12px}.pro-showcase-set{gap:7px;padding-right:7px}.pro-showcase-card{flex-basis:86px;padding:9px 4px 8px}.pro-showcase-avatar{width:46px;height:46px}.pro-showcase-name{font-size:.69rem}}
 
 /* ===== ХЭШТЕГИ ===== */
 .post .post-content .hashtags {
