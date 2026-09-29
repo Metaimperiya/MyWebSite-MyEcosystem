@@ -27,32 +27,36 @@
         });
         ['like', 'dislike'].forEach(function(kind) {
             var button = card.querySelector('[data-social-action="reaction"][data-kind="' + kind + '"]');
-            if (button) button.classList.toggle('is-selected', values.mine === kind);
+            if (button && Object.prototype.hasOwnProperty.call(values, 'mine')) button.classList.toggle('is-selected', values.mine === kind);
         });
     }
 
     function loadCounts(card, postId, type, authorUid, legacyLikes) {
-        Promise.all([
-            postRef('post_reactions', postId, type, authorUid).once('value'),
-            postRef('post_mentions', postId, type, authorUid).once('value'),
-            postRef('post_views', postId, type, authorUid).once('value')
-        ]).then(function(snaps) {
+        // A denied optional read (friend tags/views) must not suppress reaction counts.
+        postRef('post_reactions', postId, type, authorUid).once('value').then(function(snap) {
             if (!card.isConnected) return;
-            var reactions = snaps[0].val() || {};
-            var mentions = snaps[1].val() || {};
-            var views = snaps[2].val() || {};
-            var counts = { like: Number(legacyLikes || 0), dislike: 0, mentions: 0, views: Object.keys(views).length, mine: reactions[USER_UID] || '' };
+            var reactions = snap.val() || {};
+            var counts = { like: Number(legacyLikes || 0), dislike: 0, mine: reactions[USER_UID] || '' };
             Object.keys(reactions).forEach(function(uid) {
                 if (reactions[uid] === 'like') counts.like++;
                 if (reactions[uid] === 'dislike') counts.dislike++;
             });
+            setCounts(card, counts);
+        }).catch(function(error) { console.warn('Не удалось загрузить реакции публикации:', error); });
+
+        postRef('post_mentions', postId, type, authorUid).once('value').then(function(snap) {
+            if (!card.isConnected) return;
+            var mentions = snap.val() || {};
             var tagged = Object.create(null);
             Object.keys(mentions).forEach(function(taggerUid) {
                 Object.keys(mentions[taggerUid] || {}).forEach(function(targetUid) { tagged[targetUid] = true; });
             });
-            counts.mentions = Object.keys(tagged).length;
-            setCounts(card, counts);
-        }).catch(function(error) { console.warn('Не удалось загрузить реакции публикации:', error); });
+            setCounts(card, { mentions: Object.keys(tagged).length });
+        }).catch(function(error) { console.warn('Не удалось загрузить отметки друзей:', error); });
+
+        postRef('post_views', postId, type, authorUid).once('value').then(function(snap) {
+            if (card.isConnected) setCounts(card, { views: Object.keys(snap.val() || {}).length });
+        }).catch(function(error) { console.warn('Не удалось загрузить просмотры публикации:', error); });
     }
 
     function buildStatsMarkup(postId, type, authorUid, legacyLikes, comments, reposts) {
@@ -227,9 +231,12 @@
         if (button.dataset.socialAction === 'reaction') {
             if (!USER_UID) { alert('Войдите, чтобы оценить публикацию.'); return; }
             var ref = postRef('post_reactions', postId, type, authorUid).child(USER_UID);
-            ref.transaction(function(current) { return current === button.dataset.kind ? null : button.dataset.kind; }).then(function() {
+            var kind = button.dataset.kind;
+            button.disabled = true;
+            ref.transaction(function(current) { return current === kind ? null : kind; }).then(function() {
                 if (card) loadCounts(card, postId, type, authorUid, card.dataset.legacyLikes);
-            }).catch(function(error) { alert('Не удалось сохранить реакцию: ' + (error.message || 'ошибка доступа')); });
+            }).catch(function(error) { alert('Не удалось сохранить реакцию: ' + (error.message || 'ошибка доступа')); })
+                .finally(function() { button.disabled = false; });
         } else if (button.dataset.socialAction === 'pick-friends') window.openPostMentionPicker(postId, type, authorUid);
         else if (button.dataset.socialAction === 'show-mentions') showTaggedPeople(postId, type, authorUid);
         else if (button.dataset.socialAction === 'show-views') window.openPostViews(postId, type, authorUid);

@@ -11,6 +11,7 @@
     var transfersRef;
     var listenersStarted = false;
     var legacyBankCandidate = null;
+    var bankReadError = false;
     var sampleState = {
         bank: 0,
         players: {},
@@ -76,7 +77,7 @@
         if (join) join.hidden = !(targetUid === USER_UID && !profilePlayer);
         if (grant) grant.hidden = !(targetUid && !!profilePlayer && isBankOwner());
         if (bankPanel) bankPanel.hidden = !(targetUid === USER_UID && (isBankOwner() || canClaimBank()));
-        if (bankAmount) bankAmount.textContent = money(state ? state.bank : 0);
+        if (bankAmount) bankAmount.textContent = bankReadError ? 'нет доступа' : money(state ? state.bank : 0);
         if (bankInput && document.activeElement !== bankInput) bankInput.value = state ? state.bank : 0;
     }
 
@@ -104,6 +105,7 @@
         }
         listenersStarted = true;
         bankRef.on('value', function(snap) {
+            bankReadError = false;
             sharedBank = snap.val() || null;
             rebuildPlayers(); refresh();
             if (!sharedBank && legacyBankCandidate !== null && canClaimBank()) {
@@ -111,7 +113,13 @@
                 legacyBankCandidate = null;
                 setSharedBank(amount);
             }
-        }, function(error) { setFeedback('Не удалось загрузить общий банк: ' + error.message, true); });
+        }, function(error) {
+            bankReadError = true;
+            sharedBank = null;
+            rebuildPlayers();
+            refresh();
+            setFeedback('Firebase отклонил чтение общего банка (' + error.message + '). Нужно опубликовать database.rules.json.', true);
+        });
         participantsRef.on('value', function(snap) { sharedParticipants = snap.val() || {}; rebuildPlayers(); refresh(); }, function(error) { setFeedback('Не удалось загрузить список игроков: ' + error.message, true); });
         transfersRef.on('value', function(snap) { sharedTransfers = snap.val() || {}; rebuildPlayers(); refresh(); }, function(error) { setFeedback('Не удалось загрузить переводы: ' + error.message, true); });
     }
@@ -130,16 +138,16 @@
         var bank = document.getElementById('ambBankTotal');
         var wallet = document.getElementById('ambMyBalance');
         var count = Object.keys(state.players).length;
-        if (bank) bank.textContent = money(state.bank);
+        if (bank) bank.textContent = bankReadError ? 'Нет доступа' : money(state.bank);
         if (wallet) wallet.textContent = money(self ? self.balance : 0);
         var bankInput = document.getElementById('ambBankInput');
         if (bankInput && document.activeElement !== bankInput) bankInput.value = state.bank;
         var bankEdit = document.querySelector('.amb-bank-edit');
         if (bankEdit) bankEdit.hidden = !(isBankOwner() || canClaimBank());
         var bankNote = document.querySelector('.amb-bank-card > small');
-        if (bankNote) bankNote.textContent = isBankOwner() ? 'Ты управляешь общим банком.' : canClaimBank() ? 'Задай общий банк — этот аккаунт станет банкиром.' : sharedBank ? 'Банк общий для всех участников.' : 'Ожидается настройка общего банка администратором.';
+        if (bankNote) bankNote.textContent = bankReadError ? 'Firebase отклонил чтение. Опубликуй database.rules.json.' : isBankOwner() ? 'Ты управляешь общим банком.' : canClaimBank() ? 'Задай общий банк — этот аккаунт станет банкиром.' : sharedBank ? 'Банк общий для всех участников.' : 'Ожидается настройка общего банка администратором.';
         var bankBadge = document.getElementById('ambBankBadge');
-        if (bankBadge) bankBadge.textContent = sharedBank ? 'ОБЩИЙ' : 'ОЖИДАЕТ';
+        if (bankBadge) bankBadge.textContent = bankReadError ? 'НЕТ ДОСТУПА' : sharedBank ? 'ОБЩИЙ' : 'ОЖИДАЕТ';
         updateProfileWallet();
         ['ambPlayerCount', 'ambPlayerCountAside'].forEach(function(id) { var node = document.getElementById(id); if (node) node.textContent = count; });
         var join = document.getElementById('ambJoinGame');
@@ -378,6 +386,7 @@
                     if (participantsRef) participantsRef.off('value');
                     if (transfersRef) transfersRef.off('value');
                     listenersStarted = false;
+                    bankReadError = false;
                     sharedBank = null; sharedParticipants = {}; sharedTransfers = {};
                     rebuildPlayers(); refresh();
                 }
