@@ -171,6 +171,35 @@
             ".validate": "!newData.exists() || !newData.child('ad').exists() || (auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42') && newData.child('authorUid').val() === auth.uid && newData.child('ad').child('enabled').val() === true && newData.child('ad').child('title').isString() && newData.child('ad').child('title').val().length >= 2 && newData.child('ad').child('title').val().length <= 100 && newData.child('ad').child('url').isString() && newData.child('ad').child('url').val().length <= 2048 && newData.child('ad').child('button').isString() && newData.child('ad').child('button').val().length <= 40)"
           }
         },
+        "post_reactions": {
+          ".read": "auth != null",
+          "$postKey": {
+            "$uid": {
+              ".write": "auth != null && auth.uid === $uid",
+              ".validate": "!newData.exists() || (newData.isString() && (newData.val() === 'like' || newData.val() === 'dislike'))"
+            }
+          }
+        },
+        "post_mentions": {
+          ".read": "auth != null",
+          "$postKey": {
+            "$taggerUid": {
+              "$targetUid": {
+                ".write": "auth != null && auth.uid === $taggerUid && ((!data.exists() && newData.val() === true && root.child('sites').child($site).child('friends').child($taggerUid).child($targetUid).val() === true) || (!newData.exists() && data.val() === true))",
+                ".validate": "!newData.exists() || newData.val() === true"
+              }
+            }
+          }
+        },
+        "post_views": {
+          ".read": "auth != null",
+          "$postKey": {
+            "$uid": {
+              ".write": "auth != null && auth.uid === $uid",
+              ".validate": "!newData.exists() || newData.isNumber()"
+            }
+          }
+        },
         "articles": {
           ".read": true,
           "$articleId": {

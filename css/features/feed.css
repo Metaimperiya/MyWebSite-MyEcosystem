@@ -24,6 +24,12 @@
 .feed-composer[open] .feed-composer-plus{transform:rotate(45deg)}
 .feed-composer[open] .post-form{padding-top:8px}
 .feed-composer-card #postPublishStatus:empty{display:none}
+.feed-hashtag-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;padding:11px 14px;border:1px solid color-mix(in srgb,var(--link-color) 24%,var(--border-color));border-radius:var(--radius);background:color-mix(in srgb,var(--link-color) 7%,var(--card-bg));box-shadow:var(--shadow)}
+.feed-hashtag-banner[hidden]{display:none}
+.feed-hashtag-banner>div{display:flex;flex-direction:column;gap:2px;color:var(--text-secondary);font-size:.68rem}
+.feed-hashtag-banner strong{color:var(--link-color);font-size:.95rem}
+.feed-hashtag-banner button{padding:7px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--card-bg);color:var(--text-color);font:inherit;font-size:.68rem;font-weight:700;cursor:pointer}
+.feed-tag-loading,.feed-tag-empty{padding:24px 14px;border:1px dashed var(--border-color);border-radius:var(--radius);color:var(--text-secondary);text-align:center;font-size:.78rem}
 
 .pro-showcase{margin:0 0 10px;padding:14px 16px;border:1px solid var(--border-color);border-radius:var(--radius);background:linear-gradient(135deg,var(--card-bg),color-mix(in srgb,var(--link-color) 7%,var(--card-bg)));box-shadow:var(--shadow)}
 .pro-showcase[hidden]{display:none}
@@ -443,6 +449,7 @@
     padding-top: 6px;
     border-top: 1px solid var(--border-color);
 }
+.post .stats.post-social-stats{flex-wrap:wrap;gap:4px 8px}
 
 .post .stats button {
     background: none;
@@ -466,6 +473,25 @@
     color: var(--link-color);
     font-weight: 600;
 }
+.post .stats button.is-selected[data-kind="dislike"]{color:#d34848;font-weight:700}
+.post .stats button.is-selected[data-kind="like"]{color:var(--link-color);font-weight:700}
+.post-social-mention-control{display:inline-flex;align-items:center;gap:0}
+.post-social-mention-control button+button{min-width:22px;padding-left:2px;padding-right:5px;color:var(--link-color);font-size:.64rem}
+.post-social-modal{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:16px;background:#10182788}
+.post-social-dialog{width:min(440px,100%);max-height:min(78vh,680px);display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--border-color);border-radius:16px;background:var(--card-bg);color:var(--text-color);box-shadow:0 18px 60px #0004}
+.post-social-dialog>header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border-color)}
+.post-social-dialog>header strong{font-size:.9rem}
+.post-social-dialog>header button{width:30px;height:30px;border:0;border-radius:50%;background:var(--input-bg);color:var(--text-color);font-size:1.25rem;cursor:pointer}
+.post-social-dialog-body{min-height:70px;overflow:auto;padding:12px}
+.post-social-search{position:sticky;top:-12px;z-index:1;width:100%;margin-bottom:8px;padding:10px;border:1px solid var(--border-color);border-radius:10px;background:var(--card-bg);color:var(--text-color);font:inherit;font-size:.75rem}
+.post-social-friend-list,.post-social-person-list{display:grid;gap:6px}
+.post-social-friend-list label,.post-social-person-list>div{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid var(--border-color);border-radius:10px;background:var(--input-bg);font-size:.77rem}
+.post-social-friend-list input{width:17px;height:17px;accent-color:var(--link-color)}
+.post-social-person-list>div{justify-content:space-between;flex-wrap:wrap}
+.post-social-person-list button{padding:0;border:0;background:transparent;color:var(--link-color);font:inherit;cursor:pointer}
+.post-social-person-list span,.post-social-state{color:var(--text-secondary);font-size:.72rem}
+.post-social-submit{width:100%;margin-top:12px;padding:10px;border:0;border-radius:10px;background:var(--link-color);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.post-social-submit:disabled{opacity:.65;cursor:wait}
 
 /* ===== МЕНЮ ПОСТА (ТРИ ТОЧКИ) ===== */
 .post .post-menu {

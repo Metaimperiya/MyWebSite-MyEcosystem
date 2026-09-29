@@ -968,11 +968,7 @@
     };
 
     window.searchByTag = function(tag) {
-        var input = document.getElementById('postEditor');
-        if (input) {
-            input.innerHTML = tag + ' ';
-            input.focus();
-        }
+        if (typeof window.openHashtagFeed === 'function') window.openHashtagFeed(tag);
     };
 
     window.openPostPage = function(postId, type) {

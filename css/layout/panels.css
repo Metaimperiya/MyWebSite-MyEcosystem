@@ -70,6 +70,12 @@
     color: var(--link-color);
 }
 
+.trending-tags{display:grid;gap:0}
+.trending-tag{display:flex;align-items:center;justify-content:space-between;width:100%;padding:7px 0;border:0;border-bottom:1px solid var(--border-color);background:transparent;text-align:left;font:inherit;cursor:pointer}
+.trending-tag span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--link-color);font-weight:700}
+.trending-tag small{flex:0 0 auto;margin-left:8px;color:var(--text-secondary);font-size:.62rem}
+.trending-empty{cursor:default;border-bottom:0}
+
 /* Карточка TikTok показывается только в правой колонке ПК-версии. */
 .tiktok-widget {
     min-height: 300px;

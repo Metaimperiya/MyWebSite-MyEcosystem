@@ -16,6 +16,89 @@ var FEED_CONFIG = {
 
 var proShowcaseUsers = [];
 var proShowcaseStartTimer = null;
+var activeFeedHashtag = '';
+
+function normalizeFeedTag(tag) {
+    return String(tag || '').trim().replace(/^#+/, '').toLocaleLowerCase();
+}
+
+function renderTrendingTags(posts) {
+    var container = document.getElementById('trendingTags');
+    if (!container) return;
+    var counts = Object.create(null);
+    (posts || []).forEach(function(post) {
+        (Array.isArray(post.hashtags) ? post.hashtags : []).forEach(function(tag) {
+            var normalized = normalizeFeedTag(tag);
+            if (!normalized) return;
+            if (!counts[normalized]) counts[normalized] = { label: '#' + String(tag).trim().replace(/^#+/, ''), count: 0 };
+            counts[normalized].count++;
+        });
+    });
+    var tags = Object.keys(counts).map(function(key) { return counts[key]; })
+        .sort(function(a, b) { return b.count - a.count || a.label.localeCompare(b.label, 'ru'); }).slice(0, 6);
+    container.innerHTML = tags.length ? tags.map(function(item) {
+        return '<button type="button" class="panel-item trending-tag" data-trending-tag="' + esc(item.label).replace(/"/g, '&quot;') + '"><span>' + esc(item.label) + '</span><small>' + item.count + '</small></button>';
+    }).join('') : '<div class="panel-item trending-empty">Пока нет популярных тегов</div>';
+}
+
+window.openHashtagFeed = function(tag) {
+    var normalized = normalizeFeedTag(tag);
+    if (!normalized || !USER_UID) return;
+    activeFeedHashtag = normalized;
+    feedRequestId++;
+    feedLoading = true;
+    var feed = document.getElementById('feed');
+    var banner = document.getElementById('feedHashtagBanner');
+    if (!feed || !banner) return;
+    var label = '#' + String(tag).trim().replace(/^#+/, '');
+    banner.hidden = false;
+    banner.innerHTML = '<div><span>Публикации по тегу</span><strong>' + esc(label) + '</strong></div><button type="button" id="clearFeedHashtag">Показать всю ленту</button>';
+    var clearButton = document.getElementById('clearFeedHashtag');
+    if (clearButton) clearButton.addEventListener('click', function() { loadFeed(); });
+    feed.innerHTML = '<div class="feed-tag-loading">⏳ Ищем публикации…</div>';
+    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').limitToLast(500).once('value').then(function(snap) {
+        if (activeFeedHashtag !== normalized) return;
+        var matches = [];
+        snap.forEach(function(child) {
+            var post = child.val() || {};
+            var hashtags = Array.isArray(post.hashtags) ? post.hashtags : [];
+            if (hashtags.some(function(item) { return normalizeFeedTag(item) === normalized; })) {
+                post.id = child.key;
+                matches.push(post);
+            }
+        });
+        matches.sort(function(a, b) { return Number(b.timestamp || 0) - Number(a.timestamp || 0); });
+        feed.innerHTML = '';
+        if (!matches.length) {
+            feed.innerHTML = '<div class="feed-tag-empty">Публикаций с тегом ' + esc(label) + ' пока нет.</div>';
+            return;
+        }
+        var fragment = document.createDocumentFragment();
+        matches.forEach(function(post) { fragment.appendChild(renderPost(post, 'feed')); });
+        feed.appendChild(fragment);
+        if (typeof window.loadDatingLikeSummaries === 'function') {
+            var datingLikeUids = Array.from(feed.querySelectorAll('[data-dating-like]')).map(function(button) { return button.getAttribute('data-dating-like'); });
+            window.loadDatingLikeSummaries(datingLikeUids);
+        }
+    }).catch(function(error) {
+        if (activeFeedHashtag !== normalized) return;
+        console.warn('Не удалось загрузить публикации по хэштегу:', error);
+        feed.innerHTML = '<div class="feed-tag-empty">Не удалось загрузить публикации. Попробуй ещё раз.</div>';
+    }).finally(function() { feedLoading = false; });
+};
+
+document.addEventListener('click', function(event) {
+    var button = event.target.closest('[data-trending-tag]');
+    if (button) window.openHashtagFeed(button.dataset.trendingTag);
+});
+
+function loadTrendingHashtags() {
+    db.ref('sites/' + SITE + '/feed_posts').orderByChild('timestamp').limitToLast(100).once('value').then(function(snap) {
+        var posts = [];
+        snap.forEach(function(child) { posts.push(child.val() || {}); });
+        renderTrendingTags(posts);
+    }).catch(function(error) { console.warn('Не удалось загрузить популярные теги:', error); });
+}
 
 function renderProShowcase() {
     var section = document.getElementById('proShowcase');
@@ -374,6 +457,7 @@ function renderPost(p, type) {
         '<div class="post-content" data-post-id="' + esc(p.id) + '" data-post-type="' + esc(type) + '" onclick="window.openPostPageFromContent(event, this.dataset.postId, this.dataset.postType)" style="cursor:pointer;">' + contentHtml + '</div>' +
         actionsHtml + commentsHtml + inputHtml;
     initPostCarousel(div);
+    if (typeof window.enhancePostSocialActions === 'function') window.enhancePostSocialActions(div, p, type);
     
     if (p.authorUid) {
         var avatarEl = div.querySelector('#post-avatar-' + p.id);
@@ -520,11 +604,16 @@ var renderedFeedPostIds = Object.create(null);
 function loadFeed() {
     var el = document.getElementById('feed');
     if (!el) return;
+    activeFeedHashtag = '';
+    var hashtagBanner = document.getElementById('feedHashtagBanner');
+    if (hashtagBanner) hashtagBanner.hidden = true;
     if (typeof window.loadProShowcase === 'function') window.loadProShowcase();
     if (!USER_UID) {
         el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
         return;
     }
+
+    loadTrendingHashtags();
 
     feedRequestId++;
     feedLoading = false;

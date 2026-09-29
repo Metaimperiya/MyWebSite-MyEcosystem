@@ -180,7 +180,8 @@
             'like': '👍',
             'repost': '🔄',
             'subscribe': '👤',
-            'mention': '@'
+            'mention': '@',
+            'post_mention': '👤'
         };
         return icons[type] || '📢';
     }
@@ -194,6 +195,7 @@
             case 'comment': return '💬 ' + text;
             case 'like': return '👍 ' + text;
             case 'repost': return '🔄 ' + text;
+            case 'post_mention': return '👤 ' + text;
             default: return text;
         }
     }
