@@ -42,12 +42,12 @@
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
     <link rel="stylesheet" href="css/features/feed.css?v=5.6">
-    <link rel="stylesheet" href="css/features/profile.css?v=3.9">
+    <link rel="stylesheet" href="css/features/profile.css?v=4.0">
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
     <link rel="stylesheet" href="css/features/work.css?v=1.3">
     <link rel="stylesheet" href="css/features/dating.css?v=1.6">
     <link rel="stylesheet" href="css/features/referrals.css?v=1.1">
-    <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.1">
+    <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.2">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.3">
@@ -246,10 +246,10 @@
                 <section class="referrals-page">
                     <section class="ambassador-game" id="ambassadorGame">
                         <header class="amb-game-heading"><div><span class="amb-kicker">METAIMPERIYA · ДЕМО-ПРОТОТИП</span><h1>Амбассадорская биржа</h1><p>Банк, игроки и задания на приглашения — в одном месте.</p></div><span class="amb-demo-pill">НЕ ДЕНЬГИ</span></header>
-                        <div class="amb-demo-note">Макет для обсуждения. Все цифры и действия сохраняются только в этом браузере и не синхронизируются с другими игроками.</div>
+                        <div class="amb-demo-note">ДЕМО · Общий банк, балансы и переводы синхронизируются между аккаунтами. Очки не являются деньгами или платёжным средством; заявки биржи пока остаются демонстрационными.</div>
                         <div class="amb-game-grid">
                             <div class="amb-game-main">
-                                <section class="amb-bank-card"><div class="amb-bank-title"><span>🏦 ОБЩИЙ БАНК</span><span id="ambBankBadge">ДЕМО</span></div><strong id="ambBankTotal">1 000 000</strong><span class="amb-points-label">очков в банке</span><div class="amb-bank-edit"><input id="ambBankInput" type="number" min="0" max="10000000" step="100" aria-label="Размер банка"><button type="button" id="ambBankSave">Задать банк</button></div><small>В настоящей версии менять банк сможет только администратор.</small></section>
+                                <section class="amb-bank-card"><div class="amb-bank-title"><span>🏦 ОБЩИЙ БАНК</span><span id="ambBankBadge">ДЕМО</span></div><strong id="ambBankTotal">0</strong><span class="amb-points-label">очков в банке</span><div class="amb-bank-edit"><input id="ambBankInput" type="number" min="0" max="10000000" step="1" aria-label="Размер банка"><button type="button" id="ambBankSave">Задать банк</button></div><small>Банк настраивается администратором.</small></section>
                                 <div class="amb-wallet-row"><article><span>ТВОЙ БАЛАНС</span><strong id="ambMyBalance">0</strong><button type="button" id="ambJoinGame">＋ Войти в систему</button></article><article><span>ИГРОКОВ</span><strong id="ambPlayerCount">0</strong><small>участников прототипа</small></article></div><div id="ambPlayerSlot"></div>
                                 <section class="amb-board-section"><div class="amb-section-heading"><div><span class="amb-kicker">ИГРОВОЕ ПОЛЕ</span><h2>Выбери направление</h2></div><span>🎲</span></div><div class="amb-board" id="ambBoard">
                                     <button type="button" data-amb-tile="bank"><span>🏦</span><b>Банк</b><small>взнос и баланс</small></button><button type="button" data-amb-tile="referrals"><span>🔗</span><b>Рефералы</b><small>приглашения</small></button><button type="button" data-amb-tile="exchange"><span>🤝</span><b>Биржа</b><small>заявки амбассадоров</small></button><button type="button" data-amb-tile="target"><span>🎯</span><b>Таргет</b><small>продвижение</small></button><button type="button" data-amb-tile="bonus"><span>🎁</span><b>Бонус</b><small>награды игрокам</small></button><button type="button" data-amb-tile="team"><span>👥</span><b>Команда</b><small>список участников</small></button>
@@ -385,6 +385,9 @@
                             <div class="profile-badges" id="profileBadges" aria-label="Статусы профиля"></div>
                             <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
                             <button type="button" class="profile-referral-shortcut" id="profileReferralShortcut" onclick="goToReferrals()">🌐 Пригласить и посмотреть демо-очки</button>
+                            <div class="profile-game-wallet" id="profileGameWallet" hidden><span>🎲 Баланс игры: <strong id="profileGameBalance">0</strong> очков</span><button type="button" id="profileGameJoin" hidden onclick="window.joinAmbassadorGame()">＋ Войти в игру</button><button type="button" id="profileGameGrant" hidden onclick="window.grantProfileAmbassadorPoints()">＋ Начислить очки</button></div>
+                            <div class="profile-game-bank" id="profileGameBank" hidden><span>🏦 Общий банк: <strong id="profileGameBankAmount">0</strong></span><label>Задать баланс банка<input type="number" id="profileBankAmount" min="0" max="10000000" step="1"></label><button type="button" onclick="window.setAmbassadorBankFromProfile()">Сохранить банк</button></div>
+                            <div class="profile-game-feedback" id="profileGameFeedback" role="status" aria-live="polite"></div>
                         </div>
                     </div>
                     <nav class="profile-social-links" id="profileSocialLinks" aria-label="Социальные сети" hidden></nav>
@@ -839,8 +842,8 @@
 <script src="js/features/feed/post-social.js?v=1.0"></script>
 <script src="js/features/feed/feed-edit.js?v=5.4"></script>
 <script src="js/features/referrals.js?v=1.2"></script>
-<script src="js/features/ambassador-game-demo.js?v=1.1"></script>
-<script src="js/features/profile.js?v=4.0"></script>
+<script src="js/features/ambassador-game-demo.js?v=1.2"></script>
+<script src="js/features/profile.js?v=4.7"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.4"></script>
 <script src="js/features/groups.js?v=4.6"></script>

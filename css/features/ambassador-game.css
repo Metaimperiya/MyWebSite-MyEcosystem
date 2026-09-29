@@ -15,6 +15,7 @@
 .amb-bank-card>strong { margin-top:8px; color:#ffdf82; font-size:clamp(2rem,6vw,3rem); font-variant-numeric:tabular-nums; letter-spacing:.025em; }
 .amb-points-label { margin-top:-2px; color:#d3e7dc; font-size:.68rem; }
 .amb-bank-edit { display:flex; width:min(100%,330px); gap:6px; margin-top:12px; }
+.amb-bank-edit[hidden]{display:none}
 .amb-bank-edit input,.amb-bank-edit button,.amb-primary,.amb-icon-button { min-height:36px; border:1px solid #ffffff35; border-radius:9px; font:inherit; }
 .amb-bank-edit input { width:0; flex:1; padding:0 9px; outline:0; background:#ffffffed; color:#143c2d; font-size:.71rem; }
 .amb-bank-edit button { padding:0 10px; background:#f2d77e; color:#3e3216; font-size:.68rem; font-weight:800; cursor:pointer; white-space:nowrap; }

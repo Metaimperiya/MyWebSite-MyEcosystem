@@ -1,14 +1,19 @@
-// Интерактивный локальный макет биржи амбассадоров. Не пишет данные в Firebase.
+// Общий демо-банк и кошельки участников хранятся в Realtime Database.
 (function() {
     'use strict';
     var storageKey = 'mi_ambassador_board_demo_v1';
     var state;
+    var sharedBank = null;
+    var sharedParticipants = {};
+    var sharedTransfers = {};
+    var bankRef;
+    var participantsRef;
+    var transfersRef;
+    var listenersStarted = false;
+    var legacyBankCandidate = null;
     var sampleState = {
-        bank: 999940,
-        players: {
-            'sample_01': { name: 'Игрок-пример 01', balance: 40, joinedAt: Date.now() - 86400000, sample: true },
-            'sample_02': { name: 'Игрок-пример 02', balance: 20, joinedAt: Date.now() - 43200000, sample: true }
-        },
+        bank: 0,
+        players: {},
         requests: [{ id: 'sample_request', title: 'Пример: нужны амбассадоры для приглашения участников', targetCount: 10, rate: 10, budget: 100, remaining: 100, completed: 0, ownerUid: 'sample_owner', ownerName: 'Образец заявки', status: 'open', isExample: true, createdAt: Date.now() - 3600000 }],
         ledger: [{ text: 'Демо-банк подготовлен для макета', amount: '+1 000 000', at: Date.now() }]
     };
@@ -18,22 +23,103 @@
             var saved = localStorage.getItem(storageKey);
             if (saved) {
                 var parsed = JSON.parse(saved);
-                if (parsed && typeof parsed.bank === 'number' && parsed.players && Array.isArray(parsed.requests)) return parsed;
+                if (parsed && Array.isArray(parsed.requests)) {
+                    if (Number.isInteger(parsed.bank) && parsed.bank >= 0 && parsed.bank <= 10000000) legacyBankCandidate = parsed.bank;
+                    return { bank: 0, players: {}, requests: parsed.requests, ledger: Array.isArray(parsed.ledger) ? parsed.ledger : [] };
+                }
             }
         } catch (error) { console.warn('Не удалось загрузить локальные данные демо-биржи.'); }
-        return JSON.parse(JSON.stringify(sampleState));
+        return { bank: 0, players: {}, requests: JSON.parse(JSON.stringify(sampleState.requests)), ledger: [] };
     }
     function saveState() {
-        try { localStorage.setItem(storageKey, JSON.stringify(state)); }
+        try { localStorage.setItem(storageKey, JSON.stringify({ requests: state.requests, ledger: state.ledger })); }
         catch (error) { setFeedback('Браузер не сохранил демо-состояние.', true); }
     }
     function money(value) { return Math.max(0, Number(value) || 0).toLocaleString('ru-RU'); }
     function currentUid() { return typeof USER_UID !== 'undefined' && USER_UID ? USER_UID : 'guest'; }
     function currentName() { return typeof USER !== 'undefined' && USER ? USER : 'Ты'; }
     function player() { return state.players[currentUid()] || null; }
+    function isBankOwner() { return !!sharedBank && sharedBank.ownerUid === currentUid(); }
+    function canClaimBank() { return !sharedBank && typeof ADMIN_UIDS !== 'undefined' && ADMIN_UIDS.indexOf(currentUid()) !== -1; }
+    function numberOrZero(value) { var number = Number(value); return Number.isFinite(number) ? number : 0; }
+    function rebuildPlayers() {
+        var players = {};
+        Object.keys(sharedParticipants || {}).forEach(function(uid) {
+            var participant = sharedParticipants[uid] || {};
+            players[uid] = { name: participant.name || 'Участник', balance: 0, joinedAt: participant.joinedAt || 0 };
+        });
+        var grants = sharedBank && sharedBank.grants || {};
+        Object.keys(grants).forEach(function(id) {
+            var grant = grants[id] || {};
+            if (players[grant.toUid]) players[grant.toUid].balance += numberOrZero(grant.amount);
+        });
+        Object.keys(sharedTransfers || {}).forEach(function(id) {
+            var transfer = sharedTransfers[id] || {};
+            if (players[transfer.fromUid]) players[transfer.fromUid].balance -= numberOrZero(transfer.amount);
+            if (players[transfer.toUid]) players[transfer.toUid].balance += numberOrZero(transfer.amount);
+        });
+        state.players = players;
+        state.bank = sharedBank ? numberOrZero(sharedBank.total) : 0;
+    }
+    function updateProfileWallet() {
+        var targetUid = VIEWING_USER || USER_UID;
+        var wallet = document.getElementById('profileGameWallet');
+        var balance = document.getElementById('profileGameBalance');
+        var join = document.getElementById('profileGameJoin');
+        var grant = document.getElementById('profileGameGrant');
+        var bankPanel = document.getElementById('profileGameBank');
+        var bankAmount = document.getElementById('profileGameBankAmount');
+        var bankInput = document.getElementById('profileBankAmount');
+        var profilePlayer = state && state.players[targetUid];
+        if (wallet) wallet.hidden = !targetUid || (!profilePlayer && targetUid !== USER_UID);
+        if (balance) balance.textContent = money(profilePlayer ? profilePlayer.balance : 0);
+        if (join) join.hidden = !(targetUid === USER_UID && !profilePlayer);
+        if (grant) grant.hidden = !(targetUid && !!profilePlayer && isBankOwner());
+        if (bankPanel) bankPanel.hidden = !(targetUid === USER_UID && (isBankOwner() || canClaimBank()));
+        if (bankAmount) bankAmount.textContent = money(state ? state.bank : 0);
+        if (bankInput && document.activeElement !== bankInput) bankInput.value = state ? state.bank : 0;
+    }
+
+    window.loadAmbassadorProfileBalance = function() { updateProfileWallet(); };
+    window.joinAmbassadorGame = joinGame;
+    window.grantProfileAmbassadorPoints = function() {
+        var uid = VIEWING_USER || USER_UID;
+        if (!uid || !isBankOwner()) return;
+        var amount = Number(window.prompt('Сколько очков начислить этому участнику?', '100'));
+        if (Number.isInteger(amount) && amount > 0) grantFromBank(uid, amount);
+    };
+    window.setAmbassadorBankFromProfile = function() {
+        var input = document.getElementById('profileBankAmount');
+        var amount = Number(input && input.value);
+        if (!Number.isInteger(amount) || amount < 0 || amount > 10000000) { setFeedback('Укажи целое число от 0 до 10 000 000.', true); return; }
+        setSharedBank(amount);
+    };
+    function subscribeSharedGame() {
+        if (!USER_UID || !document.getElementById('ambassadorGame')) return;
+        bankRef = db.ref('sites/' + SITE + '/ambassador_bank');
+        participantsRef = db.ref('sites/' + SITE + '/ambassador_players');
+        transfersRef = db.ref('sites/' + SITE + '/ambassador_transfers');
+        if (listenersStarted) {
+            bankRef.off('value'); participantsRef.off('value'); transfersRef.off('value');
+        }
+        listenersStarted = true;
+        bankRef.on('value', function(snap) {
+            sharedBank = snap.val() || null;
+            rebuildPlayers(); refresh();
+            if (!sharedBank && legacyBankCandidate !== null && canClaimBank()) {
+                var amount = legacyBankCandidate;
+                legacyBankCandidate = null;
+                setSharedBank(amount);
+            }
+        }, function(error) { setFeedback('Не удалось загрузить общий банк: ' + error.message, true); });
+        participantsRef.on('value', function(snap) { sharedParticipants = snap.val() || {}; rebuildPlayers(); refresh(); }, function(error) { setFeedback('Не удалось загрузить список игроков: ' + error.message, true); });
+        transfersRef.on('value', function(snap) { sharedTransfers = snap.val() || {}; rebuildPlayers(); refresh(); }, function(error) { setFeedback('Не удалось загрузить переводы: ' + error.message, true); });
+    }
     function setFeedback(text, isError) {
         var node = document.getElementById('ambFeedback');
         if (node) { node.textContent = text || ''; node.classList.toggle('error', !!isError); }
+        var profileNote = document.getElementById('profileGameFeedback');
+        if (profileNote) { profileNote.textContent = text || ''; profileNote.classList.toggle('error', !!isError); }
     }
     function addLedger(text, amount) {
         state.ledger.unshift({ text: text, amount: amount || '', at: Date.now() });
@@ -46,9 +132,18 @@
         var count = Object.keys(state.players).length;
         if (bank) bank.textContent = money(state.bank);
         if (wallet) wallet.textContent = money(self ? self.balance : 0);
+        var bankInput = document.getElementById('ambBankInput');
+        if (bankInput && document.activeElement !== bankInput) bankInput.value = state.bank;
+        var bankEdit = document.querySelector('.amb-bank-edit');
+        if (bankEdit) bankEdit.hidden = !(isBankOwner() || canClaimBank());
+        var bankNote = document.querySelector('.amb-bank-card > small');
+        if (bankNote) bankNote.textContent = isBankOwner() ? 'Ты управляешь общим банком.' : canClaimBank() ? 'Задай общий банк — этот аккаунт станет банкиром.' : sharedBank ? 'Банк общий для всех участников.' : 'Ожидается настройка общего банка администратором.';
+        var bankBadge = document.getElementById('ambBankBadge');
+        if (bankBadge) bankBadge.textContent = sharedBank ? 'ОБЩИЙ' : 'ОЖИДАЕТ';
+        updateProfileWallet();
         ['ambPlayerCount', 'ambPlayerCountAside'].forEach(function(id) { var node = document.getElementById(id); if (node) node.textContent = count; });
         var join = document.getElementById('ambJoinGame');
-        if (join) { join.disabled = !!self; join.textContent = self ? '✓ Ты в системе' : '＋ Войти в систему · +100'; }
+        if (join) { join.disabled = !!self || !USER_UID; join.textContent = self ? '✓ Ты в системе' : '＋ Войти в систему'; }
         renderPlayers();
         renderRequests();
         renderLedger();
@@ -59,27 +154,30 @@
         var list = document.getElementById('ambPlayerList');
         var select = document.getElementById('ambTransferTo');
         if (!list || !select) return;
-        var players = Object.keys(state.players).map(function(uid) { return { uid: uid, data: state.players[uid] }; });
+        var players = Object.keys(state.players).map(function(uid) { return { uid: uid, data: state.players[uid] }; }).sort(function(a, b) { return b.data.balance - a.data.balance || b.data.joinedAt - a.data.joinedAt; });
         list.replaceChildren();
         players.forEach(function(entry) {
             var row = document.createElement('div'); row.className = 'amb-player-row';
             var avatar = document.createElement('span'); avatar.className = 'amb-player-avatar'; avatar.textContent = Array.from(entry.data.name || '?')[0] || '?';
             var copy = document.createElement('span'); copy.className = 'amb-player-copy';
             var name = document.createElement('strong'); name.textContent = entry.data.name || 'Игрок';
-            var note = document.createElement('small'); note.textContent = entry.data.sample ? 'демо-образец' : (entry.uid === currentUid() ? 'ты' : 'в игре');
+            var note = document.createElement('small'); note.textContent = entry.uid === currentUid() ? 'ты' : 'в игре';
             copy.append(name, note);
             var balance = document.createElement('b'); balance.textContent = money(entry.data.balance) + ' ◉';
             row.append(avatar, copy, balance);
-            if (entry.uid !== currentUid()) {
-                var grant = document.createElement('button'); grant.type = 'button'; grant.className = 'amb-mini-grant'; grant.textContent = '+100'; grant.title = 'Демо: выдать 100 очков из банка';
-                grant.addEventListener('click', function() { grantFromBank(entry.uid, 100); });
+            if (isBankOwner()) {
+                var grant = document.createElement('button'); grant.type = 'button'; grant.className = 'amb-mini-grant'; grant.textContent = '＋'; grant.title = 'Выдать очки из общего банка';
+                grant.addEventListener('click', function() {
+                    var amount = Number(window.prompt('Сколько очков выдать пользователю ' + (entry.data.name || '') + '?', '100'));
+                    if (Number.isInteger(amount) && amount > 0) grantFromBank(entry.uid, amount);
+                });
                 row.appendChild(grant);
             }
             list.appendChild(row);
         });
         if (!players.length) list.innerHTML = '<div class="amb-player-empty">Здесь появятся игроки, которые вступят в систему.</div>';
         var previous = select.value;
-        select.innerHTML = '<option value="">Выбери игрока</option>' + players.filter(function(p) { return p.uid !== currentUid(); }).map(function(p) { return '<option value="' + encodeURIComponent(p.uid) + '">' + p.data.name.replace(/[&<>"']/g, '') + ' · ' + money(p.data.balance) + '</option>'; }).join('');
+        select.innerHTML = '<option value="">Выбери игрока</option>' + players.filter(function(p) { return p.uid !== currentUid(); }).map(function(p) { return '<option value="' + encodeURIComponent(p.uid) + '">' + String(p.data.name || 'Участник').replace(/[&<>"']/g, '') + ' · ' + money(p.data.balance) + '</option>'; }).join('');
         if (previous) select.value = previous;
     }
     function requestCard(request) {
@@ -129,8 +227,20 @@
         var list = document.getElementById('ambLedger');
         if (!list) return;
         list.replaceChildren();
-        if (!state.ledger.length) { list.innerHTML = '<div class="amb-ledger-empty">Действий пока нет.</div>'; return; }
-        state.ledger.slice(0, 5).forEach(function(item) {
+        var entries = (state.ledger || []).slice();
+        Object.keys(sharedBank && sharedBank.grants || {}).forEach(function(id) {
+            var grant = sharedBank.grants[id];
+            entries.push({ text: 'Выдано ' + money(grant.amount) + ' очков · ' + (grant.toName || 'участнику'), amount: '−' + money(grant.amount), at: grant.at || 0 });
+        });
+        Object.keys(sharedTransfers || {}).forEach(function(id) {
+            var transfer = sharedTransfers[id] || {};
+            var from = state.players[transfer.fromUid] && state.players[transfer.fromUid].name || 'Участник';
+            var to = state.players[transfer.toUid] && state.players[transfer.toUid].name || 'Участник';
+            entries.push({ text: from + ' → ' + to, amount: money(transfer.amount), at: transfer.at || 0 });
+        });
+        entries.sort(function(a, b) { return Number(b.at || 0) - Number(a.at || 0); });
+        if (!entries.length) { list.innerHTML = '<div class="amb-ledger-empty">Действий пока нет.</div>'; return; }
+        entries.slice(0, 5).forEach(function(item) {
             var row = document.createElement('div'); row.className = 'amb-ledger-row';
             var text = document.createElement('span'); text.textContent = item.text;
             var amount = document.createElement('b'); amount.textContent = item.amount;
@@ -138,10 +248,57 @@
         });
     }
     function grantFromBank(uid, amount) {
-        if (state.bank < amount || !state.players[uid]) { setFeedback('В банке недостаточно демо-очков.', true); return; }
-        state.bank -= amount; state.players[uid].balance += amount;
-        addLedger('Начислено ' + amount + ' игроку ' + state.players[uid].name, '−' + money(amount));
-        setFeedback('Демо-очки выданы из банка.'); refresh();
+        if (!isBankOwner() || !Number.isInteger(amount) || amount < 1 || !state.players[uid] || !bankRef) { setFeedback('Начислить очки может только банкир участнику системы.', true); return; }
+        var grantId = bankRef.child('grants').push().key;
+        bankRef.transaction(function(current) {
+            if (!current || current.ownerUid !== currentUid() || Number(current.total) < amount) return;
+            current.grants = current.grants || {};
+            current.grants[grantId] = { toUid: uid, toName: state.players[uid].name, amount: amount, at: Date.now() };
+            current.total = Number(current.total) - amount;
+            current.updatedAt = Date.now();
+            return current;
+        }, function(error, committed) {
+            if (error) setFeedback('Не удалось выдать очки: ' + error.message, true);
+            else if (!committed) setFeedback('Банк не настроен или в нём недостаточно очков.', true);
+            else setFeedback('Начислено ' + money(amount) + ' очков. Общий банк уменьшился на эту сумму.');
+        });
+    }
+
+    window.grantAmbassadorPoints = function(uid, amount) { grantFromBank(uid, Number(amount)); };
+
+    function setSharedBank(amount) {
+        if ((!isBankOwner() && !canClaimBank()) || !bankRef) { setFeedback('Общим банком управляет только назначенный банкир.', true); return; }
+        bankRef.transaction(function(current) {
+            if (current && current.ownerUid !== currentUid()) return;
+            current = current || { ownerUid: currentUid(), grants: {} };
+            current.ownerUid = currentUid();
+            current.grants = current.grants || {};
+            current.total = amount;
+            current.updatedAt = Date.now();
+            return current;
+        }, function(error, committed) {
+            if (error) setFeedback('Не удалось сохранить общий банк: ' + error.message, true);
+            else if (!committed) setFeedback('Этот общий банк уже закреплён за другим банкиром.', true);
+            else setFeedback('Общий банк обновлён. Его новая сумма видна всем участникам.');
+        });
+    }
+
+    function joinGame() {
+        if (!USER_UID || player()) return;
+        participantsRef.child(currentUid()).set({ name: currentName(), joinedAt: Date.now() })
+            .then(function() { setFeedback('Ты вступил в систему. Начальный баланс — 0 очков.'); })
+            .catch(function(error) { setFeedback('Не удалось вступить: ' + error.message, true); });
+    }
+
+    function transferPoints(uid, amount) {
+        var self = player();
+        if (!self || !uid || !state.players[uid]) { setFeedback('Вступи в игру и выбери участника.', true); return; }
+        if (!Number.isInteger(amount) || amount < 1 || amount > self.balance) { setFeedback('Укажи целое число в пределах своего баланса.', true); return; }
+        var transfer = { fromUid: currentUid(), toUid: uid, amount: amount, at: Date.now() };
+        transfersRef.push().set(transfer).then(function() {
+            var targetName = state.players[uid].name;
+            setFeedback('Переведено ' + money(amount) + ' очков пользователю ' + targetName + '.');
+        }).catch(function(error) { setFeedback('Перевод не прошёл: ' + error.message, true); });
     }
     function completeReferral(requestId) {
         var request = state.requests.find(function(item) { return item.id === requestId; });
@@ -162,31 +319,26 @@
     function initialize() {
         if (!document.getElementById('ambassadorGame')) return;
         state = readState();
+        state.bank = 0;
+        state.players = {};
         var playerSlot = document.getElementById('ambPlayerSlot');
         var playerPanel = document.getElementById('ambPlayers');
         if (playerSlot && playerPanel) playerSlot.appendChild(playerPanel);
-        document.getElementById('ambBankInput').value = state.bank;
+        var bankInput = document.getElementById('ambBankInput');
+        if (bankInput) bankInput.value = state.bank;
         document.getElementById('ambBankSave').addEventListener('click', function() {
             var amount = Number(document.getElementById('ambBankInput').value);
             if (!Number.isInteger(amount) || amount < 0 || amount > 10000000) { setFeedback('Укажи целое число от 0 до 10 000 000.', true); return; }
-            state.bank = amount; addLedger('Размер общего демо-банка изменён', money(amount)); setFeedback('Банк обновлён только в этом браузере.'); refresh();
+            setSharedBank(amount);
         });
         document.getElementById('ambJoinGame').addEventListener('click', function() {
-            if (player()) return;
-            if (state.bank < 100) { setFeedback('В банке не хватает 100 демо-очков для стартового баланса.', true); return; }
-            state.bank -= 100; state.players[currentUid()] = { name: currentName(), balance: 100, joinedAt: Date.now(), sample: false };
-            addLedger(currentName() + ' вступил(а) в демо-систему', '−100 из банка'); setFeedback('Ты в системе. Тебе начислен тестовый баланс 100 очков.'); refresh();
+            joinGame();
         });
         document.getElementById('ambTransferButton').addEventListener('click', function() {
             var select = document.getElementById('ambTransferTo');
             var toUid = select.value ? decodeURIComponent(select.value) : '';
             var amount = Number(document.getElementById('ambTransferAmount').value);
-            var self = player();
-            if (!self || !toUid || !state.players[toUid]) { setFeedback('Вступи в игру и выбери участника.', true); return; }
-            if (!Number.isInteger(amount) || amount < 1 || amount > self.balance) { setFeedback('Укажи сумму в пределах своего баланса.', true); return; }
-            self.balance -= amount; state.players[toUid].balance += amount;
-            addLedger(currentName() + ' перевёл(а) ' + amount + ' игроку ' + state.players[toUid].name, '−' + money(amount));
-            setFeedback('Демо-перевод выполнен.'); refresh();
+            transferPoints(toUid, amount);
         });
         document.getElementById('ambCreateRequest').addEventListener('click', function() { document.getElementById('ambCreatePanel').hidden = false; document.getElementById('ambRequestTitle').focus(); });
         document.getElementById('ambCloseCreate').addEventListener('click', function() { document.getElementById('ambCreatePanel').hidden = true; });
@@ -218,6 +370,19 @@
             navigator.clipboard.writeText(brief).then(function() { setFeedback('Вводные скопированы. Вставь их в ChatGPT, Gemini или DeepSeek.'); }).catch(function() { window.prompt('Скопируй вводные для ИИ:', brief); });
         });
         refresh();
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) subscribeSharedGame();
+                else {
+                    if (bankRef) bankRef.off('value');
+                    if (participantsRef) participantsRef.off('value');
+                    if (transfersRef) transfersRef.off('value');
+                    listenersStarted = false;
+                    sharedBank = null; sharedParticipants = {}; sharedTransfers = {};
+                    rebuildPlayers(); refresh();
+                }
+            });
+        }
     }
     document.addEventListener('DOMContentLoaded', initialize);
 })();

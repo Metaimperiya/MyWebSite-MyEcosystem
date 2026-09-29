@@ -157,6 +157,25 @@
           "$uid": { ".write": "auth != null" }
         },
         "referral_wallets": { ".read": "auth != null", ".write": "auth != null" },
+        "ambassador_bank": {
+          ".read": "auth != null",
+          ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')) || (data.exists() && data.child('ownerUid').val() === auth.uid && newData.child('ownerUid').val() === auth.uid))",
+          ".validate": "!newData.exists() || (newData.child('ownerUid').isString() && newData.child('ownerUid').val() === auth.uid && newData.child('total').isNumber() && newData.child('total').val() >= 0 && newData.child('total').val() <= 10000000)"
+        },
+        "ambassador_players": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && !data.exists()",
+            ".validate": "newData.hasChildren(['name', 'joinedAt']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 120 && newData.child('joinedAt').isNumber()"
+          }
+        },
+        "ambassador_transfers": {
+          ".read": "auth != null",
+          "$transferId": {
+            ".write": "auth != null && !data.exists() && newData.child('fromUid').val() === auth.uid && root.child('sites').child($site).child('ambassador_players').child(auth.uid).exists() && root.child('sites').child($site).child('ambassador_players').child(newData.child('toUid').val()).exists()",
+            ".validate": "newData.hasChildren(['fromUid', 'toUid', 'amount', 'at']) && newData.child('fromUid').val() === auth.uid && newData.child('toUid').isString() && newData.child('toUid').val() !== auth.uid && newData.child('amount').isNumber() && newData.child('amount').val() >= 1 && newData.child('amount').val() <= 10000000 && newData.child('at').isNumber()"
+          }
+        },
         "feed_posts": {
           ".read": "auth != null",
           ".indexOn": ["authorUid"],

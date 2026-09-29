@@ -196,6 +196,7 @@ function loadProfile() {
             avatarEl.innerHTML = '<span class="letter" style="cursor:pointer;font-size:24px;" onclick="document.getElementById(\'loginModal\').classList.add(\'open\')">🔑</span>';
         }
         renderProfileContacts({});
+        if (typeof window.loadAmbassadorProfileBalance === 'function') window.loadAmbassadorProfileBalance(null);
 
         var postsContainer = document.getElementById('profilePosts');
         if (postsContainer) postsContainer.innerHTML = '';
@@ -236,6 +237,7 @@ function loadProfile() {
             bioEl.style.display = 'block';
         }
         renderProfileContacts(u);
+        if (typeof window.loadAmbassadorProfileBalance === 'function') window.loadAmbassadorProfileBalance(uid);
         renderAvatar(uid, avatarEl, (u.name || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
         makeStatsClickable(uid);
