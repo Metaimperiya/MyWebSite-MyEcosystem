@@ -5,9 +5,11 @@
     var state;
     var sharedBank = null;
     var sharedParticipants = {};
+    var sharedUsers = {};
     var sharedTransfers = {};
     var bankRef;
     var participantsRef;
+    var usersRef;
     var transfersRef;
     var listenersStarted = false;
     var legacyBankCandidate = null;
@@ -45,14 +47,20 @@
     function numberOrZero(value) { var number = Number(value); return Number.isFinite(number) ? number : 0; }
     function rebuildPlayers() {
         var players = {};
+        Object.keys(sharedUsers || {}).forEach(function(uid) {
+            var user = sharedUsers[uid] || {};
+            players[uid] = { name: user.name || 'Участник', balance: 0, joinedAt: numberOrZero(user.lastLogin || user.createdAt) };
+        });
         Object.keys(sharedParticipants || {}).forEach(function(uid) {
             var participant = sharedParticipants[uid] || {};
-            players[uid] = { name: participant.name || 'Участник', balance: 0, joinedAt: participant.joinedAt || 0 };
+            if (!players[uid]) players[uid] = { name: participant.name || 'Участник', balance: 0, joinedAt: participant.joinedAt || 0 };
         });
         var grants = sharedBank && sharedBank.grants || {};
         Object.keys(grants).forEach(function(id) {
             var grant = grants[id] || {};
-            if (players[grant.toUid]) players[grant.toUid].balance += numberOrZero(grant.amount);
+            if (!grant.toUid) return;
+            if (!players[grant.toUid]) players[grant.toUid] = { name: grant.toName || 'Участник', balance: 0, joinedAt: grant.at || 0 };
+            players[grant.toUid].balance += numberOrZero(grant.amount);
         });
         Object.keys(sharedTransfers || {}).forEach(function(id) {
             var transfer = sharedTransfers[id] || {};
@@ -62,8 +70,8 @@
         state.players = players;
         state.bank = sharedBank ? numberOrZero(sharedBank.total) : 0;
     }
-    function updateProfileWallet() {
-        var targetUid = VIEWING_USER || USER_UID;
+    function updateProfileWallet(profileUid) {
+        var targetUid = profileUid || VIEWING_USER || USER_UID;
         var wallet = document.getElementById('profileGameWallet');
         var balance = document.getElementById('profileGameBalance');
         var join = document.getElementById('profileGameJoin');
@@ -72,22 +80,23 @@
         var bankAmount = document.getElementById('profileGameBankAmount');
         var bankInput = document.getElementById('profileBankAmount');
         var profilePlayer = state && state.players[targetUid];
-        if (wallet) wallet.hidden = !targetUid || (!profilePlayer && targetUid !== USER_UID);
+        if (wallet) wallet.hidden = !targetUid || (!profilePlayer && targetUid !== USER_UID && !isBankOwner());
         if (balance) balance.textContent = money(profilePlayer ? profilePlayer.balance : 0);
         if (join) join.hidden = !(targetUid === USER_UID && !profilePlayer);
-        if (grant) grant.hidden = !(targetUid && !!profilePlayer && isBankOwner());
+        if (grant) grant.hidden = !(targetUid && targetUid !== USER_UID && isBankOwner());
         if (bankPanel) bankPanel.hidden = !(targetUid === USER_UID && (isBankOwner() || canClaimBank()));
         if (bankAmount) bankAmount.textContent = bankReadError ? 'нет доступа' : money(state ? state.bank : 0);
         if (bankInput && document.activeElement !== bankInput) bankInput.value = state ? state.bank : 0;
     }
 
-    window.loadAmbassadorProfileBalance = function() { updateProfileWallet(); };
+    window.loadAmbassadorProfileBalance = function(profileUid) { updateProfileWallet(profileUid); };
     window.joinAmbassadorGame = joinGame;
     window.grantProfileAmbassadorPoints = function() {
         var uid = VIEWING_USER || USER_UID;
         if (!uid || !isBankOwner()) return;
         var amount = Number(window.prompt('Сколько очков начислить этому участнику?', '100'));
-        if (Number.isInteger(amount) && amount > 0) grantFromBank(uid, amount);
+        var name = document.getElementById('profileName');
+        if (Number.isInteger(amount) && amount > 0) grantFromBank(uid, amount, name && name.textContent);
     };
     window.setAmbassadorBankFromProfile = function() {
         var input = document.getElementById('profileBankAmount');
@@ -99,9 +108,10 @@
         if (!USER_UID || !document.getElementById('ambassadorGame')) return;
         bankRef = db.ref('sites/' + SITE + '/ambassador_bank');
         participantsRef = db.ref('sites/' + SITE + '/ambassador_players');
+        usersRef = db.ref('sites/' + SITE + '/all_users');
         transfersRef = db.ref('sites/' + SITE + '/ambassador_transfers');
         if (listenersStarted) {
-            bankRef.off('value'); participantsRef.off('value'); transfersRef.off('value');
+            bankRef.off('value'); participantsRef.off('value'); usersRef.off('value'); transfersRef.off('value');
         }
         listenersStarted = true;
         bankRef.on('value', function(snap) {
@@ -121,6 +131,7 @@
             setFeedback('Firebase отклонил чтение общего банка (' + error.message + '). Нужно опубликовать database.rules.json.', true);
         });
         participantsRef.on('value', function(snap) { sharedParticipants = snap.val() || {}; rebuildPlayers(); refresh(); }, function(error) { setFeedback('Не удалось загрузить список игроков: ' + error.message, true); });
+        usersRef.on('value', function(snap) { sharedUsers = snap.val() || {}; rebuildPlayers(); refresh(); }, function(error) { setFeedback('Не удалось загрузить аккаунты участников: ' + error.message, true); });
         transfersRef.on('value', function(snap) { sharedTransfers = snap.val() || {}; rebuildPlayers(); refresh(); }, function(error) { setFeedback('Не удалось загрузить переводы: ' + error.message, true); });
     }
     function setFeedback(text, isError) {
@@ -183,7 +194,7 @@
             }
             list.appendChild(row);
         });
-        if (!players.length) list.innerHTML = '<div class="amb-player-empty">Здесь появятся игроки, которые вступят в систему.</div>';
+        if (!players.length) list.innerHTML = '<div class="amb-player-empty">Зарегистрированные участники появятся здесь.</div>';
         var previous = select.value;
         select.innerHTML = '<option value="">Выбери игрока</option>' + players.filter(function(p) { return p.uid !== currentUid(); }).map(function(p) { return '<option value="' + encodeURIComponent(p.uid) + '">' + String(p.data.name || 'Участник').replace(/[&<>"']/g, '') + ' · ' + money(p.data.balance) + '</option>'; }).join('');
         if (previous) select.value = previous;
@@ -255,13 +266,14 @@
             row.append(text, amount); list.appendChild(row);
         });
     }
-    function grantFromBank(uid, amount) {
-        if (!isBankOwner() || !Number.isInteger(amount) || amount < 1 || !state.players[uid] || !bankRef) { setFeedback('Начислить очки может только банкир участнику системы.', true); return; }
+    function grantFromBank(uid, amount, targetName) {
+        if (!isBankOwner() || !uid || !Number.isInteger(amount) || amount < 1 || !bankRef) { setFeedback('Начислить очки может только банкир; проверь получателя и сумму.', true); return; }
+        var recipient = state.players[uid] || { name: targetName || 'Участник', balance: 0 };
         var grantId = bankRef.child('grants').push().key;
         bankRef.transaction(function(current) {
             if (!current || current.ownerUid !== currentUid() || Number(current.total) < amount) return;
             current.grants = current.grants || {};
-            current.grants[grantId] = { toUid: uid, toName: state.players[uid].name, amount: amount, at: Date.now() };
+            current.grants[grantId] = { toUid: uid, toName: recipient.name || targetName || 'Участник', amount: amount, at: Date.now() };
             current.total = Number(current.total) - amount;
             current.updatedAt = Date.now();
             return current;
@@ -298,16 +310,28 @@
             .catch(function(error) { setFeedback('Не удалось вступить: ' + error.message, true); });
     }
 
-    function transferPoints(uid, amount) {
+    function transferPoints(uid, amount, postMeta) {
         var self = player();
-        if (!self || !uid || !state.players[uid]) { setFeedback('Вступи в игру и выбери участника.', true); return; }
-        if (!Number.isInteger(amount) || amount < 1 || amount > self.balance) { setFeedback('Укажи целое число в пределах своего баланса.', true); return; }
+        if (!self || !uid || !state.players[uid]) { setFeedback('Выбери зарегистрированного участника.', true); return Promise.resolve(false); }
+        if (!Number.isInteger(amount) || amount < 1 || amount > self.balance) { setFeedback('Недостаточно очков на балансе.', true); return Promise.resolve(false); }
         var transfer = { fromUid: currentUid(), toUid: uid, amount: amount, at: Date.now() };
-        transfersRef.push().set(transfer).then(function() {
+        if (postMeta) {
+            transfer.kind = 'post_tip';
+            transfer.postKey = String(postMeta.key);
+        }
+        return transfersRef.push().set(transfer).then(function() {
             var targetName = state.players[uid].name;
-            setFeedback('Переведено ' + money(amount) + ' очков пользователю ' + targetName + '.');
-        }).catch(function(error) { setFeedback('Перевод не прошёл: ' + error.message, true); });
+            setFeedback(postMeta ? 'Поддержан пост пользователя ' + targetName + ' на ' + money(amount) + ' очко.' : 'Переведено ' + money(amount) + ' очков пользователю ' + targetName + '.');
+            return true;
+        }).catch(function(error) { setFeedback('Перевод не прошёл: ' + error.message, true); return false; });
     }
+
+    window.tipPostWithAmbassadorPoint = function(postId, type, authorUid) {
+        if (!USER_UID) { alert('Войди, чтобы поддержать публикацию.'); return Promise.resolve(false); }
+        if (!player() || player().balance < 1) { alert('На балансе нет очков.'); return Promise.resolve(false); }
+        var postKey = (type || 'feed') + '_' + postId;
+        return transferPoints(authorUid, 1, { key: postKey });
+    };
     function completeReferral(requestId) {
         var request = state.requests.find(function(item) { return item.id === requestId; });
         if (!request || request.status !== 'active' || !request.workerUid || request.remaining < request.rate) { setFeedback('Наградной резерв закончился.', true); return; }
@@ -384,10 +408,11 @@
                 else {
                     if (bankRef) bankRef.off('value');
                     if (participantsRef) participantsRef.off('value');
+                    if (usersRef) usersRef.off('value');
                     if (transfersRef) transfersRef.off('value');
                     listenersStarted = false;
                     bankReadError = false;
-                    sharedBank = null; sharedParticipants = {}; sharedTransfers = {};
+                    sharedBank = null; sharedParticipants = {}; sharedUsers = {}; sharedTransfers = {};
                     rebuildPlayers(); refresh();
                 }
             });

@@ -450,6 +450,10 @@
     border-top: 1px solid var(--border-color);
 }
 .post .stats.post-social-stats{flex-wrap:wrap;gap:4px 8px}
+.post .stats .post-tip-button,.post .stats .post-tip-total{margin-left:auto;color:#a56b13;font-weight:700}
+.post .stats .post-tip-button{border:1px solid #e9cf91;background:#fff8e6}
+.post .stats .post-tip-button:hover{background:#ffefc4}
+.post .stats .post-tip-total{display:flex;align-items:center;gap:4px;padding:4px 8px;font-size:.7rem}
 
 .post .stats button {
     background: none;

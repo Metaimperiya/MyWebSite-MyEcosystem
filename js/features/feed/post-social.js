@@ -59,14 +59,30 @@
         }).catch(function(error) { console.warn('Не удалось загрузить просмотры публикации:', error); });
     }
 
+    function loadPostTips(card, postId, type, authorUid) {
+        var key = socialKey(postId, type, authorUid);
+        db.ref(rootPath + '/ambassador_transfers').orderByChild('postKey').equalTo(key).once('value').then(function(snap) {
+            if (!card.isConnected) return;
+            var total = 0;
+            snap.forEach(function(child) {
+                var transfer = child.val() || {};
+                if (transfer.kind === 'post_tip') total += Number(transfer.amount) || 0;
+            });
+            setCounts(card, { tips: total });
+        }).catch(function(error) { console.warn('Не удалось загрузить поддержку публикации:', error); });
+    }
+
     function buildStatsMarkup(postId, type, authorUid, legacyLikes, comments, reposts) {
         var attrs = ' data-post-id="' + escHtml(postId) + '" data-post-type="' + escHtml(type) + '" data-author-uid="' + escHtml(authorUid || '') + '"';
+        var tipAction = !authorUid ? '' : authorUid === USER_UID
+            ? '<span class="post-tip-total" title="Очки, отправленные на эту публикацию">💵 <span data-count="tips">0</span></span>'
+            : '<button type="button" class="post-tip-button" data-social-action="tip"' + attrs + ' aria-label="Поддержать автора одним очком" title="Передать автору 1 очко">💵 <span data-count="tips">0</span></button>';
         return '<button type="button" data-social-action="reaction" data-kind="like"' + attrs + ' aria-label="Нравится">👍 <span data-count="like">' + Number(legacyLikes || 0) + '</span></button>' +
             '<button type="button" data-social-action="reaction" data-kind="dislike"' + attrs + ' aria-label="Не нравится">👎 <span data-count="dislike">0</span></button>' +
             '<span class="post-social-mention-control"><button type="button" data-social-action="pick-friends"' + attrs + ' aria-label="Отметить друзей">👤</button><button type="button" data-social-action="show-mentions"' + attrs + ' aria-label="Посмотреть отмеченных"><span data-count="mentions">0</span></button></span>' +
             '<button type="button" data-social-action="comments"' + attrs + '>💬 <span id="commentCount_' + escHtml(postId) + '">' + Number(comments || 0) + '</span></button>' +
             '<button type="button" data-social-action="repost"' + attrs + '>🔁 <span id="repostCount_' + escHtml(postId) + '">' + Number(reposts || 0) + '</span></button>' +
-            '<button type="button" data-social-action="show-views"' + attrs + ' aria-label="Кто посмотрел">👁 <span data-count="views">0</span></button>';
+            '<button type="button" data-social-action="show-views"' + attrs + ' aria-label="Кто посмотрел">👁 <span data-count="views">0</span></button>' + tipAction;
     }
 
     window.enhancePostSocialActions = function(card, post, type) {
@@ -77,6 +93,7 @@
         stats.classList.add('post-social-stats');
         stats.innerHTML = buildStatsMarkup(post.id, type, post.authorUid, post.likes, post.commentCount, post.reposts);
         loadCounts(card, post.id, type, post.authorUid, post.likes);
+        if (post.authorUid) loadPostTips(card, post.id, type, post.authorUid);
         watchView(card, post.id, type, post.authorUid);
     };
 
@@ -240,6 +257,13 @@
         } else if (button.dataset.socialAction === 'pick-friends') window.openPostMentionPicker(postId, type, authorUid);
         else if (button.dataset.socialAction === 'show-mentions') showTaggedPeople(postId, type, authorUid);
         else if (button.dataset.socialAction === 'show-views') window.openPostViews(postId, type, authorUid);
+        else if (button.dataset.socialAction === 'tip') {
+            if (button.disabled) return;
+            button.disabled = true;
+            Promise.resolve(window.tipPostWithAmbassadorPoint && window.tipPostWithAmbassadorPoint(postId, type, authorUid))
+                .then(function(sent) { if (sent && card) loadPostTips(card, postId, type, authorUid); })
+                .finally(function() { button.disabled = false; });
+        }
         else if (button.dataset.socialAction === 'comments') window.toggleComments(postId, type);
         else if (button.dataset.socialAction === 'repost') window.openRepost(postId, type);
     });

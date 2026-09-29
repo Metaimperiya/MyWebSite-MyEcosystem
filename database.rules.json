@@ -171,9 +171,10 @@
         },
         "ambassador_transfers": {
           ".read": "auth != null",
+          ".indexOn": ["postKey"],
           "$transferId": {
-            ".write": "auth != null && !data.exists() && newData.child('fromUid').val() === auth.uid && root.child('sites').child($site).child('ambassador_players').child(auth.uid).exists() && root.child('sites').child($site).child('ambassador_players').child(newData.child('toUid').val()).exists()",
-            ".validate": "newData.hasChildren(['fromUid', 'toUid', 'amount', 'at']) && newData.child('fromUid').val() === auth.uid && newData.child('toUid').isString() && newData.child('toUid').val() !== auth.uid && newData.child('amount').isNumber() && newData.child('amount').val() >= 1 && newData.child('amount').val() <= 10000000 && newData.child('at').isNumber()"
+            ".write": "auth != null && !data.exists() && newData.child('fromUid').val() === auth.uid && root.child('sites').child($site).child('all_users').child(auth.uid).exists() && root.child('sites').child($site).child('all_users').child(newData.child('toUid').val()).exists()",
+            ".validate": "newData.hasChildren(['fromUid', 'toUid', 'amount', 'at']) && newData.child('fromUid').val() === auth.uid && newData.child('toUid').isString() && newData.child('toUid').val() !== auth.uid && newData.child('amount').isNumber() && newData.child('amount').val() >= 1 && newData.child('amount').val() <= 10000000 && newData.child('at').isNumber() && (!newData.child('kind').exists() || (newData.child('kind').val() === 'post_tip' && newData.child('postKey').isString() && newData.child('postKey').val().length <= 200 && newData.child('amount').val() === 1))"
           }
         },
         "feed_posts": {
