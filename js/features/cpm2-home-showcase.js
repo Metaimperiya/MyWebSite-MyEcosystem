@@ -7,7 +7,8 @@
     var config = { banners: {}, featured: {} };
     var listings = {};
     var bannerTimers = {};
-    var featureLabels = { sell1: 'Sell · блок 3', sell2: 'Sell · блок 4', sell3: 'Sell · блок 5', trade1: 'Trade · блок 6', trade2: 'Trade · блок 7' };
+    var featureLabels = { sell1: 'Sell · место 3', sell2: 'Sell · место 4', sell3: 'Sell · место 5', trade1: 'Trade · место 6', trade2: 'Trade · место 7' };
+    var featureBlockNumbers = { sell1: 3, sell2: 4, sell3: 5, trade1: 6, trade2: 7 };
     var isAdminUser = function() { return !!USER_UID && typeof ADMIN_UIDS !== 'undefined' && ADMIN_UIDS.indexOf(USER_UID) !== -1; };
 
     function escape(value) {
@@ -23,6 +24,27 @@
         } catch (error) { return ''; }
     }
 
+    function openEditor(slot) {
+        if (typeof window.goToCpm2 === 'function') window.goToCpm2();
+        window.setTimeout(function() {
+            var editor = document.getElementById('cpm2HomeEditor');
+            var details = editor && editor.querySelector('details');
+            if (details) details.open = true;
+            var target = slot ? document.querySelector('[data-cpm2-editor-target="' + slot + '"]') : editor;
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 120);
+    }
+
+    function emptySlot(section, title, description, slot) {
+        section.hidden = false;
+        var inner = '<span aria-hidden="true">＋</span><strong>' + escape(title) + '</strong><small>' + escape(description) + '</small>' + (isAdminUser() ? '<em>Нажми, чтобы настроить</em>' : '');
+        section.innerHTML = isAdminUser()
+            ? '<button type="button" class="cpm2-showcase-empty" data-cpm2-empty-slot="' + escape(slot) + '">' + inner + '</button>'
+            : '<div class="cpm2-showcase-empty cpm2-showcase-empty-public">' + inner + '</div>';
+        var button = section.querySelector('[data-cpm2-empty-slot]');
+        if (button && isAdminUser()) button.addEventListener('click', function() { openEditor(slot); });
+    }
+
     function activeListings(mode) {
         return Object.keys(listings).map(function(id) { return Object.assign({ id: id }, listings[id] || {}); })
             .filter(function(item) {
@@ -35,7 +57,12 @@
         if (!section) return;
         if (bannerTimers[slot]) clearInterval(bannerTimers[slot]);
         var images = Array.isArray(data && data.images) ? data.images.map(safeUrl).filter(Boolean).slice(0, 5) : [];
-        if (!images.length) { section.hidden = true; section.innerHTML = ''; return; }
+        if (!images.length) {
+            emptySlot(section, 'Здесь могла быть ваша реклама', (slot === 'banner1' ? 'Баннер 1 · слайдер до пяти изображений.' : 'Баннер 2 · широкий рекламный баннер.') + (isAdminUser() ? ' Добавь изображения, текст и ссылку.' : ''), slot);
+            section.classList.add('cpm2-banner-empty');
+            return;
+        }
+        section.classList.remove('cpm2-banner-empty');
         section.hidden = false;
         var index = 0;
         function paint() {
@@ -57,7 +84,12 @@
         var cards = picks.map(function(id) { return Object.assign({ id: id }, listings[id] || {}); }).filter(function(item) {
             return item.isActive === true && item.cpm2Broker === true && item.moderationStatus === 'approved' && item.brokerStatus === 'in_stock' && item.dealMode === mode;
         });
-        if (!cards.length) { section.hidden = true; section.innerHTML = ''; return; }
+        if (!cards.length) {
+            var marketTitle = mode === 'sell' ? 'Машины на продажу · SELL' : 'Машины для обмена · TRADE';
+            var marketDescription = 'Блок ' + featureBlockNumbers[slot] + '. Здесь появятся объявления CPM2.';
+            emptySlot(section, marketTitle, marketDescription + (isAdminUser() ? ' Выбери одобренное объявление в настройках CPM2.' : ''), slot);
+            return;
+        }
         section.hidden = false;
         section.innerHTML = '<div class="cpm2-sidebar-market-heading"><span>' + (mode === 'sell' ? '↗ SELL' : '⇄ TRADE') + '</span><strong>' + escape(featureLabels[slot]) + '</strong></div>' + cards.map(function(item) {
             var image = safeUrl(item.imageUrl);
@@ -98,7 +130,7 @@
                     return '<option value="' + escape(item.id) + '"' + (item.id === value ? ' selected' : '') + '>' + escape(text) + '</option>';
                 }).join('') + '</select>';
             }).join('');
-            return '<fieldset class="cpm2-home-pick-group"><legend>' + escape(featureLabels[slot]) + '</legend>' + selectHtml + (options.length ? '' : '<small>Нет одобренных объявлений этого типа. Одобри заявку в гараже — она появится здесь.</small>') + '</fieldset>';
+            return '<fieldset class="cpm2-home-pick-group" data-cpm2-editor-target="' + slot + '"><legend>' + escape(featureLabels[slot]) + '</legend>' + selectHtml + (options.length ? '' : '<small>Нет одобренных объявлений этого типа. Одобри заявку в гараже — она появится здесь.</small>') + '</fieldset>';
         }).join('');
     }
 

@@ -52,7 +52,7 @@
     <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.3">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.2">
     <link rel="stylesheet" href="css/features/cpm2.css?v=1.3">
-    <link rel="stylesheet" href="css/features/cpm2-home-showcase.css?v=1.0">
+    <link rel="stylesheet" href="css/features/cpm2-home-showcase.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.4">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -477,8 +477,8 @@
                             <summary>⚙ Настроить баннеры и объявления на главной</summary>
                             <p>Баннеры показываются в боковых колонках. Sell и Trade здесь ссылаются на уже одобренные CPM2-объявления. Каждому блоку можно выбрать до трёх карточек.</p>
                             <div class="cpm2-home-banner-editors">
-                                <fieldset><legend>Блок 1 · компактный слайдер</legend><label>Заголовок<input id="cpm2Banner1Title" maxlength="70" placeholder="Например, CPM2 METAIMPERIYA"></label><label>Текст<input id="cpm2Banner1Text" maxlength="160" placeholder="Короткое описание"></label><label>Ссылка<input id="cpm2Banner1Link" type="url" maxlength="2048" placeholder="https://…"></label><label>Ссылки на изображения · по одной на строку<textarea id="cpm2Banner1Images" rows="3" placeholder="https://…"></textarea></label><label>Или загрузи слайды<input id="cpm2Banner1Files" type="file" accept="image/*" multiple></label></fieldset>
-                                <fieldset><legend>Блок 2 · широкий баннер</legend><label>Заголовок<input id="cpm2Banner2Title" maxlength="70" placeholder="Например, Найди свою команду"></label><label>Текст<input id="cpm2Banner2Text" maxlength="160" placeholder="Короткое описание"></label><label>Ссылка<input id="cpm2Banner2Link" type="url" maxlength="2048" placeholder="https://…"></label><label>Ссылки на изображения · по одной на строку<textarea id="cpm2Banner2Images" rows="3" placeholder="https://…"></textarea></label><label>Или загрузи слайды<input id="cpm2Banner2Files" type="file" accept="image/*" multiple></label></fieldset>
+                                <fieldset data-cpm2-editor-target="banner1"><legend>Блок 1 · компактный слайдер</legend><label>Заголовок<input id="cpm2Banner1Title" maxlength="70" placeholder="Например, CPM2 METAIMPERIYA"></label><label>Текст<input id="cpm2Banner1Text" maxlength="160" placeholder="Короткое описание"></label><label>Ссылка<input id="cpm2Banner1Link" type="url" maxlength="2048" placeholder="https://…"></label><label>Ссылки на изображения · по одной на строку<textarea id="cpm2Banner1Images" rows="3" placeholder="https://…"></textarea></label><label>Или загрузи слайды<input id="cpm2Banner1Files" type="file" accept="image/*" multiple></label></fieldset>
+                                <fieldset data-cpm2-editor-target="banner2"><legend>Блок 2 · широкий баннер</legend><label>Заголовок<input id="cpm2Banner2Title" maxlength="70" placeholder="Например, Найди свою команду"></label><label>Текст<input id="cpm2Banner2Text" maxlength="160" placeholder="Короткое описание"></label><label>Ссылка<input id="cpm2Banner2Link" type="url" maxlength="2048" placeholder="https://…"></label><label>Ссылки на изображения · по одной на строку<textarea id="cpm2Banner2Images" rows="3" placeholder="https://…"></textarea></label><label>Или загрузи слайды<input id="cpm2Banner2Files" type="file" accept="image/*" multiple></label></fieldset>
                             </div>
                             <div class="cpm2-home-picks" id="cpm2HomePicks"></div>
                             <div class="cpm2-home-editor-actions"><span id="cpm2HomeEditorStatus" role="status"></span><button type="button" id="cpm2HomeSaveButton" onclick="window.saveCpm2HomepageShowcase()">Сохранить витрину</button></div>
@@ -1021,7 +1021,7 @@
 <script src="js/features/work.js?v=1.3"></script>
 <script src="js/features/dating.js?v=2.1"></script>
 <script src="js/features/marketplace.js?v=1.3"></script>
-<script src="js/features/cpm2-home-showcase.js?v=1.0"></script>
+<script src="js/features/cpm2-home-showcase.js?v=1.1"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.2"></script>
 <script src="js/features/admin.js?v=3.2"></script>
