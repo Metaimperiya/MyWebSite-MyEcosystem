@@ -14,10 +14,14 @@
         profileUid = uid || (typeof VIEWING_USER !== 'undefined' && VIEWING_USER) || USER_UID;
         var panel = document.getElementById('cpm2GaragePanel');
         var submit = document.getElementById('cpm2GarageSubmit');
+        var formBody = document.getElementById('cpm2GarageFormBody');
+        var formToggle = document.getElementById('cpm2GarageFormToggle');
         var list = document.getElementById('cpm2GarageList');
         if (!panel || !profileUid) return;
         panel.hidden = false;
         if (submit) submit.hidden = profileUid !== USER_UID;
+        if (formBody) formBody.hidden = true;
+        if (formToggle) formToggle.setAttribute('aria-expanded', 'false');
         if (list) list.innerHTML = '<div class="cpm2-garage-empty">Загружаем гараж…</div>';
         if (profileUid === USER_UID && userData) {
             var country = document.getElementById('cpm2GarageCountry');
@@ -25,9 +29,12 @@
             if (country && !country.value) country.value = userData.country || '';
             if (city && !city.value) city.value = userData.city || '';
         }
+        var submissionsRequest = profileUid === USER_UID
+            ? root('cpm2_garage_submissions/' + profileUid).once('value')
+            : Promise.resolve(null);
         Promise.all([
             root('cpm2_garage_inventory').once('value'),
-            root('cpm2_garage_submissions/' + profileUid).once('value'),
+            submissionsRequest,
             root('ambassador_bank').once('value'),
             root('marketplace_listings').orderByChild('sellerUid').equalTo(profileUid).once('value')
         ]).then(function(results) {
@@ -37,6 +44,16 @@
             if (list) list.innerHTML = '<div class="cpm2-garage-empty">Не удалось загрузить гараж: ' + esc(error.message || 'ошибка доступа') + '</div>';
         });
     }
+
+    window.toggleCpm2GarageForm = function(forceOpen) {
+        var body = document.getElementById('cpm2GarageFormBody');
+        var toggle = document.getElementById('cpm2GarageFormToggle');
+        if (!body || !toggle) return;
+        var open = typeof forceOpen === 'boolean' ? forceOpen : body.hidden;
+        body.hidden = !open;
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.textContent = open ? '− Свернуть форму' : '＋ Подать автомобиль на комиссию';
+    };
 
     function renderProfileGarage(inventory, submissions, marketplaceListings) {
         var list = document.getElementById('cpm2GarageList');
@@ -56,16 +73,32 @@
         }).join('');
         html += ownSubmissions.map(function(item) {
             var state = item.status === 'accepted' ? 'Принята · завершается публикация' : item.status === 'rejected' ? 'Отклонена модератором' : 'Подана · на модерации, ждёт фактической передачи машины';
-            return '<article class="cpm2-garage-submission"><div><strong>' + esc(item.title) + '</strong><span>' + state + (item.reviewNote ? ' · ' + esc(item.reviewNote) : '') + '</span></div><b>Оценка: ' + money(item.creditAmount) + ' CPM2</b></article>';
+            var gameIdEditor = item.status !== 'rejected' ? '<label class="cpm2-game-id-edit">Игровой ID CPM2<input type="text" maxlength="80" value="' + esc(item.gameId || '') + '" placeholder="Например, PX847653" data-garage-game-id="' + esc(item.id) + '"><button type="button" data-save-game-id="' + esc(item.id) + '">Сохранить ID</button></label>' : '<span>ID игрока CPM2: ' + esc(item.gameId || 'не указан') + '</span>';
+            return '<article class="cpm2-garage-submission"><div><strong>' + esc(item.title) + '</strong><span>' + state + (item.reviewNote ? ' · ' + esc(item.reviewNote) : '') + '</span>' + gameIdEditor + '</div><b>Оценка: ' + money(item.creditAmount) + ' CPM2</b></article>';
         }).join('');
         list.innerHTML = html || '<div class="cpm2-garage-empty">В этом гараже пока нет принятых автомобилей.</div>';
         list.querySelectorAll('[data-garage-buy]').forEach(function(button) {
             button.addEventListener('click', function() { buyCar(button.getAttribute('data-garage-buy'), button); });
         });
+        list.querySelectorAll('[data-save-game-id]').forEach(function(button) {
+            button.addEventListener('click', function() { saveSubmissionGameId(button.getAttribute('data-save-game-id'), button); });
+        });
+    }
+
+    function saveSubmissionGameId(submissionId, button) {
+        var input = document.querySelector('[data-garage-game-id="' + CSS.escape(submissionId) + '"]');
+        var gameId = (input && input.value || '').trim();
+        if (!USER_UID || profileUid !== USER_UID || !gameId || gameId.length > 80) { alert('Введи игровой ID CPM2 (до 80 символов).'); return; }
+        button.disabled = true;
+        root('cpm2_garage_submissions/' + USER_UID + '/' + submissionId + '/gameId').set(gameId)
+            .then(function() { button.textContent = 'Сохранено'; if (window.loadCpm2GarageAdmin && isAdmin()) window.loadCpm2GarageAdmin(); })
+            .catch(function(error) { alert('Не удалось сохранить ID: ' + (error.message || 'проверь Database Rules')); })
+            .finally(function() { button.disabled = false; });
     }
 
     window.submitCpm2GarageCar = function() {
         var title = (document.getElementById('cpm2GarageTitle').value || '').trim();
+        var gameId = (document.getElementById('cpm2GarageGameId').value || '').trim();
         var price = Number(document.getElementById('cpm2GaragePrice').value);
         var imageUrl = (document.getElementById('cpm2GarageImage').value || '').trim();
         var imageFile = document.getElementById('cpm2GarageImageFile').files[0];
@@ -78,6 +111,7 @@
         var feedback = document.getElementById('cpm2GarageFeedback');
         var button = document.getElementById('cpm2GarageSubmitButton');
         if (!USER_UID) { if (feedback) feedback.textContent = 'Войди в аккаунт, чтобы подать заявку.'; return; }
+        if (gameId.length < 1 || gameId.length > 80) { if (feedback) feedback.textContent = 'Укажи свой игровой ID CPM2 — по нему администратор найдёт тебя в игре.'; return; }
         if (title.length < 2 || !description || !Number.isSafeInteger(price) || price < 1 || price > 1000000000000) { if (feedback) feedback.textContent = 'Укажи модель, описание машины и целую цену в CPM2.'; return; }
         if (!countryInfo || !city) { if (feedback) feedback.textContent = 'Укажи страну и город: они появятся в Sell/Trade.'; return; }
         if (imageUrl && !/^https?:\/\//i.test(imageUrl)) { if (feedback) feedback.textContent = 'Ссылка на фото должна начинаться с https:// или http://.'; return; }
@@ -89,10 +123,11 @@
             ? storage.ref('cpm2-garage-photos/' + USER_UID + '/' + ref.key + '/main').put(imageFile, { contentType: imageFile.type }).then(function(snapshot) { return snapshot.ref.getDownloadURL(); })
             : Promise.resolve(imageUrl);
         imagePromise.then(function(savedImageUrl) {
-            return ref.set({ sellerUid: USER_UID, sellerName: typeof USER !== 'undefined' ? USER : '', title: title, description: description, imageUrl: savedImageUrl, price: price, creditAmount: price, dealMode: dealMode, tradeFor: tradeFor, country: countryInfo.name, countryCode: countryInfo.code, city: city, status: 'pending', createdAt: Date.now() });
+            return ref.set({ sellerUid: USER_UID, sellerName: typeof USER !== 'undefined' ? USER : '', gameId: gameId, title: title, description: description, imageUrl: savedImageUrl, price: price, creditAmount: price, dealMode: dealMode, tradeFor: tradeFor, country: countryInfo.name, countryCode: countryInfo.code, city: city, status: 'pending', createdAt: Date.now() });
         })
             .then(function() {
                 document.getElementById('cpm2GarageTitle').value = '';
+                document.getElementById('cpm2GarageGameId').value = '';
                 document.getElementById('cpm2GaragePrice').value = '';
                 document.getElementById('cpm2GarageImage').value = '';
                 document.getElementById('cpm2GarageImageFile').value = '';
@@ -111,6 +146,7 @@
             var form = document.getElementById('cpm2GarageSubmit');
             var select = document.getElementById('cpm2GarageMode');
             if (form) form.hidden = false;
+            window.toggleCpm2GarageForm(true);
             if (select) select.value = mode === 'trade' ? 'trade' : 'sell';
             if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 500);
@@ -168,14 +204,20 @@
     function renderAdminQueue(submissions, orders) {
         var queue = document.getElementById('cpm2GarageQueue');
         var orderList = document.getElementById('cpm2GarageOrders');
-        var pending = [];
+        var applications = [];
         Object.keys(submissions).forEach(function(uid) { Object.keys(submissions[uid] || {}).forEach(function(id) {
-            var item = submissions[uid][id]; if (item && (item.status === 'pending' || (item.status === 'accepted' && !item.publishedAt))) pending.push(Object.assign({ id: id, sellerUid: uid }, item));
+            var item = submissions[uid][id]; if (item) applications.push(Object.assign({ id: id, sellerUid: uid }, item));
         }); });
-        if (queue) queue.innerHTML = pending.length ? pending.map(function(item) {
+        applications.sort(function(a, b) { return Number(b.createdAt || 0) - Number(a.createdAt || 0); });
+        if (queue) queue.innerHTML = applications.length ? applications.map(function(item) {
             var image = /^https?:\/\//i.test(item.imageUrl || '') ? '<img src="' + esc(item.imageUrl) + '" alt="">' : '<span>🚘</span>';
-            var resumed = item.status === 'accepted';
-            return '<article class="cpm2-garage-admin-row">' + image + '<div><strong>' + esc(item.title) + (item.dealMode === 'trade' ? ' · TRADE' : ' · SELL') + '</strong><p>' + esc(item.sellerName) + ' · ' + esc(item.sellerUid) + '</p><p>' + esc(item.city || '') + ', ' + esc(item.country || '') + ' · ' + esc(item.description || 'Без описания') + '</p>' + (resumed ? '<p>Машина уже принята и баланс начислен. Повтори публикацию в каталог и ленту.</p><input type="hidden" value="' + Number(item.creditAmount || item.price || 0) + '" data-garage-credit="' + esc(uidKey(item.sellerUid, item.id)) + '">' : '<label>Начислить при приёмке <input type="number" min="1" max="1000000000000" step="1" value="' + Number(item.creditAmount || item.price || 0) + '" data-garage-credit="' + esc(uidKey(item.sellerUid, item.id)) + '"> CPM2</label>') + '<div><button type="button" data-garage-accept="' + esc(uidKey(item.sellerUid, item.id)) + '">' + (resumed ? 'Завершить публикацию' : 'Машину получил · начислить') + '</button>' + (resumed ? '' : '<button type="button" class="secondary" data-garage-reject="' + esc(uidKey(item.sellerUid, item.id)) + '">Отклонить</button>') + '</div></div></article>';
+            var resumed = item.status === 'accepted' && !item.publishedAt;
+            var status = item.status === 'rejected' ? 'Отклонена' : item.status === 'accepted' ? item.publishedAt ? 'Принята и опубликована' : 'Принята · требуется завершить публикацию' : 'Ожидает модерации';
+            var actions = item.status === 'pending'
+                ? '<label>Начислить при приёмке <input type="number" min="1" max="1000000000000" step="1" value="' + Number(item.creditAmount || item.price || 0) + '" data-garage-credit="' + esc(uidKey(item.sellerUid, item.id)) + '"> CPM2</label><div><button type="button" data-garage-accept="' + esc(uidKey(item.sellerUid, item.id)) + '">Машину получил · начислить</button><button type="button" class="secondary" data-garage-reject="' + esc(uidKey(item.sellerUid, item.id)) + '">Отклонить</button></div>'
+                : resumed ? '<p>Машина принята и баланс начислен. Можно завершить публикацию в Sell и ленте.</p><input type="hidden" value="' + Number(item.creditAmount || item.price || 0) + '" data-garage-credit="' + esc(uidKey(item.sellerUid, item.id)) + '"><div><button type="button" data-garage-accept="' + esc(uidKey(item.sellerUid, item.id)) + '">Завершить публикацию</button></div>'
+                : '<p class="cpm2-garage-admin-status">Статус: ' + status + (item.reviewNote ? ' · ' + esc(item.reviewNote) : '') + '</p>';
+            return '<article class="cpm2-garage-admin-row">' + image + '<div><strong>' + esc(item.title) + (item.dealMode === 'trade' ? ' · TRADE' : ' · SELL') + '</strong><p>' + esc(item.sellerName) + ' · UID сайта: ' + esc(item.sellerUid) + '</p><p class="cpm2-game-player-id"><strong>ID игрока CPM2: ' + esc(item.gameId || 'не указан в этой заявке') + '</strong></p><p>' + esc(item.city || '') + ', ' + esc(item.country || '') + ' · ' + esc(item.description || 'Без описания') + '</p>' + actions + '</div></article>';
         }).join('') : '<div class="cpm2-garage-empty">Новых заявок на приёмку нет.</div>';
         if (orderList) {
             var activeOrders = Object.keys(orders).map(function(id) { return Object.assign({ id: id }, orders[id] || {}); }).filter(function(order) { return order.status === 'paid_waiting_delivery' || order.status === 'trade_offer' || order.status === 'trade_waiting_delivery'; });

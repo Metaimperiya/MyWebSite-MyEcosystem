@@ -32,4 +32,5 @@
 .clan-roster-person small,.clan-roster-leader{color:var(--text-secondary);font-size:.62rem}
 .clan-roster-leader{color:#98741b;font-weight:800}
 .clan-roster-row button{min-height:29px;padding:5px 9px;font-size:.62rem}
+.clan-roster-row .clan-transfer-button{border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-secondary)}
 @media(max-width:600px){.groups-heading-actions{width:100%;justify-content:stretch}.groups-heading-actions button{flex:1}.clan-entry-panel{align-items:flex-start;flex-direction:column}.clan-entry-panel button{width:100%}.clan-application-card{grid-template-columns:minmax(0,1fr) auto;align-items:start}.clan-application-card label{grid-column:2;grid-row:1}.clan-application-card>button{grid-row:2}.clan-application-card>button:nth-last-child(1){grid-column:2}.clan-roster-heading{align-items:flex-start;flex-direction:column}}

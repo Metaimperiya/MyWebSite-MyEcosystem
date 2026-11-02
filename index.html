@@ -161,8 +161,8 @@
             <button type="button" class="menu-item" onclick="goToCpm2GarageSubmit('trade');closeSidebar();">＋ Подать на Trade</button>
             <button type="button" class="menu-item" onclick="goToProfile();closeSidebar();">🅿️ Мой гараж</button>
             <button type="button" class="menu-item" onclick="goToGroups();closeSidebar();">🛡️ Кланы</button>
-            <button type="button" class="menu-item" disabled aria-disabled="true">🛒 Магазин · скоро</button>
-            <button type="button" class="menu-item" disabled aria-disabled="true">💱 Курс CPM2 · скоро</button>
+            <button type="button" class="menu-item" onclick="goToCpm2Market('sell');closeSidebar();">🛒 Магазин · рынок Sell</button>
+            <button type="button" class="menu-item" onclick="goToCpm2();closeSidebar();">💱 Демо-курс CPM2 · обзор</button>
         </div>
 
         <a class="menu-item" href="/doss/" onclick="closeSidebar();"><span class="icon">🧠</span> DOSS OS</a>
@@ -476,16 +476,16 @@
                         <p id="cpm2Feedback" role="status"></p>
                         <section class="cpm2-audit" id="cpm2Audit" hidden><h3>Журнал операций</h3><div id="cpm2AuditRows"></div></section>
                     </section>
-                    <section class="cpm2-garage-admin" id="cpm2GarageAdmin" hidden><header><div><span>КОМИССИОННЫЙ ГАРАЖ</span><h2>Приёмка автомобилей</h2><p>Подтверждай только после того, как автомобиль действительно передан в игре.</p></div><button type="button" onclick="window.loadCpm2GarageAdmin()">Обновить</button></header><div id="cpm2GarageQueue"><div class="cpm2-garage-empty">Заявки появятся здесь.</div></div><h3>Заявки покупателей</h3><div id="cpm2GarageOrders"><div class="cpm2-garage-empty">Покупок пока нет.</div></div></section>
+                    <section class="cpm2-garage-admin" id="cpm2GarageAdmin" hidden><header><div><span>КОМИССИОННЫЙ ГАРАЖ</span><h2>Заявки и история приёмки</h2><p>Игровой ID виден здесь, чтобы найти игрока в CPM2. Подтверждай передачу только после получения машины.</p></div><button type="button" onclick="window.loadCpm2GarageAdmin()">Обновить</button></header><div id="cpm2GarageQueue"><div class="cpm2-garage-empty">Заявки появятся здесь.</div></div><h3>Заявки покупателей</h3><div id="cpm2GarageOrders"><div class="cpm2-garage-empty">Покупок пока нет.</div></div></section>
                     <section class="cpm2-section"><div class="cpm2-section-title"><h2>Разделы</h2><span>Выбери направление</span></div>
                         <div class="cpm2-grid">
                             <button type="button" class="cpm2-card" onclick="goToAutoMarket()"><span>🚘</span><strong>Авторынок</strong><small>Объявления об авто и запчастях</small><em>Открыть рынок →</em></button>
                             <button type="button" class="cpm2-card" onclick="goToProfile()"><span>🅿️</span><strong>Мой гараж</strong><small>Выставляй автомобиль на продажу или обмен через приёмку</small><em>Открыть профиль →</em></button>
                             <button type="button" class="cpm2-card" onclick="goToGroups()"><span>🛡️</span><strong>Кланы</strong><small>Создавай клан, получай символ и назначай его участникам</small><em>Открыть кланы →</em></button>
-                            <article class="cpm2-card cpm2-card-pending"><span>🛒</span><strong>Магазин</strong><small>Покупки за CPM2 и публикация получения в ленте</small><em>Следующий этап</em></article>
+                            <button type="button" class="cpm2-card" onclick="goToCpm2Market('sell')"><span>🛒</span><strong>Магазин</strong><small>Тот же рынок Sell: игровые машины на продажу за CPM2</small><em>Открыть магазин →</em></button>
                             <article class="cpm2-card cpm2-card-pending"><span>🔄</span><strong>Обмен</strong><small>Перевод и обмен внутреннего баланса</small><em>Следующий этап</em></article>
                             <article class="cpm2-card cpm2-card-pending"><span>🤝</span><strong>Sell / Trade</strong><small>Продажа и обмен предметов между участниками</small><em>Следующий этап</em></article>
-                            <article class="cpm2-card cpm2-card-pending"><span>💱</span><strong>Курс CPM2</strong><small>Гривна, рубль и доллар — курс ещё не установлен</small><em>Следующий этап</em></article>
+                            <article class="cpm2-card cpm2-card-pending"><span>💱</span><strong>Демо-курс CPM2</strong><small>Курс к UAH, RUB и USD пока не задан. Это игровой макет; обмен и выплаты не подключены.</small><em>Курс не установлен</em></article>
                         </div>
                     </section>
                 </section>
@@ -542,11 +542,14 @@
                 <section class="cpm2-garage-panel" id="cpm2GaragePanel" hidden aria-label="Игровой гараж">
                     <header><div><span>CPM2 · КОМИССИОННЫЙ ГАРАЖ</span><h3>Гараж игрока</h3><p>Автомобили, принятые администратором в игровой гараж.</p></div><b>💲</b></header>
                     <div class="cpm2-garage-submit" id="cpm2GarageSubmit" hidden>
+                        <button type="button" class="cpm2-garage-form-toggle" id="cpm2GarageFormToggle" aria-expanded="false" aria-controls="cpm2GarageFormBody" onclick="window.toggleCpm2GarageForm()">＋ Подать автомобиль на комиссию</button>
+                        <div id="cpm2GarageFormBody" hidden>
                         <strong>Передать автомобиль на комиссию</strong>
                         <p>Создай заявку и свяжись с администратором. После фактического получения машины в игре он подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в этом гараже, в Sell/Trade и общей ленте.</p>
-                        <div class="cpm2-garage-form"><label>Модель автомобиля<input id="cpm2GarageTitle" maxlength="80" placeholder="Например, Ferrari SF90"></label><label>Условия<select id="cpm2GarageMode"><option value="sell">Продажа за CPM2</option><option value="trade">Обмен</option></select></label><label>Цена / оценка в CPM2<input id="cpm2GaragePrice" type="number" min="1" max="1000000000000" step="1" placeholder="Например, 5000000"></label><label>На что меняешь (для Trade)<input id="cpm2GarageTradeFor" maxlength="160" placeholder="Модель или условия обмена"></label><label>Страна<input id="cpm2GarageCountry" maxlength="80" placeholder="Страна"></label><label>Город<input id="cpm2GarageCity" maxlength="80" placeholder="Город"></label><label>Фото по ссылке<input id="cpm2GarageImage" type="url" maxlength="2048" placeholder="https://…"></label><label>Или загрузи фото<input id="cpm2GarageImageFile" type="file" accept="image/*"></label><label>Описание<textarea id="cpm2GarageDescription" maxlength="1000" placeholder="Состояние, комплектация, условия"></textarea></label></div>
+                        <div class="cpm2-garage-form"><label>Твой ID игрока в CPM2<input id="cpm2GarageGameId" maxlength="80" autocomplete="off" placeholder="ID, по которому тебя найти в игре"></label><label>Модель автомобиля<input id="cpm2GarageTitle" maxlength="80" placeholder="Например, Ferrari SF90"></label><label>Условия<select id="cpm2GarageMode"><option value="sell">Продажа за CPM2</option><option value="trade">Обмен</option></select></label><label>Цена / оценка в CPM2<input id="cpm2GaragePrice" type="number" min="1" max="1000000000000" step="1" placeholder="Например, 5000000"></label><label>На что меняешь (для Trade)<input id="cpm2GarageTradeFor" maxlength="160" placeholder="Модель или условия обмена"></label><label>Страна<input id="cpm2GarageCountry" maxlength="80" placeholder="Страна"></label><label>Город<input id="cpm2GarageCity" maxlength="80" placeholder="Город"></label><label>Фото по ссылке<input id="cpm2GarageImage" type="url" maxlength="2048" placeholder="https://…"></label><label>Или загрузи фото<input id="cpm2GarageImageFile" type="file" accept="image/*"></label><label>Описание<textarea id="cpm2GarageDescription" maxlength="1000" placeholder="Состояние, комплектация, условия"></textarea></label></div>
                         <p class="cpm2-garage-contact">После подачи заявки напиши администратору в <a href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Telegram</a>, чтобы согласовать передачу автомобиля в CPM2.</p>
                         <button type="button" id="cpm2GarageSubmitButton" onclick="window.submitCpm2GarageCar()">Отправить на модерацию</button><div id="cpm2GarageFeedback" role="status" aria-live="polite"></div>
+                        </div>
                     </div>
                     <div class="cpm2-garage-list" id="cpm2GarageList"><div class="cpm2-garage-empty">Загружаем гараж…</div></div>
                 </section>
