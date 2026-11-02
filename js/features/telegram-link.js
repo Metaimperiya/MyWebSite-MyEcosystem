@@ -9,11 +9,32 @@
     }
     function init() {
         var panel = document.getElementById('cpm2TelegramConnect');
+        var loginPrompt = document.getElementById('telegramLoginPrompt');
         if (!panel || typeof auth === 'undefined') return;
+        var linkListenerRef = null;
         auth.onAuthStateChanged(function(user) {
             panel.hidden = !user;
+            if (loginPrompt) loginPrompt.hidden = !!user;
             var status = document.getElementById('cpm2TelegramLinkStatus');
-            if (user && status) status.textContent = 'Открой бота и отправь ему команду /link КОД.';
+            if (linkListenerRef) {
+                linkListenerRef.off('value');
+                linkListenerRef = null;
+            }
+            if (user && status && typeof db !== 'undefined' && typeof SITE !== 'undefined') {
+                status.textContent = 'Проверяем привязку…';
+                linkListenerRef = db.ref('sites/' + SITE + '/telegram_links/' + user.uid);
+                linkListenerRef.on('value', function(snapshot) {
+                    if (snapshot.exists()) {
+                        var linked = snapshot.val() || {};
+                        var identity = linked.telegramUsername ? ' @' + linked.telegramUsername : '';
+                        status.textContent = '✅ Telegram привязан' + identity + '. Можно подавать объявления из бота.';
+                    } else {
+                        status.textContent = 'Создай код ниже, открой бота и отправь ему команду /link КОД.';
+                    }
+                }, function() {
+                    status.textContent = 'Не удалось проверить привязку. Код можно создать кнопкой ниже.';
+                });
+            }
         });
     }
     window.createCpm2TelegramLinkCode = function() {

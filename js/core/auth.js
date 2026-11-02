@@ -155,9 +155,11 @@ document.addEventListener('DOMContentLoaded', function() {
             var loginModal = document.getElementById('loginModal');
             var requestedInitialPage = new URLSearchParams(window.location.search).get('page');
             var publicLanding = document.getElementById('page-landing')?.classList.contains('active') && (!requestedInitialPage || requestedInitialPage === 'landing');
-            if (loginModal && !publicLanding) loginModal.classList.add('open');
+            var publicTelegram = requestedInitialPage === 'telegram' && document.getElementById('page-telegram');
+            var publicPage = publicLanding || !!publicTelegram;
+            if (loginModal && !publicPage) loginModal.classList.add('open');
             var mainContainer = document.getElementById('mainContainer');
-            if (mainContainer) mainContainer.style.display = publicLanding ? 'block' : 'none';
+            if (mainContainer) mainContainer.style.display = publicPage ? 'block' : 'none';
             if (typeof updateUI === 'function') updateUI();
             if (typeof window.renderCpm2LandingDiscussion === 'function') window.renderCpm2LandingDiscussion();
             if (typeof startDirectMessageUnreadTracking === 'function') startDirectMessageUnreadTracking();

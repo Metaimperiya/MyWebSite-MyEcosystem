@@ -51,7 +51,7 @@
     <link rel="stylesheet" href="css/features/referrals.css?v=1.2">
     <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.3">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.2">
-    <link rel="stylesheet" href="css/features/cpm2.css?v=1.3">
+    <link rel="stylesheet" href="css/features/cpm2.css?v=1.4">
     <link rel="stylesheet" href="css/features/cpm2-home-showcase.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.4">
@@ -153,6 +153,7 @@
         <div class="menu-item" onclick="goToDating();closeSidebar();"><span class="icon">💗</span> Знакомства</div>
         <div class="menu-item" onclick="goToReferrals();closeSidebar();"><span class="icon">🌐</span> Амбассадоры и приглашения</div>
         <div class="menu-item" onclick="goToMarketplace();closeSidebar();"><span class="icon">🛍️</span> Маркетплейс</div>
+        <button type="button" class="menu-item" onclick="openPage('telegram');closeSidebar();"><span class="icon">✈️</span> Telegram · подключение</button>
         <button type="button" class="menu-item menu-parent" id="cpm2MenuToggle" aria-expanded="false" aria-controls="cpm2Menu" onclick="toggleCpm2Menu()"><span class="icon">💲</span><span>CPM2</span><span class="menu-chevron" aria-hidden="true">⌄</span></button>
         <div class="menu-sub cpm2-menu" id="cpm2Menu" hidden>
             <button type="button" class="menu-item" onclick="goToCpm2();closeSidebar();">Обзор CPM2</button>
@@ -472,10 +473,6 @@
                 <section class="cpm2-page">
                     <header class="cpm2-heading"><span class="cpm2-kicker">METAIMPERIYA · ИГРОВАЯ ЭКОНОМИКА</span><h1>CPM2</h1><p>Кланы, авторынок и будущие обмены — в одном разделе.</p></header>
                     <div class="cpm2-notice">💲 CPM2 — внутренняя игровая единица для кланового баланса, переводов и учёта сделок.</div>
-                    <section class="cpm2-telegram-connect" id="cpm2TelegramConnect" hidden>
-                        <div><strong>Связать Telegram с сайтом</strong><p>Объявления об автомобилях из Telegram попадут в общую очередь CPM2. После модерации сайт опубликует их в канале Sell или Trade.</p><div id="cpm2TelegramLinkStatus" role="status"></div></div>
-                        <button type="button" id="cpm2TelegramLinkButton" onclick="window.createCpm2TelegramLinkCode()">Создать код привязки</button>
-                    </section>
                     <section class="cpm2-home-editor" id="cpm2HomeEditor" hidden>
                         <details>
                             <summary>⚙ Настроить баннеры и объявления на главной</summary>
@@ -507,6 +504,59 @@
                             <article class="cpm2-card cpm2-card-pending"><span>🔄</span><strong>Обмен</strong><small>Перевод и обмен внутреннего баланса</small><em>Следующий этап</em></article>
                             <article class="cpm2-card cpm2-card-pending"><span>🤝</span><strong>Sell / Trade</strong><small>Продажа и обмен предметов между участниками</small><em>Следующий этап</em></article>
                             <article class="cpm2-card cpm2-card-pending"><span>💱</span><strong>Демо-курс CPM2</strong><small>Курс к UAH, RUB и USD пока не задан. Это игровой макет; обмен и выплаты не подключены.</small><em>Курс не установлен</em></article>
+                        </div>
+                    </section>
+                </section>
+            </div>
+
+            <div class="page" id="page-telegram">
+                <section class="telegram-hub">
+                    <header class="telegram-hub-heading">
+                        <span class="telegram-hub-kicker">METAIMPERIYA · CPM2</span>
+                        <h1>Telegram</h1>
+                        <p>Подключи аккаунт сайта к боту для объявлений, а на канал подпишись, чтобы видеть новости CPM2.</p>
+                    </header>
+
+                    <section class="telegram-hub-card telegram-connect-card">
+                        <div class="telegram-hub-card-icon">🔗</div>
+                        <div class="telegram-hub-card-content">
+                            <span class="telegram-hub-step">АККАУНТ И ОБЪЯВЛЕНИЯ</span>
+                            <h2>Связать сайт с Telegram-ботом</h2>
+                            <p>Привязка нужна, чтобы отправлять объявления Sell и Trade из бота в комиссионный гараж сайта.</p>
+                            <ol class="telegram-hub-steps">
+                                <li>Войди на сайт.</li>
+                                <li>Создай код и отправь боту команду <code>/link КОД</code>.</li>
+                                <li>В боте выбери «Подать объявление».</li>
+                            </ol>
+                            <div class="telegram-login-prompt" id="telegramLoginPrompt" hidden>
+                                <span>Чтобы создать код привязки, сначала войди на сайт.</span>
+                                <button type="button" onclick="openLoginModal()">Войти на сайт</button>
+                            </div>
+                            <div class="cpm2-telegram-connect" id="cpm2TelegramConnect" hidden>
+                                <div>
+                                    <strong>Статус подключения</strong>
+                                    <p id="cpm2TelegramLinkStatus" role="status" aria-live="polite">Проверяем привязку…</p>
+                                </div>
+                                <div class="telegram-connect-actions">
+                                    <button type="button" id="cpm2TelegramLinkButton" onclick="window.createCpm2TelegramLinkCode()">Создать код привязки</button>
+                                    <a class="telegram-hub-button telegram-hub-button-secondary" href="https://t.me/CPM2_xbot" target="_blank" rel="noopener noreferrer">Открыть бота ↗</a>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="telegram-hub-card telegram-news-card">
+                        <div class="telegram-hub-card-icon">📣</div>
+                        <div class="telegram-hub-card-content">
+                            <span class="telegram-hub-step">НОВОСТИ И АНОНСЫ</span>
+                            <h2>Подписаться на Telegram-канал</h2>
+                            <p>Подписка на канал добровольная. Новые объявления Sell и Trade также публикуются в тематических каналах CPM2.</p>
+                            <div class="telegram-channel-actions">
+                                <a class="telegram-hub-button" href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Открыть канал METAIMPERIYA ↗</a>
+                                <a class="telegram-hub-button telegram-hub-button-secondary" href="https://t.me/cpm_2_sale" target="_blank" rel="noopener noreferrer">Sell · объявления ↗</a>
+                                <a class="telegram-hub-button telegram-hub-button-secondary" href="https://t.me/cpm_2_trade" target="_blank" rel="noopener noreferrer">Trade · обмен ↗</a>
+                            </div>
+                            <small class="telegram-hub-note">Личные рассылки от бота пока не подключены; здесь можно подписаться на каналы. Настройку рассылки в боте добавим отдельно.</small>
                         </div>
                     </section>
                 </section>
@@ -1005,7 +1055,7 @@
 </div>
 
 <script src="js/core/firebase.js?v=3.0"></script>
-<script src="js/core/auth.js?v=3.2"></script>
+<script src="js/core/auth.js?v=3.3"></script>
 <script src="js/core/app.js?v=5.0"></script>
 <script src="js/core/lang.js?v=5.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
@@ -1019,7 +1069,7 @@
 <script src="js/features/ambassador-game-demo.js?v=1.8"></script>
 <script src="js/features/profile.js?v=5.1"></script>
 <script src="js/features/cpm2-garage.js?v=1.1"></script>
-<script src="js/features/telegram-link.js?v=1.0"></script>
+<script src="js/features/telegram-link.js?v=1.1"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.5"></script>
 <script src="js/features/groups.js?v=4.7"></script>
@@ -1040,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', function() {
             el.style.display = 'none';
         });
         var requestedPage = new URLSearchParams(window.location.search).get('page');
-        var allowedPages = ['landing', 'feed', 'work', 'dating', 'marketplace', 'referrals', 'people', 'cpm2'];
+        var allowedPages = ['landing', 'feed', 'work', 'dating', 'marketplace', 'referrals', 'people', 'cpm2', 'telegram'];
         var initialPage = allowedPages.indexOf(requestedPage) !== -1 ? requestedPage : 'landing';
         var initialPageElement = document.getElementById('page-' + initialPage);
         if (initialPageElement) {
