@@ -177,6 +177,8 @@ function validateSocialLinksWithoutBlockingSave() {
 
 function loadProfile() {
     var uid = VIEWING_USER || USER_UID;
+    var garagePanel = document.getElementById('cpm2GaragePanel');
+    if (garagePanel) garagePanel.hidden = !uid;
     console.log('🔵 loadProfile вызвана с uid:', uid, 'VIEWING_USER:', VIEWING_USER);
 
     if (!uid) {
@@ -212,6 +214,7 @@ function loadProfile() {
         var avatarEl = document.getElementById('profileAvatar');
 
         if (!u.name) {
+            if (garagePanel) garagePanel.hidden = true;
             if (nameEl) {
                 nameEl.textContent = '👤 Пользователь не найден';
                 nameEl.style.display = 'block';
@@ -240,6 +243,7 @@ function loadProfile() {
         renderProfileContacts(u);
         if (typeof window.loadAmbassadorProfileBalance === 'function') window.loadAmbassadorProfileBalance(uid);
         if (typeof window.loadCpm2ProfileBalance === 'function') window.loadCpm2ProfileBalance(uid);
+        if (typeof window.loadCpm2GarageProfile === 'function') window.loadCpm2GarageProfile(uid, u);
         renderAvatar(uid, avatarEl, (u.name || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
         makeStatsClickable(uid);

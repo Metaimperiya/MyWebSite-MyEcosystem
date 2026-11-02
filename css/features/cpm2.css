@@ -41,3 +41,50 @@ button.cpm2-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb
 #cpm2Feedback.is-error{color:#c04444}
 .post-cpm2-tip{margin-left:auto}
 @media(max-width:560px){.cpm2-wallet-panel{grid-template-columns:1fr;padding:12px}.cpm2-wallet-panel>div>strong{font-size:22px}.cpm2-bank-controls,.cpm2-transfer-controls{align-items:stretch}.cpm2-wallet-panel button{width:100%}}
+/* CPM2 commission garage */
+.cpm2-garage-panel,.cpm2-garage-admin{margin:12px 0;padding:16px;border:1px solid #d8e4db;border-radius:18px;background:linear-gradient(145deg,#fff,#f5faf6);color:#18251e}
+.cpm2-garage-panel>header,.cpm2-garage-admin>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.cpm2-garage-panel>header span,.cpm2-garage-admin>header span{font-size:.65rem;font-weight:800;letter-spacing:.12em;color:#27744e}
+.cpm2-garage-panel>header h3,.cpm2-garage-admin>header h2{margin:4px 0;font-size:1.1rem}
+.cpm2-garage-panel>header p,.cpm2-garage-admin>header p,.cpm2-garage-submit p{margin:4px 0;color:#69756e;font-size:.82rem;line-height:1.5}
+.cpm2-garage-panel>header>b{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#e7f4eb;color:#20734a;font-size:1.2rem}
+.cpm2-garage-submit{margin:12px 0;padding:14px;border:1px solid #dce9df;border-radius:14px;background:#fff}
+.cpm2-garage-submit>strong{font-size:.92rem}
+.cpm2-garage-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.cpm2-garage-form label,.cpm2-garage-admin-row label{display:grid;gap:5px;font-size:.75rem;font-weight:700;color:#526058}
+.cpm2-garage-form input,.cpm2-garage-form textarea,.cpm2-garage-admin-row input{width:100%;min-height:40px;box-sizing:border-box;padding:9px 11px;border:1px solid #d9e1dc;border-radius:10px;background:#f8faf9;color:#17251d;font:inherit}
+.cpm2-garage-form textarea{min-height:76px;resize:vertical}
+.cpm2-garage-submit>button,.cpm2-garage-car button,.cpm2-garage-admin-row button,.cpm2-garage-order button,.cpm2-garage-admin>header button{min-height:38px;padding:9px 14px;border:0;border-radius:10px;background:#207a50;color:#fff;font-weight:750;cursor:pointer}
+.cpm2-garage-submit>button:disabled,.cpm2-garage-car button:disabled{opacity:.55;cursor:wait}
+#cpm2GarageFeedback{margin-top:8px;color:#247449;font-size:.8rem}
+.cpm2-garage-contact{margin:8px 0;color:#68756d;font-size:.78rem;line-height:1.5}
+.cpm2-garage-contact a{color:#1688cf;font-weight:750;text-decoration:none}
+.shared-cpm2-listing{border-color:#cce2d3;background:linear-gradient(125deg,#f3fbf5,#f4f6f9)}
+.cpm2-garage-list{display:grid;gap:10px}
+.cpm2-garage-car{display:grid;grid-template-columns:150px minmax(0,1fr);overflow:hidden;border:1px solid #e0e8e2;border-radius:14px;background:#fff}
+.cpm2-garage-car>img,.cpm2-garage-car>.cpm2-garage-car-icon{width:100%;height:130px;object-fit:cover;background:#e8efeb}
+.cpm2-garage-car>.cpm2-garage-car-icon{display:grid;place-items:center;font-size:2.5rem}
+.cpm2-garage-car>div{display:flex;align-items:flex-start;flex-direction:column;gap:6px;padding:12px}
+.cpm2-garage-car>div>span:first-child{font-size:.62rem;font-weight:800;letter-spacing:.1em;color:#28734d}
+.cpm2-garage-car h4{margin:0;font-size:1rem}
+.cpm2-garage-car p{margin:0;color:#65716a;font-size:.8rem;white-space:pre-wrap}
+.cpm2-garage-car>div>strong{color:#216f49}
+.cpm2-garage-car button{margin-top:4px}
+.cpm2-garage-owner-tag{padding:6px 9px;border-radius:8px;background:#edf4ef;color:#68756d;font-size:.75rem}
+.cpm2-garage-submission,.cpm2-garage-order{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border:1px solid #e0e8e2;border-radius:12px;background:#fff}
+.cpm2-garage-submission>div,.cpm2-garage-order>div{display:grid;gap:4px}
+.cpm2-garage-submission span,.cpm2-garage-order span{color:#69756e;font-size:.78rem}
+.cpm2-garage-submission>b{white-space:nowrap;color:#27744e;font-size:.78rem}
+.cpm2-garage-empty{padding:18px;text-align:center;border:1px dashed #d5e1d9;border-radius:12px;color:#738077;font-size:.82rem}
+.cpm2-garage-admin>h3{margin:20px 0 10px}
+#cpm2GarageQueue{display:grid;gap:10px}
+.cpm2-garage-admin-row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;padding:12px;border:1px solid #dce6df;border-radius:13px;background:#fff}
+.cpm2-garage-admin-row>img,.cpm2-garage-admin-row>span{width:100%;height:100px;max-height:120px;object-fit:cover;border-radius:10px;background:#edf2ee}
+.cpm2-garage-admin-row>span{display:grid;place-items:center;font-size:2rem}
+.cpm2-garage-admin-row>div{display:grid;gap:7px;min-width:0}
+.cpm2-garage-admin-row p{margin:0;color:#69756e;font-size:.78rem;overflow-wrap:anywhere}
+.cpm2-garage-admin-row label{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cpm2-garage-admin-row label input{width:160px;min-height:34px}
+.cpm2-garage-admin-row>div>div{display:flex;gap:8px;flex-wrap:wrap}
+.cpm2-garage-admin-row button.secondary{border:1px solid #d4dfd7;background:#fff;color:#55645b}
+@media(max-width:600px){.cpm2-garage-form{grid-template-columns:1fr}.cpm2-garage-car{grid-template-columns:1fr}.cpm2-garage-car>img,.cpm2-garage-car>.cpm2-garage-car-icon{height:180px}.cpm2-garage-admin-row{grid-template-columns:1fr}.cpm2-garage-admin-row>img,.cpm2-garage-admin-row>span{height:165px}.cpm2-garage-submission,.cpm2-garage-order{align-items:flex-start;flex-direction:column}}

@@ -218,7 +218,7 @@
             var name = document.createElement('strong'); name.textContent = entry.data.name || 'Игрок';
             var note = document.createElement('small'); note.textContent = entry.uid === currentUid() ? 'ты' : 'в игре';
             copy.append(name, note);
-            var balance = document.createElement('b'); balance.className = 'amb-player-balances'; balance.textContent = money(entry.data.balance) + ' очк. · ' + money(entry.data.cpm2Balance) + ' CPM2';
+            var balance = document.createElement('b'); balance.className = 'amb-player-balances'; balance.textContent = money(entry.data.balance) + ' очк. · 💲 ' + money(entry.data.cpm2Balance) + ' CPM2';
             row.append(avatar, copy, balance);
             if (isBankOwner()) {
                 var grant = document.createElement('button'); grant.type = 'button'; grant.className = 'amb-mini-grant'; grant.textContent = '＋'; grant.title = 'Выдать очки из общего банка';
@@ -233,7 +233,7 @@
         });
         if (!players.length) list.innerHTML = '<div class="amb-player-empty">Зарегистрированные участники появятся здесь.</div>';
         var previous = select.value;
-        select.innerHTML = '<option value="">Выбери игрока</option>' + players.filter(function(p) { return p.uid !== currentUid(); }).map(function(p) { return '<option value="' + encodeURIComponent(p.uid) + '">' + String(p.data.name || 'Участник').replace(/[&<>"']/g, '') + ' · очки ' + money(p.data.balance) + ' · CPM2 ' + money(p.data.cpm2Balance) + '</option>'; }).join('');
+        select.innerHTML = '<option value="">Выбери игрока</option>' + players.filter(function(p) { return p.uid !== currentUid(); }).map(function(p) { return '<option value="' + encodeURIComponent(p.uid) + '">' + String(p.data.name || 'Участник').replace(/[&<>"']/g, '') + ' · очки ' + money(p.data.balance) + ' · 💲 CPM2 ' + money(p.data.cpm2Balance) + '</option>'; }).join('');
         if (previous) select.value = previous;
     }
     function requestCard(request) {
@@ -291,13 +291,13 @@
         Object.keys(sharedBank && sharedBank.cpm2Grants || {}).forEach(function(id) {
             var grant = sharedBank.cpm2Grants[id] || {};
             var source = grant.type === 'referral' ? 'Награда за приглашение' : 'Выдано CPM2';
-            entries.push({ text: source + ' · ' + (grant.toName || (state.players[grant.toUid] && state.players[grant.toUid].name) || 'участнику'), amount: '−' + money(grant.amount) + ' CPM2', at: grant.at || 0 });
+            entries.push({ text: '💲 ' + source + ' · ' + (grant.toName || (state.players[grant.toUid] && state.players[grant.toUid].name) || 'участнику'), amount: '−' + money(grant.amount) + ' CPM2', at: grant.at || 0 });
         });
         Object.keys(sharedTransfers || {}).forEach(function(id) {
             var transfer = sharedTransfers[id] || {};
             var from = state.players[transfer.fromUid] && state.players[transfer.fromUid].name || 'Участник';
             var to = state.players[transfer.toUid] && state.players[transfer.toUid].name || 'Участник';
-            entries.push({ text: (transfer.currency === 'cpm2' ? 'CPM2 · ' : '') + from + ' → ' + to, amount: money(transfer.amount) + (transfer.currency === 'cpm2' ? ' CPM2' : ' очк.'), at: transfer.at || 0 });
+            entries.push({ text: (transfer.currency === 'cpm2' ? '💲 CPM2 · ' : '') + from + ' → ' + to, amount: money(transfer.amount) + (transfer.currency === 'cpm2' ? ' CPM2' : ' очк.'), at: transfer.at || 0 });
         });
         entries.sort(function(a, b) { return Number(b.at || 0) - Number(a.at || 0); });
         if (!entries.length) { list.innerHTML = '<div class="amb-ledger-empty">Действий пока нет.</div>'; return; }
@@ -308,17 +308,19 @@
             row.append(text, amount); list.appendChild(row);
         });
     }
-    function grantFromBank(uid, amount, targetName, currency) {
+    function grantFromBank(uid, amount, targetName, currency, fixedGrantId) {
         currency = currency === 'cpm2' ? 'cpm2' : 'social';
         var maxAmount = currency === 'cpm2' ? 1000000000000 : 10000000;
-        if (!isBankOwner() || !uid || !Number.isSafeInteger(amount) || amount < 1 || amount > maxAmount || !bankRef) { setFeedback('Начислить валюту может только банкир; проверь получателя и сумму.', true); return; }
+        if (!isBankOwner() || !uid || !Number.isSafeInteger(amount) || amount < 1 || amount > maxAmount || !bankRef) { setFeedback('Начислить валюту может только банкир; проверь получателя и сумму.', true); return Promise.resolve(false); }
         var recipient = state.players[uid] || { name: targetName || 'Участник', balance: 0 };
         var grantsPath = currency === 'cpm2' ? 'cpm2Grants' : 'grants';
         var totalField = currency === 'cpm2' ? 'cpm2Total' : 'total';
-        var grantId = bankRef.child(grantsPath).push().key;
-        bankRef.transaction(function(current) {
-            if (!current || current.ownerUid !== currentUid() || Number(current[totalField] || 0) < amount) return;
+        var grantId = fixedGrantId || bankRef.child(grantsPath).push().key;
+        return bankRef.transaction(function(current) {
+            if (!current || current.ownerUid !== currentUid()) return;
             current[grantsPath] = current[grantsPath] || {};
+            if (current[grantsPath][grantId]) return current;
+            if (Number(current[totalField] || 0) < amount) return;
             current[grantsPath][grantId] = { toUid: uid, toName: recipient.name || targetName || 'Участник', amount: amount, currency: currency, type: 'admin_grant', byUid: currentUid(), at: Date.now() };
             current[totalField] = Number(current[totalField] || 0) - amount;
             current.updatedAt = Date.now();
@@ -327,10 +329,10 @@
             if (error) setFeedback('Не удалось выдать валюту: ' + error.message, true);
             else if (!committed) setFeedback('В общем банке недостаточно ' + (currency === 'cpm2' ? 'CPM2' : 'социальных очков') + '.', true);
             else setFeedback('Начислено ' + money(amount) + (currency === 'cpm2' ? ' CPM2.' : ' социальных очков.') + ' Резерв уменьшился.');
-        });
+        }).then(function(result) { return !!result.committed; });
     }
 
-    window.grantAmbassadorPoints = function(uid, amount, currency) { grantFromBank(uid, Number(amount), '', currency); };
+    window.grantAmbassadorPoints = function(uid, amount, currency, grantId) { return grantFromBank(uid, Number(amount), '', currency, grantId); };
 
     function setSharedBank(amount, currency) {
         currency = currency === 'cpm2' ? 'cpm2' : 'social';
@@ -377,10 +379,11 @@
             transfer.kind = 'post_tip';
             transfer.postKey = String(postMeta.key);
         }
-        return transfersRef.push().set(transfer).then(function() {
+        var transferRef = transfersRef.push();
+        return transferRef.set(transfer).then(function() {
             var targetName = state.players[uid].name;
             setFeedback(postMeta ? 'Публикация пользователя ' + targetName + ' поддержана на ' + money(amount) + (currency === 'cpm2' ? ' CPM2.' : ' очков.') : 'Переведено ' + money(amount) + (currency === 'cpm2' ? ' CPM2' : ' очков') + ' пользователю ' + targetName + '.');
-            return true;
+            return transferRef.key;
         }).catch(function(error) { setFeedback('Перевод не прошёл: ' + error.message, true); return false; });
     }
 

@@ -5,6 +5,7 @@
 function getPostPath(type) {
     if (type === 'foto') return 'foto_posts';
     if (type && type.indexOf('datingprofile:') === 0) return 'user_posts/' + type.slice('datingprofile:'.length);
+    if (type === 'marketplace') return 'marketplace_comments';
     if (type === 'profile') {
         var uid = VIEWING_USER || USER_UID;
         return 'user_posts/' + uid;
@@ -236,7 +237,8 @@ window.submitComment = function(postId, type) {
     if (!text) { alert('Напишите комментарий!'); return; }
     var path = getPostPath(type);
     var state = getCommentState(postId);
-    db.ref('sites/' + SITE + '/' + path + '/' + postId + '/authorUid').once('value', function(authorSnap) {
+    var authorPath = type === 'marketplace' ? 'marketplace_listings/' + postId + '/authorUid' : path + '/' + postId + '/authorUid';
+    db.ref('sites/' + SITE + '/' + authorPath).once('value', function(authorSnap) {
         var authorUid = authorSnap.val();
         var newCommentRef = db.ref('sites/' + SITE + '/' + path + '/' + postId + '/comments').push();
         newCommentRef.set({
@@ -593,6 +595,8 @@ window.openSharedEntity = function(item) {
                 if (typeof window.showWorkResume === 'function') window.showWorkResume(item.id);
             });
         }
+    } else if (item.kind === 'marketplace_listing') {
+        if (typeof window.openCpm2GarageListing === 'function') window.openCpm2GarageListing(item.id);
     } else if (item.kind === 'dating') {
         if (go) go('dating');
         db.ref('sites/' + SITE + '/dating_profiles/' + item.id).once('value').then(function(snapshot) {

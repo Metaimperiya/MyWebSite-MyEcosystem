@@ -347,13 +347,15 @@ function renderPost(p, type) {
     var sharedHtml = '';
     if (p.sharedEntity) {
         var entity = p.sharedEntity;
-        var labels = { group: 'ГРУППА', group_post: 'ЗАПИСЬ В ГРУППЕ', vacancy: 'ВАКАНСИЯ', resume: 'РЕЗЮМЕ', dating: 'АНКЕТА' };
+        var labels = { group: 'ГРУППА', group_post: 'ЗАПИСЬ В ГРУППЕ', vacancy: 'ВАКАНСИЯ', resume: 'РЕЗЮМЕ', dating: 'АНКЕТА', marketplace_listing: 'CPM2 · SELL / TRADE' };
         var openData = encodeURIComponent(JSON.stringify({ kind: entity.kind, id: entity.id || '', parentId: entity.parentId || '' }));
         var entityImage = entity.image && (/^https?:\/\//i.test(entity.image) || (entity.image.length <= 400000 && /^data:image\/(?:webp|jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(entity.image))) ? entity.image : '';
         var image = entityImage ? '<img class="shared-entity-image" src="' + esc(entityImage) + '" alt="" loading="lazy">' : '';
         if (entity.kind === 'group') {
             var groupOpenData = encodeURIComponent(JSON.stringify({ kind: 'group', id: entity.id || '' }));
             sharedHtml = '<div class="shared-entity-wrap shared-group-wrap"><button type="button" class="shared-entity-card" data-open-shared="' + groupOpenData + '">' + image + '<span class="shared-entity-copy"><small>' + (entity.isClan ? 'КЛАН ' + esc(entity.badge || '♟') : esc(labels.group)) + '</small><strong>' + esc(entity.title || 'Группа') + '</strong><span>' + esc(entity.description || (entity.isClan ? 'Клан CPM2 METAIMPERIYA' : 'Посмотри обложку и описание группы.')) + '</span><em>Перейти в ' + (entity.isClan ? 'клан' : 'группу') + ' <span aria-hidden="true">→</span></em></span></button></div>';
+        } else if (entity.kind === 'marketplace_listing') {
+            sharedHtml = '<button type="button" class="shared-entity-card shared-cpm2-listing" data-open-shared="' + openData + '">' + image + '<span class="shared-entity-copy"><small>' + esc(labels.marketplace_listing) + '</small><strong>' + esc(entity.title || 'Автомобиль CPM2') + '</strong><span>' + esc(entity.description || 'Проверенное предложение из комиссионного гаража.') + '</span><em>Открыть объявление <span aria-hidden="true">→</span></em></span></button>';
         } else {
             if (entity.kind === 'dating') {
                 var datingActions = typeof window.renderDatingActionPanel === 'function'
@@ -548,6 +550,7 @@ function initPostCarousel(root) {
 function getPostPath(type) {
     if (type === 'foto') return 'foto_posts';
     if (type === 'group') return 'group_posts/' + currentGroup;
+    if (type === 'marketplace') return 'marketplace_comments';
     if (type === 'profile') {
         var uid = VIEWING_USER || USER_UID;
         return 'user_posts/' + uid;
@@ -609,6 +612,7 @@ function loadFeed() {
     var hashtagBanner = document.getElementById('feedHashtagBanner');
     if (hashtagBanner) hashtagBanner.hidden = true;
     if (typeof window.loadProShowcase === 'function') window.loadProShowcase();
+    if (typeof window.loadCpm2MarketShowcase === 'function') window.loadCpm2MarketShowcase();
     if (!USER_UID) {
         el.innerHTML = '<div style="text-align:center;padding:20px;color:#bbb;">Войдите</div>';
         return;

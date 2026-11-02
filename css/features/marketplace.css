@@ -9,8 +9,10 @@
 .marketplace-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-bottom:12px; padding:5px; border:1px solid var(--border-color); border-radius:13px; background:var(--card-bg); }
 .marketplace-tabs button { min-height:38px; padding:7px 8px; border:0; border-radius:9px; background:transparent; color:var(--text-secondary); font:inherit; font-size:.73rem; cursor:pointer; }
 .marketplace-tabs button.active { background:color-mix(in srgb,#238c78 13%,var(--card-bg)); color:#228b77; font-weight:750; }
-.marketplace-filters { display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:8px; margin-bottom:9px; padding:10px; border:1px solid var(--border-color); border-radius:12px; background:var(--card-bg); }
+.marketplace-filters { display:grid; grid-template-columns:1.25fr repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:9px; padding:10px; border:1px solid var(--border-color); border-radius:12px; background:var(--card-bg); }
 .marketplace-filters input { box-sizing:border-box; width:100%; height:36px; padding:7px 9px; border:1px solid var(--border-color); border-radius:8px; outline:0; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.74rem; }
+.marketplace-filters select { box-sizing:border-box; width:100%; height:36px; padding:7px 9px; border:1px solid var(--border-color); border-radius:8px; outline:0; background:var(--input-bg); color:var(--text-color); font:inherit; font-size:.74rem; }
+.marketplace-filters [hidden] { display:none; }
 .marketplace-filters input:focus { border-color:#258d78; }
 .marketplace-summary { margin:0 2px 8px; color:var(--muted-text); font-size:.67rem; }
 .marketplace-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
@@ -66,7 +68,7 @@
     .marketplace-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .marketplace-tabs button { min-height:34px; font-size:.69rem; }
     .marketplace-filters { grid-template-columns:1fr 1fr; gap:7px; padding:8px; }
-    .marketplace-filters input:first-child { grid-column:1/-1; }
+    .marketplace-filters #marketplaceSearch { grid-column:1/-1; }
     .marketplace-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
     .marketplace-card-copy { padding:8px; }
     .marketplace-card-owner button { font-size:.58rem; }

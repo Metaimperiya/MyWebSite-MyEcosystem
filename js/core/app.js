@@ -480,6 +480,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatUnsub = null;
         }
         CURRENT_ROOM = null;
+        if (typeof window.loadCpm2GarageAdmin === 'function') window.loadCpm2GarageAdmin();
     };
 
     window.toggleCpm2Menu = function() {

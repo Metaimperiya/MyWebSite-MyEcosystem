@@ -50,8 +50,8 @@
     <link rel="stylesheet" href="css/features/dating.css?v=1.6">
     <link rel="stylesheet" href="css/features/referrals.css?v=1.2">
     <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.3">
-    <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
-    <link rel="stylesheet" href="css/features/cpm2.css?v=1.1">
+    <link rel="stylesheet" href="css/features/marketplace.css?v=1.2">
+    <link rel="stylesheet" href="css/features/cpm2.css?v=1.3">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.4">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="css/modules/player.css?v=3.0">
     <link rel="stylesheet" href="css/components/admin.css?v=3.0">
     <link rel="stylesheet" href="css/style.css?v=3.2">
-    <link rel="stylesheet" href="css/features/cpm2-landing.css?v=1.1">
+    <link rel="stylesheet" href="css/features/cpm2-landing.css?v=1.3">
     <link rel="stylesheet" href="css/features/clans.css?v=1.1">
 </head>
 <body>
@@ -152,14 +152,16 @@
         <div class="menu-item" onclick="goToDating();closeSidebar();"><span class="icon">💗</span> Знакомства</div>
         <div class="menu-item" onclick="goToReferrals();closeSidebar();"><span class="icon">🌐</span> Амбассадоры и приглашения</div>
         <div class="menu-item" onclick="goToMarketplace();closeSidebar();"><span class="icon">🛍️</span> Маркетплейс</div>
-        <button type="button" class="menu-item menu-parent" id="cpm2MenuToggle" aria-expanded="false" aria-controls="cpm2Menu" onclick="toggleCpm2Menu()"><span class="icon">🪙</span><span>CPM2</span><span class="menu-chevron" aria-hidden="true">⌄</span></button>
+        <button type="button" class="menu-item menu-parent" id="cpm2MenuToggle" aria-expanded="false" aria-controls="cpm2Menu" onclick="toggleCpm2Menu()"><span class="icon">💲</span><span>CPM2</span><span class="menu-chevron" aria-hidden="true">⌄</span></button>
         <div class="menu-sub cpm2-menu" id="cpm2Menu" hidden>
             <button type="button" class="menu-item" onclick="goToCpm2();closeSidebar();">Обзор CPM2</button>
-            <button type="button" class="menu-item" onclick="goToAutoMarket();closeSidebar();">🚘 Авторынок</button>
+            <button type="button" class="menu-item" onclick="goToCpm2Market('sell');closeSidebar();">↗ Sell · продажи</button>
+            <button type="button" class="menu-item" onclick="goToCpm2Market('trade');closeSidebar();">⇄ Trade · обмен</button>
+            <button type="button" class="menu-item" onclick="goToCpm2GarageSubmit('sell');closeSidebar();">＋ Подать на Sell</button>
+            <button type="button" class="menu-item" onclick="goToCpm2GarageSubmit('trade');closeSidebar();">＋ Подать на Trade</button>
+            <button type="button" class="menu-item" onclick="goToProfile();closeSidebar();">🅿️ Мой гараж</button>
             <button type="button" class="menu-item" onclick="goToGroups();closeSidebar();">🛡️ Кланы</button>
             <button type="button" class="menu-item" disabled aria-disabled="true">🛒 Магазин · скоро</button>
-            <button type="button" class="menu-item" disabled aria-disabled="true">🔄 Обмен · скоро</button>
-            <button type="button" class="menu-item" disabled aria-disabled="true">🤝 Sell / Trade · скоро</button>
             <button type="button" class="menu-item" disabled aria-disabled="true">💱 Курс CPM2 · скоро</button>
         </div>
 
@@ -250,6 +252,11 @@
                         <button type="button" class="cpm2-landing-feature" onclick="goToFeed()"><span>04 · ЛЕНТА</span><strong>Публикации игроков</strong><small>Делись постами, реагируй и обсуждай их в комментариях.</small></button>
                     </section>
 
+                    <section class="cpm2-landing-economy" aria-labelledby="cpm2LandingEconomyTitle">
+                        <div class="cpm2-landing-economy-copy"><span class="cpm2-landing-kicker">💲 CPM2 · ИГРОВАЯ ЭКОНОМИКА</span><h2 id="cpm2LandingEconomyTitle">Рынок автомобилей и клановый баланс</h2><p>Публикуй Sell и Trade, договаривайся о редких автомобилях и веди расчёты внутренними CPM2-единицами. Клановый баланс помогает учитывать крупные игровые сделки, когда прямого перевода в игре не хватает.</p><div class="cpm2-landing-economy-actions"><button type="button" onclick="goToCpm2Market('sell')">Смотреть Sell</button><button type="button" onclick="goToCpm2Market('trade')">Смотреть Trade</button><button type="button" class="cpm2-landing-economy-link" onclick="goToCpm2()">Мой CPM2-баланс →</button></div></div>
+                        <aside class="cpm2-landing-economy-note"><strong>Как устроены игровые сделки</strong><p>Участники согласуют условия и передают автомобиль в игре вручную. CPM2-баланс служит записью расчётов на сайте и сам по себе не передаёт автомобиль.</p><p>Администратор клана помогает согласовать обмен и зафиксировать его этапы. Клановый банк и накопления с игровым процентом — следующий этап разработки.</p></aside>
+                    </section>
+
                     <section class="cpm2-landing-discussion">
                         <div class="cpm2-landing-section-heading"><span>ОТКРЫТОЕ ОБСУЖДЕНИЕ</span><h2>Что ты ищешь в сообществе CPM2?</h2><p>Оставь реакцию или напиши комментарий — обсуждение доступно участникам сайта.</p></div>
                         <div id="cpm2LandingDiscussion"></div>
@@ -304,6 +311,18 @@
                 <section class="pro-showcase" id="proShowcase" aria-label="Авторы PRO" hidden>
                     <div class="pro-showcase-heading"><div><span class="pro-showcase-kicker">METAIMPERIYA</span><h2>Авторы PRO</h2></div><span class="pro-showcase-mark">PRO</span></div>
                     <div class="pro-showcase-grid" id="proShowcaseGrid" aria-label="Авторы PRO по кругу"></div>
+                </section>
+                <section class="cpm2-market-showcase" id="cpm2MarketShowcase" aria-label="CPM2: объявления и кланы" hidden>
+                    <header class="cpm2-market-heading"><div><span>CPM2 · METAIMPERIYA</span><h2>Рынок игроков</h2><p>Машины на продажу, обмен и кланы сообщества.</p></div><button type="button" class="cpm2-market-all" onclick="goToAutoMarket()">Весь рынок <span>↗</span></button></header>
+                    <nav class="cpm2-market-tabs" aria-label="Раздел рынка">
+                        <button type="button" class="active" data-cpm2-market-tab="trending" onclick="showCpm2MarketTab('trending')">✦ Trending</button>
+                        <button type="button" data-cpm2-market-tab="sell" onclick="showCpm2MarketTab('sell')">↗ Sell</button>
+                        <button type="button" data-cpm2-market-tab="trade" onclick="showCpm2MarketTab('trade')">⇄ Trade</button>
+                        <button type="button" data-cpm2-market-tab="clans" onclick="showCpm2MarketTab('clans')">♟ Clans</button>
+                    </nav>
+                    <div class="cpm2-market-status" id="cpm2MarketStatus" aria-live="polite">Загружаем предложения…</div>
+                    <div class="cpm2-market-viewport" id="cpm2MarketViewport" aria-label="Карусель объявлений"></div>
+                    <div class="cpm2-market-selected" id="cpm2MarketSelected" hidden></div>
                 </section>
                 <div id="feedHashtagBanner" class="feed-hashtag-banner" hidden></div>
                 <div id="feed"></div>
@@ -433,6 +452,7 @@
                         <button type="button" data-market-tab="library" onclick="showMarketplaceTab('library')">📚 Книги и курсы</button>
                     </nav>
                     <div class="marketplace-filters" id="marketplaceFilters">
+                        <select id="marketplaceDealModeFilter" aria-label="Тип автомобильного объявления" hidden><option value="all">Все авто</option><option value="sell">Sell · Продажа</option><option value="trade">Trade · Обмен</option></select>
                         <input id="marketplaceSearch" type="search" placeholder="Что ищешь?" autocomplete="off">
                         <input id="marketplaceCountry" list="datingCountryOptions" placeholder="Страна" autocomplete="off">
                         <input id="marketplaceCity" placeholder="Город" autocomplete="off">
@@ -446,19 +466,21 @@
             <div class="page" id="page-cpm2">
                 <section class="cpm2-page">
                     <header class="cpm2-heading"><span class="cpm2-kicker">METAIMPERIYA · ИГРОВАЯ ЭКОНОМИКА</span><h1>CPM2</h1><p>Кланы, авторынок и будущие обмены — в одном разделе.</p></header>
-                    <div class="cpm2-notice">CPM2 — внутренняя игровая система. Курс и расчёты пока не включены; значения не являются денежными.</div>
+                    <div class="cpm2-notice">💲 CPM2 — внутренняя игровая единица для кланового баланса, переводов и учёта сделок.</div>
                     <section class="cpm2-wallet-panel" id="cpm2WalletPanel">
-                        <div><span>Общий резерв</span><strong id="cpm2Reserve">Загрузка…</strong><small>CPM2 в банке</small></div>
-                        <div><span>Мой баланс</span><strong id="cpm2Balance">—</strong><small>CPM2 на счёте</small></div>
+                        <div><span>💲 CPM2 · общий резерв</span><strong id="cpm2Reserve">Загрузка…</strong><small>внутренние демо-единицы</small></div>
+                        <div><span>💲 Мой CPM2-баланс</span><strong id="cpm2Balance">—</strong><small>внутренние демо-единицы</small></div>
                         <div><span>В обращении</span><strong id="cpm2Supply">—</strong><small>резерв + балансы</small></div>
                         <div class="cpm2-bank-controls" id="cpm2BankControls" hidden><label>Задать резерв<input id="cpm2BankInput" type="number" min="0" step="1"></label><button type="button" id="cpm2BankSave">Обновить банк</button></div>
                         <div class="cpm2-transfer-controls"><label>Получатель UID<input id="cpm2Recipient" autocomplete="off" placeholder="UID участника"></label><label>Сумма<input id="cpm2Amount" type="number" min="1" step="1" value="1"></label><button type="button" id="cpm2Transfer">Перевести CPM2</button><button type="button" id="cpm2Issue" hidden>Выдать из резерва</button></div>
                         <p id="cpm2Feedback" role="status"></p>
                         <section class="cpm2-audit" id="cpm2Audit" hidden><h3>Журнал операций</h3><div id="cpm2AuditRows"></div></section>
                     </section>
+                    <section class="cpm2-garage-admin" id="cpm2GarageAdmin" hidden><header><div><span>КОМИССИОННЫЙ ГАРАЖ</span><h2>Приёмка автомобилей</h2><p>Подтверждай только после того, как автомобиль действительно передан в игре.</p></div><button type="button" onclick="window.loadCpm2GarageAdmin()">Обновить</button></header><div id="cpm2GarageQueue"><div class="cpm2-garage-empty">Заявки появятся здесь.</div></div><h3>Заявки покупателей</h3><div id="cpm2GarageOrders"><div class="cpm2-garage-empty">Покупок пока нет.</div></div></section>
                     <section class="cpm2-section"><div class="cpm2-section-title"><h2>Разделы</h2><span>Выбери направление</span></div>
                         <div class="cpm2-grid">
                             <button type="button" class="cpm2-card" onclick="goToAutoMarket()"><span>🚘</span><strong>Авторынок</strong><small>Объявления об авто и запчастях</small><em>Открыть рынок →</em></button>
+                            <button type="button" class="cpm2-card" onclick="goToProfile()"><span>🅿️</span><strong>Мой гараж</strong><small>Выставляй автомобиль на продажу или обмен через приёмку</small><em>Открыть профиль →</em></button>
                             <button type="button" class="cpm2-card" onclick="goToGroups()"><span>🛡️</span><strong>Кланы</strong><small>Создавай клан, получай символ и назначай его участникам</small><em>Открыть кланы →</em></button>
                             <article class="cpm2-card cpm2-card-pending"><span>🛒</span><strong>Магазин</strong><small>Покупки за CPM2 и публикация получения в ленте</small><em>Следующий этап</em></article>
                             <article class="cpm2-card cpm2-card-pending"><span>🔄</span><strong>Обмен</strong><small>Перевод и обмен внутреннего баланса</small><em>Следующий этап</em></article>
@@ -485,7 +507,7 @@
                             <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
                             <button type="button" class="profile-referral-shortcut" id="profileReferralShortcut" onclick="goToReferrals()">🌐 Пригласить и посмотреть демо-очки</button>
                             <div class="profile-game-wallet" id="profileGameWallet" hidden><span>🎲 Баланс игры: <strong id="profileGameBalance">0</strong> очков</span><button type="button" id="profileGameJoin" hidden onclick="window.joinAmbassadorGame()">＋ Войти в игру</button><button type="button" id="profileGameGrant" hidden onclick="window.grantProfileAmbassadorPoints()">＋ Начислить очки</button></div>
-                            <div class="profile-game-wallet cpm2-profile-wallet" id="profileCpm2Wallet" hidden><span>🪙 CPM2: <strong id="profileCpm2Balance">0</strong></span><button type="button" id="profileCpm2Grant" hidden onclick="window.grantProfileCpm2()">＋ Начислить CPM2</button></div>
+                            <div class="profile-game-wallet cpm2-profile-wallet" id="profileCpm2Wallet" hidden><span>💲 CPM2: <strong id="profileCpm2Balance">0</strong></span><button type="button" id="profileCpm2Grant" hidden onclick="window.grantProfileCpm2()">＋ Начислить CPM2</button></div>
                             <div class="profile-game-bank" id="profileGameBank" hidden><span>🏦 Общий банк: <strong id="profileGameBankAmount">0</strong></span><label>Задать баланс банка<input type="number" id="profileBankAmount" min="0" max="10000000" step="1"></label><button type="button" onclick="window.setAmbassadorBankFromProfile()">Сохранить банк</button></div>
                             <div class="profile-game-feedback" id="profileGameFeedback" role="status" aria-live="polite"></div>
                         </div>
@@ -516,6 +538,17 @@
                         <button type="button" class="profile-list-close" onclick="closeProfileList()" aria-label="Закрыть">✕</button>
                     </div>
                     <div class="profile-user-list" id="profileUserList"></div>
+                </section>
+                <section class="cpm2-garage-panel" id="cpm2GaragePanel" hidden aria-label="Игровой гараж">
+                    <header><div><span>CPM2 · КОМИССИОННЫЙ ГАРАЖ</span><h3>Гараж игрока</h3><p>Автомобили, принятые администратором в игровой гараж.</p></div><b>💲</b></header>
+                    <div class="cpm2-garage-submit" id="cpm2GarageSubmit" hidden>
+                        <strong>Передать автомобиль на комиссию</strong>
+                        <p>Создай заявку и свяжись с администратором. После фактического получения машины в игре он подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в этом гараже, в Sell/Trade и общей ленте.</p>
+                        <div class="cpm2-garage-form"><label>Модель автомобиля<input id="cpm2GarageTitle" maxlength="80" placeholder="Например, Ferrari SF90"></label><label>Условия<select id="cpm2GarageMode"><option value="sell">Продажа за CPM2</option><option value="trade">Обмен</option></select></label><label>Цена / оценка в CPM2<input id="cpm2GaragePrice" type="number" min="1" max="1000000000000" step="1" placeholder="Например, 5000000"></label><label>На что меняешь (для Trade)<input id="cpm2GarageTradeFor" maxlength="160" placeholder="Модель или условия обмена"></label><label>Страна<input id="cpm2GarageCountry" maxlength="80" placeholder="Страна"></label><label>Город<input id="cpm2GarageCity" maxlength="80" placeholder="Город"></label><label>Фото по ссылке<input id="cpm2GarageImage" type="url" maxlength="2048" placeholder="https://…"></label><label>Или загрузи фото<input id="cpm2GarageImageFile" type="file" accept="image/*"></label><label>Описание<textarea id="cpm2GarageDescription" maxlength="1000" placeholder="Состояние, комплектация, условия"></textarea></label></div>
+                        <p class="cpm2-garage-contact">После подачи заявки напиши администратору в <a href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Telegram</a>, чтобы согласовать передачу автомобиля в CPM2.</p>
+                        <button type="button" id="cpm2GarageSubmitButton" onclick="window.submitCpm2GarageCar()">Отправить на модерацию</button><div id="cpm2GarageFeedback" role="status" aria-live="polite"></div>
+                    </div>
+                    <div class="cpm2-garage-list" id="cpm2GarageList"><div class="cpm2-garage-empty">Загружаем гараж…</div></div>
                 </section>
                 <div class="card" style="margin-top:8px;">
                     <div class="post-form">
@@ -823,6 +856,7 @@
         <div class="modal-box marketplace-modal"><button class="close-btn" type="button" onclick="closeMarketplaceModal()">✕</button><h3 id="marketplaceModalTitle">Новое объявление</h3>
             <label for="marketplaceKind">Раздел</label><select id="marketplaceKind"><option value="goods">Товары</option><option value="services">Услуги</option><option value="realestate">Недвижимость</option></select>
             <label for="marketplaceCategory">Категория</label><select id="marketplaceCategory"></select>
+            <div class="marketplace-deal-mode" id="marketplaceDealModeWrap" hidden><label for="marketplaceDealMode">Предложение для CPM2</label><select id="marketplaceDealMode"><option value="sell">Sell · Продажа</option><option value="trade">Trade · Обмен</option></select><div id="marketplaceTradeForWrap" hidden><label for="marketplaceTradeFor">На что готов обменять</label><input id="marketplaceTradeFor" maxlength="160" placeholder="Например, BMW M4 или предложите вариант"></div></div>
             <div id="marketplacePropertyFields" hidden><div class="marketplace-form-row"><div><label for="marketplaceDealType">Тип объявления</label><select id="marketplaceDealType"><option>Продажа</option><option>Долгосрочная аренда</option><option>Посуточно</option><option>Хостел</option></select></div><div><label for="marketplacePropertyType">Объект</label><select id="marketplacePropertyType"><option>Квартира</option><option>Дом</option><option>Комната</option><option>Хостел</option><option>Коммерческая недвижимость</option><option>Земельный участок</option></select></div></div><div class="marketplace-form-row"><div><label for="marketplaceRooms">Комнаты (необязательно)</label><input id="marketplaceRooms" maxlength="20" placeholder="2"></div><div><label for="marketplaceArea">Площадь (необязательно)</label><input id="marketplaceArea" maxlength="30" placeholder="65 м²"></div></div></div>
             <label for="marketplaceTitle">Название</label><input id="marketplaceTitle" maxlength="100" placeholder="Что предлагаешь?"><div class="marketplace-form-row"><div><label for="marketplacePrice">Цена</label><input id="marketplacePrice" maxlength="50" placeholder="По договорённости"></div><div><label for="marketplaceCurrency">Валюта</label><select id="marketplaceCurrency"><option>UAH</option><option>USD</option><option>EUR</option><option>RUB</option></select></div></div>
             <div class="marketplace-form-row"><div><label for="marketplaceCountryInput">Страна</label><input id="marketplaceCountryInput" list="datingCountryOptions" placeholder="Начни вводить"></div><div><label for="marketplaceCityInput">Город</label><input id="marketplaceCityInput" maxlength="80" placeholder="Город"></div></div>
@@ -945,24 +979,25 @@
 
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.2"></script>
-<script src="js/core/app.js?v=4.9"></script>
+<script src="js/core/app.js?v=5.0"></script>
 <script src="js/core/lang.js?v=5.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
-<script src="js/features/feed/feed-core.js?v=5.8"></script>
-<script src="js/features/feed/feed-actions.js?v=4.9"></script>
-<script src="js/features/feed/post-social.js?v=1.3"></script>
+<script src="js/features/feed/feed-core.js?v=6.0"></script>
+<script src="js/features/feed/feed-actions.js?v=5.1"></script>
+<script src="js/features/feed/post-social.js?v=1.4"></script>
 <script src="js/features/cpm2-landing.js?v=1.0"></script>
 <script src="js/features/cpm2-economy.js?v=1.1"></script>
 <script src="js/features/feed/feed-edit.js?v=5.4"></script>
 <script src="js/features/referrals.js?v=1.3"></script>
-<script src="js/features/ambassador-game-demo.js?v=1.6"></script>
-<script src="js/features/profile.js?v=4.9"></script>
+<script src="js/features/ambassador-game-demo.js?v=1.8"></script>
+<script src="js/features/profile.js?v=5.1"></script>
+<script src="js/features/cpm2-garage.js?v=1.1"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.5"></script>
 <script src="js/features/groups.js?v=4.7"></script>
 <script src="js/features/work.js?v=1.3"></script>
 <script src="js/features/dating.js?v=2.1"></script>
-<script src="js/features/marketplace.js?v=1.2"></script>
+<script src="js/features/marketplace.js?v=1.3"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.2"></script>
 <script src="js/features/admin.js?v=3.2"></script>
