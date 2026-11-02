@@ -96,3 +96,9 @@ button.cpm2-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb
 .cpm2-garage-admin-row>div>div{display:flex;gap:8px;flex-wrap:wrap}
 .cpm2-garage-admin-row button.secondary{border:1px solid #d4dfd7;background:#fff;color:#55645b}
 @media(max-width:600px){.cpm2-garage-form{grid-template-columns:1fr}.cpm2-garage-car{grid-template-columns:1fr}.cpm2-garage-car>img,.cpm2-garage-car>.cpm2-garage-car-icon{height:180px}.cpm2-garage-admin-row{grid-template-columns:1fr}.cpm2-garage-admin-row>img,.cpm2-garage-admin-row>span{height:165px}.cpm2-garage-submission,.cpm2-garage-order{align-items:flex-start;flex-direction:column}}
+.cpm2-telegram-connect{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:14px 0;padding:16px 18px;border:1px solid #cbdcf5;border-radius:18px;background:linear-gradient(135deg,#f5f9ff,#edf5ff)}
+.cpm2-telegram-connect strong{display:block;color:#174b86;font-size:15px}
+.cpm2-telegram-connect p{margin:5px 0;color:#65758a;font-size:13px;line-height:1.45}
+.cpm2-telegram-connect button{flex:0 0 auto;border:0;border-radius:12px;padding:11px 15px;background:#2185ed;color:#fff;font-weight:700;cursor:pointer}
+#cpm2TelegramLinkStatus{color:#2b5b93;font-size:13px;overflow-wrap:anywhere}
+@media(max-width:600px){.cpm2-telegram-connect{align-items:stretch;flex-direction:column}.cpm2-telegram-connect button{width:100%}}

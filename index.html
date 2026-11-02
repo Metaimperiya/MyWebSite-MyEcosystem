@@ -472,6 +472,10 @@
                 <section class="cpm2-page">
                     <header class="cpm2-heading"><span class="cpm2-kicker">METAIMPERIYA · ИГРОВАЯ ЭКОНОМИКА</span><h1>CPM2</h1><p>Кланы, авторынок и будущие обмены — в одном разделе.</p></header>
                     <div class="cpm2-notice">💲 CPM2 — внутренняя игровая единица для кланового баланса, переводов и учёта сделок.</div>
+                    <section class="cpm2-telegram-connect" id="cpm2TelegramConnect" hidden>
+                        <div><strong>Связать Telegram с сайтом</strong><p>Объявления об автомобилях из Telegram попадут в общую очередь CPM2. После модерации сайт опубликует их в канале Sell или Trade.</p><div id="cpm2TelegramLinkStatus" role="status"></div></div>
+                        <button type="button" id="cpm2TelegramLinkButton" onclick="window.createCpm2TelegramLinkCode()">Создать код привязки</button>
+                    </section>
                     <section class="cpm2-home-editor" id="cpm2HomeEditor" hidden>
                         <details>
                             <summary>⚙ Настроить баннеры и объявления на главной</summary>
@@ -1015,6 +1019,7 @@
 <script src="js/features/ambassador-game-demo.js?v=1.8"></script>
 <script src="js/features/profile.js?v=5.1"></script>
 <script src="js/features/cpm2-garage.js?v=1.1"></script>
+<script src="js/features/telegram-link.js?v=1.0"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.5"></script>
 <script src="js/features/groups.js?v=4.7"></script>

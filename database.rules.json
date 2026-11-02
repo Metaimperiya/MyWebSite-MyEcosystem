@@ -8,6 +8,19 @@
             ".write": "$uid === auth.uid || auth.token.admin === true"
           }
         },
+        "telegram_link_codes": {
+          "$code": {
+            ".read": "auth != null && data.child('uid').val() === auth.uid",
+            ".write": "auth != null && ((!data.exists() && newData.child('uid').val() === auth.uid) || (data.exists() && !newData.exists() && data.child('uid').val() === auth.uid && data.child('expiresAt').val() <= now))",
+            ".validate": "newData.hasChildren(['uid','createdAt','expiresAt']) && newData.child('uid').isString() && newData.child('uid').val() === auth.uid && newData.child('createdAt').isNumber() && newData.child('createdAt').val() <= now + 30000 && newData.child('createdAt').val() >= now - 60000 && newData.child('expiresAt').isNumber() && newData.child('expiresAt').val() > now && newData.child('expiresAt').val() <= now + 660000"
+          }
+        },
+        "telegram_links": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": false
+          }
+        },
         "all_users": {
           ".read": "auth != null",
           ".indexOn": ["name", "lastLogin"],
@@ -131,7 +144,7 @@
         },
         "marketplace_listings": {
           ".read": "auth != null",
-          ".indexOn": ["createdAt", "kind", "countryCode", "city", "sellerUid"],
+          ".indexOn": ["createdAt", "kind", "countryCode", "city", "sellerUid", "telegramSync"],
           "$listingId": {
             ".write": "auth != null && ((auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42') && newData.child('cpm2Broker').val() === true || ((!data.exists() && newData.child('sellerUid').val() === auth.uid && newData.child('cpm2Broker').val() !== true) || (data.exists() && data.child('sellerUid').val() === auth.uid && data.child('cpm2Broker').val() !== true)))",
             ".validate": "!newData.exists() || (newData.hasChildren(['kind', 'category', 'title', 'description', 'price', 'currency', 'country', 'countryCode', 'city', 'imageUrl', 'sellerUid', 'createdAt', 'isActive']) && newData.child('kind').isString() && newData.child('kind').val().matches(/^(goods|services|realestate)$/) && newData.child('category').isString() && newData.child('category').val().length <= 80 && newData.child('title').isString() && newData.child('title').val().length >= 2 && newData.child('title').val().length <= 100 && newData.child('description').isString() && newData.child('description').val().length >= 1 && newData.child('description').val().length <= 3000 && newData.child('price').isString() && newData.child('price').val().length <= 50 && newData.child('currency').isString() && newData.child('currency').val().matches(/^(UAH|USD|EUR|RUB|CPM2)$/) && newData.child('country').isString() && newData.child('country').val().length <= 80 && newData.child('countryCode').isString() && newData.child('countryCode').val().length <= 2 && newData.child('city').isString() && newData.child('city').val().length <= 80 && newData.child('imageUrl').isString() && newData.child('imageUrl').val().length <= 2048 && ((newData.child('sellerUid').val() === auth.uid && newData.child('cpm2Broker').val() !== true) || ((auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42') && newData.child('cpm2Broker').val() === true && newData.child('moderationStatus').val() === 'approved' && ((newData.child('isActive').val() === true && newData.child('brokerStatus').val() === 'in_stock') || (newData.child('isActive').val() === false && newData.child('brokerStatus').val() === 'sold')) && root.child('sites').child($site).child('cpm2_garage_submissions').child(newData.child('sellerUid').val()).child(newData.child('submissionId').val()).child('status').val() === 'accepted')) && newData.child('createdAt').isNumber() && newData.child('isActive').isBoolean() && (!newData.child('cpm2Broker').exists() || newData.child('cpm2Broker').isBoolean()) && (!newData.child('moderationStatus').exists() || newData.child('moderationStatus').val().matches(/^(pending|approved|rejected)$/)) && (!newData.child('dealMode').exists() || newData.child('dealMode').val().matches(/^(sell|trade)$/)) && (!newData.child('tradeFor').exists() || (newData.child('tradeFor').isString() && newData.child('tradeFor').val().length <= 160)))"
