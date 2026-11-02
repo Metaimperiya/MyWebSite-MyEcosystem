@@ -4,6 +4,9 @@
 
 var groupsDirectoryRef = null;
 var groupMembershipsRef = null;
+var clanGrantRef = null;
+var clanApplicationsRef = null;
+var clanMemberBadgesRef = null;
 var groupDetailMembershipRef = null;
 var groupDetailPostsRef = null;
 var groupsCache = {};
@@ -15,6 +18,11 @@ var groupAvatarPreviewUrl = null;
 var groupCoverRemoved = false;
 var groupAvatarRemoved = false;
 var pendingSharedGroupPostId = null;
+var clanLeaderGrant = null;
+var clanApplicationsCache = {};
+var clanMemberBadgesCache = {};
+var clanUsersCache = null;
+var groupCreateMode = 'group';
 
 function groupEscape(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
@@ -24,6 +32,47 @@ function groupEscape(value) {
 
 function groupShareButton(kind, payload) {
     return '<button type="button" class="community-share-button" data-share-kind="' + groupEscape(kind) + '" data-feed-share="' + encodeURIComponent(JSON.stringify(payload)) + '">↗ Поделиться</button>';
+}
+
+function renderClanAccess() {
+    var createButton = document.getElementById('createClanButton');
+    var requestButton = document.getElementById('clanRequestButton');
+    var description = document.getElementById('clanEntryDescription');
+    var title = document.getElementById('clanEntryTitle');
+    var ownRequest = USER_UID && clanApplicationsCache[USER_UID];
+    var hasGrant = !!(clanLeaderGrant && clanLeaderGrant.active);
+    if (createButton) createButton.hidden = !hasGrant;
+    if (requestButton) {
+        requestButton.hidden = hasGrant || !!(ownRequest && ownRequest.status === 'pending');
+        requestButton.textContent = ownRequest && ownRequest.status === 'rejected' ? 'Подать снова' : 'Подать заявку';
+    }
+    if (title) title.textContent = hasGrant ? 'Ты можешь создать клан' : ownRequest && ownRequest.status === 'pending' ? 'Заявка отправлена' : 'Хочешь возглавить клан?';
+    if (description) description.textContent = hasGrant
+        ? 'Тебе выдан символ ' + (clanLeaderGrant.badge || '♟') + '. Создай клан и назначай этот значок его участникам.'
+        : ownRequest && ownRequest.status === 'pending'
+            ? 'Заявка ждёт рассмотрения администратора.'
+            : ownRequest && ownRequest.status === 'rejected'
+                ? 'Предыдущую заявку отклонили. Ты можешь отправить новую.'
+                : 'Отправь заявку. После одобрения ты получишь символ клана и сможешь создать его и назначать значки участникам.';
+    renderClanApplications();
+}
+
+function renderClanApplications() {
+    var section = document.getElementById('clanAdminApplications');
+    var list = document.getElementById('clanApplicationList');
+    if (!section || !list) return;
+    section.hidden = !isAdmin;
+    if (!isAdmin) return;
+    var pending = Object.keys(clanApplicationsCache).map(function(uid) {
+        return Object.assign({ uid: uid }, clanApplicationsCache[uid] || {});
+    }).filter(function(request) { return request.status === 'pending'; }).sort(function(a, b) { return (a.createdAt || 0) - (b.createdAt || 0); });
+    if (!pending.length) {
+        list.innerHTML = '<p class="clan-admin-empty">Новых заявок пока нет.</p>';
+        return;
+    }
+    list.innerHTML = pending.map(function(request) {
+        return '<article class="clan-application-card"><div><strong>' + groupEscape(request.clanName || 'Клан') + '</strong><p>' + groupEscape(request.about || 'Без описания') + '</p><small>' + groupEscape(request.userName || 'Участник') + ' · ' + groupEscape(request.uid) + '</small></div><label>Символ<input type="text" maxlength="8" value="♟" data-clan-grant-badge="' + groupEscape(request.uid) + '"></label><button type="button" onclick="approveClanApplication(\'' + groupEscape(request.uid) + '\')">Назначить лидером</button><button type="button" class="clan-reject-button" onclick="rejectClanApplication(\'' + groupEscape(request.uid) + '\')">Отклонить</button></article>';
+    }).join('');
 }
 
 function stopGroupDetailListeners() {
@@ -58,7 +107,7 @@ function renderGroupDirectory() {
         var memberCount = Object.keys(members).length;
         return '<article class="community-card">' +
             '<button type="button" class="community-card-main" data-open-group="' + groupEscape(group.id) + '">' +
-            '<span class="community-card-icon">' + groupEscape(Array.from((group.name || 'Группа').trim())[0] || '👥') + '</span><span class="community-card-copy"><strong>' + groupEscape(group.name || 'Группа') + '</strong>' +
+            '<span class="community-card-icon">' + groupEscape(group.isClan ? (group.clanBadge || '♟') : (Array.from((group.name || 'Группа').trim())[0] || '👥')) + '</span><span class="community-card-copy"><strong>' + (group.isClan ? '<span class="clan-type-label">КЛАН · </span>' : '') + groupEscape(group.name || 'Группа') + '</strong>' +
                 '<span>' + groupEscape(group.description || 'Группа сообщества') + '</span></span></button>' +
             '<div class="community-card-footer"><span>👤 ' + memberCount + ' участников</span>' +
             (isMember ? '<span class="community-member-label">Вы участник</span>' : '<button type="button" class="community-join-button" data-join-group="' + groupEscape(group.id) + '">Вступить</button>') + '</div></article>';
@@ -81,10 +130,10 @@ function renderGroupDetailHeader() {
     var created = group.createdAt ? new Date(group.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     var initial = Array.from((group.name || 'Группа').trim())[0] || '👥';
     header.innerHTML = '<div class="group-profile-cover' + (group.coverUrl ? ' has-cover' : '') + '"><span>СООБЩЕСТВО</span></div><div class="group-profile-main">' +
-        '<div class="group-profile-avatar">' + (group.avatarUrl ? '' : groupEscape(initial)) + '</div><div class="group-profile-identity"><h2>' + groupEscape(group.name || 'Группа') +
-        '</h2><span>Группа · ' + Object.keys(members).length + ' участников' + (created ? ' · создана ' + groupEscape(created) : '') + '</span></div>' +
-        groupShareButton('group', { id: selectedCommunityId, title: group.name || 'Группа', description: group.description || 'Сообщество METAIMPERIYA', image: group.avatarUrl || group.coverUrl || '' }) +
-        (group.ownerUid === USER_UID ? '<button type="button" class="group-settings-button" onclick="openEditGroup()">⚙ Настроить</button>' : '') + '</div>' +
+        '<div class="group-profile-avatar">' + (group.avatarUrl ? '' : groupEscape(group.isClan ? (group.clanBadge || '♟') : initial)) + '</div><div class="group-profile-identity"><h2>' + (group.isClan ? '<span class="clan-type-label">КЛАН · </span>' : '') + groupEscape(group.name || 'Группа') +
+        '</h2><span>' + (group.isClan ? 'Клан · лидер ' + groupEscape(group.leaderName || group.ownerName || 'участник') : 'Группа') + ' · ' + Object.keys(members).length + ' участников' + (created ? ' · создана ' + groupEscape(created) : '') + '</span></div>' +
+        groupShareButton('group', { id: selectedCommunityId, title: group.name || 'Группа', description: group.description || (group.isClan ? 'Клан CPM2 METAIMPERIYA' : 'Сообщество METAIMPERIYA'), image: group.avatarUrl || group.coverUrl || '', isClan: !!group.isClan, badge: group.clanBadge || '' }) +
+        ((group.ownerUid === USER_UID || group.leaderUid === USER_UID) ? '<button type="button" class="group-settings-button" onclick="openEditGroup()">⚙ Настроить</button>' : '') + '</div>' +
         '<p class="group-profile-description">' + groupEscape(group.description || 'У этой группы пока нет описания.') + '</p>';
     if (group.coverUrl) {
         var cover = header.querySelector('.group-profile-cover');
@@ -107,17 +156,140 @@ function renderGroupDetailHeader() {
         '<div><dt>Создатель</dt><dd>' + groupEscape(group.ownerName || 'Участник METAIMPERIYA') + '</dd></div>' +
         '<div><dt>Участников</dt><dd>' + Object.keys(members).length + '</dd></div>' +
         (created ? '<div><dt>Создана</dt><dd>' + groupEscape(created) + '</dd></div>' : '') + '</dl>';
+    renderClanRoster();
 }
+
+function renderClanRoster() {
+    var panel = document.getElementById('clanRosterManager');
+    if (!panel || !selectedCommunityId) return;
+    var group = groupsCache[selectedCommunityId] || {};
+    var canManage = !!group.isClan && (group.leaderUid === USER_UID || group.ownerUid === USER_UID || isAdmin);
+    panel.hidden = !canManage;
+    if (!canManage) return;
+    var members = groupMembershipsCache[selectedCommunityId] || {};
+    var memberIds = Object.keys(members).filter(function(uid) { return members[uid] === true; });
+    if (!clanUsersCache) {
+        panel.innerHTML = '<h3>Состав клана</h3><p>Загружаю участников…</p>';
+        db.ref('sites/' + SITE + '/all_users').once('value').then(function(snapshot) {
+            clanUsersCache = snapshot.val() || {};
+            renderClanRoster();
+        }).catch(function(error) { panel.innerHTML = '<h3>Состав клана</h3><p>Не удалось загрузить участников: ' + groupEscape(error.message) + '</p>'; });
+        return;
+    }
+    panel.innerHTML = '<div class="clan-roster-heading"><div><span>УПРАВЛЕНИЕ КЛАНОМ</span><h3>Состав и значки</h3></div><small>Символ клана: ' + groupEscape(group.clanBadge || '♟') + '</small></div>' +
+        (memberIds.length ? '<div class="clan-roster-list">' + memberIds.map(function(uid) {
+            var person = clanUsersCache[uid] || {};
+            var badge = clanMemberBadgesCache[uid] || {};
+            var assigned = badge.groupId === selectedCommunityId;
+            return '<div class="clan-roster-row"><span class="clan-roster-person"><strong>' + groupEscape(person.name || uid) + '</strong><small>' + (uid === group.leaderUid ? 'Лидер клана' : assigned ? groupEscape(badge.role || 'Участник клана') : 'Участник группы') + '</small></span>' +
+                (uid === group.leaderUid ? '<span class="clan-roster-leader">' + groupEscape(group.clanBadge || '♟') + ' Лидер</span>' : '<button type="button" data-clan-member-toggle="' + groupEscape(uid) + '">' + (assigned ? 'Снять значок' : 'Выдать значок') + '</button>') + '</div>';
+        }).join('') + '</div>' : '<p>В клане пока никого нет.</p>');
+    panel.querySelectorAll('[data-clan-member-toggle]').forEach(function(button) {
+        button.addEventListener('click', function() { window.toggleClanMemberBadge(button.getAttribute('data-clan-member-toggle')); });
+    });
+}
+
+window.openClanApplication = function() {
+    if (!USER_UID) { if (window.openLoginModal) window.openLoginModal(); return; }
+    if (clanLeaderGrant && clanLeaderGrant.active) return;
+    var modal = document.getElementById('clanApplicationModal');
+    var app = clanApplicationsCache[USER_UID] || {};
+    var name = document.getElementById('clanApplicationName');
+    var reason = document.getElementById('clanApplicationReason');
+    var error = document.getElementById('clanApplicationError');
+    if (name) name.value = app.status === 'rejected' ? app.clanName || '' : '';
+    if (reason) reason.value = app.status === 'rejected' ? app.about || '' : '';
+    if (error) error.textContent = '';
+    if (modal) modal.classList.add('open');
+};
+
+window.closeClanApplication = function() {
+    var modal = document.getElementById('clanApplicationModal');
+    if (modal) modal.classList.remove('open');
+};
+
+window.submitClanApplication = function() {
+    if (!USER_UID) return;
+    var name = (document.getElementById('clanApplicationName') || {}).value || '';
+    var about = (document.getElementById('clanApplicationReason') || {}).value || '';
+    var error = document.getElementById('clanApplicationError');
+    name = name.trim(); about = about.trim();
+    if (name.length < 2) { if (error) error.textContent = 'Укажи название клана.'; return; }
+    var existing = clanApplicationsCache[USER_UID];
+    if (existing && existing.status === 'pending') { if (error) error.textContent = 'Заявка уже отправлена и ждёт рассмотрения.'; return; }
+    var user = clanUsersCache && clanUsersCache[USER_UID] || {};
+    db.ref('sites/' + SITE + '/clan_applications/' + USER_UID).set({
+        uid: USER_UID, userName: user.name || USER || 'Участник', clanName: name.slice(0, 60), about: about.slice(0, 300), status: 'pending', createdAt: Date.now()
+    }).then(function() {
+        clanApplicationsCache[USER_UID] = { uid: USER_UID, userName: user.name || USER || 'Участник', clanName: name.slice(0, 60), about: about.slice(0, 300), status: 'pending', createdAt: Date.now() };
+        window.closeClanApplication();
+        renderClanAccess();
+    }).catch(function(saveError) { if (error) error.textContent = 'Не удалось отправить заявку: ' + (saveError.message || 'ошибка доступа'); });
+};
+
+window.approveClanApplication = function(uid) {
+    if (!isAdmin || !uid) return;
+    var request = clanApplicationsCache[uid];
+    var badgeInput = document.querySelector('[data-clan-grant-badge="' + uid + '"]');
+    var badge = (badgeInput ? badgeInput.value : '♟').trim().slice(0, 8) || '♟';
+    if (!request) return;
+    var now = Date.now();
+    var updates = {};
+    updates['sites/' + SITE + '/clan_leaders/' + uid] = { active: true, badge: badge, clanName: request.clanName || '', grantedBy: USER_UID, grantedAt: now };
+    updates['sites/' + SITE + '/clan_applications/' + uid + '/status'] = 'approved';
+    updates['sites/' + SITE + '/clan_applications/' + uid + '/reviewedAt'] = now;
+    db.ref().update(updates).catch(function(error) { alert('Не удалось одобрить заявку: ' + (error.message || 'ошибка доступа')); });
+};
+
+window.rejectClanApplication = function(uid) {
+    if (!isAdmin || !uid || !clanApplicationsCache[uid]) return;
+    db.ref('sites/' + SITE + '/clan_applications/' + uid).update({ status: 'rejected', reviewedAt: Date.now() })
+        .catch(function(error) { alert('Не удалось отклонить заявку: ' + (error.message || 'ошибка доступа')); });
+};
+
+window.grantClanLeader = function(uid) {
+    if (!isAdmin || !uid) return Promise.reject(new Error('Нет прав администратора.'));
+    var badge = window.prompt('Символ клана для этого лидера:', '♟');
+    if (badge === null) return Promise.resolve(false);
+    badge = badge.trim().slice(0, 8) || '♟';
+    var name = clanUsersCache && clanUsersCache[uid] && clanUsersCache[uid].name || '';
+    return db.ref('sites/' + SITE + '/clan_leaders/' + uid).set({ active: true, badge: badge, grantedBy: USER_UID, grantedAt: Date.now() }).then(function() {
+        alert('Права создателя клана выданы. Символ: ' + badge + (name ? ' · ' + name : ''));
+        return true;
+    });
+};
+
+window.toggleClanMemberBadge = function(uid) {
+    var group = groupsCache[selectedCommunityId] || {};
+    if (!group.isClan || (group.leaderUid !== USER_UID && group.ownerUid !== USER_UID && !isAdmin) || !uid || uid === group.leaderUid) return;
+    var current = clanMemberBadgesCache[uid] || {};
+    var path = 'sites/' + SITE + '/user_clan_badges/' + uid;
+    if (current.groupId === selectedCommunityId) {
+        db.ref(path).remove().then(function() {
+            delete clanMemberBadgesCache[uid];
+            if (window.clearClanBadgeCache) window.clearClanBadgeCache(uid);
+            renderClanRoster();
+        }).catch(function(error) { alert('Не удалось снять значок: ' + (error.message || 'ошибка доступа')); });
+        return;
+    }
+    if (current.groupId && !confirm('У участника уже есть значок другого клана. Заменить его на значок этого клана?')) return;
+    var badge = { groupId: selectedCommunityId, groupName: group.name || 'Клан', badge: group.clanBadge || '♟', role: 'Участник клана', assignedBy: USER_UID, assignedAt: Date.now() };
+    db.ref(path).set(badge).then(function() {
+        clanMemberBadgesCache[uid] = badge;
+        if (window.clearClanBadgeCache) window.clearClanBadgeCache(uid);
+        renderClanRoster();
+    }).catch(function(error) { alert('Не удалось выдать значок: ' + (error.message || 'ошибка доступа')); });
+};
 
 function renderGroupMembership(isMember) {
     var controls = document.getElementById('groupMembership');
     var composer = document.getElementById('groupPostComposer');
     if (!controls || !selectedCommunityId) return;
     var group = groupsCache[selectedCommunityId] || {};
-    var isOwner = group.ownerUid === USER_UID;
+    var isOwner = group.ownerUid === USER_UID || group.leaderUid === USER_UID;
     selectedGroupIsMember = isMember;
     controls.innerHTML = isMember
-        ? '<div class="group-member-state">' + (isOwner ? 'Ты создатель этой группы' : 'Ты участник этой группы') + '</div>' + (!isOwner ? '<button type="button" class="group-leave-button" onclick="leaveGroup()">Покинуть группу</button>' : '')
+        ? '<div class="group-member-state">' + (group.isClan && isOwner ? 'Ты лидер этого клана ' + groupEscape(group.clanBadge || '♟') : isOwner ? 'Ты создатель этой группы' : group.isClan ? 'Ты участник этого клана' : 'Ты участник этой группы') + '</div>' + (!isOwner ? '<button type="button" class="group-leave-button" onclick="leaveGroup()">Покинуть группу</button>' : '')
         : '<button type="button" class="community-join-button" onclick="joinGroup(\'' + groupEscape(selectedCommunityId) + '\')">Вступить в группу</button><span>Вступи, чтобы публиковать записи</span>';
     if (composer) composer.hidden = !isMember || document.querySelector('[data-group-tab="about"].active') !== null;
 }
@@ -193,9 +365,16 @@ function loadGroups() {
     closeGroup();
     if (groupsDirectoryRef) groupsDirectoryRef.off();
     if (groupMembershipsRef) groupMembershipsRef.off();
+    if (clanGrantRef) clanGrantRef.off();
+    if (clanApplicationsRef) clanApplicationsRef.off();
+    if (clanMemberBadgesRef) clanMemberBadgesRef.off();
     if (!USER_UID) {
         groupsCache = {};
         groupMembershipsCache = {};
+        clanLeaderGrant = null;
+        clanApplicationsCache = {};
+        clanMemberBadgesCache = {};
+        renderClanAccess();
         list.innerHTML = '<div class="groups-empty"><span>🔒</span><strong>Войди, чтобы посмотреть группы</strong></div>';
         return;
     }
@@ -212,7 +391,28 @@ function loadGroups() {
         groupMembershipsCache = snapshot.val() || {};
         renderGroupDirectory();
         renderGroupDetailHeader();
+        renderClanRoster();
     }, function(error) { console.warn('Не удалось загрузить участников групп:', error); });
+    clanGrantRef = db.ref('sites/' + SITE + '/clan_leaders/' + USER_UID);
+    clanGrantRef.on('value', function(snapshot) {
+        clanLeaderGrant = snapshot.val() || null;
+        renderClanAccess();
+        renderGroupDirectory();
+    }, function(error) { console.warn('Не удалось проверить права создателя клана:', error); });
+    clanApplicationsRef = db.ref('sites/' + SITE + '/clan_applications' + (isAdmin ? '' : '/' + USER_UID));
+    clanApplicationsRef.on('value', function(snapshot) {
+        if (isAdmin) clanApplicationsCache = snapshot.val() || {};
+        else {
+            clanApplicationsCache = {};
+            if (snapshot.exists()) clanApplicationsCache[USER_UID] = snapshot.val();
+        }
+        renderClanAccess();
+    }, function(error) { console.warn('Не удалось загрузить заявки на клан:', error); });
+    clanMemberBadgesRef = db.ref('sites/' + SITE + '/user_clan_badges');
+    clanMemberBadgesRef.on('value', function(snapshot) {
+        clanMemberBadgesCache = snapshot.val() || {};
+        renderClanRoster();
+    }, function(error) { console.warn('Не удалось загрузить значки участников кланов:', error); });
 }
 
 window.openGroup = function(id) {
@@ -254,7 +454,7 @@ window.showGroupTab = function(tab) {
 window.openEditGroup = function() {
     if (!selectedCommunityId) return;
     var group = groupsCache[selectedCommunityId];
-    if (!group || group.ownerUid !== USER_UID) return;
+    if (!group || (group.ownerUid !== USER_UID && group.leaderUid !== USER_UID)) return;
     document.getElementById('editGroupName').value = group.name || '';
     document.getElementById('editGroupDescription').value = group.description || '';
     document.getElementById('editGroupError').textContent = '';
@@ -421,14 +621,26 @@ window.joinGroup = function(id) {
 };
 
 window.leaveGroup = function() {
-    if (!selectedCommunityId || !USER_UID || (groupsCache[selectedCommunityId] || {}).ownerUid === USER_UID) return;
-    db.ref('sites/' + SITE + '/group_members/' + selectedCommunityId + '/' + USER_UID).remove().catch(function(error) {
+    var group = groupsCache[selectedCommunityId] || {};
+    if (!selectedCommunityId || !USER_UID || group.ownerUid === USER_UID || group.leaderUid === USER_UID) return;
+    db.ref('sites/' + SITE + '/group_members/' + selectedCommunityId + '/' + USER_UID).remove().then(function() {
+        var badge = clanMemberBadgesCache[USER_UID] || {};
+        if (badge.groupId === selectedCommunityId) return db.ref('sites/' + SITE + '/user_clan_badges/' + USER_UID).remove().then(function() {
+            delete clanMemberBadgesCache[USER_UID];
+            if (window.clearClanBadgeCache) window.clearClanBadgeCache(USER_UID);
+        });
+    }).catch(function(error) {
         alert('Не удалось покинуть группу: ' + error.message);
     });
 };
 
 window.openCreateGroup = function() {
     if (!USER_UID) { alert('Войди, чтобы создать группу.'); return; }
+    groupCreateMode = 'group';
+    var title = document.getElementById('newCommunityTitle');
+    var button = document.getElementById('createGroupButton');
+    if (title) title.textContent = 'Создать группу';
+    if (button) button.textContent = 'Создать группу';
     var modal = document.getElementById('createCommunityModal');
     var name = document.getElementById('newGroupName');
     var description = document.getElementById('newGroupDescription');
@@ -440,9 +652,33 @@ window.openCreateGroup = function() {
     if (name) setTimeout(function() { name.focus(); }, 80);
 };
 
+window.openCreateClan = function() {
+    if (!USER_UID) { if (window.openLoginModal) window.openLoginModal(); return; }
+    if (!clanLeaderGrant || !clanLeaderGrant.active) { alert('Сначала получи разрешение создать клан.'); return; }
+    groupCreateMode = 'clan';
+    var title = document.getElementById('newCommunityTitle');
+    var button = document.getElementById('createGroupButton');
+    if (title) title.textContent = 'Создать клан';
+    if (button) button.textContent = 'Создать клан';
+    var name = document.getElementById('newGroupName');
+    var description = document.getElementById('newGroupDescription');
+    var error = document.getElementById('newGroupError');
+    if (name) name.value = clanLeaderGrant.clanName || '';
+    if (description) description.value = '';
+    if (error) error.textContent = '';
+    var modal = document.getElementById('createCommunityModal');
+    if (modal) modal.classList.add('open');
+    if (name) setTimeout(function() { name.focus(); }, 80);
+};
+
 window.closeCreateGroup = function() {
     var modal = document.getElementById('createCommunityModal');
     if (modal) modal.classList.remove('open');
+    groupCreateMode = 'group';
+    var title = document.getElementById('newCommunityTitle');
+    var button = document.getElementById('createGroupButton');
+    if (title) title.textContent = 'Создать группу';
+    if (button) button.textContent = 'Создать';
 };
 
 window.createGroup = function() {
@@ -457,15 +693,23 @@ window.createGroup = function() {
 
     var groupRef = db.ref('sites/' + SITE + '/groups').push();
     var id = groupRef.key;
+    var isClan = groupCreateMode === 'clan';
+    if (isClan && (!clanLeaderGrant || !clanLeaderGrant.active)) { if (error) error.textContent = 'Твои права создателя клана больше не активны.'; return; }
     var group = { name: name, description: descriptionInput ? descriptionInput.value.trim().slice(0, 300) : '', ownerUid: USER_UID, ownerName: USER || 'Пользователь', createdAt: Date.now() };
+    if (isClan) {
+        group.isClan = true;
+        group.leaderUid = USER_UID;
+        group.leaderName = USER || 'Пользователь';
+        group.clanBadge = clanLeaderGrant.badge || '♟';
+    }
     var updates = {};
     updates['sites/' + SITE + '/groups/' + id] = group;
     updates['sites/' + SITE + '/group_members/' + id + '/' + USER_UID] = true;
     var announcementId = db.ref('sites/' + SITE + '/feed_posts').push().key;
     var announcement = {
         author: USER || 'Пользователь', authorUid: USER_UID, authorAvatar: null,
-        text: 'Создал новую группу', timestamp: group.createdAt, likes: 0, commentCount: 0, reposts: 0,
-        hashtags: [], media: [], sharedEntity: { kind: 'group', id: id, title: group.name, description: group.description || 'Новая группа METAIMPERIYA', image: '' },
+        text: isClan ? 'Создал новый клан' : 'Создал новую группу', timestamp: group.createdAt, likes: 0, commentCount: 0, reposts: 0,
+        hashtags: [], media: [], sharedEntity: { kind: 'group', id: id, title: group.name, description: group.description || (isClan ? 'Новый клан CPM2 METAIMPERIYA' : 'Новая группа METAIMPERIYA'), image: '', isClan: isClan, badge: group.clanBadge || '' },
         deleted: null, deletedAt: null
     };
     updates['sites/' + SITE + '/feed_posts/' + announcementId] = announcement;
@@ -473,6 +717,10 @@ window.createGroup = function() {
     if (error) error.textContent = '';
     if (button) { button.disabled = true; button.textContent = 'Создаю…'; }
     db.ref().update(updates).then(function() {
+        if (!isClan) return null;
+        var badge = { groupId: id, groupName: name, badge: group.clanBadge, role: 'Лидер клана', assignedBy: USER_UID, assignedAt: Date.now() };
+        return db.ref('sites/' + SITE + '/user_clan_badges/' + USER_UID).set(badge).then(function() { clanMemberBadgesCache[USER_UID] = badge; });
+    }).then(function() {
         groupsCache[id] = group;
         if (!groupMembershipsCache[id]) groupMembershipsCache[id] = {};
         groupMembershipsCache[id][USER_UID] = true;
@@ -484,7 +732,7 @@ window.createGroup = function() {
         console.error('Не удалось создать группу:', saveError);
         if (error) {
             error.textContent = saveError.code === 'PERMISSION_DENIED' || /permission_denied|permission denied/i.test(saveError.message || '')
-                ? 'Firebase отклонил создание: опубликуй Database Rules из проекта (firebase deploy --only database --project myecosystem-e6414). Деплой сайта правила не обновляет.'
+                ? 'Firebase отклонил создание. Проверь, что обновлённые Database Rules опубликованы в проекте.'
                 : 'Не удалось создать группу. Проверь подключение и попробуй ещё раз.';
         }
     }).finally(function() {

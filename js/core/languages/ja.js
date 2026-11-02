@@ -1,0 +1,11 @@
+// 日本語
+window.LANG_JA = {
+    app_name: 'METAIMPERIYA', menu: 'メニュー', profile: 'プロフィール', settings: '設定', logout: 'ログアウト', theme: 'テーマ',
+    feed: 'フィード', what_new: '最近どうですか？', photo: '写真', publish: '投稿', clear: 'クリア', empty_feed: 'まだ投稿はありません',
+    login_to_see: 'ログインしてフィードを見る', guest: 'ゲスト', setup_profile: 'プロフィールを設定', edit_profile: 'プロフィールを編集', change_avatar: 'アバターを変更',
+    go_home: 'ホームへ', friends: '友達', subscribers: 'フォロワー', subscriptions: 'フォロー中', no_posts: '📝 投稿はまだありません。何か書いてみましょう！', loading: '読み込み中…', my_posts: '自分の投稿', friends_title: '🤝 友達', no_friends: '友達はいません',
+    enter_link: '埋め込むリンクを入力…', embedded_page: '埋め込みページ', collapse: '閉じる', expand: '展開', link_saved: '✅ リンクを保存しました！', avatar_updated: '✅ アバターを更新しました！', groups: 'グループ', create_group: 'グループを作成', new_group: '新しいグループ', group_name: '名前…', create: '作成', people: 'ユーザー', all_users: 'すべてのユーザー',
+    add_friend: '➕ 友達に追加', already_friends: '🤝 友達', request_sent: '⏳ リクエストを送信しました', request_received: '📩 友達リクエストが届きました', accept: '承認', decline: '拒否', remove_from_friends: '友達から削除', chat: 'チャット', back: '戻る', message: 'メッセージ…', no_messages: 'メッセージはありません', delete_message: 'メッセージを削除', chat_list_empty: '🤝 友達を追加してチャットを始めましょう', cannot_write_self: '自分にはメッセージを送れません',
+    notifications: '通知', no_notifications: '通知はありません', admin: '管理者', admin_password: 'パスワード…', admin_login: 'ログイン', all_chats: 'すべてのチャット', no_chats: '個別チャットはありません', edit_post: '✏️ 編集', delete_post: '🗑 削除', restore_post: '↩️ 復元', post_deleted: '🗑 投稿を削除しました', enter_link_placeholder: 'リンクを入力：', link_text: 'リンク',
+    login_title: '👤 ログイン', login_google: 'Googleでログイン', or: 'または', enter_name_placeholder: '名前を入力…', cancel: 'キャンセル', login: 'ログイン', player: 'PLAYER', playlist: 'プレイリスト', download: 'ダウンロード', visualizer: 'ビジュアライザー', online: 'オンライン', edit: '編集', delete: '削除', save: '保存', close: '閉じる', confirm: '確認', post_updated: '✅ 投稿を更新しました！', repost_created: '✅ 再共有しました！', search: '検索', add: '追加', remove: '削除', write_comment: 'コメントを書く…', reply: '返信', like: 'いいね', repost: '再共有', share: '共有', copy_link: 'リンクをコピー', report: '報告', block: 'ブロック', unblock: 'ブロック解除', follow: 'フォロー', unfollow: 'フォロー解除', no_comments: 'コメントはありません', load_more: 'もっと読み込む', all_loaded: 'すべて読み込みました', write_reply: '返信を書く…', edit_comment: 'コメントを編集', delete_comment: 'コメントを削除', language: '言語', select_language: '言語を選択'
+};

@@ -195,6 +195,7 @@ function renderCommentTree(comment, commentsMap, postId, type, level, allComment
     html += '<button class="comment-like-btn" onclick="toggleLikeComment(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')">👍 <span id="commentLikeCount_' + comment.id + '">' + likes + '</span></button>';
     html += '<button class="comment-reply-btn" onclick="openReply(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')">💬 Ответить</button>';
     html += '</div>';
+    html += '<div class="comment-translation-wrap"><button type="button" class="comment-translate-btn" data-i18n="translate_comment" onclick="translateFeedComment(this)">🌐 Translate</button><span class="comment-translation-status" role="status" aria-live="polite"></span><div class="comment-translation" data-no-translate hidden></div></div>';
     html += '<div class="comment-reply-input-wrap" id="replyInput_' + comment.id + '" style="display:none; margin-top:4px;">';
     html += '<input type="text" id="replyInputField_' + comment.id + '" placeholder="Написать ответ..." class="reply-input">';
     html += '<button onclick="submitReply(\'' + postId + '\', \'' + comment.id + '\', \'' + type + '\')" class="reply-send-btn">→</button>';

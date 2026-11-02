@@ -19,7 +19,29 @@
           ".read": "auth != null",
           "$groupId": {
             ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid) || (data.exists() && data.child('ownerUid').val() === auth.uid))",
-            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'description', 'ownerUid', 'ownerName', 'createdAt']) && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 60 && newData.child('description').isString() && newData.child('description').val().length <= 300 && newData.child('ownerUid').val() === auth.uid && newData.child('ownerName').isString() && newData.child('createdAt').isNumber() && (!newData.child('coverUrl').exists() || (newData.child('coverUrl').isString() && newData.child('coverUrl').val().length <= 400000)) && (!newData.child('avatarUrl').exists() || (newData.child('avatarUrl').isString() && newData.child('avatarUrl').val().length <= 400000)))"
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'description', 'ownerUid', 'ownerName', 'createdAt']) && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 60 && newData.child('description').isString() && newData.child('description').val().length <= 300 && newData.child('ownerUid').val() === auth.uid && newData.child('ownerName').isString() && newData.child('createdAt').isNumber() && (!newData.child('coverUrl').exists() || (newData.child('coverUrl').isString() && newData.child('coverUrl').val().length <= 400000)) && (!newData.child('avatarUrl').exists() || (newData.child('avatarUrl').isString() && newData.child('avatarUrl').val().length <= 400000)) && (!newData.child('isClan').exists() || newData.child('isClan').val() !== true || (newData.child('leaderUid').val() === auth.uid && newData.child('leaderUid').val() === newData.child('ownerUid').val() && newData.child('clanBadge').isString() && newData.child('clanBadge').val().length <= 8 && root.child('sites').child($site).child('clan_leaders').child(auth.uid).child('active').val() === true && root.child('sites').child($site).child('clan_leaders').child(auth.uid).child('badge').val() === newData.child('clanBadge').val())))"
+          }
+        },
+        "clan_applications": {
+          ".read": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42' || auth.token.admin === true)",
+          "$uid": {
+            ".read": "auth != null && (auth.uid === $uid || auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42' || auth.token.admin === true)",
+            ".write": "auth != null && ((auth.uid === $uid && (!data.exists() || data.child('status').val() === 'rejected') && newData.child('status').val() === 'pending') || auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42' || auth.token.admin === true)",
+            ".validate": "!newData.exists() || (newData.child('uid').val() === $uid && newData.child('clanName').isString() && newData.child('clanName').val().length >= 2 && newData.child('clanName').val().length <= 60 && newData.child('about').isString() && newData.child('about').val().length <= 300 && newData.child('status').isString() && (newData.child('status').val() === 'pending' || newData.child('status').val() === 'approved' || newData.child('status').val() === 'rejected') && newData.child('createdAt').isNumber() && (auth.uid === $uid ? newData.child('status').val() === 'pending' : auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42' || auth.token.admin === true))"
+          }
+        },
+        "clan_leaders": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42' || auth.token.admin === true)",
+            ".validate": "!newData.exists() || (newData.child('active').isBoolean() && newData.child('badge').isString() && newData.child('badge').val().length >= 1 && newData.child('badge').val().length <= 8 && newData.child('grantedBy').val() === auth.uid && newData.child('grantedAt').isNumber())"
+          }
+        },
+        "user_clan_badges": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && ((auth.uid === $uid && !newData.exists()) || (newData.exists() && root.child('sites').child($site).child('groups').child(newData.child('groupId').val()).child('leaderUid').val() === auth.uid && root.child('sites').child($site).child('group_members').child(newData.child('groupId').val()).child($uid).val() === true) || auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42' || auth.token.admin === true)",
+            ".validate": "!newData.exists() || (newData.child('groupId').isString() && newData.child('groupName').isString() && newData.child('groupName').val().length <= 60 && newData.child('badge').isString() && newData.child('badge').val().length >= 1 && newData.child('badge').val().length <= 8 && newData.child('role').isString() && newData.child('role').val().length >= 1 && newData.child('role').val().length <= 40 && newData.child('assignedBy').isString() && newData.child('assignedAt').isNumber())"
           }
         },
         "group_members": {

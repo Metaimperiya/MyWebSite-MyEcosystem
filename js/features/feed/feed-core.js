@@ -353,7 +353,7 @@ function renderPost(p, type) {
         var image = entityImage ? '<img class="shared-entity-image" src="' + esc(entityImage) + '" alt="" loading="lazy">' : '';
         if (entity.kind === 'group') {
             var groupOpenData = encodeURIComponent(JSON.stringify({ kind: 'group', id: entity.id || '' }));
-            sharedHtml = '<div class="shared-entity-wrap shared-group-wrap"><button type="button" class="shared-entity-card" data-open-shared="' + groupOpenData + '">' + image + '<span class="shared-entity-copy"><small>' + esc(labels.group) + '</small><strong>' + esc(entity.title || 'Группа') + '</strong><span>' + esc(entity.description || 'Посмотри обложку и описание группы.') + '</span><em>Перейти в группу <span aria-hidden="true">→</span></em></span></button></div>';
+            sharedHtml = '<div class="shared-entity-wrap shared-group-wrap"><button type="button" class="shared-entity-card" data-open-shared="' + groupOpenData + '">' + image + '<span class="shared-entity-copy"><small>' + (entity.isClan ? 'КЛАН ' + esc(entity.badge || '♟') : esc(labels.group)) + '</small><strong>' + esc(entity.title || 'Группа') + '</strong><span>' + esc(entity.description || (entity.isClan ? 'Клан CPM2 METAIMPERIYA' : 'Посмотри обложку и описание группы.')) + '</span><em>Перейти в ' + (entity.isClan ? 'клан' : 'группу') + ' <span aria-hidden="true">→</span></em></span></button></div>';
         } else {
             if (entity.kind === 'dating') {
                 var datingActions = typeof window.renderDatingActionPanel === 'function'
@@ -464,6 +464,7 @@ function renderPost(p, type) {
         if (avatarEl && !p.authorAvatar) {
             renderAvatar(p.authorUid, avatarEl, letter);
         }
+        if (avatarEl && window.decorateClanBadge) window.decorateClanBadge(p.authorUid, avatarEl);
         if (typeof window.loadInlineProfileRating === 'function') {
             window.loadInlineProfileRating(p.authorUid, div.querySelector('.inline-profile-rating'));
         }

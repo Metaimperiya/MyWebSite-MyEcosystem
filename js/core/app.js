@@ -250,6 +250,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
+    var clanAvatarBadgeCache = Object.create(null);
+    var clanAvatarBadgePending = Object.create(null);
+    window.decorateClanBadge = function(uid, container) {
+        if (!uid || !container) return;
+        container.dataset.clanAvatarUid = uid;
+        function paint(badge) {
+            var old = container.querySelector('.clan-avatar-emblem');
+            if (!badge || !badge.badge) { if (old) old.remove(); return; }
+            if (!old) {
+                old = document.createElement('span');
+                old.className = 'clan-avatar-emblem';
+                old.setAttribute('aria-hidden', 'true');
+                container.appendChild(old);
+            }
+            old.textContent = badge.badge;
+            old.title = (badge.groupName || 'Клан') + ' · ' + (badge.role || 'Участник клана');
+        }
+        if (Object.prototype.hasOwnProperty.call(clanAvatarBadgeCache, uid)) { paint(clanAvatarBadgeCache[uid]); return; }
+        if (clanAvatarBadgePending[uid]) { clanAvatarBadgePending[uid].push(paint); return; }
+        clanAvatarBadgePending[uid] = [paint];
+        db.ref('sites/' + SITE + '/user_clan_badges/' + uid).once('value').then(function(snapshot) {
+            var value = snapshot.val() || null;
+            clanAvatarBadgeCache[uid] = value;
+            clanAvatarBadgePending[uid].forEach(function(callback) { callback(value); });
+            delete clanAvatarBadgePending[uid];
+        }).catch(function(error) {
+            console.warn('Не удалось загрузить значок клана:', error);
+            clanAvatarBadgeCache[uid] = null;
+            clanAvatarBadgePending[uid].forEach(function(callback) { callback(null); });
+            delete clanAvatarBadgePending[uid];
+        });
+    };
+    window.clearClanBadgeCache = function(uid) {
+        if (!uid) return;
+        delete clanAvatarBadgeCache[uid];
+        document.querySelectorAll('[data-clan-avatar-uid]').forEach(function(container) {
+            if (container.dataset.clanAvatarUid === uid) window.decorateClanBadge(uid, container);
+        });
+    };
+
     window.renderAvatar = function(uid, container, letter) {
         if (!container) return;
         window.getUserAvatar(uid, function(url) {
@@ -258,6 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 container.innerHTML = '<span class="letter">' + (letter || '?') + '</span>';
             }
+            if (window.decorateClanBadge) window.decorateClanBadge(uid, container);
         });
     };
 

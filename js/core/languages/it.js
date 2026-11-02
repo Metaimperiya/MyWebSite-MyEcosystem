@@ -1,0 +1,26 @@
+// ITALIANO
+window.LANG_IT = {
+    app_name: 'METAIMPERIYA', menu: 'Menu', profile: 'Profilo', settings: 'Impostazioni', logout: 'Esci', theme: 'Tema',
+    feed: 'Feed', what_new: 'Che cosa c’è di nuovo?', photo: 'Foto', publish: 'Pubblica', clear: 'Cancella', empty_feed: 'Ancora niente',
+    login_to_see: 'Accedi per vedere il feed', guest: 'Ospite', setup_profile: 'Completa il profilo', edit_profile: 'Modifica profilo',
+    change_avatar: 'Cambia avatar', go_home: 'Vai alla home', friends: 'Amici', subscribers: 'Follower', subscriptions: 'Seguiti',
+    no_posts: '📝 Nessun post. Scrivi qualcosa!', loading: 'Caricamento…', my_posts: 'I miei post', friends_title: '🤝 Amici', no_friends: 'Nessun amico',
+    enter_link: 'Inserisci un link da incorporare…', embedded_page: 'Pagina incorporata', collapse: 'Comprimi', expand: 'Espandi',
+    link_saved: '✅ Link salvato!', avatar_updated: '✅ Avatar aggiornato!', groups: 'Gruppi', create_group: 'Crea un gruppo',
+    new_group: 'Nuovo gruppo', group_name: 'Nome…', create: 'Crea', people: 'Persone', all_users: 'Tutti gli utenti',
+    add_friend: '➕ Aggiungi agli amici', already_friends: '🤝 Amici', request_sent: '⏳ Richiesta inviata', request_received: '📩 Richiesta ricevuta',
+    accept: 'Accetta', decline: 'Rifiuta', remove_from_friends: 'Rimuovi dagli amici', chat: 'Chat', back: 'Indietro', message: 'Messaggio…',
+    no_messages: 'Nessun messaggio', delete_message: 'Elimina messaggio', chat_list_empty: '🤝 Aggiungi amici per iniziare a chattare',
+    cannot_write_self: 'Non puoi scrivere a te stesso', notifications: 'Notifiche', no_notifications: 'Nessuna notifica', admin: 'Amministratore',
+    admin_password: 'Password…', admin_login: 'Accedi', all_chats: 'Tutte le chat', no_chats: 'Nessuna chat privata',
+    edit_post: '✏️ Modifica', delete_post: '🗑 Elimina', restore_post: '↩️ Ripristina', post_deleted: '🗑 Post eliminato',
+    enter_link_placeholder: 'Inserisci il link:', link_text: 'link', login_title: '👤 Accedi', login_google: 'Accedi con Google', or: 'oppure',
+    enter_name_placeholder: 'Inserisci il nome…', cancel: 'Annulla', login: 'Accedi', player: 'PLAYER', playlist: 'Playlist',
+    download: 'Scarica', visualizer: 'Visualizzatore', online: 'online', edit: 'Modifica', delete: 'Elimina', save: 'Salva',
+    close: 'Chiudi', confirm: 'Conferma', post_updated: '✅ Post aggiornato!', repost_created: '✅ Post ricondiviso!', search: 'Cerca',
+    add: 'Aggiungi', remove: 'Rimuovi', write_comment: 'Scrivi un commento…', reply: 'Rispondi', like: 'Mi piace', repost: 'Ricondividi',
+    share: 'Condividi', copy_link: 'Copia link', report: 'Segnala', block: 'Blocca', unblock: 'Sblocca', follow: 'Segui',
+    unfollow: 'Non seguire più', no_comments: 'Nessun commento', load_more: 'Carica altri', all_loaded: 'Tutto caricato',
+    write_reply: 'Scrivi una risposta…', edit_comment: 'Modifica commento', delete_comment: 'Elimina commento', language: 'Lingua',
+    select_language: 'Scegli la lingua'
+};

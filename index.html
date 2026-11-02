@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="css/core/base.css?v=3.0">
     <link rel="stylesheet" href="css/core/reset.css?v=3.0">
     <link rel="stylesheet" href="css/core/variables.css?v=3.0">
-    <link rel="stylesheet" href="css/features/feed.css?v=5.6">
+    <link rel="stylesheet" href="css/features/feed.css?v=5.7">
     <link rel="stylesheet" href="css/features/profile.css?v=4.0">
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
     <link rel="stylesheet" href="css/features/work.css?v=1.3">
@@ -60,11 +60,12 @@
     <link rel="stylesheet" href="css/layout/grid.css?v=3.0">
     <link rel="stylesheet" href="css/layout/panels.css?v=3.1">
     <link rel="stylesheet" href="css/layout/sidebar.css?v=3.0">
-    <link rel="stylesheet" href="css/layout/topbar.css?v=3.1">
+    <link rel="stylesheet" href="css/layout/topbar.css?v=3.2">
     <link rel="stylesheet" href="css/modules/player.css?v=3.0">
     <link rel="stylesheet" href="css/components/admin.css?v=3.0">
     <link rel="stylesheet" href="css/style.css?v=3.2">
-    <link rel="stylesheet" href="css/features/cpm2-landing.css?v=1.0">
+    <link rel="stylesheet" href="css/features/cpm2-landing.css?v=1.1">
+    <link rel="stylesheet" href="css/features/clans.css?v=1.1">
 </head>
 <body>
 
@@ -95,8 +96,28 @@
         <div class="settings-item" onclick="toggleTheme()">
             <span class="icon">🌓</span> Theme
         </div>
-        <div class="settings-item" onclick="toggleLanguage()">
+        <div class="settings-item" data-language-trigger onclick="toggleLanguage()">
             <span class="icon">🌐</span> <span id="langDisplay">English</span>
+        </div>
+        <div class="language-menu" id="languageMenu" hidden role="menu" aria-label="Choose language">
+            <span class="language-menu-title">Choose language</span>
+            <div class="language-menu-grid">
+                <button type="button" data-language="en" onclick="setLanguage('en')">English</button>
+                <button type="button" data-language="ru" onclick="setLanguage('ru')">Русский</button>
+                <button type="button" data-language="tr" onclick="setLanguage('tr')">Türkçe</button>
+                <button type="button" data-language="ar" onclick="setLanguage('ar')">العربية</button>
+                <button type="button" data-language="es" onclick="setLanguage('es')">Español</button>
+                <button type="button" data-language="it" onclick="setLanguage('it')">Italiano</button>
+                <button type="button" data-language="de" onclick="setLanguage('de')">Deutsch</button>
+                <button type="button" data-language="zh" onclick="setLanguage('zh')">简体中文</button>
+                <button type="button" data-language="ja" onclick="setLanguage('ja')">日本語</button>
+                <button type="button" data-language="uk" onclick="setLanguage('uk')">Українська</button>
+                <button type="button" data-language="hi" onclick="setLanguage('hi')">हिन्दी</button>
+                <button type="button" data-language="bn" onclick="setLanguage('bn')">বাংলা</button>
+                <button type="button" data-language="ur" onclick="setLanguage('ur')">اردو</button>
+                <button type="button" data-language="fa" onclick="setLanguage('fa')">فارسی</button>
+                <button type="button" data-language="he" onclick="setLanguage('he')">עברית</button>
+            </div>
         </div>
         <div class="settings-divider"></div>
         <div class="settings-item" onclick="toggleViewMode()">
@@ -210,6 +231,9 @@
                     <section class="cpm2-landing-hero">
                         <span class="cpm2-landing-kicker">СООБЩЕСТВО ИГРОКОВ</span>
                         <h1>CPM2 METAIMPERIYA</h1>
+                        <label class="landing-language-picker" for="landingLanguageSelect"><span>🌐 <span id="landingLanguageLabel" data-i18n="landing_language_label">Выбери язык перед входом в сообщество</span></span><select id="landingLanguageSelect" onchange="setLanguage(this.value)" aria-label="Choose language">
+                            <option value="en">English</option><option value="ru">Русский</option><option value="tr">Türkçe</option><option value="ar">العربية</option><option value="es">Español</option><option value="it">Italiano</option><option value="de">Deutsch</option><option value="zh">简体中文</option><option value="ja">日本語</option><option value="uk">Українська</option><option value="hi">हिन्दी</option><option value="bn">বাংলা</option><option value="ur">اردو</option><option value="fa">فارسی</option><option value="he">עברית</option>
+                        </select></label>
                         <p class="cpm2-landing-lead">Сообщество игроков Car Parking Multiplayer 2: общайся, собирай клан, находи людей для автомобильных сделок, публикуй объявления о продаже и обмене машин.</p>
                         <div class="cpm2-landing-actions">
                             <button type="button" class="cpm2-landing-primary" onclick="goToFeed()">Перейти в ленту <span aria-hidden="true">→</span></button>
@@ -326,7 +350,12 @@
 
             <div class="page" id="page-groups">
                 <section class="groups-page">
-                    <div class="groups-heading"><div><span class="groups-kicker">СООБЩЕСТВА</span><h2>Группы</h2><p>Создавай сообщества и общайся в отдельной ленте каждой группы.</p></div><button type="button" class="groups-create-button" onclick="openCreateGroup()">＋ Создать группу</button></div>
+                    <div class="groups-heading"><div><span class="groups-kicker">CPM2 · METAIMPERIYA</span><h2>Кланы и группы</h2><p>Создай сообщество или оформи клан с лидером, символом и отдельной лентой.</p></div><div class="groups-heading-actions"><button type="button" class="groups-create-button clan-create-button" id="createClanButton" onclick="openCreateClan()" hidden>＋ Создать клан</button><button type="button" class="groups-create-button groups-create-secondary" onclick="openCreateGroup()">＋ Создать группу</button></div></div>
+                    <section class="clan-entry-panel" id="clanEntryPanel">
+                        <div><strong id="clanEntryTitle">Хочешь возглавить клан?</strong><p id="clanEntryDescription">Отправь заявку. После одобрения ты получишь символ клана и сможешь создать его и назначать значки участникам.</p></div>
+                        <button type="button" id="clanRequestButton" onclick="openClanApplication()">Подать заявку</button>
+                    </section>
+                    <section class="clan-admin-applications" id="clanAdminApplications" hidden><h3>Заявки на создание клана</h3><div id="clanApplicationList"></div></section>
                     <div class="groups-directory" id="groupsDirectory">
                         <label class="groups-search"><span aria-hidden="true">⌕</span><input id="groupsSearch" type="search" placeholder="Поиск групп" autocomplete="off"></label>
                         <div class="group-list" id="groupList"></div>
@@ -335,6 +364,7 @@
                         <button type="button" class="group-back-button" onclick="closeGroup()">← Все группы</button>
                         <div class="group-profile" id="groupDetailHeader"></div>
                         <div class="group-membership" id="groupMembership"></div>
+                        <section class="clan-roster-manager" id="clanRosterManager" hidden></section>
                         <div class="group-profile-tabs" role="tablist" aria-label="Разделы группы">
                             <button type="button" class="active" data-group-tab="feed" onclick="showGroupTab('feed')">Лента</button>
                             <button type="button" data-group-tab="about" onclick="showGroupTab('about')">Информация</button>
@@ -429,7 +459,7 @@
                     <section class="cpm2-section"><div class="cpm2-section-title"><h2>Разделы</h2><span>Выбери направление</span></div>
                         <div class="cpm2-grid">
                             <button type="button" class="cpm2-card" onclick="goToAutoMarket()"><span>🚘</span><strong>Авторынок</strong><small>Объявления об авто и запчастях</small><em>Открыть рынок →</em></button>
-                            <button type="button" class="cpm2-card" onclick="goToGroups()"><span>🛡️</span><strong>Кланы</strong><small>Сейчас работает раздел групп; клановые роли добавим поверх него</small><em>Открыть сообщества →</em></button>
+                            <button type="button" class="cpm2-card" onclick="goToGroups()"><span>🛡️</span><strong>Кланы</strong><small>Создавай клан, получай символ и назначай его участникам</small><em>Открыть кланы →</em></button>
                             <article class="cpm2-card cpm2-card-pending"><span>🛒</span><strong>Магазин</strong><small>Покупки за CPM2 и публикация получения в ленте</small><em>Следующий этап</em></article>
                             <article class="cpm2-card cpm2-card-pending"><span>🔄</span><strong>Обмен</strong><small>Перевод и обмен внутреннего баланса</small><em>Следующий этап</em></article>
                             <article class="cpm2-card cpm2-card-pending"><span>🤝</span><strong>Sell / Trade</strong><small>Продажа и обмен предметов между участниками</small><em>Следующий этап</em></article>
@@ -682,13 +712,24 @@
     <div class="modal-overlay" id="createCommunityModal">
         <div class="modal-box group-create-modal">
             <button class="close-btn" type="button" onclick="closeCreateGroup()">✕</button>
-            <h3>Создать группу</h3>
+            <h3 id="newCommunityTitle">Создать группу</h3>
             <label for="newGroupName">Название</label>
             <input id="newGroupName" maxlength="60" placeholder="Например, любители кино">
             <label for="newGroupDescription">О чём эта группа? <span>(необязательно)</span></label>
             <textarea id="newGroupDescription" maxlength="300" placeholder="Короткое описание сообщества"></textarea>
             <div class="group-create-error" id="newGroupError" role="alert"></div>
             <button class="btn-primary" id="createGroupButton" type="button" onclick="createGroup()">Создать</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="clanApplicationModal">
+        <div class="modal-box group-create-modal">
+            <button class="close-btn" type="button" onclick="closeClanApplication()">✕</button>
+            <h3>Заявка на создание клана</h3>
+            <label for="clanApplicationName">Название клана</label><input id="clanApplicationName" maxlength="60" placeholder="Например, Night Riders">
+            <label for="clanApplicationReason">Коротко о клане</label><textarea id="clanApplicationReason" maxlength="300" placeholder="Кого объединяет клан и чем он будет заниматься?"></textarea>
+            <div class="group-create-error" id="clanApplicationError" role="alert"></div>
+            <button class="btn-primary" type="button" onclick="submitClanApplication()">Отправить заявку</button>
         </div>
     </div>
 
@@ -904,21 +945,21 @@
 
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.2"></script>
-<script src="js/core/app.js?v=4.8"></script>
-<script src="js/core/lang.js?v=3.0"></script>
+<script src="js/core/app.js?v=4.9"></script>
+<script src="js/core/lang.js?v=5.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
-<script src="js/features/feed/feed-core.js?v=5.7"></script>
-<script src="js/features/feed/feed-actions.js?v=4.8"></script>
+<script src="js/features/feed/feed-core.js?v=5.8"></script>
+<script src="js/features/feed/feed-actions.js?v=4.9"></script>
 <script src="js/features/feed/post-social.js?v=1.3"></script>
 <script src="js/features/cpm2-landing.js?v=1.0"></script>
 <script src="js/features/cpm2-economy.js?v=1.1"></script>
 <script src="js/features/feed/feed-edit.js?v=5.4"></script>
 <script src="js/features/referrals.js?v=1.3"></script>
 <script src="js/features/ambassador-game-demo.js?v=1.6"></script>
-<script src="js/features/profile.js?v=4.8"></script>
+<script src="js/features/profile.js?v=4.9"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.5"></script>
-<script src="js/features/groups.js?v=4.6"></script>
+<script src="js/features/groups.js?v=4.7"></script>
 <script src="js/features/work.js?v=1.3"></script>
 <script src="js/features/dating.js?v=2.1"></script>
 <script src="js/features/marketplace.js?v=1.2"></script>

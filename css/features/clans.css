@@ -1,0 +1,35 @@
+.avatar-wrap{position:relative;overflow:visible!important}
+.avatar-wrap>img{border-radius:50%}
+.clan-avatar-emblem{position:absolute;z-index:8;top:-5px;right:-5px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 2px;border:1.5px solid var(--card-bg);border-radius:999px;background:#fff;color:#172033;font-size:.72rem;font-weight:800;line-height:1;box-shadow:0 2px 5px #0003;pointer-events:none}
+.profile-header .clan-avatar-emblem{top:-5px;right:-5px;min-width:25px;height:25px;font-size:1.05rem}
+.people-list .people-item-main .avatar-wrap{overflow:visible!important}
+.groups-heading-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.groups-create-secondary{border:1px solid var(--border-color);background:var(--input-bg);color:var(--text-color)}
+.clan-create-button{background:linear-gradient(135deg,#244e35,#2f7550)}
+.clan-entry-panel{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 14px;padding:15px 17px;border:1px solid color-mix(in srgb,#b69b4a 36%,var(--border-color));border-radius:15px;background:linear-gradient(120deg,color-mix(in srgb,#dfbd55 11%,var(--card-bg)),var(--card-bg));box-shadow:var(--shadow)}
+.clan-entry-panel strong{font-size:.84rem}
+.clan-entry-panel p{margin:4px 0 0;color:var(--text-secondary);font-size:.7rem;line-height:1.5}
+.clan-entry-panel button,.clan-application-card>button,.clan-roster-row button{flex:0 0 auto;min-height:34px;padding:6px 11px;border:0;border-radius:9px;background:var(--link-color);color:#fff;font:inherit;font-size:.68rem;font-weight:750;cursor:pointer}
+.clan-admin-applications{margin:0 0 14px;padding:14px;border:1px solid var(--border-color);border-radius:14px;background:var(--card-bg)}
+.clan-admin-applications h3{margin:0 0 10px;font-size:.9rem}
+.clan-application-card{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:9px;padding:10px 0;border-top:1px solid var(--border-color)}
+.clan-application-card strong{font-size:.8rem}
+.clan-application-card p{margin:3px 0;color:var(--text-secondary);font-size:.69rem;line-height:1.4}
+.clan-application-card small{color:var(--muted-text);font-size:.58rem;overflow-wrap:anywhere}
+.clan-application-card label{display:grid;gap:3px;color:var(--text-secondary);font-size:.6rem}
+.clan-application-card input{width:58px;height:30px;padding:3px;border:1px solid var(--border-color);border-radius:8px;background:var(--input-bg);color:var(--text-color);font:inherit;font-size:.9rem;text-align:center}
+.clan-application-card .clan-reject-button{border:1px solid var(--border-color);background:var(--input-bg);color:var(--text-secondary)}
+.clan-admin-empty{margin:0;color:var(--text-secondary);font-size:.72rem}
+.clan-type-label{color:#98741b;font-size:.55rem;font-weight:850;letter-spacing:.08em}
+.clan-roster-manager{margin:10px 0;padding:14px;border:1px solid color-mix(in srgb,var(--link-color) 24%,var(--border-color));border-radius:14px;background:var(--card-bg);box-shadow:var(--shadow)}
+.clan-roster-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.clan-roster-heading>div>span{color:var(--link-color);font-size:.55rem;font-weight:850;letter-spacing:.1em}
+.clan-roster-heading h3{margin:3px 0 0;font-size:.9rem}
+.clan-roster-heading>small{color:var(--text-secondary);font-size:.67rem}
+.clan-roster-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border-color)}
+.clan-roster-person{display:grid;min-width:0;gap:2px}
+.clan-roster-person strong{overflow:hidden;font-size:.72rem;text-overflow:ellipsis;white-space:nowrap}
+.clan-roster-person small,.clan-roster-leader{color:var(--text-secondary);font-size:.62rem}
+.clan-roster-leader{color:#98741b;font-weight:800}
+.clan-roster-row button{min-height:29px;padding:5px 9px;font-size:.62rem}
+@media(max-width:600px){.groups-heading-actions{width:100%;justify-content:stretch}.groups-heading-actions button{flex:1}.clan-entry-panel{align-items:flex-start;flex-direction:column}.clan-entry-panel button{width:100%}.clan-application-card{grid-template-columns:minmax(0,1fr) auto;align-items:start}.clan-application-card label{grid-column:2;grid-row:1}.clan-application-card>button{grid-row:2}.clan-application-card>button:nth-last-child(1){grid-column:2}.clan-roster-heading{align-items:flex-start;flex-direction:column}}
