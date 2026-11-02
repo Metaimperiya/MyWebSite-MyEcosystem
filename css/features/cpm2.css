@@ -1,0 +1,43 @@
+.sidebar .menu-parent{box-sizing:border-box;width:100%;border:0;background:transparent;text-align:left;font:inherit}
+.sidebar .menu-parent .menu-chevron{margin-left:auto;transition:transform .18s ease}
+.sidebar .menu-parent[aria-expanded="true"] .menu-chevron{transform:rotate(180deg)}
+.sidebar .cpm2-menu{padding:2px 0 5px 24px}
+.sidebar .cpm2-menu .menu-item{box-sizing:border-box;width:100%;border:0;background:transparent;text-align:left;font:inherit}
+.sidebar .cpm2-menu .menu-item:disabled{opacity:.48;cursor:default}
+.cpm2-page{padding:5px 0 28px;color:var(--text-color)}
+.cpm2-heading{padding:19px;border:1px solid var(--border-color);border-radius:16px;background:radial-gradient(circle at 95% 0,color-mix(in srgb,#e0b64f 18%,transparent),transparent 35%),var(--card-bg);box-shadow:var(--shadow)}
+.cpm2-kicker{color:#a67918;font-size:.65rem;font-weight:850;letter-spacing:.1em}
+.cpm2-heading h1{margin:5px 0;font-size:1.45rem}
+.cpm2-heading p{margin:0;color:var(--text-secondary);font-size:.78rem;line-height:1.5}
+.cpm2-notice{margin:11px 0;padding:10px 12px;border:1px solid #e5ce8b;border-radius:11px;background:#fff8df;color:#755d20;font-size:.7rem;line-height:1.5}
+.cpm2-section{margin-top:14px;padding:15px;border:1px solid var(--border-color);border-radius:15px;background:var(--card-bg)}
+.cpm2-section-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:11px}
+.cpm2-section-title h2{margin:0;font-size:1rem}
+.cpm2-section-title span{color:var(--text-secondary);font-size:.68rem}
+.cpm2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cpm2-card{display:grid;justify-items:start;gap:7px;min-height:145px;padding:14px;border:1px solid var(--border-color);border-radius:12px;background:var(--input-bg);color:var(--text-color);text-align:left;text-decoration:none}
+button.cpm2-card{font:inherit;cursor:pointer;transition:transform .16s ease,border-color .16s ease}
+button.cpm2-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,#b88e36 55%,var(--border-color))}
+.cpm2-card>span{font-size:1.45rem}
+.cpm2-card>strong{font-size:.82rem}
+.cpm2-card>small{color:var(--text-secondary);font-size:.68rem;line-height:1.45}
+.cpm2-card>em{align-self:end;margin-top:auto;color:#a67918;font-size:.68rem;font-style:normal;font-weight:750}
+.cpm2-card-pending{opacity:.78}
+@media(max-width:600px){.cpm2-heading{padding:15px}.cpm2-section{padding:11px}.cpm2-grid{grid-template-columns:1fr}.cpm2-card{min-height:120px}}
+.cpm2-wallet-panel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0;padding:16px;border:1px solid #dce4ef;border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(30,60,100,.06)}
+.cpm2-wallet-panel>div:not(.cpm2-bank-controls):not(.cpm2-transfer-controls){display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:14px;background:#f3f6fb}
+.cpm2-wallet-panel>div>span,.cpm2-wallet-panel label{font-size:12px;color:#677487}
+.cpm2-wallet-panel>div>strong{font-size:25px;color:#1769d2;font-variant-numeric:tabular-nums}
+.cpm2-wallet-panel small{color:#7b8797}
+.cpm2-bank-controls,.cpm2-transfer-controls{display:flex;align-items:end;gap:10px;flex-wrap:wrap;grid-column:1/-1;padding-top:10px;border-top:1px solid #e7ebf0}
+.cpm2-bank-controls label,.cpm2-transfer-controls label{display:grid;gap:5px;flex:1;min-width:140px}
+.cpm2-wallet-panel input{width:100%;min-height:40px;padding:8px 10px;border:1px solid #d7dee8;border-radius:10px;background:#f7f8fa}
+.cpm2-wallet-panel button{min-height:40px;padding:0 14px;border:0;border-radius:10px;background:#1769d2;color:#fff;font-weight:700;cursor:pointer}
+.cpm2-audit{grid-column:1/-1;padding-top:12px;border-top:1px solid #e7ebf0}
+.cpm2-audit h3{margin:0 0 8px;font-size:15px}
+.cpm2-audit-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #edf0f4;font-size:12px}
+.cpm2-audit-row span{overflow-wrap:anywhere;color:#576579}
+#cpm2Feedback{grid-column:1/-1;margin:0;color:#24734f;font-size:13px}
+#cpm2Feedback.is-error{color:#c04444}
+.post-cpm2-tip{margin-left:auto}
+@media(max-width:560px){.cpm2-wallet-panel{grid-template-columns:1fr;padding:12px}.cpm2-wallet-panel>div>strong{font-size:22px}.cpm2-bank-controls,.cpm2-transfer-controls{align-items:stretch}.cpm2-wallet-panel button{width:100%}}

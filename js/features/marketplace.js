@@ -267,3 +267,10 @@ document.getElementById('marketplaceImageFile').addEventListener('change', funct
     marketplaceImagePreviewUrl = URL.createObjectURL(file);
     renderMarketplaceImagePreview(marketplaceImagePreviewUrl);
 });
+
+window.goToAutoMarket = function() {
+    var search = document.getElementById('marketplaceSearch');
+    if (search) search.value = 'авто';
+    window.showMarketplaceTab('goods');
+    window.goToMarketplace();
+};

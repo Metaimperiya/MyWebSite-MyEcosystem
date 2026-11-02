@@ -160,7 +160,7 @@
         "ambassador_bank": {
           ".read": "auth != null",
           ".write": "auth != null && ((!data.exists() && newData.child('ownerUid').val() === auth.uid && (auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')) || (data.exists() && data.child('ownerUid').val() === auth.uid && newData.child('ownerUid').val() === auth.uid))",
-          ".validate": "!newData.exists() || (newData.child('ownerUid').isString() && newData.child('ownerUid').val() === auth.uid && newData.child('total').isNumber() && newData.child('total').val() >= 0 && newData.child('total').val() <= 10000000)"
+          ".validate": "!newData.exists() || (newData.child('ownerUid').isString() && newData.child('ownerUid').val() === auth.uid && newData.child('total').isNumber() && newData.child('total').val() >= 0 && newData.child('total').val() <= 10000000 && (!newData.child('cpm2Total').exists() || (newData.child('cpm2Total').isNumber() && newData.child('cpm2Total').val() >= 0 && newData.child('cpm2Total').val() <= 1000000000000)))"
         },
         "ambassador_players": {
           ".read": "auth != null",
@@ -174,12 +174,26 @@
           ".indexOn": ["postKey"],
           "$transferId": {
             ".write": "auth != null && !data.exists() && newData.child('fromUid').val() === auth.uid && root.child('sites').child($site).child('all_users').child(auth.uid).exists() && root.child('sites').child($site).child('all_users').child(newData.child('toUid').val()).exists()",
-            ".validate": "newData.hasChildren(['fromUid', 'toUid', 'amount', 'at']) && newData.child('fromUid').val() === auth.uid && newData.child('toUid').isString() && newData.child('toUid').val() !== auth.uid && newData.child('amount').isNumber() && newData.child('amount').val() >= 1 && newData.child('amount').val() <= 10000000 && newData.child('at').isNumber() && (!newData.child('kind').exists() || (newData.child('kind').val() === 'post_tip' && newData.child('postKey').isString() && newData.child('postKey').val().length <= 200 && newData.child('amount').val() === 1))"
+            ".validate": "newData.hasChildren(['fromUid', 'toUid', 'amount', 'at']) && newData.child('fromUid').val() === auth.uid && newData.child('toUid').isString() && newData.child('toUid').val() !== auth.uid && newData.child('amount').isNumber() && newData.child('amount').val() >= 1 && newData.child('at').isNumber() && ((!newData.child('currency').exists() || newData.child('currency').val() === 'social') ? (newData.child('amount').val() <= 10000000 && (!newData.child('kind').exists() || (newData.child('kind').val() === 'post_tip' && newData.child('postKey').isString() && newData.child('postKey').val().length <= 200))) : (newData.child('currency').val() === 'cpm2' && newData.child('amount').val() <= 1000000000000 && (!newData.child('kind').exists() || (newData.child('kind').val() === 'post_tip' && newData.child('postKey').isString() && newData.child('postKey').val().length <= 200))))"
           }
         },
         "feed_posts": {
           ".read": "auth != null",
           ".indexOn": ["authorUid"],
+          "metaimperiya_cpm2_landing_discussion": {
+            "comments": {
+              ".read": true,
+              "$commentId": {
+                ".write": "auth != null && ((!data.exists() && newData.child('authorUid').val() === auth.uid) || (data.exists() && data.child('authorUid').val() === auth.uid) || auth.token.admin === true)",
+                ".validate": "!newData.exists() || (newData.child('authorUid').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length <= 1000 && newData.child('timestamp').isNumber())"
+              }
+            },
+            "commentCount": {
+              ".read": true,
+              ".write": "auth != null",
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            }
+          },
           "$postId": {
             "comments": {
               ".read": true,

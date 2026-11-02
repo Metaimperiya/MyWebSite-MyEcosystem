@@ -18,7 +18,6 @@ const MAX_LEVEL = 86;
 const XP = { post: 12, comment: 3, visit: 2 };
 const REFERRAL_SITE = 'www_metaimperiya_com';
 const MAX_REFERRAL_ANCESTORS = 100;
-
 function referralSite(value) {
   if (value !== REFERRAL_SITE) throw new HttpsError('invalid-argument', 'Неизвестный сайт.');
   return value;
@@ -42,13 +41,24 @@ exports.getReferralDashboard = onCall(async (request) => {
     if (!code) throw new HttpsError('unavailable', 'Не удалось создать ссылку. Попробуй ещё раз.');
   }
   await db.ref(`sites/${site}/referral_codes/${code}`).transaction((current) => current || { uid, createdAt: Date.now() });
-  const [directSnap, teamSnap, walletSnap] = await Promise.all([
+  const [directSnap, teamSnap, walletSnap, bankSnap, transferSnap] = await Promise.all([
     db.ref(`sites/${site}/referrals/${uid}`).once('value'),
     db.ref(`sites/${site}/referral_team/${uid}`).once('value'),
-    db.ref(`sites/${site}/referral_wallets/${uid}`).once('value')
+    db.ref(`sites/${site}/referral_wallets/${uid}`).once('value'),
+    db.ref(`sites/${site}/ambassador_bank`).once('value'),
+    db.ref(`sites/${site}/ambassador_transfers`).once('value')
   ]);
   const direct = directSnap.val() || {};
   const team = teamSnap.val() || {};
+  const bank = bankSnap.val() || {};
+  let cpm2Balance = 0;
+  Object.values(bank.cpm2Grants || {}).forEach((grant) => { if (grant && grant.toUid === uid) cpm2Balance += Number(grant.amount || 0); });
+  transferSnap.forEach((child) => {
+    const transfer = child.val() || {};
+    if (transfer.currency !== 'cpm2') return;
+    if (transfer.fromUid === uid) cpm2Balance -= Number(transfer.amount || 0);
+    if (transfer.toUid === uid) cpm2Balance += Number(transfer.amount || 0);
+  });
   const members = Object.keys(team).map((memberUid) => ({
     uid: memberUid,
     depth: Number(team[memberUid].depth || 1),
@@ -61,6 +71,7 @@ exports.getReferralDashboard = onCall(async (request) => {
     directCount: Object.keys(direct).length,
     teamCount: Object.keys(team).length,
     balance: Number(walletSnap.child('balance').val() || 0),
+    cpm2Balance: Math.max(0, cpm2Balance),
     members
   };
 });
@@ -167,8 +178,23 @@ exports.claimReferral = onCall(async (request) => {
     updates[`sites/${site}/referral_team/${ancestorUid}/${uid}`] = { depth, joinedAt, directReferrerUid: referrerUid };
   });
   await db.ref().update(updates);
-  logger.info('Referral attributed', { uid, referrerUid, teamAncestors: ancestorUids.length });
-  return { claimed: true, referrerUid };
+  // Referral awards use the existing ambassador bank and grant ledger.
+  // One demo CPM2 is awarded to the direct inviter, at most once per signup.
+  const referralGrantKey = `referral_${uid}`;
+  const bankRef = db.ref(`sites/${site}/ambassador_bank`);
+  await bankRef.transaction((bank) => {
+    if (!bank || !bank.ownerUid) return;
+    bank.cpm2Total = Math.max(0, Number(bank.cpm2Total || 0));
+    bank.cpm2Grants = bank.cpm2Grants || {};
+    if (bank.cpm2Grants[referralGrantKey]) return bank;
+    if (bank.cpm2Total < 1) return;
+    bank.cpm2Total -= 1;
+    bank.cpm2Grants[referralGrantKey] = { toUid: referrerUid, toName: '', amount: 1, currency: 'cpm2', type: 'referral', referredUid: uid, at: Date.now() };
+    return bank;
+  });
+  const rewarded = await bankRef.child(`cpm2Grants/${referralGrantKey}`).once('value').then((snap) => snap.exists());
+  logger.info('Referral attributed', { uid, referrerUid, teamAncestors: ancestorUids.length, cpm2Rewarded: rewarded });
+  return { claimed: true, referrerUid, cpm2Rewarded: rewarded };
 });
 
 function levelForExperience(experience) {

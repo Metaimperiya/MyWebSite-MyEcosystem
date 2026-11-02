@@ -20,6 +20,9 @@
 .amb-bank-edit input { width:0; flex:1; padding:0 9px; outline:0; background:#ffffffed; color:#143c2d; font-size:.71rem; }
 .amb-bank-edit button { padding:0 10px; background:#f2d77e; color:#3e3216; font-size:.68rem; font-weight:800; cursor:pointer; white-space:nowrap; }
 .amb-bank-card>small { margin-top:8px; color:#c6dbce; font-size:.56rem; }
+.amb-cpm2-bank { display:grid; width:100%; justify-items:center; gap:3px; margin-top:12px; padding-top:10px; border-top:1px solid #ffffff30; color:#d3e7dc; font-size:.67rem; }
+.amb-cpm2-bank>span strong { color:#ffdf82; font-variant-numeric:tabular-nums; }
+.amb-cpm2-bank .amb-bank-edit { margin-top:5px; }
 .amb-wallet-row { display:grid; grid-template-columns:1.2fr .8fr; gap:9px; }
 .amb-wallet-row article { display:grid; justify-items:start; gap:4px; padding:12px; border:1px solid #d9e4d9; border-radius:14px; background:#fff; }
 .amb-wallet-row article>span { color:#678073; font-size:.56rem; font-weight:800; letter-spacing:.08em; }
@@ -75,6 +78,7 @@
 .amb-player-copy strong { overflow:hidden; color:#304c3d; font-size:.61rem; text-overflow:ellipsis; white-space:nowrap; }
 .amb-player-copy small { color:#8a978f; font-size:.51rem; }
 .amb-player-row>b { color:#246647; font-size:.59rem; white-space:nowrap; }
+.amb-player-row>.amb-player-balances { max-width:132px; white-space:normal; text-align:right; line-height:1.35; }
 .amb-mini-grant { padding:4px 6px; border:1px solid #d4e3d4; border-radius:7px; background:#f1f7ef; color:#2a704c; font:inherit; font-size:.54rem; font-weight:800; cursor:pointer; }
 .amb-player-empty { padding:13px 4px; color:#829187; font-size:.6rem; line-height:1.5; text-align:center; }
 .amb-transfer { display:grid; gap:7px; padding-top:9px; border-top:1px solid #e7ede6; }

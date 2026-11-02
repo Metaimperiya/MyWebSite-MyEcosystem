@@ -65,6 +65,15 @@
 
 .people-directory { max-width:760px; margin:0 auto; padding:14px; }
 .people-directory-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.people-heading-actions { display:flex; align-items:center; gap:8px; }
+.people-refresh { width:34px; height:34px; border:1px solid var(--border-color); border-radius:50%; background:var(--card-bg); color:var(--link-color); font-size:1.15rem; cursor:pointer; }
+.people-name-line { display:flex; align-items:center; flex-wrap:wrap; gap:5px; min-width:0; }
+.people-badge { display:inline-flex; align-items:center; justify-content:center; min-height:16px; padding:1px 5px; border-radius:6px; font-size:.52rem; font-weight:850; line-height:1; }
+.people-badge-pro { background:#fff0bd; color:#7b5a10; }
+.people-badge-verified { width:16px; padding:0; border-radius:50%; background:#2584e8; color:#fff; font-size:.68rem; }
+.people-level { color:var(--text-secondary); font-size:.55rem; }
+.people-groups { display:flex; flex-wrap:wrap; gap:4px; }
+.people-group-chip { padding:2px 6px; border-radius:8px; background:var(--input-bg); color:var(--text-secondary); font-size:.54rem; }
 .people-directory-heading h2 { margin:3px 0; font-size:1.2rem; }
 .people-directory-heading p { margin:3px 0 0; color:var(--text-secondary); font-size:.72rem; }
 .people-directory-kicker { color:var(--link-color); font-size:.57rem; font-weight:800; letter-spacing:.12em; }
@@ -92,6 +101,8 @@
 .people-load-more:disabled { opacity:.6; cursor:wait; }
 @media(max-width:600px) {
     .people-directory { padding:10px; }
+    .people-directory-heading { align-items:center; }
+    .people-directory-heading p { max-width:230px; }
     .people-filters { grid-template-columns:1fr 1fr; }
     .people-filters label:last-child { grid-column:1/-1; }
     .people-item-main .avatar-wrap,

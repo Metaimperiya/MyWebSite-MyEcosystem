@@ -14,6 +14,7 @@
         var bucket = type === 'foto' ? 'foto' : type && type.indexOf('datingprofile:') === 0 ? type : type === 'profile' ? 'profile_' + (authorUid || VIEWING_USER || USER_UID) : 'feed';
         return encodeURIComponent(bucket + '_' + postId).replace(/\./g, '%2E');
     }
+    window.getPostSocialKey = function(postId, type, authorUid) { return socialKey(postId, type, authorUid); };
 
     function postRef(branch, postId, type, authorUid) {
         return db.ref(rootPath + '/' + branch + '/' + socialKey(postId, type, authorUid));
@@ -63,20 +64,23 @@
         var key = socialKey(postId, type, authorUid);
         db.ref(rootPath + '/ambassador_transfers').orderByChild('postKey').equalTo(key).once('value').then(function(snap) {
             if (!card.isConnected) return;
-            var total = 0;
+            var socialTotal = 0;
+            var cpm2Total = 0;
             snap.forEach(function(child) {
                 var transfer = child.val() || {};
-                if (transfer.kind === 'post_tip') total += Number(transfer.amount) || 0;
+                if (transfer.kind !== 'post_tip') return;
+                if (transfer.currency === 'cpm2') cpm2Total += Number(transfer.amount) || 0;
+                else socialTotal += Number(transfer.amount) || 0;
             });
-            setCounts(card, { tips: total });
+            setCounts(card, { tips: socialTotal, cpm2tips: cpm2Total });
         }).catch(function(error) { console.warn('Не удалось загрузить поддержку публикации:', error); });
     }
 
     function buildStatsMarkup(postId, type, authorUid, legacyLikes, comments, reposts) {
         var attrs = ' data-post-id="' + escHtml(postId) + '" data-post-type="' + escHtml(type) + '" data-author-uid="' + escHtml(authorUid || '') + '"';
         var tipAction = !authorUid ? '' : authorUid === USER_UID
-            ? '<span class="post-tip-total" title="Очки, отправленные на эту публикацию">💵 <span data-count="tips">0</span></span>'
-            : '<button type="button" class="post-tip-button" data-social-action="tip"' + attrs + ' aria-label="Поддержать автора одним очком" title="Передать автору 1 очко">💵 <span data-count="tips">0</span></button>';
+            ? '<span class="post-tip-total" title="Социальные очки этой публикации">💵 <span data-count="tips">0</span></span><span class="post-tip-total" title="CPM2 этой публикации">🪙 <span data-count="cpm2tips">0</span></span>'
+            : '<button type="button" class="post-tip-button" data-social-action="tip"' + attrs + ' aria-label="Поддержать автора социальными очками">💵 <span data-count="tips">0</span></button><button type="button" class="post-tip-button post-cpm2-tip" data-social-action="cpm2-tip"' + attrs + ' aria-label="Поддержать автора CPM2" title="Отправить CPM2">🪙 <span data-count="cpm2tips">0</span></button>';
         return '<button type="button" data-social-action="reaction" data-kind="like"' + attrs + ' aria-label="Нравится">👍 <span data-count="like">' + Number(legacyLikes || 0) + '</span></button>' +
             '<button type="button" data-social-action="reaction" data-kind="dislike"' + attrs + ' aria-label="Не нравится">👎 <span data-count="dislike">0</span></button>' +
             '<span class="post-social-mention-control"><button type="button" data-social-action="pick-friends"' + attrs + ' aria-label="Отметить друзей">👤</button><button type="button" data-social-action="show-mentions"' + attrs + ' aria-label="Посмотреть отмеченных"><span data-count="mentions">0</span></button></span>' +
@@ -260,8 +264,17 @@
         else if (button.dataset.socialAction === 'tip') {
             if (button.disabled) return;
             button.disabled = true;
-            Promise.resolve(window.tipPostWithAmbassadorPoint && window.tipPostWithAmbassadorPoint(postId, type, authorUid))
+            var socialAmount = Number(window.prompt('Сколько социальных очков отправить автору?', '1'));
+            Promise.resolve(Number.isSafeInteger(socialAmount) && socialAmount > 0 && window.tipPostWithAmbassadorPoint && window.tipPostWithAmbassadorPoint(postId, type, authorUid, socialAmount))
                 .then(function(sent) { if (sent && card) loadPostTips(card, postId, type, authorUid); })
+                .finally(function() { button.disabled = false; });
+        } else if (button.dataset.socialAction === 'cpm2-tip') {
+            if (button.disabled) return;
+            var cpm2Amount = Number(window.prompt('Сколько CPM2 отправить автору?', '1'));
+            if (!Number.isSafeInteger(cpm2Amount) || cpm2Amount < 1) return;
+            button.disabled = true;
+            Promise.resolve(window.tipPostWithCpm2 && window.tipPostWithCpm2(postId, type, authorUid, cpm2Amount))
+                .then(function() { if (card) loadPostTips(card, postId, type, authorUid); })
                 .finally(function() { button.disabled = false; });
         }
         else if (button.dataset.socialAction === 'comments') window.toggleComments(postId, type);

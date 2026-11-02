@@ -29,7 +29,7 @@
 .referral-team-feed[hidden],.referral-members-list[hidden] { display:none !important; }
 .referral-post-source { padding:6px 11px 0; color:var(--link-color); font-size:.62rem; font-weight:700; }
 .referrals-demo-banner { margin:0 0 12px; padding:9px 12px; border:1px solid #f0d48a; border-radius:11px; background:#fff8df; color:#755600; font-size:.68rem; line-height:1.45; }
-.referrals-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.referrals-stats { grid-template-columns:repeat(4,minmax(0,1fr)); }
 .referral-transfer-card { display:flex; align-items:end; gap:9px; margin:12px 0; padding:13px; border:1px solid var(--border-color); border-radius:14px; background:var(--card-bg); }
 .referral-transfer-card>div { display:grid; gap:3px; flex:1; }
 .referral-transfer-card>div strong { font-size:.76rem; }
@@ -60,3 +60,4 @@
 .referral-admin-no-ledger { display:block; margin-top:5px; }
 @media(max-width:600px) { .referral-transfer-card { align-items:stretch; flex-wrap:wrap; } .referral-transfer-card>div { flex-basis:100%; } .referral-transfer-card label { flex:1; width:auto; } .referral-transfer-card button { align-self:end; } .referral-admin-panel { padding:10px; } .referral-admin-tools { grid-template-columns:1fr; } .referral-admin-tools select { width:100%; } .referral-admin-row { align-items:flex-start; } .referral-admin-stats { max-width:38%; } }
 @media(max-width:520px) { .referrals-heading { align-items:center; } .referrals-heading h1 { font-size:1.12rem; } .referrals-heading p { font-size:.69rem; } .referrals-link-card { align-items:flex-start; flex-direction:column; } .referrals-link-card button { width:100%; } .referral-member { gap:8px; padding:8px; } }
+@media(max-width:600px) { .referrals-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }

@@ -197,6 +197,7 @@ function loadProfile() {
         }
         renderProfileContacts({});
         if (typeof window.loadAmbassadorProfileBalance === 'function') window.loadAmbassadorProfileBalance(null);
+        if (typeof window.loadCpm2ProfileBalance === 'function') window.loadCpm2ProfileBalance(null);
 
         var postsContainer = document.getElementById('profilePosts');
         if (postsContainer) postsContainer.innerHTML = '';
@@ -238,6 +239,7 @@ function loadProfile() {
         }
         renderProfileContacts(u);
         if (typeof window.loadAmbassadorProfileBalance === 'function') window.loadAmbassadorProfileBalance(uid);
+        if (typeof window.loadCpm2ProfileBalance === 'function') window.loadCpm2ProfileBalance(uid);
         renderAvatar(uid, avatarEl, (u.name || '?').charAt(0).toUpperCase());
         showProfileActions(uid);
         makeStatsClickable(uid);

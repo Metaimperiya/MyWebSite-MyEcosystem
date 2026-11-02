@@ -269,6 +269,8 @@ document.addEventListener('DOMContentLoaded', function() {
             el.classList.remove('active');
             el.style.display = 'none';
         });
+        var layout = document.getElementById('appLayout');
+        if (layout) layout.classList.toggle('landing-layout', pageId === 'landing');
         
         var el = document.getElementById('page-' + pageId);
         if (el) {
@@ -287,12 +289,26 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     window.goToFeed = function() {
-        if (!window.checkAccess()) return;
+        var wasLanding = !!document.getElementById('page-landing')?.classList.contains('active');
+        if (!window.checkAccess()) {
+            if (wasLanding) sessionStorage.setItem('metaimperiyaAfterLoginPage', 'feed');
+            return;
+        }
+        sessionStorage.removeItem('metaimperiyaAfterLoginPage');
         if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
             window.location.href = '/';
             return;
         }
         window.setActivePage('feed');
+        if (wasLanding) {
+            var feedPage = document.getElementById('page-feed');
+            if (feedPage) {
+                feedPage.classList.remove('landing-feed-enter');
+                void feedPage.offsetWidth;
+                feedPage.classList.add('landing-feed-enter');
+                feedPage.addEventListener('animationend', function() { feedPage.classList.remove('landing-feed-enter'); }, { once: true });
+            }
+        }
         document.getElementById('chatView').classList.remove('active');
         if (chatUnsub) {
             if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
@@ -403,6 +419,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         CURRENT_ROOM = null;
         if (typeof loadMarketplace === 'function') loadMarketplace();
+    };
+
+    window.goToCpm2 = function() {
+        if (!window.checkAccess()) {
+            if (document.getElementById('page-landing')?.classList.contains('active')) sessionStorage.setItem('metaimperiyaAfterLoginPage', 'cpm2');
+            return;
+        }
+        sessionStorage.removeItem('metaimperiyaAfterLoginPage');
+        if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
+            window.location.href = '/?page=cpm2';
+            return;
+        }
+        window.setActivePage('cpm2');
+        var chatView = document.getElementById('chatView');
+        if (chatView) chatView.classList.remove('active');
+        if (chatUnsub) {
+            if (typeof chatUnsub === 'string') db.ref(chatUnsub).off('value');
+            chatUnsub = null;
+        }
+        CURRENT_ROOM = null;
+    };
+
+    window.toggleCpm2Menu = function() {
+        var menu = document.getElementById('cpm2Menu');
+        var toggle = document.getElementById('cpm2MenuToggle');
+        if (!menu || !toggle) return;
+        menu.hidden = !menu.hidden;
+        toggle.setAttribute('aria-expanded', String(!menu.hidden));
     };
 
     // ===== САЙДБАР =====

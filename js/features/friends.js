@@ -91,6 +91,8 @@ var peopleCursor = null;
 var peopleHasMore = false;
 var peoplePageBusy = false;
 var peopleStatusCache = {};
+var peopleFollowCache = {};
+var peopleEnrichRequest = 0;
 
 function peopleNormalize(value) { return String(value || '').trim().toLocaleLowerCase('ru'); }
 
@@ -133,7 +135,12 @@ function renderPeopleDirectory() {
         var name = user.name || 'Участник';
         var details = peopleProfileDetails(user);
         var location = [details.city || user.city, details.country || user.country].filter(Boolean).join(', ');
-        return '<article class="people-item" data-people-id="' + esc(id) + '"><button type="button" class="people-item-main" onclick="viewUser(\'' + esc(id) + '\')"><span class="avatar-wrap" id="pava-' + esc(id) + '"><span class="letter">' + esc(Array.from(name)[0] || '?') + '</span></span><span class="info"><strong class="name">' + esc(name) + '</strong>' + (location ? '<span class="people-location">⌖ ' + esc(location) + '</span>' : '') + '<span class="status" id="pstatus-' + esc(id) + '">Проверяем связь…</span></span></button><div class="people-actions" id="paction-' + esc(id) + '"></div></article>';
+        var trust = user.peopleStatus || {};
+        var badges = (trust.pro ? '<span class="people-badge people-badge-pro">PRO</span>' : '') + (trust.verified ? '<span class="people-badge people-badge-verified" title="Подтверждённый профиль">✓</span>' : '') + (trust.level ? '<span class="people-level">Ур. ' + Number(trust.level) + '</span>' : '');
+        var memberships = (user.peopleGroups || []).slice(0, 2).map(function(group) { return '<span class="people-group-chip">🛡 ' + esc(group.name) + '</span>'; }).join('');
+        var following = peopleFollowCache[id] === true;
+        var extraActions = id === USER_UID ? '' : '<button type="button" class="people-action" onclick="event.stopPropagation();openPrivateChat(\'' + esc(id) + '\')">✉ Написать</button><button type="button" class="people-action secondary people-follow-button" aria-pressed="' + following + '" onclick="event.stopPropagation();togglePeopleFollow(\'' + esc(id) + '\')">' + (following ? '✓ Подписан' : '＋ Подписаться') + '</button>';
+        return '<article class="people-item" data-people-id="' + esc(id) + '"><button type="button" class="people-item-main" onclick="viewUser(\'' + esc(id) + '\')"><span class="avatar-wrap" id="pava-' + esc(id) + '"><span class="letter">' + esc(Array.from(name)[0] || '?') + '</span></span><span class="info"><span class="people-name-line"><strong class="name">' + esc(name) + '</strong>' + badges + '</span>' + (location ? '<span class="people-location">⌖ ' + esc(location) + '</span>' : '') + (memberships ? '<span class="people-groups">' + memberships + '</span>' : '') + '<span class="status" id="pstatus-' + esc(id) + '">Проверяем связь…</span></span></button><div class="people-actions" id="paction-' + esc(id) + '">' + extraActions + '</div></article>';
     }).join('');
     page.forEach(function(person) {
         var id = person.uid;
@@ -145,7 +152,7 @@ function renderPeopleDirectory() {
             var actionEl = document.getElementById('paction-' + id);
             var labels = { friend: '🤝 Уже друзья', pending_sent: '⏳ Заявка отправлена', pending_received: '📩 Заявка тебе', none: 'Новый участник' };
             if (statusEl) statusEl.textContent = labels[cached] || '';
-            if (actionEl) actionEl.innerHTML = friendActionHtml(cached, id);
+            if (actionEl) actionEl.insertAdjacentHTML('afterbegin', friendActionHtml(cached, id));
         }
     });
 
@@ -175,10 +182,60 @@ function renderPeopleDirectory() {
             var actionEl = document.getElementById('paction-' + entry.uid);
             var labels = { friend: '🤝 Уже друзья', pending_sent: '⏳ Заявка отправлена', pending_received: '📩 Заявка тебе', none: 'Новый участник' };
             if (statusEl) statusEl.textContent = labels[entry.status] || '';
-            if (actionEl) actionEl.innerHTML = friendActionHtml(entry.status, entry.uid);
+            if (actionEl) actionEl.insertAdjacentHTML('afterbegin', friendActionHtml(entry.status, entry.uid));
         });
     }).catch(function(error) { console.warn('Не удалось обновить статусы участников:', error); });
 }
+
+function enrichPeoplePage(people) {
+    if (!people.length || !USER_UID) return Promise.resolve();
+    var requestId = ++peopleEnrichRequest;
+    return Promise.all([
+        db.ref('sites/' + SITE + '/profile_status').once('value'),
+        db.ref('sites/' + SITE + '/profile_levels').once('value'),
+        db.ref('sites/' + SITE + '/groups').once('value'),
+        db.ref('sites/' + SITE + '/group_members').once('value'),
+        db.ref('sites/' + SITE + '/subscriptions/' + USER_UID).once('value')
+    ]).then(function(snaps) {
+        if (requestId !== peopleEnrichRequest) return;
+        var statuses = snaps[0].val() || {};
+        var levels = snaps[1].val() || {};
+        var groups = snaps[2].val() || {};
+        var memberships = snaps[3].val() || {};
+        peopleFollowCache = snaps[4].val() || {};
+        people.forEach(function(person) {
+            var status = statuses[person.uid] || {};
+            person.user.peopleStatus = {
+                pro: status.pro === true && (!status.proExpiresAt || Number(status.proExpiresAt) > Date.now()),
+                verified: status.verified === true,
+                level: Number(levels[person.uid] && levels[person.uid].level || 0)
+            };
+            person.user.peopleGroups = Object.keys(memberships).filter(function(groupId) {
+                return memberships[groupId] && memberships[groupId][person.uid] === true && groups[groupId];
+            }).map(function(groupId) { return { id: groupId, name: groups[groupId].name || 'Сообщество' }; });
+        });
+        renderPeopleDirectory();
+    }).catch(function(error) { console.warn('Не удалось загрузить статусы и группы для People:', error); });
+}
+
+window.togglePeopleFollow = function(targetUid) {
+    if (!USER_UID || !targetUid || targetUid === USER_UID) return;
+    var following = peopleFollowCache[targetUid] === true;
+    Promise.all([
+        db.ref('sites/' + SITE + '/blocks/' + USER_UID + '/' + targetUid).once('value'),
+        db.ref('sites/' + SITE + '/blocks/' + targetUid + '/' + USER_UID).once('value')
+    ]).then(function(snaps) {
+        if (!following && (snaps[0].exists() || snaps[1].exists())) throw new Error('Подписка недоступна: один из участников заблокировал другого.');
+        var updates = {};
+        updates['sites/' + SITE + '/subscriptions/' + USER_UID + '/' + targetUid] = following ? null : true;
+        updates['sites/' + SITE + '/subscribers/' + targetUid + '/' + USER_UID] = following ? null : true;
+        return db.ref().update(updates).then(function() {
+            if (!following && typeof sendNotification === 'function') sendNotification(targetUid, { type: 'subscribe', fromUid: USER_UID, text: USER + ' подписался(ась) на вас', timestamp: Date.now() });
+            peopleFollowCache[targetUid] = !following;
+            renderPeopleDirectory();
+        });
+    }).catch(function(error) { alert(error.message || 'Не удалось изменить подписку.'); });
+};
 
 function loadMorePeople() {
     if (peoplePageBusy || !peopleHasMore) return;
@@ -252,6 +309,7 @@ function fetchPeoplePage(reset) {
         peoplePageBusy = false;
         updatePeopleFilterOptions();
         renderPeopleDirectory();
+        enrichPeoplePage(data.people || []);
         if (!peopleDirectoryUsers.length && peopleHasMore) {
             var more = document.getElementById('peopleLoadMore');
             if (more) more.textContent = 'Искать дальше';
@@ -282,6 +340,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     var sort = document.getElementById('peopleSort');
     if (sort) sort.addEventListener('change', function() { loadPeople(); });
+    document.addEventListener('visibilitychange', function() {
+        var page = document.getElementById('page-people');
+        if (!document.hidden && page && page.classList.contains('active')) loadPeople();
+    });
 });
 
 // ================================================================ */

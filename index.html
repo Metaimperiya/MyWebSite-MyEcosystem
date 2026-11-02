@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="7ZXKvfMi1rU0OC1CV1sObHTmeRaiVQvkxVFe7Ge63-A">
     <meta name="robots" content="index, follow">
     
-    <title>METAIMPERIYA — Social Platform</title>
+    <title>CPM2 METAIMPERIYA — сообщество, авторынок и кланы</title>
+    <meta name="description" content="CPM2 METAIMPERIYA — независимое сообщество игроков: общение, кланы, лента и объявления о продаже и обмене автомобилей Car Parking Multiplayer 2.">
+    <meta name="keywords" content="CPM2, CPM 2, Car Parking Multiplayer 2, CPM2 community, CPM2 cars, CPM2 car trade, CPM2 sell trade, CPM2 marketplace, сообщество CPM2, рынок автомобилей CPM2, купить машину CPM2, продать машину CPM2, обмен автомобилей CPM2, кланы CPM2, игроки CPM2">
 
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="METAIMPERIYA">
-    <meta property="og:title" content="METAIMPERIYA — Social Platform">
-    <meta property="og:description" content="METAIMPERIYA — социальная платформа. Новости, музыка, видео, игры и общение.">
+    <meta property="og:site_name" content="CPM2 METAIMPERIYA">
+    <meta property="og:title" content="CPM2 METAIMPERIYA — сообщество игроков">
+    <meta property="og:description" content="Общение игроков CPM2, кланы, публикации и площадка для объявлений об автомобилях Car Parking Multiplayer 2.">
     <meta property="og:image" content="https://metaimperiya.com/assets/images/metaimperiya-com.png">
     <meta property="og:image:secure_url" content="https://metaimperiya.com/assets/images/metaimperiya-com.png">
     <meta property="og:image:type" content="image/png">
@@ -21,8 +23,8 @@
     <meta property="og:url" content="https://metaimperiya.com/">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="METAIMPERIYA — Social Platform">
-    <meta name="twitter:description" content="METAIMPERIYA — социальная платформа. Новости, музыка, видео, игры и общение.">
+    <meta name="twitter:title" content="CPM2 METAIMPERIYA — сообщество игроков">
+    <meta name="twitter:description" content="Общение игроков CPM2, кланы, публикации и площадка для объявлений об автомобилях Car Parking Multiplayer 2.">
     <meta name="twitter:image" content="https://metaimperiya.com/assets/images/metaimperiya-com.png">
     <meta name="twitter:image:alt" content="METAIMPERIYA">
 
@@ -46,11 +48,12 @@
     <link rel="stylesheet" href="css/features/groups.css?v=1.5">
     <link rel="stylesheet" href="css/features/work.css?v=1.3">
     <link rel="stylesheet" href="css/features/dating.css?v=1.6">
-    <link rel="stylesheet" href="css/features/referrals.css?v=1.1">
-    <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.2">
+    <link rel="stylesheet" href="css/features/referrals.css?v=1.2">
+    <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.3">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.1">
+    <link rel="stylesheet" href="css/features/cpm2.css?v=1.1">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
-    <link rel="stylesheet" href="css/features/friends.css?v=3.3">
+    <link rel="stylesheet" href="css/features/friends.css?v=3.4">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
     <link rel="stylesheet" href="css/features/modals.css?v=3.1">
     <link rel="stylesheet" href="css/features/notifications.css?v=3.0">
@@ -61,6 +64,7 @@
     <link rel="stylesheet" href="css/modules/player.css?v=3.0">
     <link rel="stylesheet" href="css/components/admin.css?v=3.0">
     <link rel="stylesheet" href="css/style.css?v=3.2">
+    <link rel="stylesheet" href="css/features/cpm2-landing.css?v=1.0">
 </head>
 <body>
 
@@ -68,7 +72,7 @@
     <header class="pc-topbar" id="topbar">
         <div class="logo">
             <span class="menu-icon" onclick="toggleSidebar()">☰</span>
-            <span onclick="goToFeed()">METAIMPERIYA 🏴‍☠️</span>
+            <span onclick="goToFeed()">CPM2 METAIMPERIYA</span>
         </div>
         <input class="search" placeholder="Search..." id="pcSearch">
         <div class="right">
@@ -111,6 +115,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="sidebar">
         <button class="close-btn" onclick="closeSidebar()">✕</button>
+        <div class="sidebar-brand">CPM2 METAIMPERIYA</div>
         <div class="user-info">
             <div class="avatar-wrap" id="sAvatar"><span class="letter">?</span></div>
             <div>
@@ -126,6 +131,16 @@
         <div class="menu-item" onclick="goToDating();closeSidebar();"><span class="icon">💗</span> Знакомства</div>
         <div class="menu-item" onclick="goToReferrals();closeSidebar();"><span class="icon">🌐</span> Амбассадоры и приглашения</div>
         <div class="menu-item" onclick="goToMarketplace();closeSidebar();"><span class="icon">🛍️</span> Маркетплейс</div>
+        <button type="button" class="menu-item menu-parent" id="cpm2MenuToggle" aria-expanded="false" aria-controls="cpm2Menu" onclick="toggleCpm2Menu()"><span class="icon">🪙</span><span>CPM2</span><span class="menu-chevron" aria-hidden="true">⌄</span></button>
+        <div class="menu-sub cpm2-menu" id="cpm2Menu" hidden>
+            <button type="button" class="menu-item" onclick="goToCpm2();closeSidebar();">Обзор CPM2</button>
+            <button type="button" class="menu-item" onclick="goToAutoMarket();closeSidebar();">🚘 Авторынок</button>
+            <button type="button" class="menu-item" onclick="goToGroups();closeSidebar();">🛡️ Кланы</button>
+            <button type="button" class="menu-item" disabled aria-disabled="true">🛒 Магазин · скоро</button>
+            <button type="button" class="menu-item" disabled aria-disabled="true">🔄 Обмен · скоро</button>
+            <button type="button" class="menu-item" disabled aria-disabled="true">🤝 Sell / Trade · скоро</button>
+            <button type="button" class="menu-item" disabled aria-disabled="true">💱 Курс CPM2 · скоро</button>
+        </div>
 
         <a class="menu-item" href="/doss/" onclick="closeSidebar();"><span class="icon">🧠</span> DOSS OS</a>
 
@@ -190,7 +205,35 @@
                 </div>
             </div>
 
-            <div class="page active" id="page-feed">
+            <div class="page active" id="page-landing">
+                <main class="cpm2-landing">
+                    <section class="cpm2-landing-hero">
+                        <span class="cpm2-landing-kicker">СООБЩЕСТВО ИГРОКОВ</span>
+                        <h1>CPM2 METAIMPERIYA</h1>
+                        <p class="cpm2-landing-lead">Сообщество игроков Car Parking Multiplayer 2: общайся, собирай клан, находи людей для автомобильных сделок, публикуй объявления о продаже и обмене машин.</p>
+                        <div class="cpm2-landing-actions">
+                            <button type="button" class="cpm2-landing-primary" onclick="goToFeed()">Перейти в ленту <span aria-hidden="true">→</span></button>
+                            <button type="button" class="cpm2-landing-secondary" onclick="goToCpm2()">Возможности CPM2</button>
+                        </div>
+                        <div class="cpm2-landing-search-terms" aria-label="Темы сообщества"><span>CPM2</span><span>Car Parking Multiplayer 2</span><span>Авторынок CPM2</span><span>Обмен машин</span><span>Кланы CPM2</span></div>
+                        <p class="cpm2-landing-note">Независимое сообщество игроков. METAIMPERIYA не является официальным проектом разработчиков CPM2.</p>
+                    </section>
+
+                    <section class="cpm2-landing-features" aria-label="Разделы сообщества">
+                        <button type="button" class="cpm2-landing-feature" onclick="goToCpm2()"><span>01 · CPM2</span><strong>Игровое сообщество</strong><small>Общайся, публикуй новости и находи игроков.</small></button>
+                        <button type="button" class="cpm2-landing-feature" onclick="goToCpm2()"><span>02 · АВТОРЫНОК</span><strong>Объявления и обмен</strong><small>Площадка для предложений о продаже и обмене автомобилей.</small></button>
+                        <button type="button" class="cpm2-landing-feature" onclick="goToCpm2()"><span>03 · КЛАНЫ</span><strong>Играй вместе</strong><small>Создавай команду, вступай в кланы и общайся внутри сообщества.</small></button>
+                        <button type="button" class="cpm2-landing-feature" onclick="goToFeed()"><span>04 · ЛЕНТА</span><strong>Публикации игроков</strong><small>Делись постами, реагируй и обсуждай их в комментариях.</small></button>
+                    </section>
+
+                    <section class="cpm2-landing-discussion">
+                        <div class="cpm2-landing-section-heading"><span>ОТКРЫТОЕ ОБСУЖДЕНИЕ</span><h2>Что ты ищешь в сообществе CPM2?</h2><p>Оставь реакцию или напиши комментарий — обсуждение доступно участникам сайта.</p></div>
+                        <div id="cpm2LandingDiscussion"></div>
+                    </section>
+                </main>
+            </div>
+
+            <div class="page" id="page-feed">
                 <div class="card feed-composer-card">
                     <details class="feed-composer" id="feedComposer">
                         <summary class="feed-composer-toggle"><span class="feed-composer-plus" aria-hidden="true">＋</span><span>Создать публикацию</span></summary>
@@ -249,8 +292,8 @@
                         <div class="amb-demo-note">ДЕМО · Общий банк, балансы и переводы синхронизируются между аккаунтами. Очки не являются деньгами или платёжным средством; заявки биржи пока остаются демонстрационными.</div>
                         <div class="amb-game-grid">
                             <div class="amb-game-main">
-                                <section class="amb-bank-card"><div class="amb-bank-title"><span>🏦 ОБЩИЙ БАНК</span><span id="ambBankBadge">ДЕМО</span></div><strong id="ambBankTotal">0</strong><span class="amb-points-label">очков в банке</span><div class="amb-bank-edit"><input id="ambBankInput" type="number" min="0" max="10000000" step="1" aria-label="Размер банка"><button type="button" id="ambBankSave">Задать банк</button></div><small>Банк настраивается администратором.</small></section>
-                                <div class="amb-wallet-row"><article><span>ТВОЙ БАЛАНС</span><strong id="ambMyBalance">0</strong><button type="button" id="ambJoinGame">＋ Войти в систему</button></article><article><span>ИГРОКОВ</span><strong id="ambPlayerCount">0</strong><small>участников прототипа</small></article></div><div id="ambPlayerSlot"></div>
+                                <section class="amb-bank-card"><div class="amb-bank-title"><span>🏦 ОБЩИЙ БАНК</span><span id="ambBankBadge">ДЕМО</span></div><strong id="ambBankTotal">0</strong><span class="amb-points-label">социальных очков в резерве</span><div class="amb-bank-edit"><input id="ambBankInput" type="number" min="0" max="10000000" step="1" aria-label="Размер банка социальных очков"><button type="button" id="ambBankSave">Задать банк</button></div><div class="amb-cpm2-bank"><span>🪙 CPM2 в резерве: <strong id="ambCpm2BankTotal">0</strong></span><div class="amb-bank-edit"><input id="ambCpm2BankInput" type="number" min="0" max="1000000000000" step="1" aria-label="Размер CPM2 резерва"><button type="button" id="ambCpm2BankSave">Задать CPM2</button></div></div><small>Обе валюты используют текущий общий банк и его журнал.</small></section>
+                                <div class="amb-wallet-row"><article><span>ТВОЙ БАЛАНС</span><strong id="ambMyBalance">0</strong><small>социальных очков</small><strong id="ambMyCpm2Balance">0</strong><small>CPM2</small><button type="button" id="ambJoinGame">＋ Войти в систему</button></article><article><span>ИГРОКОВ</span><strong id="ambPlayerCount">0</strong><small>участников прототипа</small></article></div><div id="ambPlayerSlot"></div>
                                 <section class="amb-board-section"><div class="amb-section-heading"><div><span class="amb-kicker">ИГРОВОЕ ПОЛЕ</span><h2>Выбери направление</h2></div><span>🎲</span></div><div class="amb-board" id="ambBoard">
                                     <button type="button" data-amb-tile="bank"><span>🏦</span><b>Банк</b><small>взнос и баланс</small></button><button type="button" data-amb-tile="referrals"><span>🔗</span><b>Рефералы</b><small>приглашения</small></button><button type="button" data-amb-tile="exchange"><span>🤝</span><b>Биржа</b><small>заявки амбассадоров</small></button><button type="button" data-amb-tile="target"><span>🎯</span><b>Таргет</b><small>продвижение</small></button><button type="button" data-amb-tile="bonus"><span>🎁</span><b>Бонус</b><small>награды игрокам</small></button><button type="button" data-amb-tile="team"><span>👥</span><b>Команда</b><small>список участников</small></button>
                                 </div></section>
@@ -259,14 +302,14 @@
                                 <section class="amb-promo-panel"><div class="amb-section-heading"><div><span class="amb-kicker">КАНАЛЫ ПРОДВИЖЕНИЯ</span><h2>Площадки для трафика</h2></div><span>📣</span></div><p class="amb-promo-copy">Площадки, где можно размещать кампании и приглашать аудиторию.</p><nav class="amb-platform-list" aria-label="Площадки продвижения"><a href="https://t.me/" target="_blank" rel="noopener">✈️ Telegram</a><a href="https://www.instagram.com/" target="_blank" rel="noopener">📸 Instagram</a><a href="https://x.com/" target="_blank" rel="noopener">𝕏 X</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">f Facebook</a><a href="https://vk.com/" target="_blank" rel="noopener">ⓥ ВКонтакте</a><a href="https://www.tiktok.com/" target="_blank" rel="noopener">♪ TikTok</a><a href="https://likee.video/" target="_blank" rel="noopener">♥ Likee</a><a href="https://www.youtube.com/" target="_blank" rel="noopener">▶ YouTube</a><a href="https://www.threads.net/" target="_blank" rel="noopener">＠ Threads</a><a href="https://www.twitch.tv/" target="_blank" rel="noopener">◉ Twitch</a><a href="https://www.pinterest.com/" target="_blank" rel="noopener">℗ Pinterest</a></nav></section>
                                 <section class="amb-ai-panel"><div class="amb-section-heading"><div><span class="amb-kicker">ИИ-КОМАНДА</span><h2>Попроси оценить концепцию</h2></div><span>🧠</span></div><p class="amb-promo-copy">Откроются отдельные сервисы. Прямого подключения или передачи данных пока нет.</p><div class="amb-ai-grid"><a class="amb-ai-card" href="https://chatgpt.com/" target="_blank" rel="noopener"><span>🟢</span><strong>ChatGPT</strong><small>Идеи, сценарии и обратная связь</small></a><a class="amb-ai-card" href="https://gemini.google.com/" target="_blank" rel="noopener"><span>🔵</span><strong>Gemini</strong><small>Оценка интерфейса и развития</small></a><a class="amb-ai-card" href="https://chat.deepseek.com/" target="_blank" rel="noopener"><span>🟣</span><strong>DeepSeek</strong><small>Проверка логики и вариантов</small></a></div><div class="amb-ai-footer"><small>Текст проекта можно скопировать и вставить в любой ИИ.</small><button type="button" id="ambCopyAiBrief">Скопировать вводные</button></div></section>
                             </div>
-                            <aside class="amb-game-aside"><section class="amb-player-panel" id="ambPlayers"><div class="amb-aside-heading"><span>👥</span><div><strong>Игроки</strong><small>Все зарегистрированные аккаунты</small></div><b id="ambPlayerCountAside">0</b></div><div class="amb-player-list" id="ambPlayerList"></div><div class="amb-transfer"><strong>Передать очки</strong><label>Кому<select id="ambTransferTo"></select></label><label>Сколько<input id="ambTransferAmount" type="number" min="1" value="10"></label><button type="button" id="ambTransferButton">Перевести</button></div></section><section class="amb-howto"><span>💡</span><div><strong>Как это будет работать</strong><p>Администратор пополняет банк → игрок получает баланс → размещает заявку с наградой → амбассадор принимает её и получает свою ссылку.</p></div></section><section class="amb-ledger"><div class="amb-aside-heading"><span>📜</span><div><strong>Последние действия</strong><small>История демо-игры</small></div></div><div id="ambLedger"></div></section></aside>
+                            <aside class="amb-game-aside"><section class="amb-player-panel" id="ambPlayers"><div class="amb-aside-heading"><span>👥</span><div><strong>Игроки</strong><small>Все зарегистрированные аккаунты</small></div><b id="ambPlayerCountAside">0</b></div><div class="amb-player-list" id="ambPlayerList"></div><div class="amb-transfer"><strong>Передать валюту</strong><label>Валюта<select id="ambTransferCurrency"><option value="social">Социальные очки</option><option value="cpm2">CPM2</option></select></label><label>Кому<select id="ambTransferTo"></select></label><label>Сколько<input id="ambTransferAmount" type="number" min="1" value="10"></label><button type="button" id="ambTransferButton">Перевести</button></div></section><section class="amb-howto"><span>💡</span><div><strong>Как это будет работать</strong><p>Один общий Firebase-банк хранит два резерва. Начисления, переводы, поддержка постов и приглашения отражаются в своих валютах.</p></div></section><section class="amb-ledger"><div class="amb-aside-heading"><span>📜</span><div><strong>Последние действия</strong><small>История демо-игры</small></div></div><div id="ambLedger"></div></section></aside>
                         </div>
                     </section>
                     <details class="amb-real-referrals"><summary>Текущий раздел приглашений</summary>
                     <header class="referrals-heading"><div><span class="referrals-kicker">METAIMPERIYA · СООБЩЕСТВО</span><h2>Приглашения и команда</h2><p>Текущие ссылки и статистика реферальной команды.</p></div><button type="button" class="referrals-refresh" onclick="loadReferralDashboard()">↻ Обновить</button></header>
                     <div class="referrals-demo-banner">ДЕМО · Очки пока не являются деньгами или платёжным средством. В прототипе данные можно менять.</div>
                     <section class="referrals-link-card"><div><span class="referrals-kicker">ТВОЯ ССЫЛКА-ПРИГЛАШЕНИЕ</span><p id="referralLinkValue">Готовим персональную ссылку…</p></div><button type="button" id="copyReferralLink" onclick="copyReferralLink()">⧉ Скопировать</button></section>
-                    <div class="referrals-stats"><article><strong id="referralDirectCount">—</strong><span>приглашены тобой</span></article><article><strong id="referralTeamCount">—</strong><span>всего в команде</span></article><article><strong id="referralPointsBalance">0</strong><span>демо-очков</span></article></div>
+                    <div class="referrals-stats"><article><strong id="referralDirectCount">—</strong><span>приглашены тобой</span></article><article><strong id="referralTeamCount">—</strong><span>всего в команде</span></article><article><strong id="referralPointsBalance">0</strong><span>социальных демо-очков</span></article><article><strong id="referralCpm2Balance">0</strong><span>CPM2 за приглашения и переводы</span></article></div>
                     <section class="referral-transfer-card"><div><strong>Перевести демо-очки</strong><span>Начни вводить имя или UID и выбери участника из подсказок.</span></div><label><span>Получатель</span><input id="referralTransferUid" list="referralRecipientOptions" autocomplete="off" placeholder="Имя или UID" oninput="searchReferralRecipient(this.value)"><datalist id="referralRecipientOptions"></datalist></label><label><span>Количество</span><input id="referralTransferAmount" type="number" min="1" step="1" value="1"></label><button type="button" onclick="transferReferralPoints()">Перевести</button></section>
                     <div class="referrals-tabs"><button type="button" class="active" data-referral-tab="members" onclick="showReferralTab('members')">Участники</button><button type="button" data-referral-tab="feed" onclick="showReferralTab('feed')">Лента команды</button></div>
                     <div class="referral-members-list" id="referralMembersList"><div class="referrals-empty">Загружаем приглашения…</div></div>
@@ -308,7 +351,7 @@
 
             <div class="page" id="page-people">
                 <section class="people-directory card">
-                    <header class="people-directory-heading"><div><span class="people-directory-kicker">METAIMPERIYA · СООБЩЕСТВО</span><h2>Люди</h2><p>Найди участников по имени и городу.</p></div><span class="people-results-count" id="peopleResultsCount"></span></header>
+                    <header class="people-directory-heading"><div><span class="people-directory-kicker">METAIMPERIYA · СООБЩЕСТВО</span><h2>Люди</h2><p>Найди участников, открой профиль, подпишись или напиши.</p></div><div class="people-heading-actions"><span class="people-results-count" id="peopleResultsCount"></span><button type="button" class="people-refresh" onclick="loadPeople()" aria-label="Обновить список людей" title="Обновить">↻</button></div></header>
                     <div class="people-directory-tools">
                         <label class="people-search"><span aria-hidden="true">⌕</span><input id="peopleSearch" type="search" placeholder="Поиск по имени, профессии или интересам" autocomplete="off"></label>
                         <div class="people-filters">
@@ -370,6 +413,32 @@
                 </section>
             </div>
 
+            <div class="page" id="page-cpm2">
+                <section class="cpm2-page">
+                    <header class="cpm2-heading"><span class="cpm2-kicker">METAIMPERIYA · ИГРОВАЯ ЭКОНОМИКА</span><h1>CPM2</h1><p>Кланы, авторынок и будущие обмены — в одном разделе.</p></header>
+                    <div class="cpm2-notice">CPM2 — внутренняя игровая система. Курс и расчёты пока не включены; значения не являются денежными.</div>
+                    <section class="cpm2-wallet-panel" id="cpm2WalletPanel">
+                        <div><span>Общий резерв</span><strong id="cpm2Reserve">Загрузка…</strong><small>CPM2 в банке</small></div>
+                        <div><span>Мой баланс</span><strong id="cpm2Balance">—</strong><small>CPM2 на счёте</small></div>
+                        <div><span>В обращении</span><strong id="cpm2Supply">—</strong><small>резерв + балансы</small></div>
+                        <div class="cpm2-bank-controls" id="cpm2BankControls" hidden><label>Задать резерв<input id="cpm2BankInput" type="number" min="0" step="1"></label><button type="button" id="cpm2BankSave">Обновить банк</button></div>
+                        <div class="cpm2-transfer-controls"><label>Получатель UID<input id="cpm2Recipient" autocomplete="off" placeholder="UID участника"></label><label>Сумма<input id="cpm2Amount" type="number" min="1" step="1" value="1"></label><button type="button" id="cpm2Transfer">Перевести CPM2</button><button type="button" id="cpm2Issue" hidden>Выдать из резерва</button></div>
+                        <p id="cpm2Feedback" role="status"></p>
+                        <section class="cpm2-audit" id="cpm2Audit" hidden><h3>Журнал операций</h3><div id="cpm2AuditRows"></div></section>
+                    </section>
+                    <section class="cpm2-section"><div class="cpm2-section-title"><h2>Разделы</h2><span>Выбери направление</span></div>
+                        <div class="cpm2-grid">
+                            <button type="button" class="cpm2-card" onclick="goToAutoMarket()"><span>🚘</span><strong>Авторынок</strong><small>Объявления об авто и запчастях</small><em>Открыть рынок →</em></button>
+                            <button type="button" class="cpm2-card" onclick="goToGroups()"><span>🛡️</span><strong>Кланы</strong><small>Сейчас работает раздел групп; клановые роли добавим поверх него</small><em>Открыть сообщества →</em></button>
+                            <article class="cpm2-card cpm2-card-pending"><span>🛒</span><strong>Магазин</strong><small>Покупки за CPM2 и публикация получения в ленте</small><em>Следующий этап</em></article>
+                            <article class="cpm2-card cpm2-card-pending"><span>🔄</span><strong>Обмен</strong><small>Перевод и обмен внутреннего баланса</small><em>Следующий этап</em></article>
+                            <article class="cpm2-card cpm2-card-pending"><span>🤝</span><strong>Sell / Trade</strong><small>Продажа и обмен предметов между участниками</small><em>Следующий этап</em></article>
+                            <article class="cpm2-card cpm2-card-pending"><span>💱</span><strong>Курс CPM2</strong><small>Гривна, рубль и доллар — курс ещё не установлен</small><em>Следующий этап</em></article>
+                        </div>
+                    </section>
+                </section>
+            </div>
+
             <div class="page" id="page-profile">
                 <div class="profile-header is-collapsed">
                     <div class="profile-stats" aria-label="Статистика профиля">
@@ -386,6 +455,7 @@
                             <div class="profile-level" id="profileLevel" aria-label="Уровень профиля"></div>
                             <button type="button" class="profile-referral-shortcut" id="profileReferralShortcut" onclick="goToReferrals()">🌐 Пригласить и посмотреть демо-очки</button>
                             <div class="profile-game-wallet" id="profileGameWallet" hidden><span>🎲 Баланс игры: <strong id="profileGameBalance">0</strong> очков</span><button type="button" id="profileGameJoin" hidden onclick="window.joinAmbassadorGame()">＋ Войти в игру</button><button type="button" id="profileGameGrant" hidden onclick="window.grantProfileAmbassadorPoints()">＋ Начислить очки</button></div>
+                            <div class="profile-game-wallet cpm2-profile-wallet" id="profileCpm2Wallet" hidden><span>🪙 CPM2: <strong id="profileCpm2Balance">0</strong></span><button type="button" id="profileCpm2Grant" hidden onclick="window.grantProfileCpm2()">＋ Начислить CPM2</button></div>
                             <div class="profile-game-bank" id="profileGameBank" hidden><span>🏦 Общий банк: <strong id="profileGameBankAmount">0</strong></span><label>Задать баланс банка<input type="number" id="profileBankAmount" min="0" max="10000000" step="1"></label><button type="button" onclick="window.setAmbassadorBankFromProfile()">Сохранить банк</button></div>
                             <div class="profile-game-feedback" id="profileGameFeedback" role="status" aria-live="polite"></div>
                         </div>
@@ -834,22 +904,24 @@
 
 <script src="js/core/firebase.js?v=3.0"></script>
 <script src="js/core/auth.js?v=3.2"></script>
-<script src="js/core/app.js?v=4.7"></script>
+<script src="js/core/app.js?v=4.8"></script>
 <script src="js/core/lang.js?v=3.0"></script>
 <script src="js/modules/player.js?v=3.0"></script>
 <script src="js/features/feed/feed-core.js?v=5.7"></script>
 <script src="js/features/feed/feed-actions.js?v=4.8"></script>
-<script src="js/features/feed/post-social.js?v=1.2"></script>
+<script src="js/features/feed/post-social.js?v=1.3"></script>
+<script src="js/features/cpm2-landing.js?v=1.0"></script>
+<script src="js/features/cpm2-economy.js?v=1.1"></script>
 <script src="js/features/feed/feed-edit.js?v=5.4"></script>
-<script src="js/features/referrals.js?v=1.2"></script>
-<script src="js/features/ambassador-game-demo.js?v=1.4"></script>
-<script src="js/features/profile.js?v=4.7"></script>
+<script src="js/features/referrals.js?v=1.3"></script>
+<script src="js/features/ambassador-game-demo.js?v=1.6"></script>
+<script src="js/features/profile.js?v=4.8"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
-<script src="js/features/friends.js?v=3.4"></script>
+<script src="js/features/friends.js?v=3.5"></script>
 <script src="js/features/groups.js?v=4.6"></script>
 <script src="js/features/work.js?v=1.3"></script>
 <script src="js/features/dating.js?v=2.1"></script>
-<script src="js/features/marketplace.js?v=1.1"></script>
+<script src="js/features/marketplace.js?v=1.2"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.2"></script>
 <script src="js/features/admin.js?v=3.2"></script>
@@ -863,14 +935,18 @@ document.addEventListener('DOMContentLoaded', function() {
             el.style.display = 'none';
         });
         var requestedPage = new URLSearchParams(window.location.search).get('page');
-        var initialPage = requestedPage === 'work' || requestedPage === 'dating' || requestedPage === 'marketplace' || requestedPage === 'referrals' || requestedPage === 'people' ? requestedPage : 'feed';
+        var allowedPages = ['landing', 'feed', 'work', 'dating', 'marketplace', 'referrals', 'people', 'cpm2'];
+        var initialPage = allowedPages.indexOf(requestedPage) !== -1 ? requestedPage : 'landing';
         var initialPageElement = document.getElementById('page-' + initialPage);
         if (initialPageElement) {
             initialPageElement.classList.add('active');
             initialPageElement.style.display = 'block';
+            var layout = document.getElementById('appLayout');
+            if (layout) layout.classList.toggle('landing-layout', initialPage === 'landing');
             console.log('✅ Initial page opened:', initialPage);
         }
         if (initialPage === 'referrals' && typeof window.loadReferralDashboard === 'function') window.loadReferralDashboard();
+        if (typeof window.renderCpm2LandingDiscussion === 'function') window.renderCpm2LandingDiscussion();
         if (typeof updateUI === 'function') updateUI();
         if (typeof updatePcTopbar === 'function') updatePcTopbar();
         if (typeof updateNotifBadge === 'function') updateNotifBadge();

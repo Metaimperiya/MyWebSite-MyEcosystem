@@ -120,6 +120,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (mainContainer) mainContainer.style.display = 'block';
 
             if (typeof updateUI === 'function') updateUI();
+            if (typeof window.refreshCpm2LandingReactions === 'function') window.refreshCpm2LandingReactions();
+            var afterLoginPage = sessionStorage.getItem('metaimperiyaAfterLoginPage');
+            if ((afterLoginPage === 'feed' || afterLoginPage === 'cpm2') && typeof window.setActivePage === 'function') {
+                sessionStorage.removeItem('metaimperiyaAfterLoginPage');
+                window.setActivePage(afterLoginPage);
+                window.history.replaceState(null, '', '/?page=' + afterLoginPage);
+            }
             if (typeof loadFeed === 'function') loadFeed();
             if (typeof loadGroups === 'function') loadGroups();
             if (typeof loadWork === 'function') loadWork();
@@ -146,10 +153,13 @@ document.addEventListener('DOMContentLoaded', function() {
             USER_UID = null;
             isAdmin = false;
             var loginModal = document.getElementById('loginModal');
-            if (loginModal) loginModal.classList.add('open');
+            var requestedInitialPage = new URLSearchParams(window.location.search).get('page');
+            var publicLanding = document.getElementById('page-landing')?.classList.contains('active') && (!requestedInitialPage || requestedInitialPage === 'landing');
+            if (loginModal && !publicLanding) loginModal.classList.add('open');
             var mainContainer = document.getElementById('mainContainer');
-            if (mainContainer) mainContainer.style.display = 'none';
+            if (mainContainer) mainContainer.style.display = publicLanding ? 'block' : 'none';
             if (typeof updateUI === 'function') updateUI();
+            if (typeof window.renderCpm2LandingDiscussion === 'function') window.renderCpm2LandingDiscussion();
             if (typeof startDirectMessageUnreadTracking === 'function') startDirectMessageUnreadTracking();
             console.log('⛔ Гость, иди нахуй!');
         }

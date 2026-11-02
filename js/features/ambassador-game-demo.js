@@ -49,26 +49,35 @@
         var players = {};
         Object.keys(sharedUsers || {}).forEach(function(uid) {
             var user = sharedUsers[uid] || {};
-            players[uid] = { name: user.name || 'Участник', balance: 0, joinedAt: numberOrZero(user.lastLogin || user.createdAt) };
+            players[uid] = { name: user.name || 'Участник', balance: 0, cpm2Balance: 0, joinedAt: numberOrZero(user.lastLogin || user.createdAt) };
         });
         Object.keys(sharedParticipants || {}).forEach(function(uid) {
             var participant = sharedParticipants[uid] || {};
-            if (!players[uid]) players[uid] = { name: participant.name || 'Участник', balance: 0, joinedAt: participant.joinedAt || 0 };
+            if (!players[uid]) players[uid] = { name: participant.name || 'Участник', balance: 0, cpm2Balance: 0, joinedAt: participant.joinedAt || 0 };
         });
         var grants = sharedBank && sharedBank.grants || {};
         Object.keys(grants).forEach(function(id) {
             var grant = grants[id] || {};
             if (!grant.toUid) return;
-            if (!players[grant.toUid]) players[grant.toUid] = { name: grant.toName || 'Участник', balance: 0, joinedAt: grant.at || 0 };
+            if (!players[grant.toUid]) players[grant.toUid] = { name: grant.toName || 'Участник', balance: 0, cpm2Balance: 0, joinedAt: grant.at || 0 };
             players[grant.toUid].balance += numberOrZero(grant.amount);
+        });
+        var cpm2Grants = sharedBank && sharedBank.cpm2Grants || {};
+        Object.keys(cpm2Grants).forEach(function(id) {
+            var grant = cpm2Grants[id] || {};
+            if (!grant.toUid) return;
+            if (!players[grant.toUid]) players[grant.toUid] = { name: grant.toName || 'Участник', balance: 0, cpm2Balance: 0, joinedAt: grant.at || 0 };
+            players[grant.toUid].cpm2Balance += numberOrZero(grant.amount);
         });
         Object.keys(sharedTransfers || {}).forEach(function(id) {
             var transfer = sharedTransfers[id] || {};
-            if (players[transfer.fromUid]) players[transfer.fromUid].balance -= numberOrZero(transfer.amount);
-            if (players[transfer.toUid]) players[transfer.toUid].balance += numberOrZero(transfer.amount);
+            var balanceKey = transfer.currency === 'cpm2' ? 'cpm2Balance' : 'balance';
+            if (players[transfer.fromUid]) players[transfer.fromUid][balanceKey] -= numberOrZero(transfer.amount);
+            if (players[transfer.toUid]) players[transfer.toUid][balanceKey] += numberOrZero(transfer.amount);
         });
         state.players = players;
         state.bank = sharedBank ? numberOrZero(sharedBank.total) : 0;
+        state.cpm2Bank = sharedBank ? numberOrZero(sharedBank.cpm2Total) : 0;
     }
     function updateProfileWallet(profileUid) {
         var targetUid = profileUid || VIEWING_USER || USER_UID;
@@ -79,9 +88,15 @@
         var bankPanel = document.getElementById('profileGameBank');
         var bankAmount = document.getElementById('profileGameBankAmount');
         var bankInput = document.getElementById('profileBankAmount');
+        var cpm2Balance = document.getElementById('profileCpm2Balance');
+        var cpm2Grant = document.getElementById('profileCpm2Grant');
+        var cpm2Wallet = document.getElementById('profileCpm2Wallet');
         var profilePlayer = state && state.players[targetUid];
         if (wallet) wallet.hidden = !targetUid || (!profilePlayer && targetUid !== USER_UID && !isBankOwner());
         if (balance) balance.textContent = money(profilePlayer ? profilePlayer.balance : 0);
+        if (cpm2Balance) cpm2Balance.textContent = money(profilePlayer ? profilePlayer.cpm2Balance : 0);
+        if (cpm2Wallet) cpm2Wallet.hidden = !targetUid || (!profilePlayer && targetUid !== USER_UID && !isBankOwner());
+        if (cpm2Grant) cpm2Grant.hidden = !(targetUid && targetUid !== USER_UID && isBankOwner());
         if (join) join.hidden = !(targetUid === USER_UID && !profilePlayer);
         if (grant) grant.hidden = !(targetUid && targetUid !== USER_UID && isBankOwner());
         if (bankPanel) bankPanel.hidden = !(targetUid === USER_UID && (isBankOwner() || canClaimBank()));
@@ -98,12 +113,27 @@
         var name = document.getElementById('profileName');
         if (Number.isInteger(amount) && amount > 0) grantFromBank(uid, amount, name && name.textContent);
     };
+    window.grantProfileCpm2 = function() {
+        var uid = VIEWING_USER || USER_UID;
+        if (!uid || !isBankOwner()) return;
+        var amount = Number(window.prompt('Сколько CPM2 выдать этому участнику из общего резерва?', '100'));
+        var name = document.getElementById('profileName');
+        if (Number.isSafeInteger(amount) && amount > 0) grantFromBank(uid, amount, name && name.textContent, 'cpm2');
+    };
     window.setAmbassadorBankFromProfile = function() {
         var input = document.getElementById('profileBankAmount');
         var amount = Number(input && input.value);
         if (!Number.isInteger(amount) || amount < 0 || amount > 10000000) { setFeedback('Укажи целое число от 0 до 10 000 000.', true); return; }
         setSharedBank(amount);
     };
+    window.setCpm2Bank = function(amount) {
+        amount = Number(amount);
+        if (!Number.isSafeInteger(amount) || amount < 0 || amount > 1000000000000) { setFeedback('CPM2-резерв должен быть от 0 до 1 000 000 000 000.', true); return false; }
+        setSharedBank(amount, 'cpm2');
+        return true;
+    };
+    window.transferCpm2 = function(uid, amount, postMeta) { return transferPoints(uid, Number(amount), postMeta, 'cpm2'); };
+    window.getAmbassadorPlayer = function(uid) { return state && state.players ? state.players[uid || currentUid()] || null : null; };
     function subscribeSharedGame() {
         if (!USER_UID || !document.getElementById('ambassadorGame')) return;
         bankRef = db.ref('sites/' + SITE + '/ambassador_bank');
@@ -148,11 +178,17 @@
         var self = player();
         var bank = document.getElementById('ambBankTotal');
         var wallet = document.getElementById('ambMyBalance');
+        var cpm2Bank = document.getElementById('ambCpm2BankTotal');
+        var cpm2Wallet = document.getElementById('ambMyCpm2Balance');
         var count = Object.keys(state.players).length;
         if (bank) bank.textContent = bankReadError ? 'Нет доступа' : money(state.bank);
         if (wallet) wallet.textContent = money(self ? self.balance : 0);
+        if (cpm2Bank) cpm2Bank.textContent = bankReadError ? 'Нет доступа' : money(state.cpm2Bank);
+        if (cpm2Wallet) cpm2Wallet.textContent = money(self ? self.cpm2Balance : 0);
         var bankInput = document.getElementById('ambBankInput');
         if (bankInput && document.activeElement !== bankInput) bankInput.value = state.bank;
+        var cpm2BankInput = document.getElementById('ambCpm2BankInput');
+        if (cpm2BankInput && document.activeElement !== cpm2BankInput) cpm2BankInput.value = state.cpm2Bank;
         var bankEdit = document.querySelector('.amb-bank-edit');
         if (bankEdit) bankEdit.hidden = !(isBankOwner() || canClaimBank());
         var bankNote = document.querySelector('.amb-bank-card > small');
@@ -182,13 +218,14 @@
             var name = document.createElement('strong'); name.textContent = entry.data.name || 'Игрок';
             var note = document.createElement('small'); note.textContent = entry.uid === currentUid() ? 'ты' : 'в игре';
             copy.append(name, note);
-            var balance = document.createElement('b'); balance.textContent = money(entry.data.balance) + ' ◉';
+            var balance = document.createElement('b'); balance.className = 'amb-player-balances'; balance.textContent = money(entry.data.balance) + ' очк. · ' + money(entry.data.cpm2Balance) + ' CPM2';
             row.append(avatar, copy, balance);
             if (isBankOwner()) {
                 var grant = document.createElement('button'); grant.type = 'button'; grant.className = 'amb-mini-grant'; grant.textContent = '＋'; grant.title = 'Выдать очки из общего банка';
                 grant.addEventListener('click', function() {
-                    var amount = Number(window.prompt('Сколько очков выдать пользователю ' + (entry.data.name || '') + '?', '100'));
-                    if (Number.isInteger(amount) && amount > 0) grantFromBank(entry.uid, amount);
+                    var currency = window.prompt('1 — социальные очки, 2 — CPM2', '1');
+                    var amount = Number(window.prompt('Сколько начислить пользователю ' + (entry.data.name || '') + '?', '100'));
+                    if (Number.isSafeInteger(amount) && amount > 0) grantFromBank(entry.uid, amount, entry.data.name, currency === '2' ? 'cpm2' : 'social');
                 });
                 row.appendChild(grant);
             }
@@ -196,7 +233,7 @@
         });
         if (!players.length) list.innerHTML = '<div class="amb-player-empty">Зарегистрированные участники появятся здесь.</div>';
         var previous = select.value;
-        select.innerHTML = '<option value="">Выбери игрока</option>' + players.filter(function(p) { return p.uid !== currentUid(); }).map(function(p) { return '<option value="' + encodeURIComponent(p.uid) + '">' + String(p.data.name || 'Участник').replace(/[&<>"']/g, '') + ' · ' + money(p.data.balance) + '</option>'; }).join('');
+        select.innerHTML = '<option value="">Выбери игрока</option>' + players.filter(function(p) { return p.uid !== currentUid(); }).map(function(p) { return '<option value="' + encodeURIComponent(p.uid) + '">' + String(p.data.name || 'Участник').replace(/[&<>"']/g, '') + ' · очки ' + money(p.data.balance) + ' · CPM2 ' + money(p.data.cpm2Balance) + '</option>'; }).join('');
         if (previous) select.value = previous;
     }
     function requestCard(request) {
@@ -251,11 +288,16 @@
             var grant = sharedBank.grants[id];
             entries.push({ text: 'Выдано ' + money(grant.amount) + ' очков · ' + (grant.toName || 'участнику'), amount: '−' + money(grant.amount), at: grant.at || 0 });
         });
+        Object.keys(sharedBank && sharedBank.cpm2Grants || {}).forEach(function(id) {
+            var grant = sharedBank.cpm2Grants[id] || {};
+            var source = grant.type === 'referral' ? 'Награда за приглашение' : 'Выдано CPM2';
+            entries.push({ text: source + ' · ' + (grant.toName || (state.players[grant.toUid] && state.players[grant.toUid].name) || 'участнику'), amount: '−' + money(grant.amount) + ' CPM2', at: grant.at || 0 });
+        });
         Object.keys(sharedTransfers || {}).forEach(function(id) {
             var transfer = sharedTransfers[id] || {};
             var from = state.players[transfer.fromUid] && state.players[transfer.fromUid].name || 'Участник';
             var to = state.players[transfer.toUid] && state.players[transfer.toUid].name || 'Участник';
-            entries.push({ text: from + ' → ' + to, amount: money(transfer.amount), at: transfer.at || 0 });
+            entries.push({ text: (transfer.currency === 'cpm2' ? 'CPM2 · ' : '') + from + ' → ' + to, amount: money(transfer.amount) + (transfer.currency === 'cpm2' ? ' CPM2' : ' очк.'), at: transfer.at || 0 });
         });
         entries.sort(function(a, b) { return Number(b.at || 0) - Number(a.at || 0); });
         if (!entries.length) { list.innerHTML = '<div class="amb-ledger-empty">Действий пока нет.</div>'; return; }
@@ -266,40 +308,53 @@
             row.append(text, amount); list.appendChild(row);
         });
     }
-    function grantFromBank(uid, amount, targetName) {
-        if (!isBankOwner() || !uid || !Number.isInteger(amount) || amount < 1 || !bankRef) { setFeedback('Начислить очки может только банкир; проверь получателя и сумму.', true); return; }
+    function grantFromBank(uid, amount, targetName, currency) {
+        currency = currency === 'cpm2' ? 'cpm2' : 'social';
+        var maxAmount = currency === 'cpm2' ? 1000000000000 : 10000000;
+        if (!isBankOwner() || !uid || !Number.isSafeInteger(amount) || amount < 1 || amount > maxAmount || !bankRef) { setFeedback('Начислить валюту может только банкир; проверь получателя и сумму.', true); return; }
         var recipient = state.players[uid] || { name: targetName || 'Участник', balance: 0 };
-        var grantId = bankRef.child('grants').push().key;
+        var grantsPath = currency === 'cpm2' ? 'cpm2Grants' : 'grants';
+        var totalField = currency === 'cpm2' ? 'cpm2Total' : 'total';
+        var grantId = bankRef.child(grantsPath).push().key;
         bankRef.transaction(function(current) {
-            if (!current || current.ownerUid !== currentUid() || Number(current.total) < amount) return;
-            current.grants = current.grants || {};
-            current.grants[grantId] = { toUid: uid, toName: recipient.name || targetName || 'Участник', amount: amount, at: Date.now() };
-            current.total = Number(current.total) - amount;
+            if (!current || current.ownerUid !== currentUid() || Number(current[totalField] || 0) < amount) return;
+            current[grantsPath] = current[grantsPath] || {};
+            current[grantsPath][grantId] = { toUid: uid, toName: recipient.name || targetName || 'Участник', amount: amount, currency: currency, type: 'admin_grant', byUid: currentUid(), at: Date.now() };
+            current[totalField] = Number(current[totalField] || 0) - amount;
             current.updatedAt = Date.now();
             return current;
         }, function(error, committed) {
-            if (error) setFeedback('Не удалось выдать очки: ' + error.message, true);
-            else if (!committed) setFeedback('Банк не настроен или в нём недостаточно очков.', true);
-            else setFeedback('Начислено ' + money(amount) + ' очков. Общий банк уменьшился на эту сумму.');
+            if (error) setFeedback('Не удалось выдать валюту: ' + error.message, true);
+            else if (!committed) setFeedback('В общем банке недостаточно ' + (currency === 'cpm2' ? 'CPM2' : 'социальных очков') + '.', true);
+            else setFeedback('Начислено ' + money(amount) + (currency === 'cpm2' ? ' CPM2.' : ' социальных очков.') + ' Резерв уменьшился.');
         });
     }
 
-    window.grantAmbassadorPoints = function(uid, amount) { grantFromBank(uid, Number(amount)); };
+    window.grantAmbassadorPoints = function(uid, amount, currency) { grantFromBank(uid, Number(amount), '', currency); };
 
-    function setSharedBank(amount) {
+    function setSharedBank(amount, currency) {
+        currency = currency === 'cpm2' ? 'cpm2' : 'social';
         if ((!isBankOwner() && !canClaimBank()) || !bankRef) { setFeedback('Общим банком управляет только назначенный банкир.', true); return; }
+        var adjustmentId = currency === 'cpm2' ? bankRef.child('cpm2Adjustments').push().key : null;
         bankRef.transaction(function(current) {
             if (current && current.ownerUid !== currentUid()) return;
-            current = current || { ownerUid: currentUid(), grants: {} };
+            current = current || { ownerUid: currentUid(), total: 0, cpm2Total: 0, grants: {}, cpm2Grants: {} };
             current.ownerUid = currentUid();
             current.grants = current.grants || {};
-            current.total = amount;
+            current.cpm2Grants = current.cpm2Grants || {};
+            var totalField = currency === 'cpm2' ? 'cpm2Total' : 'total';
+            var previous = Number(current[totalField] || 0);
+            current[totalField] = amount;
+            if (currency === 'cpm2' && amount !== previous) {
+                current.cpm2Adjustments = current.cpm2Adjustments || {};
+                current.cpm2Adjustments[adjustmentId] = { byUid: currentUid(), delta: amount - previous, at: Date.now() };
+            }
             current.updatedAt = Date.now();
             return current;
         }, function(error, committed) {
             if (error) setFeedback('Не удалось сохранить общий банк: ' + error.message, true);
             else if (!committed) setFeedback('Этот общий банк уже закреплён за другим банкиром.', true);
-            else setFeedback('Общий банк обновлён. Его новая сумма видна всем участникам.');
+            else setFeedback((currency === 'cpm2' ? 'Резерв CPM2' : 'Банк социальных очков') + ' обновлён и виден участникам.');
         });
     }
 
@@ -310,27 +365,36 @@
             .catch(function(error) { setFeedback('Не удалось вступить: ' + error.message, true); });
     }
 
-    function transferPoints(uid, amount, postMeta) {
+    function transferPoints(uid, amount, postMeta, currency) {
+        currency = currency === 'cpm2' ? 'cpm2' : 'social';
         var self = player();
+        var balance = self && Number(self[currency === 'cpm2' ? 'cpm2Balance' : 'balance'] || 0);
         if (!self || !uid || !state.players[uid]) { setFeedback('Выбери зарегистрированного участника.', true); return Promise.resolve(false); }
-        if (!Number.isInteger(amount) || amount < 1 || amount > self.balance) { setFeedback('Недостаточно очков на балансе.', true); return Promise.resolve(false); }
+        if (!Number.isSafeInteger(amount) || amount < 1 || amount > balance) { setFeedback('Недостаточно ' + (currency === 'cpm2' ? 'CPM2' : 'социальных очков') + ' на балансе.', true); return Promise.resolve(false); }
         var transfer = { fromUid: currentUid(), toUid: uid, amount: amount, at: Date.now() };
+        if (currency === 'cpm2') transfer.currency = 'cpm2';
         if (postMeta) {
             transfer.kind = 'post_tip';
             transfer.postKey = String(postMeta.key);
         }
         return transfersRef.push().set(transfer).then(function() {
             var targetName = state.players[uid].name;
-            setFeedback(postMeta ? 'Поддержан пост пользователя ' + targetName + ' на ' + money(amount) + ' очко.' : 'Переведено ' + money(amount) + ' очков пользователю ' + targetName + '.');
+            setFeedback(postMeta ? 'Публикация пользователя ' + targetName + ' поддержана на ' + money(amount) + (currency === 'cpm2' ? ' CPM2.' : ' очков.') : 'Переведено ' + money(amount) + (currency === 'cpm2' ? ' CPM2' : ' очков') + ' пользователю ' + targetName + '.');
             return true;
         }).catch(function(error) { setFeedback('Перевод не прошёл: ' + error.message, true); return false; });
     }
 
-    window.tipPostWithAmbassadorPoint = function(postId, type, authorUid) {
+    window.tipPostWithAmbassadorPoint = function(postId, type, authorUid, amount) {
         if (!USER_UID) { alert('Войди, чтобы поддержать публикацию.'); return Promise.resolve(false); }
-        if (!player() || player().balance < 1) { alert('На балансе нет очков.'); return Promise.resolve(false); }
-        var postKey = (type || 'feed') + '_' + postId;
-        return transferPoints(authorUid, 1, { key: postKey });
+        amount = Number(amount || 1);
+        if (!player() || player().balance < amount) { alert('Недостаточно социальных очков на балансе.'); return Promise.resolve(false); }
+        var postKey = window.getPostSocialKey ? window.getPostSocialKey(postId, type, authorUid) : (type || 'feed') + '_' + postId;
+        return transferPoints(authorUid, amount, { key: postKey });
+    };
+    window.tipPostWithCpm2 = function(postId, type, authorUid, amount) {
+        if (!USER_UID) { alert('Войди, чтобы поддержать публикацию.'); return Promise.resolve(false); }
+        var postKey = window.getPostSocialKey ? window.getPostSocialKey(postId, type, authorUid) : (type || 'feed') + '_' + postId;
+        return transferPoints(authorUid, Number(amount), { key: postKey }, 'cpm2');
     };
     function completeReferral(requestId) {
         var request = state.requests.find(function(item) { return item.id === requestId; });
@@ -352,6 +416,7 @@
         if (!document.getElementById('ambassadorGame')) return;
         state = readState();
         state.bank = 0;
+        state.cpm2Bank = 0;
         state.players = {};
         var playerSlot = document.getElementById('ambPlayerSlot');
         var playerPanel = document.getElementById('ambPlayers');
@@ -363,6 +428,11 @@
             if (!Number.isInteger(amount) || amount < 0 || amount > 10000000) { setFeedback('Укажи целое число от 0 до 10 000 000.', true); return; }
             setSharedBank(amount);
         });
+        document.getElementById('ambCpm2BankSave').addEventListener('click', function() {
+            var amount = Number(document.getElementById('ambCpm2BankInput').value);
+            if (!Number.isSafeInteger(amount) || amount < 0 || amount > 1000000000000) { setFeedback('Укажи целое число от 0 до 1 000 000 000 000 CPM2.', true); return; }
+            setSharedBank(amount, 'cpm2');
+        });
         document.getElementById('ambJoinGame').addEventListener('click', function() {
             joinGame();
         });
@@ -370,7 +440,8 @@
             var select = document.getElementById('ambTransferTo');
             var toUid = select.value ? decodeURIComponent(select.value) : '';
             var amount = Number(document.getElementById('ambTransferAmount').value);
-            transferPoints(toUid, amount);
+            var currency = document.getElementById('ambTransferCurrency').value;
+            transferPoints(toUid, amount, null, currency);
         });
         document.getElementById('ambCreateRequest').addEventListener('click', function() { document.getElementById('ambCreatePanel').hidden = false; document.getElementById('ambRequestTitle').focus(); });
         document.getElementById('ambCloseCreate').addEventListener('click', function() { document.getElementById('ambCreatePanel').hidden = true; });

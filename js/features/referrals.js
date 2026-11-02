@@ -161,6 +161,8 @@
             if (total) total.textContent = referralDashboard.teamCount || 0;
             var points = document.getElementById('referralPointsBalance');
             if (points) points.textContent = referralDashboard.balance;
+            var cpm2Points = document.getElementById('referralCpm2Balance');
+            if (cpm2Points) cpm2Points.textContent = Number(referralDashboard.cpm2Balance || 0).toLocaleString('ru-RU');
             renderMembers(referralDashboard.members || []);
             if (referralTab === 'feed') window.loadReferralFeed();
             var adminPanel = document.getElementById('referralAdminPanel');
