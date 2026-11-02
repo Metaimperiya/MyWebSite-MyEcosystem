@@ -41,5 +41,16 @@ service firebase.storage {
                             && request.resource.contentType.matches('image/.*');
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
+    match /cpm2-homepage-banners/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+                            && request.auth.uid == userId
+                            && request.auth.uid in ['ayXehcol9FgAQU6tZuup7aSaRoV2', 'pWB0nGVvVXc4je6466ss7IwBm9G2', 'ANR62p3qcjOe2ALsdVvJHUNCCV42']
+                            && request.resource.size < 5 * 1024 * 1024
+                            && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.auth.uid in ['ayXehcol9FgAQU6tZuup7aSaRoV2', 'pWB0nGVvVXc4je6466ss7IwBm9G2', 'ANR62p3qcjOe2ALsdVvJHUNCCV42'];
+    }
   }
 }

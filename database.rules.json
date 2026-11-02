@@ -124,6 +124,11 @@
             ".validate": "!newData.exists() || (newData.hasChildren(['reporterUid', 'reportedUid', 'reason', 'createdAt', 'status']) && newData.child('reporterUid').val() === auth.uid && newData.child('reportedUid').isString() && newData.child('reportedUid').val() !== auth.uid && newData.child('reason').isString() && newData.child('reason').val().length >= 3 && newData.child('reason').val().length <= 500 && newData.child('createdAt').isNumber() && newData.child('status').val() === 'new')"
           }
         },
+        "cpm2_homepage_showcase": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.token.admin === true || auth.uid === 'ayXehcol9FgAQU6tZuup7aSaRoV2' || auth.uid === 'pWB0nGVvVXc4je6466ss7IwBm9G2' || auth.uid === 'ANR62p3qcjOe2ALsdVvJHUNCCV42')",
+          ".validate": "!newData.exists() || (newData.hasChildren(['banners', 'featured', 'updatedAt', 'updatedBy']) && newData.child('banners').hasChildren(['banner1', 'banner2']) && newData.child('featured').hasChildren(['sell1', 'sell2', 'sell3', 'trade1', 'trade2']) && newData.child('updatedAt').isNumber() && newData.child('updatedBy').val() === auth.uid)"
+        },
         "marketplace_listings": {
           ".read": "auth != null",
           ".indexOn": ["createdAt", "kind", "countryCode", "city", "sellerUid"],

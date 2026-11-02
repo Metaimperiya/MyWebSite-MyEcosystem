@@ -52,6 +52,7 @@
     <link rel="stylesheet" href="css/features/ambassador-game.css?v=1.3">
     <link rel="stylesheet" href="css/features/marketplace.css?v=1.2">
     <link rel="stylesheet" href="css/features/cpm2.css?v=1.3">
+    <link rel="stylesheet" href="css/features/cpm2-home-showcase.css?v=1.0">
     <link rel="stylesheet" href="css/features/reputation.css?v=1.0">
     <link rel="stylesheet" href="css/features/friends.css?v=3.4">
     <link rel="stylesheet" href="css/features/chat.css?v=3.1">
@@ -206,6 +207,10 @@
                 <div class="panel-item">👥 Online: <span id="onlineCount">0</span></div>
                 <div class="panel-item">📰 Posts: <span id="totalPosts">0</span></div>
             </div>
+            <section class="cpm2-sidebar-banner cpm2-banner-square" id="cpm2BannerSlot1" data-cpm2-banner-slot="banner1" hidden aria-label="Баннер CPM2 1"></section>
+            <section class="cpm2-sidebar-market" id="cpm2SellSlot1" data-cpm2-feature-slot="sell1" hidden></section>
+            <section class="cpm2-sidebar-market" id="cpm2SellSlot2" data-cpm2-feature-slot="sell2" hidden></section>
+            <section class="cpm2-sidebar-market" id="cpm2SellSlot3" data-cpm2-feature-slot="sell3" hidden></section>
         </div>
 
         <div class="panel-center">
@@ -467,6 +472,18 @@
                 <section class="cpm2-page">
                     <header class="cpm2-heading"><span class="cpm2-kicker">METAIMPERIYA · ИГРОВАЯ ЭКОНОМИКА</span><h1>CPM2</h1><p>Кланы, авторынок и будущие обмены — в одном разделе.</p></header>
                     <div class="cpm2-notice">💲 CPM2 — внутренняя игровая единица для кланового баланса, переводов и учёта сделок.</div>
+                    <section class="cpm2-home-editor" id="cpm2HomeEditor" hidden>
+                        <details>
+                            <summary>⚙ Настроить баннеры и объявления на главной</summary>
+                            <p>Баннеры показываются в боковых колонках. Sell и Trade здесь ссылаются на уже одобренные CPM2-объявления. Каждому блоку можно выбрать до трёх карточек.</p>
+                            <div class="cpm2-home-banner-editors">
+                                <fieldset><legend>Блок 1 · компактный слайдер</legend><label>Заголовок<input id="cpm2Banner1Title" maxlength="70" placeholder="Например, CPM2 METAIMPERIYA"></label><label>Текст<input id="cpm2Banner1Text" maxlength="160" placeholder="Короткое описание"></label><label>Ссылка<input id="cpm2Banner1Link" type="url" maxlength="2048" placeholder="https://…"></label><label>Ссылки на изображения · по одной на строку<textarea id="cpm2Banner1Images" rows="3" placeholder="https://…"></textarea></label><label>Или загрузи слайды<input id="cpm2Banner1Files" type="file" accept="image/*" multiple></label></fieldset>
+                                <fieldset><legend>Блок 2 · широкий баннер</legend><label>Заголовок<input id="cpm2Banner2Title" maxlength="70" placeholder="Например, Найди свою команду"></label><label>Текст<input id="cpm2Banner2Text" maxlength="160" placeholder="Короткое описание"></label><label>Ссылка<input id="cpm2Banner2Link" type="url" maxlength="2048" placeholder="https://…"></label><label>Ссылки на изображения · по одной на строку<textarea id="cpm2Banner2Images" rows="3" placeholder="https://…"></textarea></label><label>Или загрузи слайды<input id="cpm2Banner2Files" type="file" accept="image/*" multiple></label></fieldset>
+                            </div>
+                            <div class="cpm2-home-picks" id="cpm2HomePicks"></div>
+                            <div class="cpm2-home-editor-actions"><span id="cpm2HomeEditorStatus" role="status"></span><button type="button" id="cpm2HomeSaveButton" onclick="window.saveCpm2HomepageShowcase()">Сохранить витрину</button></div>
+                        </details>
+                    </section>
                     <section class="cpm2-wallet-panel" id="cpm2WalletPanel">
                         <div><span>💲 CPM2 · общий резерв</span><strong id="cpm2Reserve">Загрузка…</strong><small>внутренние демо-единицы</small></div>
                         <div><span>💲 Мой CPM2-баланс</span><strong id="cpm2Balance">—</strong><small>внутренние демо-единицы</small></div>
@@ -649,6 +666,7 @@
         </div>
 
         <div class="panel-right" id="panelRight">
+            <section class="cpm2-sidebar-banner cpm2-banner-wide" id="cpm2BannerSlot2" data-cpm2-banner-slot="banner2" hidden aria-label="Баннер CPM2 2"></section>
             <aside class="panel-card tiktok-widget" aria-label="TikTok METAIMPERIYA">
                 <div class="tiktok-widget__eyebrow">TikTok</div>
                 <div class="tiktok-widget__logo" aria-hidden="true">♪</div>
@@ -659,6 +677,8 @@
             <div class="panel-card tiktok-widget__hint">
                 <span aria-hidden="true">🎬</span> Подписывайтесь, чтобы не пропускать новые видео
             </div>
+            <section class="cpm2-sidebar-market" id="cpm2TradeSlot1" data-cpm2-feature-slot="trade1" hidden></section>
+            <section class="cpm2-sidebar-market" id="cpm2TradeSlot2" data-cpm2-feature-slot="trade2" hidden></section>
         </div>
 
     </div>
@@ -1001,6 +1021,7 @@
 <script src="js/features/work.js?v=1.3"></script>
 <script src="js/features/dating.js?v=2.1"></script>
 <script src="js/features/marketplace.js?v=1.3"></script>
+<script src="js/features/cpm2-home-showcase.js?v=1.0"></script>
 <script src="js/features/chat.js?v=3.2"></script>
 <script src="js/features/notifications.js?v=3.2"></script>
 <script src="js/features/admin.js?v=3.2"></script>

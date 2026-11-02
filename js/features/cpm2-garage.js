@@ -197,7 +197,12 @@
             renderAdminQueue(snapshots[0].val() || {}, snapshots[1].val() || {});
         }).catch(function(error) {
             var queue = document.getElementById('cpm2GarageQueue');
-            if (queue) queue.innerHTML = '<div class="cpm2-garage-empty">Не удалось загрузить заявки: ' + esc(error.message || 'ошибка доступа') + '</div>';
+            if (queue) {
+                var denied = error && (error.code === 'PERMISSION_DENIED' || /permission_denied|permission denied/i.test(error.message || ''));
+                queue.innerHTML = '<div class="cpm2-garage-empty">' + (denied
+                    ? 'Firebase не разрешил читать очередь. Опубликуй актуальный database.rules.json в Realtime Database проекта myecosystem-e6414 и проверь, что текущий аккаунт указан в ADMIN_UIDS.'
+                    : 'Не удалось загрузить заявки: ' + esc(error && error.message || 'ошибка доступа')) + '</div>';
+            }
         });
     }
 
