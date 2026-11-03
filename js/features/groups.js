@@ -22,7 +22,8 @@ var clanLeaderGrant = null;
 var adminClanBadge = '♟';
 var clanApplicationsCache = {};
 var clanMemberBadgesCache = {};
-var clanUsersCache = null;
+var clanUsersCache = Object.create(null);
+var clanUsersPending = Object.create(null);
 var groupCreateMode = 'group';
 
 function groupEscape(value) {
@@ -177,12 +178,18 @@ function renderClanRoster() {
     if (!canManage) return;
     var members = groupMembershipsCache[selectedCommunityId] || {};
     var memberIds = Object.keys(members).filter(function(uid) { return members[uid] === true; });
-    if (!clanUsersCache) {
+    var missingUserIds = memberIds.filter(function(uid) { return !Object.prototype.hasOwnProperty.call(clanUsersCache, uid) && !clanUsersPending[uid]; });
+    if (missingUserIds.length) {
         panel.innerHTML = '<h3>Состав клана</h3><p>Загружаю участников…</p>';
-        db.ref('sites/' + SITE + '/all_users').once('value').then(function(snapshot) {
-            clanUsersCache = snapshot.val() || {};
-            renderClanRoster();
-        }).catch(function(error) { panel.innerHTML = '<h3>Состав клана</h3><p>Не удалось загрузить участников: ' + groupEscape(error.message) + '</p>'; });
+        Promise.all(missingUserIds.map(function(uid) {
+            clanUsersPending[uid] = true;
+            return db.ref('sites/' + SITE + '/all_users/' + uid).once('value').then(function(snapshot) {
+                clanUsersCache[uid] = snapshot.val() || {};
+            }).catch(function(error) {
+                console.warn('Не удалось загрузить профиль участника клана:', uid, error);
+                clanUsersCache[uid] = {};
+            }).finally(function() { delete clanUsersPending[uid]; });
+        })).then(renderClanRoster);
         return;
     }
     panel.innerHTML = '<div class="clan-roster-heading"><div><span>УПРАВЛЕНИЕ КЛАНОМ</span><h3>Состав и значки</h3></div><small>Символ клана: ' + groupEscape(group.clanBadge || '♟') + '</small></div>' +
@@ -793,7 +800,7 @@ window.createGroup = function() {
         if (!groupMembershipsCache[id]) groupMembershipsCache[id] = {};
         groupMembershipsCache[id][USER_UID] = true;
         window.closeCreateGroup();
-        loadGroups();
+        renderGroupDirectory();
         if (typeof loadFeed === 'function') loadFeed();
         window.openGroup(id);
     }).catch(function(saveError) {
