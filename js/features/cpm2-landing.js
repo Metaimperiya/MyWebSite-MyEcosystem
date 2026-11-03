@@ -51,7 +51,7 @@
         if (!target) return;
         target.innerHTML = '<article class="card post cpm2-landing-post" data-id="' + discussionId + '" data-type="feed">' +
             '<div class="author"><span class="post-author-avatar"><span class="avatar-wrap"><span class="letter">M</span></span></span><span class="name">METAIMPERIYA</span><span class="time">ОБСУЖДЕНИЕ</span></div>' +
-            '<div class="post-content">Что для тебя главное в сообществе CPM2? Расскажи в комментариях: кого ищешь для игры, какой автомобиль хочешь обменять или какую идею для клана стоит обсудить.</div>' +
+            '<div class="post-content">Что для тебя главное в сообществе CPM2? Расскажи в комментариях: кого ищешь для игры, какой автомобиль хочешь обменять или какую идею для сообщества стоит обсудить.</div>' +
             '<div class="stats"><button type="button" data-landing-reaction="like" onclick="toggleCpm2LandingReaction(\'like\')" aria-label="Нравится">👍 <span>0</span></button><button type="button" data-landing-reaction="dislike" onclick="toggleCpm2LandingReaction(\'dislike\')" aria-label="Не нравится">👎 <span>0</span></button><button type="button" onclick="if(window.checkAccess())window.toggleComments(\'' + discussionId + '\',\'feed\')">💬 <span id="commentCount_' + discussionId + '">0</span></button></div>' +
             '<div class="cpm2-landing-reaction-state" aria-live="polite"></div>' +
             '<div class="comments-wrapper" id="commentsWrapper_' + discussionId + '" style="display:none"><div class="comments"><div class="comments-body"><div class="comments-list"><div id="commentsContainer_' + discussionId + '"></div></div></div></div></div>' +

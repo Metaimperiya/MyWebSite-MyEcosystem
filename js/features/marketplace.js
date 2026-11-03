@@ -9,7 +9,6 @@ var marketplaceImageCleared = false;
 var marketplaceDealModeFilter = 'all';
 var cpm2ShowcaseTab = 'trending';
 var cpm2ShowcaseListings = {};
-var cpm2ShowcaseGroups = {};
 var cpm2ShowcaseStartTimer = null;
 var cpm2ShowcaseTimer = null;
 
@@ -54,17 +53,8 @@ window.loadCpm2MarketShowcase = function() {
     section.hidden = false;
     var status = document.getElementById('cpm2MarketStatus');
     if (status) status.textContent = 'Загружаем предложения CPM2…';
-    Promise.all([
-        db.ref('sites/' + SITE + '/marketplace_listings').once('value'),
-        db.ref('sites/' + SITE + '/groups').once('value'),
-        db.ref('sites/' + SITE + '/group_members').once('value')
-    ]).then(function(snapshots) {
-        cpm2ShowcaseListings = snapshots[0].val() || {};
-        cpm2ShowcaseGroups = snapshots[1].val() || {};
-        var members = snapshots[2].val() || {};
-        Object.keys(cpm2ShowcaseGroups).forEach(function(id) {
-            cpm2ShowcaseGroups[id]._memberCount = Object.keys(members[id] || {}).length;
-        });
+    db.ref('sites/' + SITE + '/marketplace_listings').once('value').then(function(snapshot) {
+        cpm2ShowcaseListings = snapshot.val() || {};
         renderCpm2MarketShowcase();
     }).catch(function(error) {
         console.warn('Не удалось загрузить витрину CPM2:', error);
@@ -73,7 +63,7 @@ window.loadCpm2MarketShowcase = function() {
 };
 
 window.showCpm2MarketTab = function(tab) {
-    if (['trending', 'sell', 'trade', 'clans'].indexOf(tab) === -1) return;
+    if (['trending', 'sell', 'trade'].indexOf(tab) === -1) return;
     cpm2ShowcaseTab = tab;
     document.querySelectorAll('[data-cpm2-market-tab]').forEach(function(button) {
         button.classList.toggle('active', button.getAttribute('data-cpm2-market-tab') === tab);
@@ -107,23 +97,6 @@ function renderCpm2MarketShowcase() {
     clearInterval(cpm2ShowcaseTimer);
     if (selected) { selected.hidden = true; selected.innerHTML = ''; }
     var cards = [];
-    if (cpm2ShowcaseTab === 'clans') {
-        cards = Object.keys(cpm2ShowcaseGroups).map(function(id) {
-            return Object.assign({ id: id }, cpm2ShowcaseGroups[id] || {});
-        }).filter(function(group) { return group.isClan === true; })
-            .sort(function(a, b) { return (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0); }).slice(0, 12);
-        status.textContent = cards.length ? 'Кланы CPM2 · ' + cards.length + ' сообществ' : 'Кланы CPM2';
-        viewport.innerHTML = cards.length ? '<div class="cpm2-market-track">' + cards.map(function(group) {
-            var image = marketUrl(group.coverUrl || group.avatarUrl);
-            var badge = group.clanBadge || '♟';
-            return '<button type="button" class="cpm2-market-card cpm2-clan-card" data-cpm2-clan="' + cpm2ShowcaseEscape(group.id) + '"><span class="cpm2-market-card-image">' + (image ? '<img src="' + cpm2ShowcaseEscape(image) + '" alt="" loading="lazy">' : '<span>' + cpm2ShowcaseEscape(badge) + '</span>') + '<span class="cpm2-market-card-shade"></span></span><span class="cpm2-market-card-badge">♟ CLAN</span><span class="cpm2-market-card-copy"><strong>' + cpm2ShowcaseEscape(group.name || 'Клан CPM2') + '</strong><small>' + cpm2ShowcaseEscape(group._memberCount || 0) + ' участников</small><em>Открыть →</em></span></button>';
-        }).join('') + '</div>' : '<div class="cpm2-market-empty">Пока нет созданных кланов. Открой раздел Clans и создай первый.</div>';
-        viewport.querySelectorAll('[data-cpm2-clan]').forEach(function(button) {
-            button.addEventListener('click', function() { window.openCpm2ShowcaseClan(button.getAttribute('data-cpm2-clan')); });
-        });
-        startCpm2Carousel(viewport);
-        return;
-    }
     var mode = cpm2ShowcaseTab === 'sell' ? 'sell' : cpm2ShowcaseTab === 'trade' ? 'trade' : 'trending';
     cards = cpm2AutoListings(mode);
     var title = cpm2ShowcaseTab === 'sell' ? 'Продажа автомобилей' : cpm2ShowcaseTab === 'trade' ? 'Обмен автомобилей' : 'Свежие предложения CPM2';
@@ -164,16 +137,6 @@ function renderCpm2SelectedListing(id) {
     selected.innerHTML = '<div class="cpm2-market-selected-head"><div><h3>' + cpm2ShowcaseEscape(item.title || 'Автомобиль CPM2') + '</h3><span class="cpm2-market-selected-meta">' + (isTrade ? '⇄ Trade · ' + cpm2ShowcaseEscape(item.tradeFor || 'Обмен предложениями') : '↗ Sell') + ' · ' + cpm2ShowcaseEscape(item.city || '') + (item.country ? ', ' + cpm2ShowcaseEscape(item.country) : '') + '</span></div><strong class="cpm2-market-selected-price">' + (isTrade ? 'ОБМЕН' : cpm2ShowcaseEscape(item.price ? item.price + ' ' + (item.currency || '') : 'По договорённости')) + '</strong></div><p>' + cpm2ShowcaseEscape(item.description || '') + '</p><div class="cpm2-market-selected-actions"><button type="button" onclick="viewUserProfile(\'' + cpm2ShowcaseEscape(item.sellerUid) + '\')">Профиль продавца</button><button type="button" class="cpm2-market-comment-toggle" onclick="toggleComments(\'' + key + '\',\'marketplace\')">💬 Комментарии <span id="commentCount_' + key + '">' + Number(item.commentCount || 0) + '</span></button><button type="button" onclick="goToCpm2Market(\'' + (isTrade ? 'trade' : 'sell') + '\')">Все ' + (isTrade ? 'обмены' : 'продажи') + ' →</button></div><div class="comments-wrapper" id="commentsWrapper_' + key + '" style="display:none"><div class="comments"><div class="comments-body"><div class="comments-list"><div id="commentsContainer_' + key + '"></div></div></div></div></div><div class="comment-input-wrap"><input type="text" id="commentInput_' + key + '" maxlength="1000" placeholder="Написать комментарий…" onkeydown="if(event.key===\'Enter\')submitComment(\'' + key + '\',\'marketplace\')"><button type="button" onclick="if(window.checkAccess())submitComment(\'' + key + '\',\'marketplace\')" aria-label="Отправить комментарий">→</button></div>';
     selected.hidden = false;
 }
-
-window.openCpm2ShowcaseClan = function(id) {
-    if (!window.checkAccess()) return;
-    window.goToGroups();
-    db.ref('sites/' + SITE + '/groups/' + id).once('value').then(function(snapshot) {
-        if (!snapshot.exists()) return;
-        groupsCache[id] = snapshot.val();
-        window.openGroup(id);
-    });
-};
 
 window.showMarketplaceTab = function(tab) {
     if (['goods', 'services', 'realestate', 'library'].indexOf(tab) === -1) return;

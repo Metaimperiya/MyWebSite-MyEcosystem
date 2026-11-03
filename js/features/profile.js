@@ -576,15 +576,6 @@ function showProfileActions(uid) {
             'position:relative;z-index:9;';
         actions.appendChild(dossBtn);
 
-        if (isAdmin && typeof window.grantClanLeader === 'function') {
-            var selfClanGrant = document.createElement('button');
-            selfClanGrant.type = 'button';
-            selfClanGrant.className = 'profile-action-btn';
-            selfClanGrant.textContent = '♟ Назначить себя лидером клана';
-            selfClanGrant.onclick = function() { window.grantClanLeader(uid).catch(function(error) { alert(error.message || 'Не удалось выдать права.'); }); };
-            actions.appendChild(selfClanGrant);
-        }
-
         var container = document.createElement('div');
         container.style.cssText = 'position:absolute;top:12px;right:16px;z-index:10;';
 
@@ -657,14 +648,6 @@ function showProfileActions(uid) {
     wrapper.appendChild(blockBtn);
 
     actions.appendChild(wrapper);
-    if (isAdmin && typeof window.grantClanLeader === 'function') {
-        var clanGrantBtn = document.createElement('button');
-        clanGrantBtn.type = 'button';
-        clanGrantBtn.className = 'profile-action-btn';
-        clanGrantBtn.textContent = '♟ Назначить создателем клана';
-        clanGrantBtn.onclick = function() { window.grantClanLeader(uid).catch(function(error) { alert(error.message || 'Не удалось выдать права.'); }); };
-        actions.appendChild(clanGrantBtn);
-    }
     getFriendStatusRealtime(USER_UID, uid, function(status) {
         setProfileFriendAction(mainBtn, status, uid);
     });
