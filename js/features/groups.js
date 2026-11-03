@@ -801,8 +801,10 @@ window.createGroup = function() {
         groupMembershipsCache[id][USER_UID] = true;
         window.closeCreateGroup();
         renderGroupDirectory();
-        if (typeof loadFeed === 'function') loadFeed();
-        window.openGroup(id);
+        var entryDescription = document.getElementById('clanEntryDescription');
+        if (entryDescription) entryDescription.textContent = isClan
+            ? 'Клан «' + name.slice(0, 60) + '» создан и добавлен в список. Открой его карточку, чтобы перейти в клан.'
+            : 'Группа «' + name.slice(0, 60) + '» создана и добавлена в список.';
     }).catch(function(saveError) {
         console.error('Не удалось создать группу:', saveError);
         if (error) {
