@@ -65,7 +65,7 @@
     <link rel="stylesheet" href="css/modules/player.css?v=3.0">
     <link rel="stylesheet" href="css/components/admin.css?v=3.0">
     <link rel="stylesheet" href="css/style.css?v=3.2">
-    <link rel="stylesheet" href="css/features/cpm2-landing.css?v=1.4">
+    <link rel="stylesheet" href="css/features/cpm2-landing.css?v=1.5">
     <link rel="stylesheet" href="css/features/clans.css?v=1.1">
 </head>
 <body>
@@ -251,6 +251,22 @@
                         <p class="cpm2-landing-note">Независимое сообщество игроков. METAIMPERIYA не является официальным проектом разработчиков CPM2.</p>
                     </section>
 
+                    <section class="cpm2-landing-story" aria-labelledby="cpm2LandingStoryTitle">
+                        <div class="cpm2-landing-story-copy">
+                            <span class="cpm2-landing-kicker">МЫ ТОЛЬКО НАЧИНАЕМ</span>
+                            <h2 id="cpm2LandingStoryTitle">Чтобы нужная машина не терялась в десятке чатов</h2>
+                            <p>Мы собираем игроков CPM2 в одном месте: здесь можно познакомиться, найти клан, выставить автомобиль на Sell или предложить обмен в Trade. Сообщество развивается вместе с игроками — новые разделы и возможности будем добавлять по мере роста.</p>
+                            <p class="cpm2-landing-story-aside">Знакомо: ищешь редкую машину, а нужное предложение уже утонуло в переписке? Мы хотим, чтобы такие предложения было проще найти и обсудить.</p>
+                        </div>
+                        <div class="cpm2-landing-howto">
+                            <h3>Как проходит сделка</h3>
+                            <article><span>01</span><div><strong>Найди или размести лот</strong><small>Выбери Sell для продажи или Trade для обмена.</small></div></article>
+                            <article><span>02</span><div><strong>Обсуди условия</strong><small>Свяжись с участником и согласуй передачу автомобиля в игре.</small></div></article>
+                            <article><span>03</span><div><strong>Подтверди комиссионную сделку</strong><small>Для лотов через комиссионный гараж администратор помогает подтвердить получение машины и начисление CPM2.</small></div></article>
+                            <small class="cpm2-landing-howto-note">Передача автомобиля выполняется игроками вручную в CPM2. Баланс CPM2 — внутренняя запись сайта.</small>
+                        </div>
+                    </section>
+
                     <section class="cpm2-landing-features" aria-label="Разделы сообщества">
                         <button type="button" class="cpm2-landing-feature" onclick="goToCpm2()"><span>01 · CPM2</span><strong>Игровое сообщество</strong><small>Общайся, публикуй новости и находи игроков.</small></button>
                         <button type="button" class="cpm2-landing-feature" onclick="goToCpm2()"><span>02 · АВТОРЫНОК</span><strong>Объявления и обмен</strong><small>Площадка для предложений о продаже и обмене автомобилей.</small></button>
@@ -259,8 +275,8 @@
                     </section>
 
                     <section class="cpm2-landing-economy" aria-labelledby="cpm2LandingEconomyTitle">
-                        <div class="cpm2-landing-economy-copy"><span class="cpm2-landing-kicker">💲 CPM2 · ИГРОВАЯ ЭКОНОМИКА</span><h2 id="cpm2LandingEconomyTitle">Рынок автомобилей и клановый баланс</h2><p>Публикуй Sell и Trade, договаривайся о редких автомобилях и веди расчёты внутренними CPM2-единицами. Клановый баланс помогает учитывать крупные игровые сделки, когда прямого перевода в игре не хватает.</p><div class="cpm2-landing-economy-actions"><button type="button" onclick="goToCpm2Market('sell')">Смотреть Sell</button><button type="button" onclick="goToCpm2Market('trade')">Смотреть Trade</button><button type="button" class="cpm2-landing-economy-link" onclick="goToCpm2()">Мой CPM2-баланс →</button></div></div>
-                        <aside class="cpm2-landing-economy-note"><strong>Как устроены игровые сделки</strong><p>Участники согласуют условия и передают автомобиль в игре вручную. CPM2-баланс служит записью расчётов на сайте и сам по себе не передаёт автомобиль.</p><p>Администратор клана помогает согласовать обмен и зафиксировать его этапы. Клановый банк и накопления с игровым процентом — следующий этап разработки.</p></aside>
+                        <div class="cpm2-landing-economy-copy"><span class="cpm2-landing-kicker">💲 CPM2 · ИГРОВАЯ ЭКОНОМИКА</span><h2 id="cpm2LandingEconomyTitle">Sell, Trade и расчёты в CPM2</h2><p>Размещай игровые автомобили на Sell, предлагай обмен в Trade и находи покупателей в сообществе. В комиссионной сделке администратор подтверждает получение машины в игре и начисляет продавцу внутренние CPM2-единицы.</p><div class="cpm2-landing-economy-actions"><button type="button" onclick="goToCpm2Market('sell')">Смотреть Sell</button><button type="button" onclick="goToCpm2Market('trade')">Смотреть Trade</button><button type="button" class="cpm2-landing-economy-link" onclick="goToCpm2()">Мой CPM2-баланс →</button></div></div>
+                        <aside class="cpm2-landing-economy-note"><strong>Передача машины — в игре</strong><p>Покупатель и продавец договариваются об условиях, а автомобиль передают вручную в Car Parking Multiplayer 2.</p><p>CPM2-баланс фиксирует игровые расчёты на сайте и не является реальными деньгами или автоматической передачей автомобиля.</p></aside>
                     </section>
 
                     <section class="cpm2-landing-discussion">
@@ -615,10 +631,10 @@
                     <div class="cpm2-garage-submit" id="cpm2GarageSubmit" hidden>
                         <button type="button" class="cpm2-garage-form-toggle" id="cpm2GarageFormToggle" aria-expanded="false" aria-controls="cpm2GarageFormBody" onclick="window.toggleCpm2GarageForm()">＋ Подать автомобиль на комиссию</button>
                         <div id="cpm2GarageFormBody" hidden>
-                        <strong>Передать автомобиль на комиссию</strong>
-                        <p>Создай заявку и свяжись с администратором. После фактического получения машины в игре он подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в этом гараже, в Sell/Trade и общей ленте.</p>
-                        <div class="cpm2-garage-form"><label>Твой ID игрока в CPM2<input id="cpm2GarageGameId" maxlength="80" autocomplete="off" placeholder="ID, по которому тебя найти в игре"></label><label>Модель автомобиля<input id="cpm2GarageTitle" maxlength="80" placeholder="Например, Ferrari SF90"></label><label>Условия<select id="cpm2GarageMode"><option value="sell">Продажа за CPM2</option><option value="trade">Обмен</option></select></label><label>Цена / оценка в CPM2<input id="cpm2GaragePrice" type="number" min="1" max="1000000000000" step="1" placeholder="Например, 5000000"></label><label>На что меняешь (для Trade)<input id="cpm2GarageTradeFor" maxlength="160" placeholder="Модель или условия обмена"></label><label>Страна<input id="cpm2GarageCountry" maxlength="80" placeholder="Страна"></label><label>Город<input id="cpm2GarageCity" maxlength="80" placeholder="Город"></label><label>Фото по ссылке<input id="cpm2GarageImage" type="url" maxlength="2048" placeholder="https://…"></label><label>Или загрузи фото<input id="cpm2GarageImageFile" type="file" accept="image/*"></label><label>Описание<textarea id="cpm2GarageDescription" maxlength="1000" placeholder="Состояние, комплектация, условия"></textarea></label></div>
-                        <p class="cpm2-garage-contact">После подачи заявки напиши администратору в <a href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Telegram</a>, чтобы согласовать передачу автомобиля в CPM2.</p>
+                        <strong id="cpm2GarageFormHeading">Передать автомобиль на комиссию</strong>
+                        <p id="cpm2GarageFormDescription">Создай заявку и свяжись с администратором. После фактического получения машины в игре он подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в этом гараже, в Sell/Trade и общей ленте.</p>
+                        <div class="cpm2-garage-form"><label id="cpm2GarageGameIdLabel">Твой ID игрока в CPM2<input id="cpm2GarageGameId" maxlength="80" autocomplete="off" placeholder="ID, по которому тебя найти в игре"></label><label>Модель автомобиля<input id="cpm2GarageTitle" maxlength="80" placeholder="Например, Ferrari SF90"></label><label>Условия<select id="cpm2GarageMode"><option value="sell">Продажа за CPM2</option><option value="trade">Обмен</option></select></label><label>Цена / оценка в CPM2<input id="cpm2GaragePrice" type="number" min="1" max="1000000000000" step="1" placeholder="Например, 5000000"></label><label>На что меняешь (для Trade)<input id="cpm2GarageTradeFor" maxlength="160" placeholder="Модель или условия обмена"></label><label>Страна<input id="cpm2GarageCountry" maxlength="80" placeholder="Страна"></label><label>Город<input id="cpm2GarageCity" maxlength="80" placeholder="Город"></label><label>Фото по ссылке<input id="cpm2GarageImage" type="url" maxlength="2048" placeholder="https://…"></label><label>Или загрузи фото<input id="cpm2GarageImageFile" type="file" accept="image/*"></label><label>Описание<textarea id="cpm2GarageDescription" maxlength="1000" placeholder="Состояние, комплектация, условия"></textarea></label></div>
+                        <p class="cpm2-garage-contact" id="cpm2GarageContact">После подачи заявки напиши администратору в <a href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Telegram</a>, чтобы согласовать передачу автомобиля в CPM2.</p>
                         <button type="button" id="cpm2GarageSubmitButton" onclick="window.submitCpm2GarageCar()">Отправить на модерацию</button><div id="cpm2GarageFeedback" role="status" aria-live="polite"></div>
                         </div>
                     </div>
@@ -1068,7 +1084,7 @@
 <script src="js/features/referrals.js?v=1.3"></script>
 <script src="js/features/ambassador-game-demo.js?v=1.8"></script>
 <script src="js/features/profile.js?v=5.1"></script>
-<script src="js/features/cpm2-garage.js?v=1.1"></script>
+<script src="js/features/cpm2-garage.js?v=1.2"></script>
 <script src="js/features/telegram-link.js?v=1.1"></script>
 <script src="js/features/reputation.js?v=1.2"></script>
 <script src="js/features/friends.js?v=3.5"></script>

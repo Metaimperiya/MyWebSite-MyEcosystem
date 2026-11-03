@@ -20,6 +20,18 @@
 .cpm2-landing-search-terms{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
 .cpm2-landing-search-terms span{padding:5px 9px;border:1px solid var(--border-color);border-radius:999px;background:color-mix(in srgb,var(--card-bg) 88%,transparent);color:var(--text-secondary);font-size:.63rem;font-weight:650}
 .cpm2-landing-note{margin:16px 0 0;color:var(--text-secondary);font-size:.67rem;line-height:1.5}
+.cpm2-landing-story{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(250px,.85fr);gap:16px;margin:13px 0;padding:clamp(17px,3.5vw,25px);border:1px solid var(--border-color);border-radius:18px;background:linear-gradient(135deg,var(--card-bg),color-mix(in srgb,#d7aa38 5%,var(--card-bg)));box-shadow:var(--shadow)}
+.cpm2-landing-story-copy h2{margin:7px 0 9px;font-size:clamp(1.12rem,3vw,1.45rem);line-height:1.25;letter-spacing:-.025em}
+.cpm2-landing-story-copy>p{margin:0;color:var(--text-secondary);font-size:.77rem;line-height:1.65}
+.cpm2-landing-story-copy .cpm2-landing-story-aside{margin-top:10px;padding:10px 12px;border-left:3px solid #d7aa38;border-radius:0 10px 10px 0;background:color-mix(in srgb,#d7aa38 8%,var(--card-bg));font-size:.72rem}
+.cpm2-landing-howto{padding:14px;border:1px solid color-mix(in srgb,var(--link-color) 18%,var(--border-color));border-radius:14px;background:color-mix(in srgb,var(--link-color) 3%,var(--card-bg))}
+.cpm2-landing-howto h3{margin:0 0 10px;font-size:.86rem}
+.cpm2-landing-howto article{display:flex;align-items:flex-start;gap:9px;margin:9px 0}
+.cpm2-landing-howto article>span{display:grid;flex:0 0 27px;height:27px;place-items:center;border-radius:9px;background:color-mix(in srgb,var(--link-color) 12%,var(--card-bg));color:var(--link-color);font-size:.63rem;font-weight:850}
+.cpm2-landing-howto article div{display:grid;gap:3px}
+.cpm2-landing-howto article strong{font-size:.7rem}
+.cpm2-landing-howto article small,.cpm2-landing-howto-note{color:var(--text-secondary);font-size:.63rem;line-height:1.5}
+.cpm2-landing-howto-note{display:block;margin-top:11px;padding-top:9px;border-top:1px solid var(--border-color)}
 .cpm2-landing-features{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:13px 0}
 .cpm2-landing-feature{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px solid var(--border-color);border-radius:15px;background:var(--card-bg);color:var(--text-color);text-align:left;cursor:pointer;box-shadow:var(--shadow);transition:border-color .16s ease,transform .16s ease}
 .cpm2-landing-feature:hover{transform:translateY(-2px);border-color:var(--link-color)}
@@ -90,7 +102,7 @@
 .marketplace-deal-mode select,.marketplace-deal-mode input{width:100%;padding:9px 10px;border:1px solid var(--border-color);border-radius:9px;background:var(--card-bg);color:var(--text-color);font:inherit}
 .landing-feed-enter{animation:landing-feed-enter .44s cubic-bezier(.2,.75,.25,1) both}
 @keyframes landing-feed-enter{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:640px){.cpm2-landing-economy{grid-template-columns:1fr;gap:10px}.cpm2-landing-economy-note{padding:11px}}
+@media(max-width:640px){.cpm2-landing-story{grid-template-columns:1fr;gap:11px}.cpm2-landing-economy{grid-template-columns:1fr;gap:10px}.cpm2-landing-economy-note{padding:11px}}
 @media(max-width:520px){.cpm2-landing{padding-top:4px}.cpm2-landing-hero{border-radius:17px}.cpm2-landing-features{gap:8px}.cpm2-landing-feature{padding:13px}.cpm2-landing-feature strong{font-size:.82rem}.cpm2-landing-feature small{font-size:.66rem}.cpm2-market-showcase{padding:12px;border-radius:15px}.cpm2-market-heading{align-items:flex-start}.cpm2-market-heading p{max-width:230px;line-height:1.4}.cpm2-market-tabs button{padding:8px 4px;font-size:.62rem}.cpm2-market-card{flex-basis:180px;min-height:116px}.cpm2-landing-economy-actions{gap:6px}.cpm2-landing-economy-actions button{padding:8px 9px;font-size:.64rem}}
 @media(max-width:360px){.cpm2-landing-features{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.landing-feed-enter{animation:none}.cpm2-landing-actions button,.cpm2-landing-feature{transition:none}}
