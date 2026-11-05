@@ -2,6 +2,13 @@
 /* PLAYER — ПЛЕЕР (БЕЗ ГИФОК) */
 /* ================================================================ */
 
+.player-handle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;padding:12px 24px;border:0;border-radius:12px;background:linear-gradient(135deg,#1877f2,#4a9eff);box-shadow:0 4px 16px #1877f259;color:#fff;cursor:pointer;font-size:.9rem;font-weight:700;letter-spacing:.5px;user-select:none}
+.player-handle:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.player-handle .handle-icon,.player-handle .handle-arrow{font-size:1rem}
+.player-handle .handle-arrow{transition:transform .2s ease}
+.player-handle .handle-arrow.open{transform:rotate(180deg)}
+.player-handle:focus-visible{outline:3px solid #d7aa38;outline-offset:2px}
+
 .player-drawer {
     position: relative;
     z-index: 10;

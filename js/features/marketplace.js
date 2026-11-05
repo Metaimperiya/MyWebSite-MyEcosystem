@@ -325,7 +325,9 @@ function openMarketplaceDetail(id) {
     var isOwner = item.sellerUid === USER_UID;
     var subdetails = item.kind === 'realestate'
         ? '<div class="marketplace-detail-facts"><span>' + marketEscape(item.dealType || '') + '</span><span>' + marketEscape(item.propertyType || '') + '</span>' + (item.rooms ? '<span>' + marketEscape(item.rooms) + ' комнат</span>' : '') + (item.area ? '<span>' + marketEscape(item.area) + '</span>' : '') + '</div>' : '';
-    content.innerHTML = (image ? '<img class="marketplace-detail-image" src="' + marketEscape(image) + '" alt="">' : '') + '<span class="marketplace-card-category">' + marketEscape(item.category) + '</span><h2>' + marketEscape(item.title) + '</h2><strong class="marketplace-detail-price">' + (item.price ? marketEscape(item.price) + ' ' + marketEscape(item.currency) : 'Цена по договорённости') + '</strong><p class="marketplace-card-location">📍 ' + marketEscape(item.city) + ', ' + marketEscape(item.country) + '</p>' + subdetails + '<p class="marketplace-detail-description">' + marketEscape(item.description).replace(/\n/g, '<br>') + '</p>' + (isOwner ? '<div class="marketplace-detail-actions"><button class="marketplace-primary" type="button" data-detail-edit="' + marketEscape(id) + '">Изменить</button><button class="marketplace-secondary" type="button" data-detail-archive="' + marketEscape(id) + '">Снять с публикации</button></div>' : '<button class="marketplace-primary" type="button" data-contact-seller="' + marketEscape(item.sellerUid) + '">Связаться с продавцом</button>');
+    var currentAdmins = typeof ADMIN_UIDS !== 'undefined' ? ADMIN_UIDS : [];
+    var canTelegramShare = !!USER_UID && currentAdmins.indexOf(USER_UID) !== -1 && item.cpm2Broker === true;
+    content.innerHTML = (image ? '<img class="marketplace-detail-image" src="' + marketEscape(image) + '" alt="">' : '') + '<span class="marketplace-card-category">' + marketEscape(item.category) + '</span><h2>' + marketEscape(item.title) + '</h2><strong class="marketplace-detail-price">' + (item.price ? marketEscape(item.price) + ' ' + marketEscape(item.currency) : 'Цена по договорённости') + '</strong><p class="marketplace-card-location">📍 ' + marketEscape(item.city) + ', ' + marketEscape(item.country) + '</p>' + subdetails + '<p class="marketplace-detail-description">' + marketEscape(item.description).replace(/\n/g, '<br>') + '</p>' + (isOwner ? '<div class="marketplace-detail-actions"><button class="marketplace-primary" type="button" data-detail-edit="' + marketEscape(id) + '">Изменить</button><button class="marketplace-secondary" type="button" data-detail-archive="' + marketEscape(id) + '">Снять с публикации</button></div>' : '<button class="marketplace-primary" type="button" data-contact-seller="' + marketEscape(item.sellerUid) + '">Связаться с продавцом</button>') + (canTelegramShare ? '<button class="marketplace-secondary" type="button" data-telegram-share="' + marketEscape(id) + '">Поделиться в Telegram</button>' : '');
     document.getElementById('marketplaceDetailModal').classList.add('open');
     var edit = content.querySelector('[data-detail-edit]');
     if (edit) edit.onclick = function() { closeMarketplaceDetail(); openMarketplaceListing(id); };
@@ -333,6 +335,12 @@ function openMarketplaceDetail(id) {
     if (archive) archive.onclick = function() { archiveMarketplaceListing(id); };
     var contact = content.querySelector('[data-contact-seller]');
     if (contact) contact.onclick = function() { closeMarketplaceDetail(); if (typeof viewUserProfile === 'function') viewUserProfile(item.sellerUid); };
+    var share = content.querySelector('[data-telegram-share]');
+    if (share) share.onclick = function() {
+        var deal = item.dealMode === 'trade' ? 'TRADE · Ищет: ' + (item.tradeFor || 'предложения') : 'SELL · ' + (item.price || 'Цена по договорённости') + ' CPM2';
+        var message = [item.title, deal, (item.city || '') + ', ' + (item.country || ''), item.description || '', 'Каталог CPM2: ' + location.origin + '/?page=marketplace'].filter(Boolean).join('\n');
+        window.open('https://t.me/share/url?url=' + encodeURIComponent(location.origin + '/?page=marketplace') + '&text=' + encodeURIComponent(message), '_blank', 'noopener,noreferrer');
+    };
 }
 
 function archiveMarketplaceListing(id) {

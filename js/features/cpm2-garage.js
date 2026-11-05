@@ -20,6 +20,7 @@
         var formHeading = document.getElementById('cpm2GarageFormHeading');
         var formDescription = document.getElementById('cpm2GarageFormDescription');
         var formContact = document.getElementById('cpm2GarageContact');
+        var telegramOption = document.getElementById('cpm2GarageTelegramOptIn');
         var submitButton = document.getElementById('cpm2GarageSubmitButton');
         var gameIdLabel = document.getElementById('cpm2GarageGameIdLabel');
         var list = document.getElementById('cpm2GarageList');
@@ -30,11 +31,12 @@
         if (formToggle) formToggle.textContent = adminFormMode ? '＋ Выставить машину от администрации' : '＋ Подать автомобиль на комиссию';
         if (formHeading) formHeading.textContent = adminFormMode ? 'Новое объявление администрации' : 'Передать автомобиль на комиссию';
         if (formDescription) formDescription.textContent = adminFormMode
-            ? 'Добавь лот администрации сразу в Sell или Trade. Он появится в профиле, на рынке, в ленте и в Telegram без очереди модерации и без начисления CPM2 продавцу.'
-            : 'Создай заявку и свяжись с администратором. После фактического получения машины в игре он подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в этом гараже, в Sell/Trade и общей ленте.';
+            ? 'Добавь лот администрации сразу в Sell или Trade. Он появится в профиле, на рынке и в ленте без очереди модерации и без начисления CPM2 продавцу.'
+            : 'Подай автомобиль на модерацию. После фактического получения машины в игре администрация подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в гараже, Sell/Trade и общей ленте.';
+        if (telegramOption && telegramOption.parentElement) telegramOption.parentElement.hidden = adminFormMode;
         if (formContact) formContact.innerHTML = adminFormMode
             ? 'Игровой ID укажи для связи по сделке. Передача автомобиля покупателю всё равно подтверждается вручную в CPM2.'
-            : 'После подачи заявки напиши администратору в <a href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Telegram</a>, чтобы согласовать передачу автомобиля в CPM2.';
+            : 'Telegram подключать не обязательно. Для передачи автомобиля после подачи заявки свяжись с администрацией через сайт.';
         if (submitButton) submitButton.textContent = adminFormMode ? 'Опубликовать объявление' : 'Отправить на модерацию';
         if (gameIdLabel) gameIdLabel.firstChild.textContent = adminFormMode ? 'Игровой ID CPM2 для связи' : 'Твой ID игрока в CPM2';
         if (formBody) formBody.hidden = true;
@@ -127,6 +129,7 @@
         var countryInfo = typeof datingCountryCode === 'function' ? datingCountryCode(countryText) : null;
         var feedback = document.getElementById('cpm2GarageFeedback');
         var button = document.getElementById('cpm2GarageSubmitButton');
+        var telegramOptIn = !!document.getElementById('cpm2GarageTelegramOptIn') && document.getElementById('cpm2GarageTelegramOptIn').checked;
         if (!USER_UID) { if (feedback) feedback.textContent = 'Войди в аккаунт, чтобы подать заявку.'; return; }
         if (gameId.length < 1 || gameId.length > 80) { if (feedback) feedback.textContent = 'Укажи свой игровой ID CPM2 — по нему администратор найдёт тебя в игре.'; return; }
         if (title.length < 2 || !description || !Number.isSafeInteger(price) || price < 1 || price > 1000000000000) { if (feedback) feedback.textContent = 'Укажи модель, описание машины и целую цену в CPM2.'; return; }
@@ -134,6 +137,7 @@
         if (imageUrl && !/^https?:\/\//i.test(imageUrl)) { if (feedback) feedback.textContent = 'Ссылка на фото должна начинаться с https:// или http://.'; return; }
         if (imageFile && (!imageFile.type.match(/^image\//i) || imageFile.size >= 5 * 1024 * 1024)) { if (feedback) feedback.textContent = 'Выбери изображение размером меньше 5 МБ.'; return; }
         if (dealMode === 'trade' && !tradeFor) { if (feedback) feedback.textContent = 'Для обмена напиши, что ищешь.'; return; }
+        function continueSubmission() {
         button.disabled = true;
         if (isAdmin() && profileUid === USER_UID) {
             publishAdminCpm2Car({ title: title, gameId: gameId, price: price, imageUrl: imageUrl, imageFile: imageFile, description: description, dealMode: dealMode, tradeFor: tradeFor, country: countryInfo.name, countryCode: countryInfo.code, city: city }, button, feedback);
@@ -144,7 +148,7 @@
             ? storage.ref('cpm2-garage-photos/' + USER_UID + '/' + ref.key + '/main').put(imageFile, { contentType: imageFile.type }).then(function(snapshot) { return snapshot.ref.getDownloadURL(); })
             : Promise.resolve(imageUrl);
         imagePromise.then(function(savedImageUrl) {
-            return ref.set({ sellerUid: USER_UID, sellerName: typeof USER !== 'undefined' ? USER : '', gameId: gameId, title: title, description: description, imageUrl: savedImageUrl, price: price, creditAmount: price, dealMode: dealMode, tradeFor: tradeFor, country: countryInfo.name, countryCode: countryInfo.code, city: city, status: 'pending', createdAt: Date.now() });
+            return ref.set({ sellerUid: USER_UID, sellerName: typeof USER !== 'undefined' ? USER : '', gameId: gameId, title: title, description: description, imageUrl: savedImageUrl, price: price, creditAmount: price, dealMode: dealMode, tradeFor: tradeFor, country: countryInfo.name, countryCode: countryInfo.code, city: city, telegramSync: telegramOptIn, status: 'pending', createdAt: Date.now() });
         })
             .then(function() {
                 document.getElementById('cpm2GarageTitle').value = '';
@@ -153,10 +157,29 @@
                 document.getElementById('cpm2GarageImage').value = '';
                 document.getElementById('cpm2GarageImageFile').value = '';
                 document.getElementById('cpm2GarageDescription').value = '';
-                if (feedback) feedback.innerHTML = 'Заявка отправлена на модерацию. Напиши админу в <a href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Telegram</a>, чтобы согласовать передачу машины в игре.';
+                var optIn = document.getElementById('cpm2GarageTelegramOptIn');
+                if (optIn) optIn.checked = false;
+                if (feedback) feedback.textContent = 'Заявка отправлена на модерацию. Подключение Telegram не требуется.';
                 loadProfile(USER_UID);
             }).catch(function(error) { if (feedback) feedback.textContent = error.code === 'storage/unauthorized' || error.code === 'storage/bucket-not-found' ? 'Не удалось загрузить фото в текущий Firebase Storage. Укажи прямую ссылку или проверь Storage Rules.' : 'Не удалось отправить заявку: ' + (error.message || 'проверь Database Rules'); })
             .finally(function() { button.disabled = false; });
+        }
+        if (telegramOptIn && !(isAdmin() && profileUid === USER_UID)) {
+            button.disabled = true;
+            root('telegram_links/' + USER_UID).once('value').then(function(snapshot) {
+                if (!snapshot.exists()) {
+                    if (feedback) feedback.innerHTML = 'Чтобы отправить объявление в Telegram, сначала <a href="#" onclick="openPage(\'telegram\');return false;">подключи Telegram</a>. Или сними галочку и размести объявление только на сайте.';
+                    button.disabled = false;
+                    return;
+                }
+                continueSubmission();
+            }).catch(function(error) {
+                if (feedback) feedback.textContent = 'Не удалось проверить Telegram. Сними галочку, чтобы отправить объявление только на сайт.';
+                button.disabled = false;
+            });
+            return;
+        }
+        continueSubmission();
     };
 
     function publishAdminCpm2Car(form, button, feedback) {
@@ -168,7 +191,7 @@
             : Promise.resolve(form.imageUrl);
         imagePromise.then(function(savedImageUrl) {
             var item = { sellerUid: USER_UID, sellerName: typeof USER !== 'undefined' ? USER : 'Администрация', gameId: form.gameId, title: form.title, description: form.description, imageUrl: savedImageUrl, price: form.price, creditAmount: form.price, dealMode: form.dealMode, tradeFor: form.tradeFor, country: form.country, countryCode: form.countryCode, city: form.city, status: 'accepted', createdAt: now, publishedAt: now, reviewedAt: now, reviewedBy: USER_UID, marketplaceListingId: listingId, source: 'admin' };
-            var listing = { kind: 'goods', category: 'Авто и запчасти', title: item.title, description: item.description, price: String(item.price), currency: 'CPM2', country: item.country, countryCode: item.countryCode, city: item.city, imageUrl: item.imageUrl, sellerUid: USER_UID, authorUid: USER_UID, submissionId: submissionRef.key, createdAt: now, isActive: true, cpm2Broker: true, moderationStatus: 'approved', brokerStatus: 'in_stock', brokerCreditAmount: item.creditAmount, dealMode: item.dealMode, tradeFor: item.tradeFor, telegramSync: true, source: 'admin', gameId: item.gameId, telegramContact: '' };
+            var listing = { kind: 'goods', category: 'Авто и запчасти', title: item.title, description: item.description, price: String(item.price), currency: 'CPM2', country: item.country, countryCode: item.countryCode, city: item.city, imageUrl: item.imageUrl, sellerUid: USER_UID, authorUid: USER_UID, submissionId: submissionRef.key, createdAt: now, isActive: true, cpm2Broker: true, moderationStatus: 'approved', brokerStatus: 'in_stock', brokerCreditAmount: item.creditAmount, dealMode: item.dealMode, tradeFor: item.tradeFor, telegramSync: false, source: 'admin', gameId: item.gameId, telegramContact: '' };
             var inventory = { title: item.title, description: item.description, imageUrl: item.imageUrl, sellerUid: USER_UID, sellerName: item.sellerName, price: item.price, creditAmount: item.creditAmount, dealMode: item.dealMode, tradeFor: item.tradeFor, isAvailable: true, createdAt: now, acceptedAt: now, acceptedBy: USER_UID };
             var feedPost = { authorUid: USER_UID, author: item.sellerName, text: (item.dealMode === 'trade' ? 'Администрация выставила машину на Trade: ' : 'Администрация выставила машину на Sell: ') + item.title, timestamp: now, sharedEntity: { kind: 'marketplace_listing', id: listingId, title: item.title, description: (item.dealMode === 'trade' ? 'TRADE · Ищет: ' + (item.tradeFor || 'предложения') : 'SELL · ' + money(item.price) + ' CPM2') + ' · ' + item.city + ', ' + item.country, image: item.imageUrl } };
             return submissionRef.set(item)
@@ -275,7 +298,7 @@
                 ? '<label>Начислить при приёмке <input type="number" min="1" max="1000000000000" step="1" value="' + Number(item.creditAmount || item.price || 0) + '" data-garage-credit="' + esc(uidKey(item.sellerUid, item.id)) + '"> CPM2</label><div><button type="button" data-garage-accept="' + esc(uidKey(item.sellerUid, item.id)) + '">Машину получил · начислить</button><button type="button" class="secondary" data-garage-reject="' + esc(uidKey(item.sellerUid, item.id)) + '">Отклонить</button></div>'
                 : resumed ? '<p>Машина принята и баланс начислен. Можно завершить публикацию в Sell и ленте.</p><input type="hidden" value="' + Number(item.creditAmount || item.price || 0) + '" data-garage-credit="' + esc(uidKey(item.sellerUid, item.id)) + '"><div><button type="button" data-garage-accept="' + esc(uidKey(item.sellerUid, item.id)) + '">Завершить публикацию</button></div>'
                 : '<p class="cpm2-garage-admin-status">Статус: ' + status + (item.reviewNote ? ' · ' + esc(item.reviewNote) : '') + '</p>';
-            return '<article class="cpm2-garage-admin-row">' + image + '<div><strong>' + esc(item.title) + (item.dealMode === 'trade' ? ' · TRADE' : ' · SELL') + '</strong><p>' + esc(item.sellerName) + ' · UID сайта: ' + esc(item.sellerUid) + (item.source === 'telegram' ? ' · Заявка из Telegram' : '') + '</p><p class="cpm2-game-player-id"><strong>ID игрока CPM2: ' + esc(item.gameId || 'не указан в этой заявке') + '</strong></p>' + (item.telegramContact ? '<p>Контакт Telegram: ' + esc(item.telegramContact) + '</p>' : '') + '<p>' + esc(item.city || '') + ', ' + esc(item.country || '') + ' · ' + esc(item.description || 'Без описания') + '</p>' + actions + '</div></article>';
+            return '<article class="cpm2-garage-admin-row">' + image + '<div><strong>' + esc(item.title) + (item.dealMode === 'trade' ? ' · TRADE' : ' · SELL') + '</strong><p>' + esc(item.sellerName) + ' · UID сайта: ' + esc(item.sellerUid) + (item.source === 'telegram' ? ' · Заявка из Telegram' : '') + '</p><p>Telegram: ' + (item.telegramSync === true ? 'запрошена публикация' : 'только сайт') + '</p><p class="cpm2-game-player-id"><strong>ID игрока CPM2: ' + esc(item.gameId || 'не указан в этой заявке') + '</strong></p>' + (item.telegramContact ? '<p>Контакт Telegram: ' + esc(item.telegramContact) + '</p>' : '') + '<p>' + esc(item.city || '') + ', ' + esc(item.country || '') + ' · ' + esc(item.description || 'Без описания') + '</p>' + actions + '</div></article>';
         }).join('') : '<div class="cpm2-garage-empty">Новых заявок на приёмку нет.</div>';
         if (orderList) {
             var activeOrders = Object.keys(orders).map(function(id) { return Object.assign({ id: id }, orders[id] || {}); }).filter(function(order) { return order.status === 'paid_waiting_delivery' || order.status === 'trade_offer' || order.status === 'trade_waiting_delivery'; });
@@ -317,7 +340,7 @@
                 var now = Date.now();
                 var listingId = item.marketplaceListingId || ('cpm2_' + pair.uid + '_' + pair.id);
                 var effectiveCredit = item.status === 'pending' ? amount : Number(item.creditAmount || amount);
-                var listing = { kind: 'goods', category: 'Авто и запчасти', title: item.title, description: item.description || '', price: String(item.price), currency: 'CPM2', country: item.country, countryCode: item.countryCode, city: item.city, imageUrl: item.imageUrl || '', sellerUid: pair.uid, authorUid: pair.uid, submissionId: pair.id, createdAt: item.createdAt, isActive: true, cpm2Broker: true, moderationStatus: 'approved', brokerStatus: 'in_stock', brokerCreditAmount: effectiveCredit, dealMode: item.dealMode === 'trade' ? 'trade' : 'sell', tradeFor: item.tradeFor || '', telegramSync: true, source: item.source === 'telegram' ? 'telegram' : 'website', gameId: item.gameId || '', telegramContact: item.telegramContact || '' };
+                var listing = { kind: 'goods', category: 'Авто и запчасти', title: item.title, description: item.description || '', price: String(item.price), currency: 'CPM2', country: item.country, countryCode: item.countryCode, city: item.city, imageUrl: item.imageUrl || '', sellerUid: pair.uid, authorUid: pair.uid, submissionId: pair.id, createdAt: item.createdAt, isActive: true, cpm2Broker: true, moderationStatus: 'approved', brokerStatus: 'in_stock', brokerCreditAmount: effectiveCredit, dealMode: item.dealMode === 'trade' ? 'trade' : 'sell', tradeFor: item.tradeFor || '', telegramSync: item.telegramSync === true, source: item.source === 'telegram' ? 'telegram' : 'website', gameId: item.gameId || '', telegramContact: item.telegramContact || '' };
                 var inventoryRef = root('cpm2_garage_inventory').child(listingId);
                 var listingRef = root('marketplace_listings/' + listingId);
                 var feedRef = root('feed_posts/' + listingId);

@@ -4,9 +4,9 @@
 
 var currentTrack = 0;
 var playlist = [
-    { name: 'Давай замутим', file: 'music/davay-zamutim-chto-my-s-toboy-zamutim.mp3' },
-    { name: 'Google Maps накрутка', file: 'music/google-maps-nakrutka.mp3' },
-    { name: 'SPA Web Development', file: 'music/spa-web-development.mp3' }
+    { name: 'Давай замутим', file: '/music/davay-zamutim-chto-my-s-toboy-zamutim.mp3' },
+    { name: 'Google Maps накрутка', file: '/music/google-maps-nakrutka.mp3' },
+    { name: 'SPA Web Development', file: '/music/spa-web-development.mp3' }
 ];
 
 var audio = new Audio();
@@ -70,6 +70,9 @@ window.playPrev = function() {
     var prev = (currentTrack - 1 + playlist.length) % playlist.length;
     playTrack(prev);
 };
+
+window.nextTrack = window.playNext;
+window.prevTrack = window.playPrev;
 
 window.toggleDrawerPlaylist = function() {
     var playlistEl = document.getElementById('drawerPlaylist');
@@ -332,6 +335,23 @@ function updatePlayerUI() {
     });
 }
 
+function renderPlaylist() {
+    var playlistEl = document.getElementById('drawerPlaylist');
+    if (!playlistEl) return;
+    playlistEl.innerHTML = '';
+    playlist.forEach(function(track, index) {
+        var item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'playlist-item';
+        item.setAttribute('aria-current', index === currentTrack ? 'true' : 'false');
+        item.innerHTML = '<span class="pl-name"></span><span class="pl-index"></span>';
+        item.querySelector('.pl-name').textContent = track.name;
+        item.querySelector('.pl-index').textContent = String(index + 1).padStart(2, '0');
+        item.addEventListener('click', function() { playTrack(index); });
+        playlistEl.appendChild(item);
+    });
+}
+
 // ===== ПРОГРЕСС-БАР =====
 audio.addEventListener('timeupdate', function() {
     var progress = document.getElementById('drawerProgressFill');
@@ -349,6 +369,16 @@ audio.addEventListener('timeupdate', function() {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    var progressWrap = document.getElementById('progressWrap');
+    if (progressWrap) progressWrap.addEventListener('click', function(event) {
+        if (!audio.duration) return;
+        var bounds = progressWrap.getBoundingClientRect();
+        var ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
+        audio.currentTime = ratio * audio.duration;
+    });
+});
+
 audio.addEventListener('ended', function() {
     isPlaying = false;
     updatePlayerUI();
@@ -362,6 +392,8 @@ window.toggleDrawer = function() {
     drawer.classList.toggle('open');
     if (handle) {
         var label = handle.querySelector('.handle-label');
+        var arrow = document.getElementById('handleArrow');
+        if (arrow) arrow.classList.toggle('open', drawer.classList.contains('open'));
         if (label) {
             label.textContent = drawer.classList.contains('open') ? '🎵 СВЕРНУТЬ' : '🎵 ПЛЕЕР';
         }
@@ -370,6 +402,7 @@ window.toggleDrawer = function() {
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', function() {
+    renderPlaylist();
     if (playlist.length > 0) {
         audio.src = playlist[0].file;
         audio.load();

@@ -1,42 +1,226 @@
 {
   "version": 2,
   "builds": [
-    { "src": "**/*.html", "use": "@vercel/static" },
-    { "src": "css/**/*", "use": "@vercel/static" },
-    { "src": "js/**/*", "use": "@vercel/static" },
-    { "src": "assets/**/*", "use": "@vercel/static" },
-    { "src": "music/**/*", "use": "@vercel/static" }
+    {
+      "src": "**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "css/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "js/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "music/**/*",
+      "use": "@vercel/static"
+    }
   ],
-    "rewrites": [
-    { "source": "/doss", "destination": "/doss/index.html" },
-    { "source": "/doss/:path*", "destination": "/doss/index.html" },
-    { "source": "/news/:slug*", "destination": "/content/article.html" },
-    { "source": "/video/:slug*", "destination": "/content/article.html" },
-    { "source": "/music/:slug*", "destination": "/content/article.html" },
-    { "source": "/games/:slug*", "destination": "/content/article.html" },
-    { "source": "/sport/:slug*", "destination": "/content/article.html" },
-    { "source": "/cinema/:slug*", "destination": "/content/article.html" },
-    { "source": "/programming/:slug*", "destination": "/content/article.html" },
-    { "source": "/business/:slug*", "destination": "/content/article.html" },
-    { "source": "/dating/:slug*", "destination": "/content/article.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "rewrites": [
+    {
+      "source": "/doss",
+      "destination": "/doss/index.html"
+    },
+    {
+      "source": "/doss/:path*",
+      "destination": "/doss/index.html"
+    },
+    {
+      "source": "/news/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/video/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/music/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/games/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/sport/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/cinema/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/programming/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/business/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/dating/:slug*",
+      "destination": "/content/article.html"
+    },
+    {
+      "source": "/en",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/en/",
+      "destination": "/en/index.html"
+    },
+    {
+      "source": "/tr",
+      "destination": "/tr/index.html"
+    },
+    {
+      "source": "/tr/",
+      "destination": "/tr/index.html"
+    },
+    {
+      "source": "/ar",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/ar/",
+      "destination": "/ar/index.html"
+    },
+    {
+      "source": "/es",
+      "destination": "/es/index.html"
+    },
+    {
+      "source": "/es/",
+      "destination": "/es/index.html"
+    },
+    {
+      "source": "/it",
+      "destination": "/it/index.html"
+    },
+    {
+      "source": "/it/",
+      "destination": "/it/index.html"
+    },
+    {
+      "source": "/de",
+      "destination": "/de/index.html"
+    },
+    {
+      "source": "/de/",
+      "destination": "/de/index.html"
+    },
+    {
+      "source": "/zh",
+      "destination": "/zh/index.html"
+    },
+    {
+      "source": "/zh/",
+      "destination": "/zh/index.html"
+    },
+    {
+      "source": "/ja",
+      "destination": "/ja/index.html"
+    },
+    {
+      "source": "/ja/",
+      "destination": "/ja/index.html"
+    },
+    {
+      "source": "/uk",
+      "destination": "/uk/index.html"
+    },
+    {
+      "source": "/uk/",
+      "destination": "/uk/index.html"
+    },
+    {
+      "source": "/hi",
+      "destination": "/hi/index.html"
+    },
+    {
+      "source": "/hi/",
+      "destination": "/hi/index.html"
+    },
+    {
+      "source": "/bn",
+      "destination": "/bn/index.html"
+    },
+    {
+      "source": "/bn/",
+      "destination": "/bn/index.html"
+    },
+    {
+      "source": "/ur",
+      "destination": "/ur/index.html"
+    },
+    {
+      "source": "/ur/",
+      "destination": "/ur/index.html"
+    },
+    {
+      "source": "/fa",
+      "destination": "/fa/index.html"
+    },
+    {
+      "source": "/fa/",
+      "destination": "/fa/index.html"
+    },
+    {
+      "source": "/he",
+      "destination": "/he/index.html"
+    },
+    {
+      "source": "/he/",
+      "destination": "/he/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
-        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin-allow-popups" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin-allow-popups"
+        }
       ]
     },
     {
       "source": "/(.*)\\.(js|css|png|jpg|jpeg|gif|svg|ico|webmanifest|mp3)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ]

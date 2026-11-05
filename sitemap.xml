@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://metaimperiya.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://metaimperiya.com/en/</loc></url>
+  <url><loc>https://metaimperiya.com/</loc></url>
+  <url><loc>https://metaimperiya.com/tr/</loc></url>
+  <url><loc>https://metaimperiya.com/ar/</loc></url>
+  <url><loc>https://metaimperiya.com/es/</loc></url>
+  <url><loc>https://metaimperiya.com/it/</loc></url>
+  <url><loc>https://metaimperiya.com/de/</loc></url>
+  <url><loc>https://metaimperiya.com/zh/</loc></url>
+  <url><loc>https://metaimperiya.com/ja/</loc></url>
+  <url><loc>https://metaimperiya.com/uk/</loc></url>
+  <url><loc>https://metaimperiya.com/hi/</loc></url>
+  <url><loc>https://metaimperiya.com/bn/</loc></url>
+  <url><loc>https://metaimperiya.com/ur/</loc></url>
+  <url><loc>https://metaimperiya.com/fa/</loc></url>
+  <url><loc>https://metaimperiya.com/he/</loc></url>
 </urlset>

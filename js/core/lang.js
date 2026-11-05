@@ -25,6 +25,8 @@ var languageLoadPromise = Promise.all(availableLanguages.map(loadLanguage)).then
 });
 var currentLang = (function() {
     try {
+        var requested = new URLSearchParams(window.location.search).get('lang');
+        if (availableLanguages.indexOf(requested) !== -1) return requested;
         var saved = localStorage.getItem('lang');
         return availableLanguages.indexOf(saved) !== -1 ? saved : 'en';
     } catch (error) { return 'en'; }

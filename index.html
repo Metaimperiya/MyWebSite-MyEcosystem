@@ -10,6 +10,24 @@
     <meta name="description" content="METAIMPERIYA — авторынок CPM2 (Car Parking Multiplayer 2): объявления о продаже, покупка и обмен авто. Buy &amp; Sell Cars, Car Trade, Car Exchange.">
     <meta name="keywords" content="CPM2, CPM 2, Car Parking Multiplayer 2, Car Parking 2, METAIMPERIYA, авторынок CPM2, объявления о продаже авто CPM2, продажа автомобилей CPM2, покупка авто CPM2, обмен авто CPM2, купля-продажа машин CPM2, Buy &amp; Sell Cars CPM2, Car Trade CPM2, Car Exchange CPM2, CPM2 car sale, CPM2 car trading">
     <link rel="canonical" href="https://metaimperiya.com/">
+  <!-- BEGIN GENERATED HREFLANG -->
+    <link rel="alternate" hreflang="en" href="https://metaimperiya.com/en/">
+    <link rel="alternate" hreflang="ru" href="https://metaimperiya.com/">
+    <link rel="alternate" hreflang="tr" href="https://metaimperiya.com/tr/">
+    <link rel="alternate" hreflang="ar" href="https://metaimperiya.com/ar/">
+    <link rel="alternate" hreflang="es" href="https://metaimperiya.com/es/">
+    <link rel="alternate" hreflang="it" href="https://metaimperiya.com/it/">
+    <link rel="alternate" hreflang="de" href="https://metaimperiya.com/de/">
+    <link rel="alternate" hreflang="zh-Hans" href="https://metaimperiya.com/zh/">
+    <link rel="alternate" hreflang="ja" href="https://metaimperiya.com/ja/">
+    <link rel="alternate" hreflang="uk" href="https://metaimperiya.com/uk/">
+    <link rel="alternate" hreflang="hi" href="https://metaimperiya.com/hi/">
+    <link rel="alternate" hreflang="bn" href="https://metaimperiya.com/bn/">
+    <link rel="alternate" hreflang="ur" href="https://metaimperiya.com/ur/">
+    <link rel="alternate" hreflang="fa" href="https://metaimperiya.com/fa/">
+    <link rel="alternate" hreflang="he" href="https://metaimperiya.com/he/">
+  <link rel="alternate" hreflang="x-default" href="https://metaimperiya.com/en/">
+  <!-- END GENERATED HREFLANG -->
 
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="CPM2 METAIMPERIYA">
@@ -28,6 +46,33 @@
     <meta name="twitter:description" content="METAIMPERIYA — авторынок CPM2 (Car Parking Multiplayer 2): объявления о продаже, покупка и обмен авто. Buy &amp; Sell Cars, Car Trade, Car Exchange.">
     <meta name="twitter:image" content="https://metaimperiya.com/assets/images/metaimperiya-com.png">
     <meta name="twitter:image:alt" content="METAIMPERIYA">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://metaimperiya.com/#organization",
+          "name": "METAIMPERIYA",
+          "url": "https://metaimperiya.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://metaimperiya.com/assets/images/metaimperiya-512x512.png"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://metaimperiya.com/#website",
+          "name": "CPM2 METAIMPERIYA",
+          "alternateName": "METAIMPERIYA",
+          "url": "https://metaimperiya.com/",
+          "inLanguage": "ru",
+          "publisher": { "@id": "https://metaimperiya.com/#organization" }
+        }
+      ]
+    }
+    </script>
 
     <link rel="icon" href="assets/icons/metaimperiya.ico" sizes="any">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/metaimperiya-16x16.png">
@@ -216,21 +261,22 @@
 
         <div class="panel-center">
 
+            <div class="player-handle" id="playerHandle" onclick="toggleDrawer()" role="button" tabindex="0" aria-controls="playerDrawer">
+                <span class="handle-icon">▶</span><span class="handle-label">🎵 ПЛЕЕР</span><span class="handle-arrow" id="handleArrow">▾</span>
+            </div>
             <div class="player-drawer" id="playerDrawer">
-                <div class="handle" onclick="toggleDrawer()">
-                    <div class="bar"></div> 🎵 PLAYER <div class="bar"></div>
-                </div>
                 <div class="content" id="playerContent">
-                    <div class="track-info"><div class="track-name" id="currentTrackName">Select a track</div></div>
-                    <div class="progress-wrap" id="progressWrap"><div class="progress-fill" id="progressFill"></div></div>
-                    <div class="time-wrap"><span id="currentTime">0:00</span><span id="totalTime">0:00</span></div>
+                    <div class="track-info"><div class="track-name" id="drawerTrackName">Выберите трек</div></div>
+                    <div class="progress-wrap" id="progressWrap"><div class="progress-fill" id="drawerProgressFill"></div></div>
+                    <div class="time-wrap"><span id="drawerCurrentTime">0:00</span><span id="drawerTotalTime">0:00</span></div>
                     <div class="controls">
-                        <button onclick="prevTrack()">⏮</button>
-                        <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
-                        <button onclick="nextTrack()">⏭</button>
-                        <button onclick="downloadCurrentTrack()">⬇️</button>
+                        <button type="button" onclick="playPrev()" aria-label="Предыдущий трек">⏮</button>
+                        <button type="button" class="play-btn" id="drawerPlayBtn" onclick="togglePlay()" aria-label="Воспроизвести или поставить на паузу">▶</button>
+                        <button type="button" onclick="playNext()" aria-label="Следующий трек">⏭</button>
+                        <button type="button" onclick="downloadCurrentTrack()" aria-label="Скачать трек">⬇️</button>
+                        <button type="button" onclick="openVisualizer()" aria-label="Открыть визуализатор">🎨</button>
                     </div>
-                    <div class="playlist" id="playlistContainer"></div>
+                    <div class="playlist" id="drawerPlaylist"></div>
                 </div>
             </div>
 
@@ -624,9 +670,10 @@
                         <button type="button" class="cpm2-garage-form-toggle" id="cpm2GarageFormToggle" aria-expanded="false" aria-controls="cpm2GarageFormBody" onclick="window.toggleCpm2GarageForm()">＋ Подать автомобиль на комиссию</button>
                         <div id="cpm2GarageFormBody" hidden>
                         <strong id="cpm2GarageFormHeading">Передать автомобиль на комиссию</strong>
-                        <p id="cpm2GarageFormDescription">Создай заявку и свяжись с администратором. После фактического получения машины в игре он подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в этом гараже, в Sell/Trade и общей ленте.</p>
+                        <p id="cpm2GarageFormDescription">Подай автомобиль на модерацию. После фактического получения машины в игре администрация подтвердит её и начислит CPM2 из резерва. Одобренный лот появится в гараже, Sell/Trade и общей ленте.</p>
                         <div class="cpm2-garage-form"><label id="cpm2GarageGameIdLabel">Твой ID игрока в CPM2<input id="cpm2GarageGameId" maxlength="80" autocomplete="off" placeholder="ID, по которому тебя найти в игре"></label><label>Модель автомобиля<input id="cpm2GarageTitle" maxlength="80" placeholder="Например, Ferrari SF90"></label><label>Условия<select id="cpm2GarageMode"><option value="sell">Продажа за CPM2</option><option value="trade">Обмен</option></select></label><label>Цена / оценка в CPM2<input id="cpm2GaragePrice" type="number" min="1" max="1000000000000" step="1" placeholder="Например, 5000000"></label><label>На что меняешь (для Trade)<input id="cpm2GarageTradeFor" maxlength="160" placeholder="Модель или условия обмена"></label><label>Страна<input id="cpm2GarageCountry" maxlength="80" placeholder="Страна"></label><label>Город<input id="cpm2GarageCity" maxlength="80" placeholder="Город"></label><label>Фото по ссылке<input id="cpm2GarageImage" type="url" maxlength="2048" placeholder="https://…"></label><label>Или загрузи фото<input id="cpm2GarageImageFile" type="file" accept="image/*"></label><label>Описание<textarea id="cpm2GarageDescription" maxlength="1000" placeholder="Состояние, комплектация, условия"></textarea></label></div>
-                        <p class="cpm2-garage-contact" id="cpm2GarageContact">После подачи заявки напиши администратору в <a href="https://t.me/METAIMPERIYA" target="_blank" rel="noopener noreferrer">Telegram</a>, чтобы согласовать передачу автомобиля в CPM2.</p>
+                        <label class="cpm2-garage-telegram-option"><input id="cpm2GarageTelegramOptIn" type="checkbox"> Хочу публикацию объявления в Telegram (нужно подключить Telegram)</label>
+                        <p class="cpm2-garage-contact" id="cpm2GarageContact">Telegram подключать не обязательно. Укажи корректный игровой ID CPM2, чтобы администрация могла найти тебя в игре.</p>
                         <button type="button" id="cpm2GarageSubmitButton" onclick="window.submitCpm2GarageCar()">Отправить на модерацию</button><div id="cpm2GarageFeedback" role="status" aria-live="polite"></div>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 {
-  "name": "METAIMPERIYA",
+  "name": "CPM2 METAIMPERIYA",
   "short_name": "METAIMPERIYA",
-  "description": "Социальная платформа нового поколения",
+  "description": "Авторынок Car Parking Multiplayer 2 (CPM2): объявления о продаже автомобилей, покупка и обмен авто.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1877f2",

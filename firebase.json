@@ -10,7 +10,7 @@
   },
   "hosting": {
     "predeploy": [
-      "node scripts/generate-content-pages.mjs"
+      "node scripts/generate-content-pages.mjs && node scripts/generate-localized-landing-pages.mjs"
     ],
     "public": ".",
     "ignore": [

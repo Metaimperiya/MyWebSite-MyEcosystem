@@ -5,8 +5,8 @@
   "main": "index.html",
   "scripts": {
     "start": "vercel dev",
-    "build": "node scripts/generate-content-pages.mjs && vercel build",
-    "deploy": "vercel --prod"
+    "build": "node scripts/generate-content-pages.mjs && node scripts/generate-localized-landing-pages.mjs && vercel build",
+    "deploy": "node scripts/generate-content-pages.mjs && node scripts/generate-localized-landing-pages.mjs && vercel --prod"
   },
   "keywords": ["social", "network", "firebase", "metaimperiya"],
   "author": "METAIMPERIYA",
