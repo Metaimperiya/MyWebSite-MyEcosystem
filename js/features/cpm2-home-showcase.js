@@ -10,6 +10,7 @@
     var featureLabels = { sell1: 'Sell · место 3', sell2: 'Sell · место 4', sell3: 'Sell · место 5', trade1: 'Trade · место 6', trade2: 'Trade · место 7' };
     var featureBlockNumbers = { sell1: 3, sell2: 4, sell3: 5, trade1: 6, trade2: 7 };
     var isAdminUser = function() { return !!USER_UID && typeof ADMIN_UIDS !== 'undefined' && ADMIN_UIDS.indexOf(USER_UID) !== -1; };
+    var localized = function(key, fallback) { return typeof window.t === 'function' ? window.t(key) : fallback; };
 
     function escape(value) {
         return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
@@ -37,7 +38,7 @@
 
     function emptySlot(section, title, description, slot) {
         section.hidden = false;
-        var inner = '<span aria-hidden="true">＋</span><strong>' + escape(title) + '</strong><small>' + escape(description) + '</small>' + (isAdminUser() ? '<em>Нажми, чтобы настроить</em>' : '');
+        var inner = '<span aria-hidden="true">＋</span><strong>' + escape(title) + '</strong><small>' + escape(description) + '</small>' + (isAdminUser() ? '<em>' + escape(localized('landing_banner_upload_cta', 'Нажми, чтобы добавить изображения, текст и ссылку.')) + '</em>' : '');
         section.innerHTML = isAdminUser()
             ? '<button type="button" class="cpm2-showcase-empty" data-cpm2-empty-slot="' + escape(slot) + '">' + inner + '</button>'
             : '<div class="cpm2-showcase-empty cpm2-showcase-empty-public">' + inner + '</div>';
@@ -58,7 +59,7 @@
         if (bannerTimers[slot]) clearInterval(bannerTimers[slot]);
         var images = Array.isArray(data && data.images) ? data.images.map(safeUrl).filter(Boolean).slice(0, 5) : [];
         if (!images.length) {
-            emptySlot(section, 'Здесь могла быть ваша реклама', (slot === 'banner1' ? 'Баннер 1 · слайдер до пяти изображений.' : 'Баннер 2 · широкий рекламный баннер.') + (isAdminUser() ? ' Добавь изображения, текст и ссылку.' : ''), slot);
+            emptySlot(section, localized('landing_banner_placeholder', 'Здесь могла быть ваша реклама'), localized(slot === 'banner1' ? 'landing_banner1_hint' : 'landing_banner2_hint', slot === 'banner1' ? 'Баннер 1 · слайдер до пяти изображений.' : 'Баннер 2 · широкий рекламный баннер.'), slot);
             section.classList.add('cpm2-banner-empty');
             return;
         }
@@ -85,8 +86,8 @@
             return item.isActive === true && item.cpm2Broker === true && item.moderationStatus === 'approved' && item.brokerStatus === 'in_stock' && item.dealMode === mode;
         });
         if (!cards.length) {
-            var marketTitle = mode === 'sell' ? 'Машины на продажу · SELL' : 'Машины для обмена · TRADE';
-            var marketDescription = 'Блок ' + featureBlockNumbers[slot] + '. Здесь появятся объявления CPM2.';
+            var marketTitle = localized(mode === 'sell' ? 'landing_sell_title' : 'landing_trade_title', mode === 'sell' ? 'Машины на продажу · SELL' : 'Машины для обмена · TRADE');
+            var marketDescription = 'Блок ' + featureBlockNumbers[slot] + '. ' + localized('landing_listing_empty', 'Здесь появятся объявления CPM2.');
             emptySlot(section, marketTitle, marketDescription + (isAdminUser() ? ' Выбери одобренное объявление в настройках CPM2.' : ''), slot);
             return;
         }

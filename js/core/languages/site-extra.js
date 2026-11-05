@@ -1,6 +1,6 @@
 // Extra interface phrases shared by the main site and feature modules.
 window.LANG_EN_EXTRA = {
-    site_title: 'CPM2 Meta Empire — community for Car Parking Multiplayer 2',
+    site_title: 'CPM 2 METAIMPERIYA — community for Car Parking Multiplayer 2',
     home: 'Home', theme_label: 'Theme', complaints: 'Reports', sections: 'Sections',
     trending: 'Trending', trending_empty: 'No trending tags yet', statistics: 'Statistics', online_count: 'Online:', posts_count: 'Posts:',
     player_select_track: 'Select a track', cpm2_overview: 'CPM2 overview', auto_market: 'Car marketplace', clans: 'Clans', shop_soon: 'Shop · coming soon', exchange_soon: 'Exchange · coming soon', trade_soon: 'Sell / Trade · coming soon', rate_soon: 'CPM2 rate · coming soon',
@@ -31,7 +31,7 @@ window.LANG_EN_EXTRA = {
 };
 
 window.LANG_RU_EXTRA = {
-    site_title: 'CPM2 Meta Empire — сообщество игроков Car Parking Multiplayer 2',
+    site_title: 'CPM 2 METAIMPERIYA — сообщество игроков Car Parking Multiplayer 2',
     home: 'Главная', theme_label: 'Тема', complaints: 'Жалобы', sections: 'Разделы',
     trending: 'В тренде', trending_empty: 'Пока нет популярных тегов', statistics: 'Статистика', online_count: 'Онлайн:', posts_count: 'Посты:',
     player_select_track: 'Выберите трек', cpm2_overview: 'Обзор CPM2', auto_market: 'Авторынок', clans: 'Кланы', shop_soon: 'Магазин · скоро', exchange_soon: 'Обмен · скоро', trade_soon: 'Sell / Trade · скоро', rate_soon: 'Курс CPM2 · скоро',
@@ -61,7 +61,7 @@ window.LANG_RU_EXTRA = {
 };
 
 window.LANG_ES_EXTRA = {
-    site_title: 'CPM2 Meta Empire — comunidad de Car Parking Multiplayer 2', home: 'Inicio', theme_label: 'Tema', complaints: 'Denuncias', sections: 'Secciones',
+    site_title: 'CPM 2 METAIMPERIYA — comunidad de Car Parking Multiplayer 2', home: 'Inicio', theme_label: 'Tema', complaints: 'Denuncias', sections: 'Secciones',
     trending: 'Tendencias', trending_empty: 'Aún no hay etiquetas populares', statistics: 'Estadísticas', online_count: 'En línea:', posts_count: 'Publicaciones:', player_select_track: 'Selecciona una pista',
     cpm2_overview: 'Resumen de CPM2', auto_market: 'Mercado de coches', clans: 'Clanes', shop_soon: 'Tienda · próximamente', exchange_soon: 'Intercambio · próximamente', trade_soon: 'Venta / intercambio · próximamente', rate_soon: 'Tasa CPM2 · próximamente',
     clans_title: 'Clanes y grupos', clans_description: 'Crea una comunidad o un clan con líder, emblema y su propio feed.', create_clan: '＋ Crear un clan', create_group_button: '＋ Crear un grupo', apply_clan: 'Solicitar liderar un clan',
@@ -76,7 +76,7 @@ window.LANG_ES_EXTRA = {
 };
 
 window.LANG_DE_EXTRA = {
-    site_title: 'CPM2 Meta Empire — Community für Car Parking Multiplayer 2', home: 'Startseite', theme_label: 'Design', complaints: 'Meldungen', sections: 'Bereiche',
+    site_title: 'CPM 2 METAIMPERIYA — Community für Car Parking Multiplayer 2', home: 'Startseite', theme_label: 'Design', complaints: 'Meldungen', sections: 'Bereiche',
     trending: 'Im Trend', trending_empty: 'Noch keine beliebten Tags', statistics: 'Statistik', online_count: 'Online:', posts_count: 'Beiträge:', player_select_track: 'Titel auswählen',
     cpm2_overview: 'CPM2-Übersicht', auto_market: 'Automarkt', clans: 'Clans', shop_soon: 'Shop · demnächst', exchange_soon: 'Tausch · demnächst', trade_soon: 'Verkauf / Tausch · demnächst', rate_soon: 'CPM2-Kurs · demnächst',
     clans_title: 'Clans und Gruppen', clans_description: 'Erstelle eine Community oder einen Clan mit Leitung, Emblem und eigenem Feed.', create_clan: '＋ Clan erstellen', create_group_button: '＋ Gruppe erstellen', apply_clan: 'Als Clanleitung bewerben',
@@ -91,7 +91,7 @@ window.LANG_DE_EXTRA = {
 };
 
 window.LANG_TR_EXTRA = {
-    site_title: 'CPM2 Meta Empire — Car Parking Multiplayer 2 topluluğu', home: 'Ana sayfa', theme_label: 'Tema', complaints: 'Şikâyetler', sections: 'Bölümler',
+    site_title: 'CPM 2 METAIMPERIYA — Car Parking Multiplayer 2 topluluğu', home: 'Ana sayfa', theme_label: 'Tema', complaints: 'Şikâyetler', sections: 'Bölümler',
     trending: 'Gündem', trending_empty: 'Henüz popüler etiket yok', statistics: 'İstatistikler', online_count: 'Çevrimiçi:', posts_count: 'Gönderiler:', player_select_track: 'Bir parça seç',
     cpm2_overview: 'CPM2 genel bakış', auto_market: 'Araç pazarı', clans: 'Klanlar', shop_soon: 'Mağaza · yakında', exchange_soon: 'Takas · yakında', trade_soon: 'Satış / takas · yakında', rate_soon: 'CPM2 kuru · yakında',
     clans_title: 'Klanlar ve gruplar', clans_description: 'Lideri, arması ve kendi akışı olan bir topluluk veya klan oluştur.', create_clan: '＋ Klan oluştur', create_group_button: '＋ Grup oluştur', apply_clan: 'Klan liderliği için başvur',
@@ -106,7 +106,7 @@ window.LANG_TR_EXTRA = {
 };
 
 window.LANG_AR_EXTRA = {
-    site_title: 'CPM2 Meta Empire — مجتمع لعبة Car Parking Multiplayer 2', home: 'الرئيسية', theme_label: 'المظهر', complaints: 'البلاغات', sections: 'الأقسام',
+    site_title: 'CPM 2 METAIMPERIYA — مجتمع لعبة Car Parking Multiplayer 2', home: 'الرئيسية', theme_label: 'المظهر', complaints: 'البلاغات', sections: 'الأقسام',
     trending: 'الرائج', trending_empty: 'لا توجد وسوم رائجة بعد', statistics: 'الإحصاءات', online_count: 'متصل:', posts_count: 'المنشورات:', player_select_track: 'اختر مقطعاً',
     cpm2_overview: 'نظرة عامة على CPM2', auto_market: 'سوق السيارات', clans: 'العشائر', shop_soon: 'المتجر · قريباً', exchange_soon: 'التبادل · قريباً', trade_soon: 'بيع / تبادل · قريباً', rate_soon: 'سعر CPM2 · قريباً',
     clans_title: 'العشائر والمجموعات', clans_description: 'أنشئ مجتمعاً أو عشيرة لها قائد وشارة وخلاصة منشورات خاصة بها.', create_clan: '＋ إنشاء عشيرة', create_group_button: '＋ إنشاء مجموعة', apply_clan: 'التقدم لقيادة عشيرة',
@@ -121,7 +121,7 @@ window.LANG_AR_EXTRA = {
 };
 
 window.LANG_IT_EXTRA = {
-    site_title: 'CPM2 Meta Empire — community di Car Parking Multiplayer 2', home: 'Home', theme_label: 'Tema', complaints: 'Segnalazioni', sections: 'Sezioni',
+    site_title: 'CPM 2 METAIMPERIYA — community di Car Parking Multiplayer 2', home: 'Home', theme_label: 'Tema', complaints: 'Segnalazioni', sections: 'Sezioni',
     trending: 'Tendenze', trending_empty: 'Non ci sono ancora hashtag popolari', statistics: 'Statistiche', online_count: 'Online:', posts_count: 'Post:', player_select_track: 'Seleziona un brano',
     cpm2_overview: 'Panoramica CPM2', auto_market: 'Mercato auto', clans: 'Clan', shop_soon: 'Negozio · prossimamente', exchange_soon: 'Scambio · prossimamente', trade_soon: 'Vendi / scambia · prossimamente', rate_soon: 'Cambio CPM2 · prossimamente',
     clans_title: 'Clan e gruppi', clans_description: 'Crea una community o un clan con un leader, un emblema e un feed dedicato.', create_clan: '＋ Crea un clan', create_group_button: '＋ Crea un gruppo', apply_clan: 'Candidati come leader di un clan',
@@ -137,7 +137,7 @@ window.LANG_IT_EXTRA = {
 };
 
 window.LANG_ZH_EXTRA = {
-    site_title: 'CPM2 Meta Empire — Car Parking Multiplayer 2 玩家社区', home: '首页', theme_label: '主题', complaints: '举报', sections: '版块',
+    site_title: 'CPM 2 METAIMPERIYA — Car Parking Multiplayer 2 玩家社区', home: '首页', theme_label: '主题', complaints: '举报', sections: '版块',
     trending: '热门', trending_empty: '暂无热门标签', statistics: '统计', online_count: '在线：', posts_count: '帖子：', player_select_track: '选择曲目',
     cpm2_overview: 'CPM2 概览', auto_market: '汽车市场', clans: '战队', shop_soon: '商店 · 即将推出', exchange_soon: '兑换 · 即将推出', trade_soon: '出售 / 交易 · 即将推出', rate_soon: 'CPM2 汇率 · 即将推出',
     language_picker_label: '选择语言', language_saved: '语言已保存', site_motto: 'Car Parking Multiplayer 2 玩家社区', translator_label: '翻译', translate_original: '显示原文', translating: '正在翻译…', translator_unavailable: '此浏览器暂不支持设备端翻译。请使用支持内置翻译器的桌面版 Chrome。', translate_failed: '翻译失败，请稍后重试。', same_language: '评论已经是当前语言。',
@@ -145,7 +145,7 @@ window.LANG_ZH_EXTRA = {
 };
 
 window.LANG_JA_EXTRA = {
-    site_title: 'CPM2 Meta Empire — Car Parking Multiplayer 2 コミュニティ', home: 'ホーム', theme_label: 'テーマ', complaints: '通報', sections: 'セクション',
+    site_title: 'CPM 2 METAIMPERIYA — Car Parking Multiplayer 2 コミュニティ', home: 'ホーム', theme_label: 'テーマ', complaints: '通報', sections: 'セクション',
     trending: 'トレンド', trending_empty: '人気のタグはまだありません', statistics: '統計', online_count: 'オンライン：', posts_count: '投稿：', player_select_track: '曲を選択',
     cpm2_overview: 'CPM2 概要', auto_market: '車マーケット', clans: 'クラン', shop_soon: 'ショップ · 準備中', exchange_soon: '交換 · 準備中', trade_soon: '販売 / 取引 · 準備中', rate_soon: 'CPM2 レート · 準備中',
     language_picker_label: '言語を選択', language_saved: '言語を保存しました', site_motto: 'Car Parking Multiplayer 2 プレイヤーのコミュニティ', translator_label: '翻訳', translate_original: '原文を表示', translating: '翻訳中…', translator_unavailable: 'このブラウザーは端末内翻訳に対応していません。翻訳機能に対応したデスクトップ版 Chrome をお使いください。', translate_failed: '翻訳に失敗しました。もう一度お試しください。', same_language: 'コメントはすでに現在の言語です。',
@@ -154,6 +154,8 @@ window.LANG_JA_EXTRA = {
 
 var sitePagePhrases = {
     en: {
+        landing_banner_placeholder: 'Your ad could be here', landing_banner1_hint: 'Banner 1 · carousel with up to five images.', landing_banner2_hint: 'Banner 2 · wide promotional banner.', landing_banner_upload_cta: 'Click to add images, text, and a link.', landing_sell_title: 'Cars for sale · SELL', landing_trade_title: 'Cars for trade · TRADE', landing_listing_empty: 'CPM2 listings will appear here.',
+        landing_topic_market: 'CPM2 car market', landing_topic_trade: 'Car trading', landing_feature_market_tag: '02 · CAR MARKET', landing_feature_groups_tag: '03 · GROUPS', landing_feature_feed_tag: '04 · FEED',
         landing_kicker: 'PLAYER COMMUNITY', landing_lead: 'A community for Car Parking Multiplayer 2 players: chat, build a clan, find people for car deals, and post vehicles for sale or trade.', go_to_feed: 'Go to feed', cpm2_features: 'CPM2 features', landing_note: 'An independent player community. METAIMPERIYA is not an official project of the CPM2 developers.',
         feature_community: 'Gaming community', feature_community_copy: 'Chat, share news, and meet other players.', feature_market: 'Listings and trades', feature_market_copy: 'A place to offer cars for sale or trade.', feature_clans: 'Play together', feature_clans_copy: 'Build a team, join clans, and chat with the community.', feature_feed: 'Player posts', feature_feed_copy: 'Share posts, react, and discuss them in comments.',
         discussion_kicker: 'OPEN DISCUSSION', discussion_title: 'What are you looking for in the CPM2 community?', discussion_copy: 'React or leave a comment. All site members can join the discussion.',
@@ -165,7 +167,9 @@ var sitePagePhrases = {
         create_post: 'Create a post', photo_carousel: '📎 Photos for carousel', add_frame: '＋ Add frame', frame_carousel_note: 'Photos and frames will appear as slides in one carousel', ad_mode: 'Publish as an ad / listing', publish_button: '📤 Publish', clear_button: 'Clear'
     },
     ru: {
-        landing_kicker: 'СООБЩЕСТВО ИГРОКОВ', landing_lead: 'Сообщество игроков Car Parking Multiplayer 2: общайся, собирай клан, находи людей для автомобильных сделок, публикуй объявления о продаже и обмене машин.', go_to_feed: 'Перейти в ленту', cpm2_features: 'Возможности CPM2', landing_note: 'Независимое сообщество игроков. METAIMPERIYA не является официальным проектом разработчиков CPM2.',
+        landing_banner_placeholder: 'Здесь могла быть ваша реклама', landing_banner1_hint: 'Баннер 1 · слайдер до пяти изображений.', landing_banner2_hint: 'Баннер 2 · широкий рекламный баннер.', landing_banner_upload_cta: 'Нажми, чтобы добавить изображения, текст и ссылку.', landing_sell_title: 'Машины на продажу · SELL', landing_trade_title: 'Машины для обмена · TRADE', landing_listing_empty: 'Здесь появятся объявления CPM2.',
+        landing_topic_market: 'Авторынок CPM2', landing_topic_trade: 'Обмен машин', landing_feature_market_tag: '02 · АВТОРЫНОК', landing_feature_groups_tag: '03 · ГРУППЫ', landing_feature_feed_tag: '04 · ЛЕНТА',
+        landing_kicker: 'СООБЩЕСТВО ИГРОКОВ', landing_lead: 'Сообщество игроков Car Parking Multiplayer 2: общайся, находи людей для автомобильных сделок, публикуй объявления о продаже и обмене машин.', go_to_feed: 'Перейти в ленту', cpm2_features: 'Возможности CPM2', landing_note: 'Независимое сообщество игроков. METAIMPERIYA не является официальным проектом разработчиков CPM2.',
         feature_community: 'Игровое сообщество', feature_community_copy: 'Общайся, публикуй новости и находи игроков.', feature_market: 'Объявления и обмен', feature_market_copy: 'Площадка для предложений о продаже и обмене автомобилей.', feature_clans: 'Играй вместе', feature_clans_copy: 'Создавай команду, вступай в кланы и общайся внутри сообщества.', feature_feed: 'Публикации игроков', feature_feed_copy: 'Делись постами, реагируй и обсуждай их в комментариях.',
         discussion_kicker: 'ОТКРЫТОЕ ОБСУЖДЕНИЕ', discussion_title: 'Что ты ищешь в сообществе CPM2?', discussion_copy: 'Оставь реакцию или напиши комментарий — обсуждение доступно участникам сайта.',
         work_nav: 'Работа', dating_nav: 'Знакомства', ambassadors_nav: 'Амбассадоры и приглашения', marketplace_nav: 'Маркетплейс', photos_nav: 'Фото', pages_nav: 'Страницы', news_nav: 'Новости', video_nav: 'Видео', music_nav: 'Музыка', games_nav: 'Игры', sports_nav: 'Спорт', cinema_nav: 'Кино', programming_nav: 'Программирование', business_nav: 'Бизнес',
@@ -176,6 +180,8 @@ var sitePagePhrases = {
         create_post: 'Создать публикацию', photo_carousel: '📎 Фото для карусели', add_frame: '＋ Добавить фрейм', frame_carousel_note: 'Фото и фрейм станут слайдами одной карусели', ad_mode: 'Опубликовать как рекламу / объявление', publish_button: '📤 Опубликовать', clear_button: 'Очистить'
     },
     es: {
+        landing_banner_placeholder: 'Aquí podría aparecer tu anuncio', landing_banner1_hint: 'Banner 1 · carrusel de hasta cinco imágenes.', landing_banner2_hint: 'Banner 2 · banner promocional ancho.', landing_banner_upload_cta: 'Haz clic para añadir imágenes, texto y un enlace.', landing_sell_title: 'Coches en venta · SELL', landing_trade_title: 'Coches para intercambiar · TRADE', landing_listing_empty: 'Aquí aparecerán los anuncios de CPM2.',
+        landing_topic_market: 'Mercado de coches CPM2', landing_topic_trade: 'Intercambio de coches', landing_feature_market_tag: '02 · MERCADO DE COCHES', landing_feature_groups_tag: '03 · GRUPOS', landing_feature_feed_tag: '04 · FEED',
         landing_kicker: 'COMUNIDAD DE JUGADORES', landing_lead: 'Comunidad de jugadores de Car Parking Multiplayer 2: chatea, forma un clan, encuentra personas para hacer tratos con coches y publica vehículos para vender o intercambiar.', go_to_feed: 'Ir al feed', cpm2_features: 'Funciones de CPM2', landing_note: 'Comunidad independiente de jugadores. METAIMPERIYA no es un proyecto oficial de los desarrolladores de CPM2.',
         feature_community: 'Comunidad de juego', feature_community_copy: 'Chatea, comparte noticias y conoce a otros jugadores.', feature_market: 'Anuncios e intercambios', feature_market_copy: 'Un espacio para ofrecer coches en venta o intercambio.', feature_clans: 'Juega en equipo', feature_clans_copy: 'Forma un equipo, únete a clanes y habla con la comunidad.', feature_feed: 'Publicaciones de jugadores', feature_feed_copy: 'Comparte publicaciones, reacciona y comenta.',
         discussion_kicker: 'DEBATE ABIERTO', discussion_title: '¿Qué buscas en la comunidad de CPM2?', discussion_copy: 'Reacciona o deja un comentario. Los miembros del sitio pueden participar.',
@@ -187,6 +193,8 @@ var sitePagePhrases = {
         create_post: 'Crear publicación', photo_carousel: '📎 Fotos para el carrusel', add_frame: '＋ Añadir marco', frame_carousel_note: 'Las fotos y los marcos aparecerán como diapositivas en un carrusel', ad_mode: 'Publicar como anuncio', publish_button: '📤 Publicar', clear_button: 'Borrar'
     },
     de: {
+        landing_banner_placeholder: 'Hier könnte deine Werbung stehen', landing_banner1_hint: 'Banner 1 · Karussell mit bis zu fünf Bildern.', landing_banner2_hint: 'Banner 2 · breites Werbebanner.', landing_banner_upload_cta: 'Klicke, um Bilder, Text und einen Link hinzuzufügen.', landing_sell_title: 'Autos zum Verkauf · SELL', landing_trade_title: 'Autos zum Tausch · TRADE', landing_listing_empty: 'Hier erscheinen CPM2-Angebote.',
+        landing_topic_market: 'CPM2-Automarkt', landing_topic_trade: 'Autotausch', landing_feature_market_tag: '02 · AUTOMARKT', landing_feature_groups_tag: '03 · GRUPPEN', landing_feature_feed_tag: '04 · FEED',
         landing_kicker: 'SPIELER-COMMUNITY', landing_lead: 'Community für Car Parking Multiplayer 2: Chatte, gründe einen Clan, finde Leute für Autogeschäfte und veröffentliche Fahrzeuge zum Verkauf oder Tausch.', go_to_feed: 'Zum Feed', cpm2_features: 'CPM2-Funktionen', landing_note: 'Eine unabhängige Spieler-Community. METAIMPERIYA ist kein offizielles Projekt der CPM2-Entwickler.',
         feature_community: 'Gaming-Community', feature_community_copy: 'Chatte, teile Neuigkeiten und lerne andere Spieler kennen.', feature_market: 'Anzeigen und Tausch', feature_market_copy: 'Ein Marktplatz für Angebote zum Verkauf oder Tausch von Autos.', feature_clans: 'Gemeinsam spielen', feature_clans_copy: 'Stelle ein Team zusammen, tritt Clans bei und tausche dich mit der Community aus.', feature_feed: 'Beiträge der Spieler', feature_feed_copy: 'Teile Beiträge, reagiere darauf und diskutiere in den Kommentaren.',
         discussion_kicker: 'OFFENE DISKUSSION', discussion_title: 'Was suchst du in der CPM2-Community?', discussion_copy: 'Reagiere oder schreibe einen Kommentar. Mitglieder der Website können mitdiskutieren.',
@@ -198,6 +206,8 @@ var sitePagePhrases = {
         create_post: 'Beitrag erstellen', photo_carousel: '📎 Fotos für das Karussell', add_frame: '＋ Frame hinzufügen', frame_carousel_note: 'Fotos und Frames erscheinen als gemeinsame Karussell-Folien', ad_mode: 'Als Werbung / Anzeige veröffentlichen', publish_button: '📤 Veröffentlichen', clear_button: 'Leeren'
     },
     tr: {
+        landing_banner_placeholder: 'Reklamınız burada olabilir', landing_banner1_hint: 'Banner 1 · en fazla beş görselli kaydırıcı.', landing_banner2_hint: 'Banner 2 · geniş tanıtım bannerı.', landing_banner_upload_cta: 'Görsel, metin ve bağlantı eklemek için tıkla.', landing_sell_title: 'Satılık araçlar · SELL', landing_trade_title: 'Takaslık araçlar · TRADE', landing_listing_empty: 'CPM2 ilanları burada görünecek.',
+        landing_topic_market: 'CPM2 araç pazarı', landing_topic_trade: 'Araç takası', landing_feature_market_tag: '02 · ARAÇ PAZARI', landing_feature_groups_tag: '03 · GRUPLAR', landing_feature_feed_tag: '04 · AKIŞ',
         landing_kicker: 'OYUNCU TOPLULUĞU', landing_lead: 'Car Parking Multiplayer 2 oyuncuları için topluluk: sohbet et, klan kur, araç alışverişi için oyuncular bul ve satılık ya da takas araç ilanları paylaş.', go_to_feed: 'Akışa git', cpm2_features: 'CPM2 özellikleri', landing_note: 'Bağımsız oyuncu topluluğu. METAIMPERIYA, CPM2 geliştiricilerinin resmî projesi değildir.',
         feature_community: 'Oyun topluluğu', feature_community_copy: 'Sohbet et, haber paylaş ve diğer oyuncuları bul.', feature_market: 'İlanlar ve takas', feature_market_copy: 'Araç satış ve takas teklifleri için bir alan.', feature_clans: 'Birlikte oyna', feature_clans_copy: 'Takım kur, klanlara katıl ve toplulukla sohbet et.', feature_feed: 'Oyuncu gönderileri', feature_feed_copy: 'Gönderi paylaş, tepki ver ve yorumlarda konuş.',
         discussion_kicker: 'AÇIK TARTIŞMA', discussion_title: 'CPM2 topluluğunda ne arıyorsun?', discussion_copy: 'Tepki bırak veya yorum yaz. Site üyeleri tartışmaya katılabilir.',
@@ -209,6 +219,8 @@ var sitePagePhrases = {
         create_post: 'Gönderi oluştur', photo_carousel: '📎 Döngü için fotoğraflar', add_frame: '＋ Çerçeve ekle', frame_carousel_note: 'Fotoğraflar ve çerçeveler aynı döngüde slayt olarak görünür', ad_mode: 'Reklam / ilan olarak yayınla', publish_button: '📤 Yayınla', clear_button: 'Temizle'
     },
     ar: {
+        landing_banner_placeholder: 'يمكن أن يظهر إعلانك هنا', landing_banner1_hint: 'الشريط 1 · عرض دوّار يصل إلى خمس صور.', landing_banner2_hint: 'الشريط 2 · إعلان عريض.', landing_banner_upload_cta: 'انقر لإضافة الصور والنص والرابط.', landing_sell_title: 'سيارات للبيع · SELL', landing_trade_title: 'سيارات للتبادل · TRADE', landing_listing_empty: 'ستظهر إعلانات CPM2 هنا.',
+        landing_topic_market: 'سوق سيارات CPM2', landing_topic_trade: 'تبادل السيارات', landing_feature_market_tag: '02 · سوق السيارات', landing_feature_groups_tag: '03 · المجموعات', landing_feature_feed_tag: '04 · المنشورات',
         landing_kicker: 'مجتمع اللاعبين', landing_lead: 'مجتمع لاعبي Car Parking Multiplayer 2: دردش، وأنشئ عشيرة، وابحث عن لاعبين لصفقات السيارات، وانشر سيارات للبيع أو التبادل.', go_to_feed: 'انتقل إلى الخلاصة', cpm2_features: 'مزايا CPM2', landing_note: 'مجتمع مستقل للاعبين. METAIMPERIYA ليس مشروعاً رسمياً لمطوري CPM2.',
         feature_community: 'مجتمع اللعبة', feature_community_copy: 'دردش وانشر الأخبار وتعرّف على لاعبين آخرين.', feature_market: 'إعلانات وتبادل', feature_market_copy: 'مساحة لعرض السيارات للبيع أو التبادل.', feature_clans: 'العبوا معاً', feature_clans_copy: 'كوّن فريقاً وانضم إلى العشائر وتواصل مع المجتمع.', feature_feed: 'منشورات اللاعبين', feature_feed_copy: 'شارك المنشورات وتفاعل معها وناقشها في التعليقات.',
         discussion_kicker: 'نقاش مفتوح', discussion_title: 'ما الذي تبحث عنه في مجتمع CPM2؟', discussion_copy: 'أضف تفاعلاً أو تعليقاً. يمكن لأعضاء الموقع المشاركة في النقاش.',
@@ -220,6 +232,8 @@ var sitePagePhrases = {
         create_post: 'إنشاء منشور', photo_carousel: '📎 صور للعرض المتتابع', add_frame: '＋ أضف إطاراً', frame_carousel_note: 'ستظهر الصور والإطارات كشرائح في عرض واحد', ad_mode: 'النشر كإعلان / عرض', publish_button: '📤 نشر', clear_button: 'مسح'
     },
     it: {
+        landing_banner_placeholder: 'Qui potrebbe esserci la tua pubblicità', landing_banner1_hint: 'Banner 1 · carosello fino a cinque immagini.', landing_banner2_hint: 'Banner 2 · banner promozionale largo.', landing_banner_upload_cta: 'Clicca per aggiungere immagini, testo e un link.', landing_sell_title: 'Auto in vendita · SELL', landing_trade_title: 'Auto da scambiare · TRADE', landing_listing_empty: 'Gli annunci CPM2 appariranno qui.',
+        landing_topic_market: 'Mercato auto CPM2', landing_topic_trade: 'Scambio auto', landing_feature_market_tag: '02 · MERCATO AUTO', landing_feature_groups_tag: '03 · GRUPPI', landing_feature_feed_tag: '04 · FEED',
         landing_kicker: 'COMMUNITY DI GIOCATORI', landing_lead: 'Community per i giocatori di Car Parking Multiplayer 2: chatta, crea un clan, trova persone per trattative auto e pubblica veicoli in vendita o scambio.', go_to_feed: 'Vai al feed', cpm2_features: 'Funzioni CPM2', landing_note: 'Community indipendente di giocatori. METAIMPERIYA non è un progetto ufficiale degli sviluppatori di CPM2.',
         feature_community: 'Community di gioco', feature_community_copy: 'Chatta, condividi notizie e conosci altri giocatori.', feature_market: 'Annunci e scambi', feature_market_copy: 'Uno spazio per offrire auto in vendita o in scambio.', feature_clans: 'Gioca insieme', feature_clans_copy: 'Crea una squadra, unisciti ai clan e parla con la community.', feature_feed: 'Post dei giocatori', feature_feed_copy: 'Condividi post, reagisci e discuti nei commenti.',
         discussion_kicker: 'DISCUSSIONE APERTA', discussion_title: 'Cosa cerchi nella community CPM2?', discussion_copy: 'Lascia una reazione o un commento. Tutti i membri del sito possono partecipare.',
@@ -291,16 +305,157 @@ var siteAccountPhrases = {
         community_members: 'Membri della community', user_not_found: 'Utente non trovato', login_to_save: 'Accedi per salvare il profilo', save_changes: 'Salva le modifiche', send_message: '💬 Invia messaggio'
     },
     zh: {
+        landing_banner_placeholder: '此处可以展示你的广告', landing_banner1_hint: '横幅 1 · 最多五张图片的轮播。', landing_banner2_hint: '横幅 2 · 宽幅推广横幅。', landing_banner_upload_cta: '点击添加图片、文字和链接。', landing_sell_title: '出售车辆 · SELL', landing_trade_title: '交换车辆 · TRADE', landing_listing_empty: 'CPM2 车辆信息将在此显示。',
+        landing_topic_market: 'CPM2 汽车市场', landing_topic_trade: '汽车交换', landing_feature_market_tag: '02 · 汽车市场', landing_feature_groups_tag: '03 · 群组', landing_feature_feed_tag: '04 · 动态',
         social_networks: '社交网络', call_button: '📞 拨打电话', email_label: '邮箱', phone_label: '电话', show_description: '显示简介', hide_description: '隐藏简介', reviews_rating: '评价与评分', status_management: '状态管理', level_label: '等级', experience_label: '经验',
         ambassador_exchange: '大使交易所', ambassador_intro: '银行、玩家和邀请任务，尽在一处。', demo_not_money: '非真实货币', total_bank: '公共银行', social_points_reserve: '储备社交积分', set_bank: '设置银行余额', my_balance: '我的余额', social_points: '社交积分', players: '玩家', prototype_members: '原型参与者', join_system: '＋ 加入系统', game_board: '游戏棋盘', choose_direction: '选择方向', referrals: '邀请', exchange: '交易所', targeting: '推广', bonus: '奖励', team: '团队', bank_reserve: '总储备', in_circulation: '流通中', transfer_cpm2: '转账 CPM2', audit_log: '交易记录', bank_access_denied: '无权访问',
         community_members: '社区成员', user_not_found: '未找到用户', login_to_save: '登录后保存个人资料', save_changes: '保存更改', send_message: '💬 发消息'
     },
     ja: {
+        landing_banner_placeholder: 'ここに広告を掲載できます', landing_banner1_hint: 'バナー1 · 最大5枚の画像を表示するカルーセル。', landing_banner2_hint: 'バナー2 · 横長の広告バナー。', landing_banner_upload_cta: 'クリックして画像、テキスト、リンクを追加します。', landing_sell_title: '販売中の車 · SELL', landing_trade_title: '交換用の車 · TRADE', landing_listing_empty: 'CPM2 の出品がここに表示されます。',
+        landing_topic_market: 'CPM2 車マーケット', landing_topic_trade: '車の交換', landing_feature_market_tag: '02 · 車マーケット', landing_feature_groups_tag: '03 · グループ', landing_feature_feed_tag: '04 · フィード',
         social_networks: 'ソーシャルネットワーク', call_button: '📞 電話する', email_label: 'メール', phone_label: '電話番号', show_description: 'プロフィールを表示', hide_description: 'プロフィールを隠す', reviews_rating: 'レビューと評価', status_management: 'ステータス管理', level_label: 'レベル', experience_label: '経験',
         ambassador_exchange: 'アンバサダー取引所', ambassador_intro: '銀行、プレイヤー、招待タスクをひとつの場所に。', demo_not_money: 'お金ではありません', total_bank: '共通銀行', social_points_reserve: '予備のソーシャルポイント', set_bank: '銀行残高を設定', my_balance: '残高', social_points: 'ソーシャルポイント', players: 'プレイヤー', prototype_members: 'プロトタイプ参加者', join_system: '＋ システムに参加', game_board: 'ゲームボード', choose_direction: '項目を選択', referrals: '紹介', exchange: '取引所', targeting: 'プロモーション', bonus: 'ボーナス', team: 'チーム', bank_reserve: '総準備金', in_circulation: '流通中', transfer_cpm2: 'CPM2 を送金', audit_log: '取引履歴', bank_access_denied: 'アクセスできません',
         community_members: 'コミュニティメンバー', user_not_found: 'ユーザーが見つかりません', login_to_save: 'プロフィールを保存するにはログインしてください', save_changes: '変更を保存', send_message: '💬 メッセージ'
     }
 };
+
+// Explicit landing-page copy. The landing page uses keyed strings so its
+// translation does not depend on matching Russian HTML text word-for-word.
+var landingStoryPhrases = {
+    en: {
+        landing_story_kicker: 'WE ARE JUST GETTING STARTED', landing_story_title: 'So the car you want does not get lost in a dozen chats',
+        landing_story_copy: 'We bring CPM2 players together: meet people, chat in groups, list a car for Sell, or offer a Trade. The community grows with its players, and we will add sections and features as it grows.',
+        landing_story_aside: 'Looking for a rare car, but the offer you wanted has already disappeared in the chat? We want to make offers easier to find and discuss.',
+        landing_howto_title: 'How a deal works', landing_step1_title: 'Find or post a listing', landing_step1_copy: 'Choose Sell to offer a car or Trade to exchange one.',
+        landing_step2_title: 'Agree on the terms', landing_step2_copy: 'Contact the other player and arrange the car transfer in the game.',
+        landing_step3_title: 'Confirm a brokered deal', landing_step3_copy: 'For brokered listings, an administrator helps confirm receipt of the car and credit CPM2 to the seller.',
+        landing_howto_note: 'Players transfer cars manually in CPM2. The CPM2 balance is an internal record on this site.',
+        landing_economy_kicker: '💲 CPM2 · GAME ECONOMY', landing_economy_title: 'Sell, Trade, and CPM2 transactions',
+        landing_economy_copy: 'List cars for Sell, offer a Trade, and find buyers in the community. For brokered deals, an administrator confirms receipt of the car in game and credits internal CPM2 units to the seller.',
+        landing_economy_sell: 'Browse Sell', landing_economy_trade: 'Browse Trade', landing_economy_balance: 'My CPM2 balance →',
+        landing_economy_note_title: 'Cars are transferred in the game', landing_economy_note_copy1: 'The buyer and seller agree on the terms, then transfer the car manually in Car Parking Multiplayer 2.',
+        landing_economy_note_copy2: 'The CPM2 balance records in-game transactions on this site. It is not real money and does not transfer cars automatically.'
+    },
+    ru: {
+        landing_story_kicker: 'МЫ ТОЛЬКО НАЧИНАЕМ', landing_story_title: 'Чтобы нужная машина не терялась в десятке чатов',
+        landing_story_copy: 'Мы собираем игроков CPM2 в одном месте: здесь можно познакомиться, общаться в группах, выставить автомобиль на Sell или предложить обмен в Trade. Сообщество развивается вместе с игроками — новые разделы и возможности будем добавлять по мере роста.',
+        landing_story_aside: 'Знакомо: ищешь редкую машину, а нужное предложение уже утонуло в переписке? Мы хотим, чтобы такие предложения было проще найти и обсудить.',
+        landing_howto_title: 'Как проходит сделка', landing_step1_title: 'Найди или размести лот', landing_step1_copy: 'Выбери Sell для продажи или Trade для обмена.',
+        landing_step2_title: 'Обсуди условия', landing_step2_copy: 'Свяжись с участником и согласуй передачу автомобиля в игре.',
+        landing_step3_title: 'Подтверди комиссионную сделку', landing_step3_copy: 'Для лотов через комиссионный гараж администратор помогает подтвердить получение машины и начисление CPM2.',
+        landing_howto_note: 'Передача автомобиля выполняется игроками вручную в CPM2. Баланс CPM2 — внутренняя запись сайта.',
+        landing_economy_kicker: '💲 CPM2 · ИГРОВАЯ ЭКОНОМИКА', landing_economy_title: 'Sell, Trade и расчёты в CPM2',
+        landing_economy_copy: 'Размещай игровые автомобили на Sell, предлагай обмен в Trade и находи покупателей в сообществе. В комиссионной сделке администратор подтверждает получение машины в игре и начисляет продавцу внутренние CPM2-единицы.',
+        landing_economy_sell: 'Смотреть Sell', landing_economy_trade: 'Смотреть Trade', landing_economy_balance: 'Мой CPM2-баланс →',
+        landing_economy_note_title: 'Передача машины — в игре', landing_economy_note_copy1: 'Покупатель и продавец договариваются об условиях, а автомобиль передают вручную в Car Parking Multiplayer 2.',
+        landing_economy_note_copy2: 'CPM2-баланс фиксирует игровые расчёты на сайте и не является реальными деньгами или автоматической передачей автомобиля.'
+    },
+    es: {
+        landing_story_kicker: 'ACABAMOS DE EMPEZAR', landing_story_title: 'Para que el coche que buscas no se pierda entre tantos chats',
+        landing_story_copy: 'Reunimos a jugadores de CPM2: puedes conocer gente, conversar en grupos, publicar un coche en Sell u ofrecer un intercambio en Trade. La comunidad crece con sus jugadores y añadiremos secciones y funciones a medida que avance.',
+        landing_story_aside: '¿Buscas un coche raro y la oferta ya se perdió en el chat? Queremos que sea más fácil encontrar y comentar esas ofertas.',
+        landing_howto_title: 'Cómo funciona una operación', landing_step1_title: 'Busca o publica un anuncio', landing_step1_copy: 'Elige Sell para vender un coche o Trade para intercambiarlo.',
+        landing_step2_title: 'Acuerda las condiciones', landing_step2_copy: 'Contacta con el otro jugador y acuerda la entrega del coche en el juego.',
+        landing_step3_title: 'Confirma una operación con intermediario', landing_step3_copy: 'En los anuncios gestionados por el garaje, un administrador ayuda a confirmar la recepción del coche y el abono de CPM2 al vendedor.',
+        landing_howto_note: 'Los jugadores transfieren los coches manualmente en CPM2. El saldo CPM2 es un registro interno del sitio.',
+        landing_economy_kicker: '💲 CPM2 · ECONOMÍA DEL JUEGO', landing_economy_title: 'Sell, Trade y operaciones CPM2',
+        landing_economy_copy: 'Publica coches en Sell, ofrece intercambios en Trade y encuentra compradores en la comunidad. En las operaciones con intermediario, un administrador confirma la recepción del coche en el juego y abona unidades CPM2 internas al vendedor.',
+        landing_economy_sell: 'Ver Sell', landing_economy_trade: 'Ver Trade', landing_economy_balance: 'Mi saldo CPM2 →',
+        landing_economy_note_title: 'El coche se entrega en el juego', landing_economy_note_copy1: 'Comprador y vendedor acuerdan las condiciones y transfieren el coche manualmente en Car Parking Multiplayer 2.',
+        landing_economy_note_copy2: 'El saldo CPM2 registra operaciones del juego en este sitio. No es dinero real ni transfiere coches automáticamente.'
+    },
+    de: {
+        landing_story_kicker: 'WIR FANGEN GERADE ERST AN', landing_story_title: 'Damit dein Wunschauto nicht in Dutzenden Chats untergeht',
+        landing_story_copy: 'Wir bringen CPM2-Spieler zusammen: Lerne Leute kennen, chatte in Gruppen, stelle ein Auto bei Sell ein oder biete einen Tausch bei Trade an. Die Community wächst mit ihren Spielern; weitere Bereiche und Funktionen kommen nach und nach dazu.',
+        landing_story_aside: 'Du suchst ein seltenes Auto, aber das passende Angebot ist im Chat schon verschwunden? Wir möchten, dass Angebote leichter zu finden und zu besprechen sind.',
+        landing_howto_title: 'So läuft ein Handel ab', landing_step1_title: 'Finde oder veröffentliche ein Angebot', landing_step1_copy: 'Wähle Sell für den Verkauf oder Trade für einen Tausch.',
+        landing_step2_title: 'Besprich die Bedingungen', landing_step2_copy: 'Kontaktiere den anderen Spieler und vereinbare die Übergabe im Spiel.',
+        landing_step3_title: 'Bestätige einen vermittelten Handel', landing_step3_copy: 'Bei vermittelten Angeboten hilft ein Administrator, den Erhalt des Autos und die Gutschrift von CPM2 zu bestätigen.',
+        landing_howto_note: 'Autos werden von Spielern manuell in CPM2 übertragen. Das CPM2-Guthaben ist ein interner Eintrag dieser Website.',
+        landing_economy_kicker: '💲 CPM2 · SPIELÖKONOMIE', landing_economy_title: 'Sell, Trade und CPM2-Abrechnungen',
+        landing_economy_copy: 'Stelle Autos bei Sell ein, biete bei Trade einen Tausch an und finde Käufer in der Community. Bei vermittelten Geschäften bestätigt ein Administrator den Erhalt des Autos im Spiel und schreibt dem Verkäufer interne CPM2-Einheiten gut.',
+        landing_economy_sell: 'Sell ansehen', landing_economy_trade: 'Trade ansehen', landing_economy_balance: 'Mein CPM2-Guthaben →',
+        landing_economy_note_title: 'Das Auto wird im Spiel übergeben', landing_economy_note_copy1: 'Käufer und Verkäufer vereinbaren die Bedingungen und übertragen das Auto manuell in Car Parking Multiplayer 2.',
+        landing_economy_note_copy2: 'Das CPM2-Guthaben erfasst Spieltransaktionen auf dieser Website. Es ist kein echtes Geld und überträgt Autos nicht automatisch.'
+    },
+    tr: {
+        landing_story_kicker: 'DAHA YENİ BAŞLIYORUZ', landing_story_title: 'Aradığın araba onlarca sohbet arasında kaybolmasın',
+        landing_story_copy: 'CPM2 oyuncularını bir araya getiriyoruz: insanlarla tanışabilir, gruplarda sohbet edebilir, arabanı Sell bölümünde ilana koyabilir veya Trade ile takas önerebilirsin. Topluluk oyuncularla birlikte büyüyor; yeni bölümler ve özellikler zamanla eklenecek.',
+        landing_story_aside: 'Nadir bir araba ararken istediğin teklif sohbet geçmişinde kayboldu mu? Teklifleri bulmayı ve konuşmayı kolaylaştırmak istiyoruz.',
+        landing_howto_title: 'İşlem nasıl yapılır?', landing_step1_title: 'İlan bul veya yayınla', landing_step1_copy: 'Satış için Sell, takas için Trade bölümünü seç.',
+        landing_step2_title: 'Koşulları konuş', landing_step2_copy: 'Diğer oyuncuyla iletişim kur ve araç teslimini oyunda ayarla.',
+        landing_step3_title: 'Aracılı işlemi onayla', landing_step3_copy: 'Aracılı ilanlarda yönetici, aracın teslim alındığını ve satıcıya CPM2 yüklendiğini doğrulamaya yardımcı olur.',
+        landing_howto_note: 'Araçlar oyuncular tarafından CPM2 içinde manuel olarak aktarılır. CPM2 bakiyesi bu sitedeki dahili bir kayıttır.',
+        landing_economy_kicker: '💲 CPM2 · OYUN EKONOMİSİ', landing_economy_title: 'Sell, Trade ve CPM2 işlemleri',
+        landing_economy_copy: 'Araçlarını Sell bölümünde ilana koy, Trade ile takas öner ve toplulukta alıcı bul. Aracılı işlemlerde yönetici araç teslimini oyunda doğrular ve satıcıya dahili CPM2 birimi aktarır.',
+        landing_economy_sell: 'Sell ilanları', landing_economy_trade: 'Trade ilanları', landing_economy_balance: 'CPM2 bakiyem →',
+        landing_economy_note_title: 'Araç oyunda teslim edilir', landing_economy_note_copy1: 'Alıcı ve satıcı koşulları belirler, ardından aracı Car Parking Multiplayer 2 içinde manuel olarak aktarır.',
+        landing_economy_note_copy2: 'CPM2 bakiyesi, oyundaki işlemleri bu sitede kaydeder. Gerçek para değildir ve araçları otomatik olarak aktarmaz.'
+    },
+    ar: {
+        landing_story_kicker: 'ما زلنا في البداية', landing_story_title: 'حتى لا تضيع السيارة التي تبحث عنها بين عشرات المحادثات',
+        landing_story_copy: 'نجمع لاعبي CPM2 في مكان واحد: تعرّف إلى الآخرين، وتحدث في المجموعات، واعرض سيارتك للبيع عبر Sell أو اقترح مبادلتها عبر Trade. ينمو المجتمع مع لاعبيه، وسنضيف أقساماً وميزات جديدة تدريجياً.',
+        landing_story_aside: 'هل تبحث عن سيارة نادرة ثم يضيع العرض المناسب وسط المحادثات؟ نريد تسهيل العثور على العروض ومناقشتها.',
+        landing_howto_title: 'كيف تتم الصفقة', landing_step1_title: 'ابحث عن إعلان أو أضف إعلاناً', landing_step1_copy: 'اختر Sell للبيع أو Trade للمبادلة.',
+        landing_step2_title: 'اتفق على الشروط', landing_step2_copy: 'تواصل مع اللاعب الآخر واتفقا على نقل السيارة داخل اللعبة.',
+        landing_step3_title: 'أكد الصفقة بوساطة', landing_step3_copy: 'في الإعلانات عبر الوسيط، يساعد المشرف على تأكيد استلام السيارة وإضافة CPM2 إلى رصيد البائع.',
+        landing_howto_note: 'ينقل اللاعبون السيارات يدوياً داخل CPM2. رصيد CPM2 سجل داخلي في هذا الموقع.',
+        landing_economy_kicker: '💲 CPM2 · اقتصاد اللعبة', landing_economy_title: 'البيع والتبادل وتسويات CPM2',
+        landing_economy_copy: 'اعرض السيارات للبيع عبر Sell، واقترح التبادل عبر Trade، وابحث عن مشترين في المجتمع. في الصفقات بوساطة المشرف، يتم تأكيد استلام السيارة في اللعبة وإضافة وحدات CPM2 داخلية للبائع.',
+        landing_economy_sell: 'تصفح البيع', landing_economy_trade: 'تصفح التبادل', landing_economy_balance: 'رصيد CPM2 الخاص بي ←',
+        landing_economy_note_title: 'تسليم السيارة يتم داخل اللعبة', landing_economy_note_copy1: 'يتفق البائع والمشتري على الشروط ثم ينقلان السيارة يدوياً في Car Parking Multiplayer 2.',
+        landing_economy_note_copy2: 'يسجل رصيد CPM2 معاملات اللعبة في هذا الموقع. وهو ليس مالاً حقيقياً ولا ينقل السيارات تلقائياً.'
+    },
+    it: {
+        landing_story_kicker: 'ABBIAMO APPENA INIZIATO', landing_story_title: 'Per non perdere l’auto che cerchi tra decine di chat',
+        landing_story_copy: 'Riuniamo i giocatori di CPM2: puoi conoscere persone, parlare nei gruppi, pubblicare un’auto in Sell o proporre uno scambio in Trade. La community cresce insieme ai giocatori e aggiungeremo nuove sezioni e funzioni nel tempo.',
+        landing_story_aside: 'Cerchi un’auto rara, ma l’offerta giusta è già scomparsa nella chat? Vogliamo rendere le offerte più facili da trovare e discutere.',
+        landing_howto_title: 'Come funziona una trattativa', landing_step1_title: 'Trova o pubblica un annuncio', landing_step1_copy: 'Scegli Sell per vendere o Trade per scambiare.',
+        landing_step2_title: 'Concorda le condizioni', landing_step2_copy: 'Contatta l’altro giocatore e accordati per il trasferimento dell’auto nel gioco.',
+        landing_step3_title: 'Conferma una trattativa con intermediario', landing_step3_copy: 'Per gli annunci con intermediario, un amministratore aiuta a confermare la ricezione dell’auto e l’accredito di CPM2 al venditore.',
+        landing_howto_note: 'I giocatori trasferiscono le auto manualmente in CPM2. Il saldo CPM2 è una registrazione interna del sito.',
+        landing_economy_kicker: '💲 CPM2 · ECONOMIA DI GIOCO', landing_economy_title: 'Sell, Trade e transazioni CPM2',
+        landing_economy_copy: 'Pubblica auto in Sell, proponi scambi in Trade e trova acquirenti nella community. Nelle trattative con intermediario, un amministratore conferma la ricezione dell’auto nel gioco e accredita unità CPM2 interne al venditore.',
+        landing_economy_sell: 'Vedi Sell', landing_economy_trade: 'Vedi Trade', landing_economy_balance: 'Il mio saldo CPM2 →',
+        landing_economy_note_title: 'L’auto si consegna nel gioco', landing_economy_note_copy1: 'Acquirente e venditore concordano le condizioni e trasferiscono l’auto manualmente in Car Parking Multiplayer 2.',
+        landing_economy_note_copy2: 'Il saldo CPM2 registra le transazioni di gioco sul sito. Non è denaro reale e non trasferisce auto automaticamente.'
+    },
+    zh: {
+        landing_story_kicker: '我们才刚刚起步', landing_story_title: '让你想要的车辆不再淹没在聊天记录中',
+        landing_story_copy: '我们把 CPM2 玩家聚集在一起：结识玩家、加入群组聊天、在 Sell 发布车辆，或通过 Trade 提出交换。社区与玩家共同成长，更多版块和功能将逐步推出。',
+        landing_story_aside: '寻找稀有车辆时，心仪的报价却已经淹没在聊天里？我们希望让车辆信息更容易查找和讨论。',
+        landing_howto_title: '交易流程', landing_step1_title: '查找或发布车辆信息', landing_step1_copy: '出售请选择 Sell，交换请选择 Trade。',
+        landing_step2_title: '协商交易条件', landing_step2_copy: '联系另一位玩家，并在游戏中商定车辆交接。',
+        landing_step3_title: '确认中介交易', landing_step3_copy: '通过中介车库发布的信息，由管理员协助确认收车并向卖家记入 CPM2。',
+        landing_howto_note: '车辆由玩家在 CPM2 游戏中手动转交。CPM2 余额是本站的内部记录。',
+        landing_economy_kicker: '💲 CPM2 · 游戏经济', landing_economy_title: 'Sell、Trade 与 CPM2 结算',
+        landing_economy_copy: '在 Sell 发布车辆，在 Trade 提出交换，并在社区寻找买家。中介交易由管理员在游戏中确认收车，并向卖家记入内部 CPM2 单位。',
+        landing_economy_sell: '查看 Sell', landing_economy_trade: '查看 Trade', landing_economy_balance: '我的 CPM2 余额 →',
+        landing_economy_note_title: '车辆在游戏中交接', landing_economy_note_copy1: '买卖双方协商条件，并在 Car Parking Multiplayer 2 中手动转交车辆。',
+        landing_economy_note_copy2: 'CPM2 余额用于记录本站的游戏交易。它不是真实货币，也不会自动转移车辆。'
+    },
+    ja: {
+        landing_story_kicker: '私たちはまだ始まったばかり', landing_story_title: '探している車がたくさんのチャットに埋もれないように',
+        landing_story_copy: 'CPM2 プレイヤーが集まる場所です。プレイヤーと知り合い、グループで交流し、Sell に車を出品したり、Trade で交換を提案したりできます。コミュニティの成長に合わせて、新しい機能を追加します。',
+        landing_story_aside: '珍しい車を探しているうちに、欲しい出品がチャットに埋もれてしまったことはありませんか？車の情報を見つけて話し合いやすくします。',
+        landing_howto_title: '取引の流れ', landing_step1_title: '出品を探す、または投稿する', landing_step1_copy: '販売は Sell、交換は Trade を選びます。',
+        landing_step2_title: '条件を相談する', landing_step2_copy: '相手のプレイヤーに連絡し、ゲーム内で車を受け渡す方法を決めます。',
+        landing_step3_title: '仲介取引を確認する', landing_step3_copy: '仲介ガレージ経由の出品では、管理者が車の受け取りと CPM2 の付与確認をサポートします。',
+        landing_howto_note: '車は CPM2 内でプレイヤーが手動で受け渡します。CPM2 残高はサイト内の記録です。',
+        landing_economy_kicker: '💲 CPM2 · ゲーム内経済', landing_economy_title: 'Sell、Trade、CPM2 の取引',
+        landing_economy_copy: 'Sell に車を出品し、Trade で交換を提案して、コミュニティで買い手を探しましょう。仲介取引では、管理者がゲーム内で車の受け取りを確認し、売り手に内部 CPM2 単位を付与します。',
+        landing_economy_sell: 'Sellを見る', landing_economy_trade: 'Tradeを見る', landing_economy_balance: 'CPM2 残高 →',
+        landing_economy_note_title: '車の受け渡しはゲーム内で行います', landing_economy_note_copy1: '買い手と売り手が条件を決め、Car Parking Multiplayer 2 内で手動で車を受け渡します。',
+        landing_economy_note_copy2: 'CPM2 残高はサイト内でゲーム取引を記録します。現金ではなく、車を自動で移動する機能もありません。'
+    }
+};
+
+Object.keys(landingStoryPhrases).forEach(function(code) {
+    var page = sitePagePhrases[code] || (sitePagePhrases[code] = {});
+    Object.keys(landingStoryPhrases[code]).forEach(function(key) { page[key] = landingStoryPhrases[code][key]; });
+});
+
 Object.keys(siteAccountPhrases).forEach(function(code) {
     var extra = window['LANG_' + code.toUpperCase() + '_EXTRA'] || {};
     Object.keys(siteAccountPhrases[code]).forEach(function(key) { extra[key] = siteAccountPhrases[code][key]; });

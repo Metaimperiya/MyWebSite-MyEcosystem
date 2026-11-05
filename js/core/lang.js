@@ -10,7 +10,7 @@ var loadedLanguageCodes = [];
 var languageLoadPromise = Promise.all(availableLanguages.map(loadLanguage)).then(function() {
     return new Promise(function(resolve) {
         var script = document.createElement('script');
-        script.src = 'js/core/languages/site-extra.js?v=2.0';
+        script.src = 'js/core/languages/site-extra.js?v=3.0';
         script.onload = function() {
             availableLanguages.forEach(function(code) {
                 var dictionary = getLanguageObject(code);
